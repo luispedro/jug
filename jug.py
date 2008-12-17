@@ -18,7 +18,10 @@ def execute_tasks():
             print 'No tasks can be run!'
             return
         for t in ready:
-            t.run()
+            if t.can_load():
+                t.load()
+            else:
+                t.run()
             tasks.remove(t)
 
 def init():
