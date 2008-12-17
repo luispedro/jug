@@ -1,4 +1,4 @@
-from data import create_directories
+from store import create_directories
 import jugfileparser
 import scheduler
 import options
