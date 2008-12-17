@@ -1,6 +1,6 @@
 def compfeats(url):
     print 'Feats called: ', url
-    return url
+    return url+'feats'
 
 def nfold(imgs, feats):
     print 'nfold called: ', imgs, feats
