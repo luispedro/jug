@@ -1,17 +1,16 @@
 from store import create_directories
-import jugfileparser
-import scheduler
 import options
+import task
 
 def parse_jugfile():
-    jugfileparser.parse('jugfile.py')
+    import jugfile
 
 def print_tasks():
-    for i,t in enumerate(scheduler.tasks):
+    for i,t in enumerate(task.alltasks):
         print 'Task %s: %s' % (i,t.name)
 
 def execute_tasks():
-    tasks = scheduler.tasks
+    tasks = task.alltasks
     while tasks:
         ready = [t for t in tasks if t.can_run()]
         if len(ready) == 0:

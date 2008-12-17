@@ -2,8 +2,10 @@ import md5
 import os
 from os.path import exists
 import pickle
+from store import atomic_pickle_dump
 import options
-from data import atomic_pickle_dump
+
+alltasks = []
 
 class Task(object):
     '''
@@ -17,12 +19,13 @@ class Task(object):
     f( *[dep() for dep in dependencies], **fkwargs)
 
     '''
-    def __init__(self,name,f,dependencies, kwdependencies):
-        self.name = name
+    def __init__(self,f,*dependencies, **kwdependencies):
+        self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
         self.dependencies = dependencies
         self.kwdependencies = kwdependencies
         self.finished = False
+        alltasks.append(self)
 
     def run(self):
         '''
@@ -49,7 +52,7 @@ class Task(object):
             if type(dep) == Task: return dep.finished
             if type(dep) == list: return all(is_available(sub) for sub in dep)
             return True # Value
-        return all(is_available(dep) for dep in (self.dependencies + self.kwdependencies.values()))
+        return all(is_available(dep) for dep in (list(self.dependencies) + self.kwdependencies.values()))
 
     def load(self):
         '''
