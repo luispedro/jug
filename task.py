@@ -1,3 +1,10 @@
+import md5
+import os
+from os.path import exists
+import pickle
+import options
+from data import atomic_pickle_dump
+
 class Task(object):
     '''
     Task
@@ -7,14 +14,14 @@ class Task(object):
 
     Defines a task, which is roughly equivalent to
 
-    f( [dep() for dep in dependencies], **fkwargs)
+    f( *[dep() for dep in dependencies], **fkwargs)
 
     '''
-    def __init__(self,name,f,dependencies,fkwargs={}):
+    def __init__(self,name,f,dependencies, kwdependencies):
         self.name = name
         self.f = f
         self.dependencies = dependencies
-        self.fkwargs = fkwargs
+        self.kwdependencies = kwdependencies
         self.finished = False
 
     def run(self):
@@ -26,9 +33,10 @@ class Task(object):
         assert self.can_run()
         assert not self.finished
         args = [value(dep) for dep in self.dependencies]
-        self.result = self.f(self.args,**self.fkwargs)
+        kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
+        self.result = self.f(*args,**kwargs)
         name = self._filename()
-        atomic_pickle_dump(name,self.result)
+        atomic_pickle_dump(self.result,name)
 
     def can_run(self):
         '''
@@ -36,7 +44,9 @@ class Task(object):
 
         Returns true if all the dependencies are finished.
         '''
-        return all(dep.finished for dep in self.dependencies)
+        def is_available(dep):
+            return type(dep) != Task or dep.finished
+        return all(is_available(dep) for dep in (self.dependencies + self.kwdependencies.values()))
 
     def load(self):
         '''
@@ -57,9 +67,13 @@ class Task(object):
     def _filename(self):
         M = md5.md5()
         for dep in self.dependencies:
-            M.update(dep._filename())
-        M.update(self.f)
-        M.update(self.fkwargs)
+            if type(dep) == Task: M.update(dep._filename())
+            else: M.update(pickle.dumps(dep))
+        for n, dep in self.kwdependencies.iteritems():
+            M.update(n)
+            if type(dep) == Task: M.update(dep._filename())
+            else: M.update(pickle.dumps(dep))
+        M.update(pickle.dumps(self.name))
         D = M.hexdigest()
         return os.path.join(options.datadir,D[0],D[1],D[2:])
 

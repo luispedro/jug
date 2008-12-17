@@ -1,7 +1,9 @@
 import pickle
-from os import path
-from os import mkdir
+import os
+from os import path, mkdir, fdopen
+from os.path import dirname
 import tempfile
+import options
 
 def create_directories(dname):
     '''
@@ -28,11 +30,11 @@ def atomic_pickle_dump(object, outname):
     # the same directory as the result.
     #
     # Don't mess unless you know what you are doing!
-    fname = tempfile.mkstemp('.pp','jugtemp',options.datadir + '/tempfiles/')
-    F = file(fname, 'w')
-    pickle.dump(F,object)
+    fd, fname = tempfile.mkstemp('.pp','jugtemp',options.datadir + '/tempfiles/')
+    F = fdopen(fd,'w')
+    pickle.dump(object,F)
     F.close()
-    create_directory(dirname(outname))
+    create_directories(dirname(outname))
     os.rename(fname,outname)
 
 def obj2fname(obj):
