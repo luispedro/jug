@@ -101,3 +101,7 @@ def value(obj):
         return tuple(value(elem) for elem in obj)
     return obj
 
+def TaskGenerator(func):
+    def ret_task(*args,**kwargs):
+        return Task(func,*args,**kwargs)
+    return ret_task
