@@ -37,6 +37,7 @@ class Task(object):
         self.result = self.f(*args,**kwargs)
         name = self._filename()
         atomic_pickle_dump(self.result,name)
+        self.finished = True
 
     def can_run(self):
         '''
@@ -45,7 +46,9 @@ class Task(object):
         Returns true if all the dependencies are finished.
         '''
         def is_available(dep):
-            return type(dep) != Task or dep.finished
+            if type(dep) == Task: return dep.finished
+            if type(dep) == list: return all(is_available(sub) for sub in dep)
+            return True # Value
         return all(is_available(dep) for dep in (self.dependencies + self.kwdependencies.values()))
 
     def load(self):
@@ -66,13 +69,21 @@ class Task(object):
 
     def _filename(self):
         M = md5.md5()
-        for dep in self.dependencies:
-            if type(dep) == Task: M.update(dep._filename())
-            else: M.update(pickle.dumps(dep))
-        for n, dep in self.kwdependencies.iteritems():
-            M.update(n)
-            if type(dep) == Task: M.update(dep._filename())
-            else: M.update(pickle.dumps(dep))
+        def update(*args):
+            if not args: return
+            names,elems = args
+            for n,e in zip(names,elems):
+                M.update(pickle.dumps(n))
+                if type(e) == Task: 
+                    M.update(e._filename())
+                elif type(e) == list:
+                    update(*zip(*enumerate(e)))
+                elif type(e) == dict:
+                    update(e.keys(),e.values())
+                else:
+                    M.update(e)
+        update(*zip(*enumerate(self.dependencies)))
+        update(*zip(*self.kwdependencies.items()))
         M.update(pickle.dumps(self.name))
         D = M.hexdigest()
         return os.path.join(options.datadir,D[0],D[1],D[2:])
@@ -81,5 +92,9 @@ def value(obj):
     if type(obj) == Task:
         assert obj.finished
         return obj.result
+    if type(obj) == list:
+        return [value(elem) for elem in obj]
+    if type(obj) == tuple:
+        return tuple(value(elem) for elem in obj)
     return obj
 
