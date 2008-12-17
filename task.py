@@ -65,7 +65,7 @@ class Task(object):
         '''
         bool = task.can_load()
         '''
-        return self.can_run() and exists(self._filename())
+        return exists(self._filename())
 
     def _filename(self):
         M = md5.md5()
@@ -81,7 +81,7 @@ class Task(object):
                 elif type(e) == dict:
                     update(e.keys(),e.values())
                 else:
-                    M.update(e)
+                    M.update(pickle.dumps(e))
         update(*zip(*enumerate(self.dependencies)))
         update(*zip(*self.kwdependencies.items()))
         M.update(pickle.dumps(self.name))

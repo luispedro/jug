@@ -7,21 +7,28 @@ def _possible_args(args,kwargs):
         if type(a) == ParamSearch:
             for v in a.values:
                 args[i] = v
-                for r in _possible_args(args,kwargs):
-                    yield r
+                for a,b in _possible_args(args,kwargs):
+                    yield list(a),b.copy()
                 return
 
     for k, v in kwargs.items():
         if type(v) == ParamSearch:
-            del kwargs[k]
             for p in v.values:
-                kwargs[v.name] = p
-                for r in _possible_args(args,kwargs):
-                    yield r
+                kwargs[k] = p
+                for a,b in _possible_args(args,kwargs):
+                    yield list(a),b.copy()
             return
     yield list(args), kwargs
 
 def convert_to_tasks(computation):
+    '''
+    tasks = convert_to_tasks(computation)
+
+    computation must be a compute object.
+
+    Returns a list of tasks that must be completed in order to
+    execute this computation.
+    '''
     from jugfileparser import Compute
     args = computation.args
     kwargs = computation.kwargs
