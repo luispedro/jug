@@ -35,3 +35,11 @@ def release(name):
     '''
     os.unlink(_fullname(name))
 
+def is_locked(name):
+    '''
+    locked = is_locked(name)
+
+    Returns whether a lock exists for name
+    '''
+    return path.exists(_fullname(name))
+

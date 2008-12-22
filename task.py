@@ -99,6 +99,9 @@ class Task(object):
     def unlock(self):
         lock.release(self._filename(hash_only=True))
 
+    def is_locked(self):
+        return lock.is_locked(self._filename(hash_only=True))
+
 def value(obj):
     if type(obj) == Task:
         assert obj.finished
