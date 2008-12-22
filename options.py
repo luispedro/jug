@@ -3,6 +3,7 @@ tempdir = jugdir + '/tempfiles/'
 lockdir = jugdir + '/locks/'
 jugfile = 'jugfile.py'
 cmd = None
+shuffle = False
 
 def parse():
     '''
@@ -12,7 +13,7 @@ def parse():
     '''
     import optparse
     parser = optparse.OptionParser()
-    parser.add_option('--shuffle',action='store',type='int',dest='shuffle')
+    parser.add_option('--shuffle',action='store',type='int',dest='shuffle',default=False)
     options,args = parser.parse_args()
     if not args:
         import sys
@@ -32,7 +33,7 @@ Options
         sys.exit(1)
     global cmd, shuffle
     cmd = args[0]
-    if options.shuffle is not None:
+    if options.shuffle is not False:
         import random
         random.seed(options.shuffle)
         shuffle = True
