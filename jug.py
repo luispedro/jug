@@ -1,5 +1,8 @@
 from collections import defaultdict
+from time import sleep
 from store import create_directories
+import sys
+import random
 import options
 import task
 import jugfile
@@ -15,9 +18,17 @@ task_names = set(t.name for t in task.alltasks)
 tasks_executed = defaultdict(int)
 tasks_loaded = defaultdict(int)
 def execute_tasks():
+    '''
+    execute_tasks()
+
+    Implement 'execute' command
+    '''
     tasks = task.alltasks
+    if options.shuffle:
+        random.shuffle(tasks)
     while tasks:
         ready = [t for t in tasks if t.can_run()]
+        any_run = False
         if len(ready) == 0:
             print 'No tasks can be run!'
             return
@@ -26,9 +37,16 @@ def execute_tasks():
                 t.load()
                 tasks_loaded[t.name] += 1
             else:
-                t.run()
-                tasks_executed[t.name] += 1
+                if not t.lock(): continue
+                try:
+                    any_run = True
+                    t.run()
+                    tasks_executed[t.name] += 1
+                finally:
+                    t.unlock()
             tasks.remove(t)
+        if not any_run:
+            sleep(4)
 
 def print_fstats():
     print '%-20s%12s%12s' %('Task name','Executed','Loaded')
@@ -40,8 +58,12 @@ def init():
     create_directories(options.tempdir)
 
 def main():
+    options.parse()
     init()
-    execute_tasks()
+    if options.cmd == 'execute':
+        execute_tasks()
+    else:
+        print >>sys.stderr, 'Unknown command: \'%s\'' % options.cmd
     print_fstats()
 
 if __name__ == '__main__':

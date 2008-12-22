@@ -4,6 +4,7 @@ from os.path import exists
 import pickle
 from store import atomic_pickle_dump
 import options
+import lock
 
 alltasks = []
 
@@ -70,7 +71,7 @@ class Task(object):
         '''
         return exists(self._filename())
 
-    def _filename(self):
+    def _filename(self,hash_only=False):
         M = md5.md5()
         def update(*args):
             if not args: return
@@ -89,13 +90,14 @@ class Task(object):
         update(*zip(*self.kwdependencies.items()))
         M.update(pickle.dumps(self.name))
         D = M.hexdigest()
+        if hash_only: return D
         return os.path.join(options.jugdir,D[0],D[1],D[2:])
 
     def lock(self):
-        return lock.get(self._filename())
+        return lock.get(self._filename(hash_only=True))
 
     def unlock(self):
-        lock.release(self._filename())
+        lock.release(self._filename(hash_only=True))
 
 def value(obj):
     if type(obj) == Task:
