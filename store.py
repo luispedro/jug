@@ -14,7 +14,10 @@ def create_directories(dname):
     if dname.endswith('/'): dname = dname[:-1]
     head, tail = path.split(dname)
     if head: create_directories(head)
-    if not path.exists(dname): mkdir(dname)
+    try:
+        mkdir(dname)
+    except OSError:
+        pass
 
 def atomic_pickle_dump(object, outname):
     '''

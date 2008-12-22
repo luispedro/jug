@@ -17,15 +17,14 @@ def get(name):
     fullname = _fullname(name)
     if exists(fullname): return False
     create_directories(path.dirname(fullname))
-    fd, fname = tempfile.mkstemp('.lock','juglock',options.lockdir)
-    F = os.fdopen(fd,'w')
-    print >>F, 'Lock', os.getpid()
-    F.close()
-    if exists(fullname):
-        os.unlink(fname)
-    else:
-        os.rename(fname, fullname)
-    return True
+    try:
+        fd = os.open(fullname,os.O_RDWR|os.O_CREAT|os.O_EXCL)
+        F = os.fdopen(fd,'w')
+        print >>F, 'Lock', os.getpid()
+        F.close()
+        return True
+    except OSError:
+        return False
 
 def release(name):
     '''
