@@ -30,7 +30,7 @@ def atomic_pickle_dump(object, outname):
     # the same directory as the result.
     #
     # Don't mess unless you know what you are doing!
-    fd, fname = tempfile.mkstemp('.pp','jugtemp',options.datadir + '/tempfiles/')
+    fd, fname = tempfile.mkstemp('.pp','jugtemp',options.tempdir)
     F = fdopen(fd,'w')
     pickle.dump(object,F)
     F.close()

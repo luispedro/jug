@@ -89,7 +89,13 @@ class Task(object):
         update(*zip(*self.kwdependencies.items()))
         M.update(pickle.dumps(self.name))
         D = M.hexdigest()
-        return os.path.join(options.datadir,D[0],D[1],D[2:])
+        return os.path.join(options.jugdir,D[0],D[1],D[2:])
+
+    def lock(self):
+        return lock.get(self._filename())
+
+    def unlock(self):
+        lock.release(self._filename())
 
 def value(obj):
     if type(obj) == Task:

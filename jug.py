@@ -37,7 +37,7 @@ def print_fstats():
         print '%-20s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
 
 def init():
-    create_directories(options.datadir + '/tempfiles')
+    create_directories(options.tempdir)
 
 def main():
     init()
