@@ -90,7 +90,7 @@ def main():
     init()
     if options.cmd == 'execute':
         execute()
-    elif options.cmd == 'print':
+    elif options.cmd == 'count':
         do_print()
     elif options.cmd == 'status':
         status()
