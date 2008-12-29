@@ -110,7 +110,7 @@ This file is called the jugfile (you should name it *jugfile.py* on the filesyst
 Jug
 ~~~
 
-So far, we have achieved seemingly little. We have turned a simple piece of sequential code into something that generates Task objects, but does not actually perform any work. The final piece is jug. Jug takes these Task objects and runs them. It's main loop is basically
+So far, we have achieved seemingly little. We have turned a simple piece of sequential code into something that generates Task objects, but does not actually perform any work. The final piece is jug. Jug takes these Task objects and runs them. Its main loop is basically
 
 ::
 
