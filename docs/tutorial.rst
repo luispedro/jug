@@ -5,7 +5,7 @@ Jug Tutorial
 What is jug?
 ------------
 
-Jug is a simple way to write easily paralelisable programs in Python. It also handles intermediate results for you.
+Jug is a simple way to write easily parallelisable programs in Python. It also handles intermediate results for you.
 
 Example
 -------
@@ -34,14 +34,14 @@ I could write the following simple code:
             bics.append(compute_bic(clusters[-1]))
     Nr_clusters = argmin(bics) // 10
 
-Very simple and solves the problem. However, if I want to take advantage of the obvious paralelisation of the problem, then I need to write much more complicated code. My traditional approach is to break this down into smaller scripts. I'd have one to compute features for some images, I'd have another to merge all the results together and do some of the clustering, and, finally, one to merge all the results of the different clusterings. These would need to be called with different parameters to explore different areas of the parameter space, so I'd have a couple of scripts just for calling the main computation scripts. Intermediate results would be saved and loaded by the different processes.
+Very simple and solves the problem. However, if I want to take advantage of the obvious parallelisation of the problem, then I need to write much more complicated code. My traditional approach is to break this down into smaller scripts. I'd have one to compute features for some images, I'd have another to merge all the results together and do some of the clustering, and, finally, one to merge all the results of the different clusterings. These would need to be called with different parameters to explore different areas of the parameter space, so I'd have a couple of scripts just for calling the main computation scripts. Intermediate results would be saved and loaded by the different processes.
 
 This has several problems. The biggest are
 
     (1) The need to manage intermediate files. These are normally files with long names like *features_for_img_0_with_parameter_P.pp*.
     (2) The code gets much more complex.
 
-There are minor issues with having to issue several jobs (and having the cluster be idle in the meanwhile), or deciding on how to partion the jobs so that they take roughly the same amount of time, but the two above are the main ones.
+There are minor issues with having to issue several jobs (and having the cluster be idle in the meanwhile), or deciding on how to partition the jobs so that they take roughly the same amount of time, but the two above are the main ones.
 
 Jug solves all these problems!
 
@@ -167,4 +167,4 @@ Here are a couple of simple improvements I plan to make at some point:
     * Stop & re-start. Currently, jug processes will exit if they can't make any progress for a while. In the future, I'd like them to be unblockable by other jug processes.
     * No result tasks. Task-like objects that don't save intermediate results.
     * Have tasks be passed inside *sets* and *dictionaries*. Maybe even *numpy* arrays! This will make jug even more like a real parallel programming language.
-
+    * If the original arguments are files on disk, then jug should check their modification date and invalidate subsequent results.
