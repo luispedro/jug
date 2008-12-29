@@ -1,0 +1,42 @@
+\documentclass{beamer}
+\usetheme{CMU}
+
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+
+\newcommand*{\True}{\mbox{True}}
+\newcommand*{\False}{\mbox{False}}
+\newcommand*{\Expected}{\ensuremath{\mathbb{E}}}
+\newcommand{\pd}[2]{\frac{\partial#1}{\partial#2}}
+\newcommand{\pdd}[2]{\frac{\partial^2 #1}{\partial #2^2}} 
+
+\newcommand*{\error}[1]{{\color{red}\textbf{#1}}}
+\newcommand*{\Assign}{\ensuremath\,:=\,}
+\newcommand*{\Dkl}{\ensuremath{D_{\text{\textsc{kl}}}}}
+\newcommand*{\vect}[1]{{\vec{#1}}}
+
+\title{<+title+>}
+\author{<+author+>}
+\institute{Joint \textsc{cmu}-Pitt PhD.\ in Computational Biology}
+%\date{}
+
+\graphicspath{{figures/}{figures/generated/}{images/}}
+
+\AtBeginSection[] % Do nothing for \subsection*
+{
+	\begin{frame}<beamer>
+		\frametitle{Outline}
+		\tableofcontents[currentsection,currentsubsection]
+	\end{frame}
+}
+
+
+\begin{document}
+\frame{\titlepage}
+<+content+>
+\end{document}
+

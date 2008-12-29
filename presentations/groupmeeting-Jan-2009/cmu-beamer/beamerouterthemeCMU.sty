@@ -1,0 +1,88 @@
+% Copyright 2006 by Lu\'is Pedro Coelho <luis@luispedro.org>
+% Copyright 2003 by Till Tantau <tantau@users.sourceforge.net>
+%
+% This program can be redistributed and/or modified under the terms
+% of the GNU Public License, version 2.
+
+\mode<presentation>
+
+\setbeamercolor*{author in head/foot}{parent=palette tertiary}
+\setbeamercolor*{title in head/foot}{parent=palette tertiary}
+\setbeamercolor*{date in head/foot}{parent=palette tertiary}
+
+\setbeamercolor*{section in head/foot}{parent=palette tertiary}
+\setbeamercolor*{subsection in head/foot}{parent=palette primary}
+
+\defbeamertemplate*{footline}{CMU theme}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex]{author in head/foot}%
+    \hspace{1ex}\usebeamerfont{author in head/foot}\insertshortauthor~~(\insertshortinstitute)\hfill$\star$\hfill
+    \usebeamerfont{title in head/foot}\insertshorttitle\hfill$\star$\hfill
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+    \tiny(\insertframenumber{} / \inserttotalframenumber)\hspace*{1ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+
+\defbeamertemplate*{headline}{CMU theme}
+{
+  \leavevmode%
+  \hbox{%
+   \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex,right]{section in head/foot}%
+    \usebeamerfont{section in head/foot}\insertnavigation{\paperwidth}\hspace*{2ex}
+   \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+
+\defbeamertemplate*{frametitle}{CMU}[1]
+{%
+ \vspace{-.2ex}%
+  \vbox{\begin{beamercolorbox}[ht=2em,wd=\paperwidth]{frametitle}%
+    \hfill%
+  \end{beamercolorbox}}%
+  \usebeamerfont{frametitle}%
+  \vspace{-1.3em}\insertframetitle%
+}
+
+\defbeamertemplate*{title page}{CMU}[1][]
+{
+  \vbox{}
+  \vfill
+  \begin{centering}
+    \begin{beamercolorbox}[sep=8pt,center,#1]{title}
+      \usebeamerfont{title}\inserttitle\par%
+      \ifx\insertsubtitle\@empty%
+      \else%
+        \vskip0.25em%
+        {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}%
+      \fi%     
+    \end{beamercolorbox}%
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=8pt,center,#1]{author}
+      \usebeamerfont{author}\insertauthor
+    \end{beamercolorbox}
+    \begin{beamercolorbox}[sep=8pt,center,#1]{institute}
+      \usebeamerfont{institute}\insertinstitute
+    \end{beamercolorbox}
+    \begin{beamercolorbox}[sep=8pt,center,#1]{date}
+      \usebeamerfont{date}\insertdate
+    \end{beamercolorbox}\vskip0.5em
+    {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
+  \end{centering}
+  \vfill
+  \hspace*{1em}\includegraphics[height=4ex]{pitt-logo}\hfill\includegraphics[height=4ex]{cmu-wordmark}\hspace*{1em}
+}
+
+\defbeamertemplate*{navigation symbols}{CMU}
+{%
+% I actually don't like them
+}
+
+\setbeamersize{text margin left=1em,text margin right=1em}
+
+\mode
+<all>

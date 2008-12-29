@@ -1,0 +1,36 @@
+% Copyright 2006 by Lu\'is Pedro Coelho <luis@luispedro.org>
+% Copyright 2003 by Till Tantau <tantau@users.sourceforge.net>
+%
+% This program can be redistributed and/or modified under the terms
+% of the GNU Public License, version 2.
+
+\mode<presentation>
+
+\DeclareOptionBeamer{shadow}[false]{\def\beamer@themeCMU@shadow{#1}}
+\ExecuteOptionsBeamer{shadow=false}
+\ProcessOptionsBeamer
+
+\mode<presentation>
+
+\defbeamertemplate{block begin}{CMU}[1][]
+{%
+  \begin{beamercolorbox}[wd=.9\textwidth,ht=2.4ex]{block title}%
+	\usebeamerfont{block title}\hspace{1em}\raisebox{.1ex}{\insertblocktitle}
+  \end{beamercolorbox}%
+}
+
+\defbeamertemplate{block end}{CMU}[1][]
+{%
+%\vspace{-2ex}%
+%  \begin{beamercolorbox}[wd=.9\textwidth,ht=.3ex]{block title}%
+%  \end{beamercolorbox}%
+%  \par
+}
+
+\setbeamertemplate{blocks}[CMU]
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{sections/subsections in toc}[ball]
+\setbeamertemplate{title page}[default][colsep=-4bp,rounded=true,shadow=\beamer@themerounded@shadow]
+\setbeamertemplate{part page}[default][colsep=-4bp,rounded=true,shadow=\beamer@themerounded@shadow]
+  
+\mode<all>
