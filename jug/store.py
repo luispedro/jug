@@ -21,7 +21,9 @@
 #
 # For additional information visit http://murphylab.web.cmu.edu or
 # send email to murphy@cmu.edu
-
+'''
+Store: handle the file-system based backstore.
+'''
 from __future__ import division
 
 import pickle

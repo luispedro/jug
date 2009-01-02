@@ -22,6 +22,20 @@
 # For additional information visit http://murphylab.web.cmu.edu or
 # send email to murphy@cmu.edu
 
+'''
+Options
+
+Variables
+---------
+
+    * jugdir: main jug directory.
+    * tempdir: directory for temporary files.
+    * lockdir: directory for lock files.
+    * jugfile: filesystem name for the Jugfile
+    * cmd: command to run.
+    * shuffle: --shuffle argument (None if not set)
+'''
+
 from __future__ import division
 
 jugdir = 'jugdata'
@@ -29,14 +43,11 @@ tempdir = jugdir + '/tempfiles/'
 lockdir = jugdir + '/locks/'
 jugfile = 'jugfile.py'
 cmd = None
-shuffle = False
+shuffle = None
 
 _Commands = ('execute','status','stats','cleanup','count')
-
-def usage():
-    import sys
-    print '''
-python %s COMMAND OPTIONS...
+_Usage_string = \
+'''python %s COMMAND OPTIONS...
 
 Possible commands:
 * execute
@@ -53,8 +64,18 @@ Possible commands:
 Options
 --shuffle[=N]
     Shuffle the task order using N as the seed (default: 0)
-''' % sys.argv[0]
+'''
+
+def usage():
+    '''
+    usage()
+
+    Print an usage string and exit.
+    '''
+    import sys
+    print _Usage_string % sys.argv[0]
     sys.exit(1)
+
 def parse():
     '''
     options.parse()
@@ -77,7 +98,7 @@ def parse():
     if options.shuffle is not False:
         import random
         random.seed(options.shuffle)
-        shuffle = True
+        shuffle = options.shuffle
 
 
 

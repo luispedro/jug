@@ -34,6 +34,11 @@ import task
 import jugfile
 
 def do_print():
+    '''
+    do_print()
+
+    Print a count of task names.
+    '''
     task_counts = defaultdict(int)
     for t in task.alltasks:
         task_counts[t.name] += 1
@@ -80,6 +85,11 @@ def execute():
         print '%-20s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
 
 def status():
+    '''
+    status()
+
+    Implements the status command.
+    '''
     tasks_ready = defaultdict(int)
     tasks_finished = defaultdict(int)
     tasks_running = defaultdict(int)
@@ -109,6 +119,11 @@ def status():
     print
 
 def init():
+    '''
+    init()
+
+    Initializes jug (creates needed directories &c).
+    '''
     create_directories(options.tempdir)
 
 def main():

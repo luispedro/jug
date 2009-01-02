@@ -21,6 +21,16 @@
 #
 # For additional information visit http://murphylab.web.cmu.edu or
 # send email to murphy@cmu.edu
+'''
+Lock: File-system based locks
+
+Functions:
+----------
+
+    * get(): acquire the lock
+    * release(): release the lock
+    * is_locked(): check lock state
+'''
 
 from __future__ import division
 
@@ -64,7 +74,9 @@ def is_locked(name):
     '''
     locked = is_locked(name)
 
-    Returns whether a lock exists for name
+    Returns whether a lock exists for name. Note that the answer can
+    be invalid by the time this function returns. Only by trying to
+    acquire the lock can you avoid race-conditions. See the get() function.
     '''
     return path.exists(_fullname(name))
 

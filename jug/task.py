@@ -21,6 +21,11 @@
 #
 # For additional information visit http://murphylab.web.cmu.edu or
 # send email to murphy@cmu.edu
+'''
+Task: contains the Task class.
+
+This is the main unit of jug.
+'''
 
 from __future__ import division
 
