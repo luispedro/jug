@@ -143,6 +143,36 @@ def value(obj):
         return tuple(value(elem) for elem in obj)
     return obj
 
+def topological_sort(tasks):
+    '''
+    topological_sort(tasks)
+
+    Sorts a list of tasks topologically in-place. The list is sorted when
+    there is never a dependency between tasks[i] and tasks[j] if i < j.
+    '''
+    sorted = []
+    def walk(task,level = 0):
+        if level > len(tasks):
+            raise ValueError, 'tasks.topological_sort: Cycle detected.'
+        for dep in list(task.dependencies) + task.kwdependencies.values():
+            if type(dep) is list:
+                for ddep in dep:
+                    if ddep in tasks:
+                        return walk(ddep, level + 1)
+            else:
+                if dep in tasks:
+                    return walk(dep, level + 1)
+        return task
+    try:
+        while tasks:
+            t = walk(tasks[0])
+            tasks.remove(t)
+            sorted.append(t)
+    finally:
+        # This ensures that even if an exception is raised, we don't lose tasks
+        tasks.extend(sorted)
+
+
 def TaskGenerator(func):
     def ret_task(*args,**kwargs):
         return Task(func,*args,**kwargs)

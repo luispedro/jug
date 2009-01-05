@@ -49,7 +49,7 @@ task_names = set(t.name for t in task.alltasks)
 tasks = task.alltasks
 def execute():
     '''
-    execute_tasks()
+    execute()
 
     Implement 'execute' command
     '''
@@ -57,27 +57,29 @@ def execute():
     tasks_loaded = defaultdict(int)
     if options.shuffle:
         random.shuffle(tasks)
-    while tasks:
-        ready = [t for t in tasks if t.can_run()]
-        any_run = False
-        if len(ready) == 0:
-            print 'No tasks can be run!'
-            return
-        for t in ready:
+    task.topological_sort(tasks)
+    for t in tasks:
+        if not t.can_run():
+            waits = [4,8,16,32,64,128,128,128,128,1024,2048]
+            for w in waits:
+                print 'waiting...', w, 'for', t.name
+                sleep(w)
+                if t.can_run(): break
+            if not t.can_run(): # This was about an hour wait
+                print 'No tasks can be run!'
+                return
+
+        if not t.lock():
             if t.can_load():
                 t.load()
                 tasks_loaded[t.name] += 1
-            else:
-                if not t.lock(): continue
-                try:
-                    any_run = True
-                    t.run()
-                    tasks_executed[t.name] += 1
-                finally:
-                    t.unlock()
-            tasks.remove(t)
-        if not any_run:
-            sleep(4)
+            print 'unable to lock', t.name
+            continue
+        try:
+            t.run()
+            tasks_executed[t.name] += 1
+        finally:
+            t.unlock()
 
     print '%-20s%12s%12s' %('Task name','Executed','Loaded')
     print ('-' * (20+12+12))
