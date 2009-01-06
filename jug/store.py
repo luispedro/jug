@@ -26,7 +26,10 @@ Store: handle the file-system based backstore.
 '''
 from __future__ import division
 
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import os
 from os import path, mkdir, fdopen
 from os.path import dirname
