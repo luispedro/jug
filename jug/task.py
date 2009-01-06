@@ -124,6 +124,14 @@ class Task(object):
         if hash_only: return D
         return os.path.join(options.jugdir,D[0],D[1],D[2:])
 
+    def __str__(self):
+        '''String representation'''
+        return 'Task: %s()' % self.name
+
+    def __repr__(self):
+        '''Detailed representation'''
+        return 'Task(%s,dependencies=%s,kwdependencies=%s)' % (self.name,self.dependencies,self.kwdependencies)
+
     def lock(self):
         return lock.get(self._filename(hash_only=True))
 
