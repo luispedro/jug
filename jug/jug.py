@@ -68,18 +68,16 @@ def execute():
             if not t.can_run(): # This was about an hour wait
                 print 'No tasks can be run!'
                 return
-
-        if not t.lock():
+        locked = t.lock()
+        try:
             if t.can_load():
                 t.load()
                 tasks_loaded[t.name] += 1
-            print 'unable to lock', t.name
-            continue
-        try:
-            t.run()
-            tasks_executed[t.name] += 1
+            elif locked:
+                t.run()
+                tasks_executed[t.name] += 1
         finally:
-            t.unlock()
+            if locked: t.unlock()
 
     print '%-20s%12s%12s' %('Task name','Executed','Loaded')
     print ('-' * (20+12+12))
