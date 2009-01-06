@@ -67,3 +67,8 @@ def test_topological_sort_kwargs():
     jug.task.topological_sort(alltasks)
     _assert_tsorted(alltasks)
 
+
+def test_load_after_run():
+    T = jug.task.Task(add1,1)
+    T.run()
+    assert T.can_load()
