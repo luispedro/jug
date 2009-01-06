@@ -22,7 +22,7 @@
 \newcommand*{\Dkl}{\ensuremath{D_{\text{\textsc{kl}}}}}
 \newcommand*{\vect}[1]{{\vec{#1}}}
 
-\title{Jug: Simple Parallel Python}
+\title{Jug: Coarse-Level Parallel Python}
 \author{Lu\'\i{}s Pedro Coelho}
 \institute{Joint \textsc{cmu}-Pitt PhD.\ in Computational Biology}
 %\date{}
@@ -80,7 +80,11 @@ Nr_clusters = argmin(bics) // 10
 \end{enumerate}
 \end{block}
 
-Too fragmented! Too many intermediate files.
+Too fragmented!
+\note{too many jobs.
+
+too many intermediate files.
+}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -95,14 +99,13 @@ Too fragmented! Too many intermediate files.
 \begin{enumerate}
 \item runcomputefeatures.py
 \item runclustering.py
-\item runpickcluster.py
 \end{enumerate}
 \end{block}
 
 \pause
 \begin{itemize}
-\item Better use of cluster.
-\item Complex code.
+\item \textbf{Pro:} Better use of cluster.
+\item \textbf{Cons:} Complex code, very error-prone.
 \end{itemize}
 \end{frame}
 
@@ -171,9 +174,9 @@ Nr_clusters(bics)
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Enter jug}
+\frametitle{Enter Jug}
 
-You give it the jugfile, it runs the tasks for you!
+You give it the Jugfile, it runs the tasks for you!
 
 \end{frame}
 \begin{frame}[fragile]
@@ -197,16 +200,14 @@ We're back where we started!
 \begin{enumerate}
 \item Automatic task-level parallelization with dependency tracking.
 \item Remember all intermediate results.
-\pause
 \item Makes writing parallel code look like writing sequential code.
-\item Re-uses intermediate results from one run to the next.
 \end{enumerate}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Jug Limitations}
 \begin{enumerate}
-\item This is still \alert{Python}.
+\item This is still \alert{Python}, not a true parallel programming language.
 \item It makes it too easy to fill up your hard disk.
 \item It is coarse level parallelization.
 \end{enumerate}
@@ -216,9 +217,9 @@ We're back where we started!
 \frametitle{Come Learn Python}
 
 \begin{itemize}
-\item \textit{Programming for Scientists}
-\item Course Number: 98-111
-\item Tue \& Thu 6.30--7.20pm SH220
+\item \textit{Programming for Scientists}.
+\item Course Number: 98-111.
+\item Tue \& Thu 6.30--7.20pm SH220.
 \end{itemize}
 \end{frame}
 
