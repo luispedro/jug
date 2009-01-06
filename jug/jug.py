@@ -31,7 +31,6 @@ import sys
 import random
 import options
 import task
-import jugfile
 
 def do_print():
     '''
@@ -45,14 +44,14 @@ def do_print():
     for tnc in task_counts.items():
         print 'Task %s: %s' % tnc
 
-task_names = set(t.name for t in task.alltasks)
-tasks = task.alltasks
 def execute():
     '''
     execute()
 
     Implement 'execute' command
     '''
+    task_names = set(t.name for t in task.alltasks)
+    tasks = task.alltasks
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
     if options.shuffle:
@@ -68,7 +67,9 @@ def execute():
             if not t.can_run(): # This was about an hour wait
                 print 'No tasks can be run!'
                 return
-        locked = t.lock()
+        locked = False
+        if not t.can_load():
+            locked = t.lock()
         try:
             if t.can_load():
                 t.load()
@@ -83,6 +84,8 @@ def execute():
     print ('-' * (20+12+12))
     for t in task_names:
         print '%-20s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
+    if not task_names:
+        print '<no tasks>'
 
 def status():
     '''
@@ -90,6 +93,8 @@ def status():
 
     Implements the status command.
     '''
+    task_names = set(t.name for t in task.alltasks)
+    tasks = task.alltasks
     tasks_ready = defaultdict(int)
     tasks_finished = defaultdict(int)
     tasks_running = defaultdict(int)
@@ -123,8 +128,13 @@ def init():
     init()
 
     Initializes jug (creates needed directories &c).
+    Imports jugfile
     '''
     create_directories(options.tempdir)
+    jugfile = options.jugfile
+    assert jugfile.endswith('.py'), 'Jugfiles must have the .py extension!'
+    jugfile = jugfile[:-len('.py')]
+    __import__(jugfile)
 
 def main():
     options.parse()

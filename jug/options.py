@@ -61,9 +61,11 @@ Possible commands:
 * stats
     Print statistics [Not implemented]
 
-Options
+Options:
 --shuffle[=N]
     Shuffle the task order using N as the seed (default: 0)
+--jugfile=JUGFILE
+    Name of the jugfile to use (if not given, use jugfile.py)
 '''
 
 def usage():
@@ -76,6 +78,16 @@ def usage():
     print _Usage_string % sys.argv[0]
     sys.exit(1)
 
+def find_jugfile(options):
+    '''
+    jugfile = find_jugfile(options)
+
+    Returns the filename of the Jugfile or None if it is not found.
+    '''
+    if options.jugfile:
+        return options.jugfile
+    return 'jugfile.py'
+
 def parse():
     '''
     options.parse()
@@ -83,9 +95,10 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global cmd, shuffle
+    global cmd, shuffle, jugfile
     parser = optparse.OptionParser()
     parser.add_option('--shuffle',action='store',type='int',dest='shuffle',default=False)
+    parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -100,6 +113,6 @@ def parse():
         random.seed(options.shuffle)
         shuffle = options.shuffle
 
-
+    jugfile = find_jugfile(options)
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
