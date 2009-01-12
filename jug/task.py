@@ -48,6 +48,10 @@ class Task(object):
 
     '''
     def __init__(self,f,*dependencies, **kwdependencies):
+        assert f.func_name != '<lambda>', '''jug.Task does not work with lambda functions!
+Write an email to the authors if you feel you have a strong reason to use them (they are a bit
+tricky to support since the general code relies on the function name)'''
+
         self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
         self.dependencies = dependencies
@@ -113,6 +117,7 @@ class Task(object):
                     update(e.keys(),e.values())
                 else:
                     M.update(pickle.dumps(e))
+        M.update(self.name)
         update(*zip(*enumerate(self.dependencies)))
         update(*zip(*self.kwdependencies.items()))
         M.update(pickle.dumps(self.name))

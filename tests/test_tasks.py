@@ -1,5 +1,8 @@
 import jug.task
-add1 = lambda x: x + 1
+def add1(x):
+    return x + 1
+def add2(x):
+    return x + 2
 
 def _assert_tsorted(tasks):
     for i in xrange(len(tasks)):
@@ -72,3 +75,18 @@ def test_load_after_run():
     T = jug.task.Task(add1,1)
     T.run()
     assert T.can_load()
+
+def test_hash_same_func():
+    T0 = jug.task.Task(add1,0)
+    T1 = jug.task.Task(add1,1)
+
+    assert T0._filename(hash_only=True) != T1._filename(hash_only=True)
+    assert T0._filename(hash_only=False) != T1._filename(hash_only=False)
+    
+def test_hash_different_func():
+    T0 = jug.task.Task(add1,0)
+    T1 = jug.task.Task(add2,0)
+
+    assert T0._filename(hash_only=True) != T1._filename(hash_only=True)
+    assert T0._filename(hash_only=False) != T1._filename(hash_only=False)
+
