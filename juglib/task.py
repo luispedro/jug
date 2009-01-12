@@ -90,7 +90,7 @@ tricky to support since the general code relies on the function name)'''
         def is_available(dep):
             if type(dep) == Task: return dep.finished
             if type(dep) == list: return all(is_available(sub) for sub in dep)
-            return True # Value
+            return True # If dependency is not list nor task, it's a literal value
         return all(is_available(dep) for dep in (list(self.dependencies) + self.kwdependencies.values()))
 
     def load(self):
