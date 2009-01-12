@@ -88,7 +88,7 @@ tricky to support since the general code relies on the function name)'''
         Returns true if all the dependencies are finished.
         '''
         def is_available(dep):
-            if type(dep) == Task: return dep.finished
+            if type(dep) == Task: return dep.finished or dep.can_load()
             if type(dep) == list: return all(is_available(sub) for sub in dep)
             return True # If dependency is not list nor task, it's a literal value
         return all(is_available(dep) for dep in (list(self.dependencies) + self.kwdependencies.values()))
@@ -164,7 +164,7 @@ tricky to support since the general code relies on the function name)'''
 
 def value(obj):
     if type(obj) == Task:
-        assert obj.finished
+        assert obj.finished or obj.can_load()
         return obj.result
     if type(obj) == list:
         return [value(elem) for elem in obj]
