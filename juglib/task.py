@@ -57,6 +57,7 @@ tricky to support since the general code relies on the function name)'''
         self.dependencies = dependencies
         self.kwdependencies = kwdependencies
         self.finished = False
+        self.loaded = False
         alltasks.append(self)
 
     def run(self):
@@ -69,10 +70,16 @@ tricky to support since the general code relies on the function name)'''
         assert not self.finished
         args = [value(dep) for dep in self.dependencies]
         kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
-        self.result = self.f(*args,**kwargs)
+        self._result = self.f(*args,**kwargs)
         name = self._filename()
-        atomic_pickle_dump(self.result,name)
+        atomic_pickle_dump(self._result,name)
         self.finished = True
+
+    def _get_result(self):
+        if not self.finished: self.load()
+        return self._result
+
+    result = property(_get_result,doc='Result value')
 
     def can_run(self):
         '''
@@ -93,7 +100,7 @@ tricky to support since the general code relies on the function name)'''
         Loads the results from file.
         '''
         assert self.can_load()
-        self.result = pickle.load(file(self._filename()))
+        self._result = pickle.load(file(self._filename()))
         self.finished = True
 
     def can_load(self):

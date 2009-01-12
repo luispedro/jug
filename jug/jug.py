@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2008, Luís Pedro Coelho <lpc@cmu.edu>
 #
@@ -20,14 +21,14 @@
 #  THE SOFTWARE.
 
 from __future__ import division
-
 from collections import defaultdict
 from time import sleep
-from store import create_directories
 import sys
 import random
-import options
-import task
+
+import juglib.options as options
+from juglib.store import create_directories
+import juglib.task as task
 
 def do_print():
     '''
