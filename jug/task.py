@@ -129,9 +129,22 @@ class Task(object):
         return 'Task(%s,dependencies=%s,kwdependencies=%s)' % (self.name,self.dependencies,self.kwdependencies)
 
     def lock(self):
+        '''
+        locked = task.lock()
+
+        Tries to lock the task for the current process.
+        Returns true if the lock was obtained.
+        '''
         return lock.get(self._filename(hash_only=True))
 
     def unlock(self):
+        '''
+        task.unlock()
+
+        Releases the lock.
+        If the lock was not held, this may remove another
+        thread's lock!
+        '''
         lock.release(self._filename(hash_only=True))
 
     def is_locked(self):
