@@ -1,4 +1,4 @@
-from jug import lock
+from juglib import lock
 def test_twice():
     assert lock.get('foo')
     assert not lock.get('foo')
