@@ -90,3 +90,18 @@ def test_hash_different_func():
     assert T0._filename(hash_only=True) != T1._filename(hash_only=True)
     assert T0._filename(hash_only=False) != T1._filename(hash_only=False)
 
+
+def test_taskgenerator():
+    @juglib.task.TaskGenerator
+    def double(x):
+        return 2*x
+    T=double(2)
+    assert type(T) == juglib.task.Task
+    assert not T.print_result
+    @juglib.task.TaskGenerator(print_result=True)
+    def square(x):
+        return x*x
+    T=square(2)
+    assert type(T) == juglib.task.Task
+    assert T.print_result
+

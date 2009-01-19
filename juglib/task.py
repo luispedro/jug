@@ -52,12 +52,17 @@ class Task(object):
 Write an email to the authors if you feel you have a strong reason to use them (they are a bit
 tricky to support since the general code relies on the function name)'''
 
+        kwargs = dict( (k,v) for k,v in kwdependencies.iteritems() if k.startswith('task_') )
+        for k in kwargs:
+            del kwdependencies[k]
+
         self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
         self.dependencies = dependencies
         self.kwdependencies = kwdependencies
         self.finished = False
         self.loaded = False
+        self.print_result = kwargs.get('task_print_result',False)
         alltasks.append(self)
 
     def run(self):
@@ -74,12 +79,15 @@ tricky to support since the general code relies on the function name)'''
         name = self._filename()
         atomic_pickle_dump(self._result,name)
         self.finished = True
+        if self.print_result:
+            print self._result
 
     def _get_result(self):
         if not self.finished: self.load()
         return self._result
 
     result = property(_get_result,doc='Result value')
+
 
     def can_run(self):
         '''
