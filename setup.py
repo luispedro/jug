@@ -41,12 +41,27 @@ It uses the filesystem to communicate between processes and
 works correctly over NFS, so you can coordinate processes on
 different machines.
 '''
+
+classifiers = [
+'Development Status :: 2 - Pre-Alpha',
+'Environment :: Console',
+'License :: OSI Approved :: MIT License',
+'Operating System :: POSIX',
+'Operating System :: OS Independent',
+'Programming Language :: Python',
+'Topic :: Scientific/Engineering',
+'Topic :: Software Development',
+]
+
 setuptools.setup(name = 'Jug',
       version = '0.2',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luís Pedro Coelho',
       author_email = 'lpc@mcu.edu',
+      license = 'MIT',
+      platforms = ['Any'],
+      classifiers = classifiers,
       url = 'http://luispedro.org/jug',
       packages = setuptools.find_packages(exclude='tests'),
       scripts = ['jug/jug.py'],
