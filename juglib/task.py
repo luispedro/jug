@@ -239,6 +239,23 @@ def topological_sort(tasks):
         # This ensures that even if an exception is raised, we don't lose tasks
         tasks.extend(sorted)
 
+def recursive_dependencies(t):
+    '''
+    for dep in recursive_dependencies(t):
+        ...
+
+    Returns a generator that lists all recursive dependencies of task
+    '''
+    if type(t) is not Task:
+        return
+    yield t
+    for dep in t.dependencies:
+        for d in recursive_dependencies(dep):
+            yield d
+    for dep in t.kwdependencies.itervalues():
+        for d in recursive_dependencies(dep):
+            yield d
+
 def TaskGenerator(*args,**kwargs):
     '''
     TaskGenerator

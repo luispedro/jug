@@ -31,6 +31,7 @@ Variables
     * cmd: command to run.
     * shuffle: --shuffle argument (None if not set)
     * aggressive_unload: --aggressive-unload
+    * invalid_name: --invalid
 '''
 from __future__ import division
 
@@ -41,8 +42,9 @@ jugfile = 'jugfile.py'
 cmd = None
 shuffle = None
 aggressive_unload = False
+invalid_name = None
 
-_Commands = ('execute','status','stats','cleanup','count')
+_Commands = ('execute','status','stats','cleanup','count','invalidate')
 _Usage_string = \
 '''python %s COMMAND OPTIONS...
 
@@ -57,6 +59,8 @@ Possible commands:
     Cleanup [Not implemented]
 * stats
     Print statistics [Not implemented]
+* invalidate
+    Invalidate the results of a task
 
 Options:
 --shuffle[=N]
@@ -65,6 +69,8 @@ Options:
     Name of the jugfile to use (if not given, use jugfile.py)
 --aggressive-unload
     Aggressively unload data from memory
+--invalid=TASK-NAME
+    Task name to invalidate (for invalidate command only)
 '''
 
 def usage():
@@ -94,17 +100,24 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global cmd, shuffle, jugfile, aggressive_unload
+    global cmd, shuffle, jugfile, aggressive_unload, invalid_name
     parser = optparse.OptionParser()
     parser.add_option('--shuffle',action='store',type='int',dest='shuffle',default=False)
     parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
+    parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     options,args = parser.parse_args()
     if not args:
         usage()
         return
     cmd = args[0]
     if cmd not in _Commands:
+        usage()
+        return
+    if options.invalid_name and cmd != 'invalidate':
+        usage()
+        return
+    if cmd == 'invalidate' and not options.invalid_name:
         usage()
         return
 
@@ -115,5 +128,6 @@ def parse():
 
     aggressive_unload = options.aggressive_unload
     jugfile = find_jugfile(options)
+    invalid_name = options.invalid_name
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

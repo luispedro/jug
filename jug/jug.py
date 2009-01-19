@@ -24,6 +24,8 @@ from __future__ import division
 from collections import defaultdict
 from time import sleep
 import sys
+import os
+import os.path
 import random
 
 import juglib.options as options
@@ -48,15 +50,16 @@ def invalidate():
 
     Implement 'invalidate' command
     '''
+    invalid_name = options.invalid_name
     invalid = set()
     tasks = task.alltasks
     for t in tasks:
         if t.name == invalid_name:
             invalid.add(t)
         else:
-            for dep in recursive_dependencies(t):
+            for dep in task.recursive_dependencies(t):
                 if type(dep) is task.Task:
-                    if dep.name == invalid.name:
+                    if dep.name == invalid_name:
                         invalid.add(t)
                         break
     if not invalid:
@@ -64,14 +67,18 @@ def invalidate():
         return
     task_counts = defaultdict(int)
     for t in invalid:
-        os.unlink(t.filename())
-        task_counts[t.name] += 1
-    print 'Tasks Invalidated'
-    print
-    print '    Task Name          Count'
-    print '----------------------------'
-    for n_c in task_counts.items():
-        print '%21s: %12s' % n_c
+        if os.path.exists(t.filename()):
+            os.unlink(t.filename())
+            task_counts[t.name] += 1
+    if sum(task_counts.values()) == 0:
+        print 'Tasks invalidated, but no results removed'
+    else:
+        print 'Tasks Invalidated'
+        print
+        print '    Task Name          Count'
+        print '----------------------------'
+        for n_c in task_counts.items():
+            print '%21s: %12s' % n_c
 
 
 def execute():
@@ -182,8 +189,10 @@ def main():
         do_print()
     elif options.cmd == 'status':
         status()
+    elif options.cmd == 'invalidate':
+        invalidate()
     else:
-        print >>sys.stderr, 'Unknown command: \'%s\'' % options.cmd
+        print >>sys.stderr, 'Jug: unknown command: \'%s\'' % options.cmd
 
 if __name__ == '__main__':
     main()
