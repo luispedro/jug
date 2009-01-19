@@ -54,7 +54,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.2',
+      version = '0.3-git',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
