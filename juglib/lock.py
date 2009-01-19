@@ -65,7 +65,10 @@ def release(name):
 
     Removes lock
     '''
-    os.unlink(_fullname(name))
+    try:
+        os.unlink(_fullname(name))
+    except:
+        pass
 
 def is_locked(name):
     '''
