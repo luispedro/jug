@@ -42,6 +42,38 @@ def do_print():
     for tnc in task_counts.items():
         print 'Task %s: %s' % tnc
 
+def invalidate():
+    '''
+    invalidate()
+
+    Implement 'invalidate' command
+    '''
+    invalid = set()
+    tasks = task.alltasks
+    for t in tasks:
+        if t.name == invalid_name:
+            invalid.add(t)
+        else:
+            for dep in recursive_dependencies(t):
+                if type(dep) is task.Task:
+                    if dep.name == invalid.name:
+                        invalid.add(t)
+                        break
+    if not invalid:
+        print 'No results invalidated.'
+        return
+    task_counts = defaultdict(int)
+    for t in invalid:
+        os.unlink(t.filename())
+        task_counts[t.name] += 1
+    print 'Tasks Invalidated'
+    print
+    print '    Task Name          Count'
+    print '----------------------------'
+    for n_c in task_counts.items():
+        print '%21s: %12s' % n_c
+
+
 def execute():
     '''
     execute()
@@ -55,6 +87,7 @@ def execute():
     if options.shuffle:
         random.shuffle(tasks)
     task.topological_sort(tasks)
+    print 'Execute start'
     for t in tasks:
         if not t.can_run():
             waits = [4,8,16,32,64,128,128,128,128,1024,2048]
@@ -70,11 +103,17 @@ def execute():
             locked = t.lock()
         try:
             if t.can_load():
-                t.load()
+                print 'Loadable %s...' % t.name
                 tasks_loaded[t.name] += 1
             elif locked:
+                print 'Executing %s...' % t.name
                 t.run()
                 tasks_executed[t.name] += 1
+                if options.aggressive_unload:
+                    t.unload_recursive()
+        except Exception, e:
+            print >>sys.stderr, 'Exception while running %s: %s' % (repr(t),e)
+            raise
         finally:
             if locked: t.unlock()
 

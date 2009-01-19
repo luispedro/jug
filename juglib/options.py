@@ -30,6 +30,7 @@ Variables
     * jugfile: filesystem name for the Jugfile
     * cmd: command to run.
     * shuffle: --shuffle argument (None if not set)
+    * aggressive_unload: --aggressive-unload
 '''
 from __future__ import division
 
@@ -39,6 +40,7 @@ lockdir = jugdir + '/locks/'
 jugfile = 'jugfile.py'
 cmd = None
 shuffle = None
+aggressive_unload = False
 
 _Commands = ('execute','status','stats','cleanup','count')
 _Usage_string = \
@@ -61,6 +63,8 @@ Options:
     Shuffle the task order using N as the seed (default: 0)
 --jugfile=JUGFILE
     Name of the jugfile to use (if not given, use jugfile.py)
+--aggressive-unload
+    Aggressively unload data from memory
 '''
 
 def usage():
@@ -90,10 +94,11 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global cmd, shuffle, jugfile
+    global cmd, shuffle, jugfile, aggressive_unload
     parser = optparse.OptionParser()
     parser.add_option('--shuffle',action='store',type='int',dest='shuffle',default=False)
     parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
+    parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -108,6 +113,7 @@ def parse():
         random.seed(options.shuffle)
         shuffle = options.shuffle
 
+    aggressive_unload = options.aggressive_unload
     jugfile = find_jugfile(options)
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

@@ -103,21 +103,51 @@ tricky to support since the general code relies on the function name)'''
 
     def load(self):
         '''
-        self.load()
+        t.load()
 
         Loads the results from file.
         '''
         assert self.can_load()
-        self._result = pickle.load(file(self._filename()))
+        self._result = pickle.load(file(self.filename()))
         self.finished = True
+
+    def unload(self):
+        '''
+        t.unload()
+
+        Unload results (can be useful for saving memory)
+        '''
+        self._result = None
+
+    def unload_recursive(self):
+        '''
+        t.unload_recursive()
+
+        '''
+        def _dependency_walk(task):
+            for dep in list(task.dependencies) + task.kwdependencies.values():
+                if type(dep) == Task:
+                    for d in _dependency_walk(dep):
+                        yield d
+                yield dep
+        for dep in _dependency_walk(self):
+            if type(dep) == Task:
+                dep.unload()
+        self.unload()
+            
 
     def can_load(self):
         '''
         bool = task.can_load()
         '''
-        return exists(self._filename())
+        return exists(self.filename())
 
-    def _filename(self,hash_only=False):
+    def filename(self,hash_only=False):
+        '''
+        fname = t.filename()
+
+        Returns the filename that holds the result of this task.
+        '''
         M = md5.md5()
         def update(*args):
             if not args: return
@@ -125,7 +155,7 @@ tricky to support since the general code relies on the function name)'''
             for n,e in zip(names,elems):
                 M.update(pickle.dumps(n))
                 if type(e) == Task: 
-                    M.update(e._filename())
+                    M.update(e.filename())
                 elif type(e) == list:
                     update(*zip(*enumerate(e)))
                 elif type(e) == dict:
@@ -155,7 +185,7 @@ tricky to support since the general code relies on the function name)'''
         Tries to lock the task for the current process.
         Returns true if the lock was obtained.
         '''
-        return lock.get(self._filename(hash_only=True))
+        return lock.get(self.filename(hash_only=True))
 
     def unlock(self):
         '''
@@ -165,10 +195,10 @@ tricky to support since the general code relies on the function name)'''
         If the lock was not held, this may remove another
         thread's lock!
         '''
-        lock.release(self._filename(hash_only=True))
+        lock.release(self.filename(hash_only=True))
 
     def is_locked(self):
-        return lock.is_locked(self._filename(hash_only=True))
+        return lock.is_locked(self.filename(hash_only=True))
 
 def value(obj):
     if type(obj) == Task:
@@ -209,9 +239,36 @@ def topological_sort(tasks):
         # This ensures that even if an exception is raised, we don't lose tasks
         tasks.extend(sorted)
 
+def TaskGenerator(*args,**kwargs):
+    '''
+    TaskGenerator
 
-def TaskGenerator(func):
-    def ret_task(*args,**kwargs):
+    Use as either
+
+    @TaskGenerator
+    def f():
+        pass
+
+    or 
+
+    @TaskGenerator(arg=1)
+    def f():
+        pass
+
+    TaskGenerator does not take any non-keyword arguments
+    '''
+    assert not (args and kwargs), '''TaskGenerator called in a weird way.'''
+    if kwargs:
+        task_args = [('task_' + k,v) for k,v in kwargs.iteritems()]
+        def task_generator(f):
+            def gen_task(*args,**kwargs):
+                kwargs.update(task_args)
+                return Task(f,*args,**kwargs)
+            return gen_task
+        return task_generator
+    assert len(args) == 1, '''TaskGenerator called in a weird way.'''
+    func = args[0]
+    def gen_task(*args,**kwargs):
         return Task(func,*args,**kwargs)
-    return ret_task
+    return gen_task
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
