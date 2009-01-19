@@ -11,7 +11,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html web pickle htmlhelp latex changes linkcheck
+.PHONY: help clean html web pickle htmlhelp latex changes linkcheck publish
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -24,6 +24,9 @@ help:
 
 clean:
 	-rm -rf build/*
+
+publish: html
+	cp -r build/html/* /var/www/jug
 
 html:
 	mkdir -p build/html build/doctrees
