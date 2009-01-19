@@ -76,7 +76,7 @@ tricky to support since the general code relies on the function name)'''
         args = [value(dep) for dep in self.dependencies]
         kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
         self._result = self.f(*args,**kwargs)
-        name = self._filename()
+        name = self.filename()
         atomic_pickle_dump(self._result,name)
         self.finished = True
         if self.print_result:
