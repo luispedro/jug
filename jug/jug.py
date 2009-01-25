@@ -143,28 +143,21 @@ def status():
     tasks_finished = defaultdict(int)
     tasks_running = defaultdict(int)
     tasks_waiting = defaultdict(int)
-    changed = True
-    while changed:
-        changed = False
-        for t in tasks:
-            if not t.finished and t.can_load():
-                tasks_finished[t.name] += 1
-                t.load()
-                changed = True
     for t in tasks:
-        if not t.finished:
-            if t.can_run():
-                if t.is_locked():
-                    tasks_running[t.name] += 1
-                else:
-                    tasks_ready[t.name] += 1
+        if t.can_load():
+            tasks_finished[t.name] += 1
+        elif t.can_run():
+            if t.is_locked():
+                tasks_running[t.name] += 1
             else:
-                tasks_waiting[t.name] += 1
+                tasks_ready[t.name] += 1
+        else:
+            tasks_waiting[t.name] += 1
 
-    print '%-20s%12s%12s%12s%12s' %('Task name','Waiting','Ready','Finished','Running')
-    print ('-' * (20+12+12+12+12))
+    print '%-40s%12s%12s%12s%12s' %('Task name','Waiting','Ready','Finished','Running')
+    print ('-' * (40+12+12+12+12))
     for t in task_names:
-        print '%-20s%12s%12s%12s%12s' % (t,tasks_waiting[t],tasks_ready[t],tasks_finished[t],tasks_running[t])
+        print '%-40s%12s%12s%12s%12s' % (t[:40],tasks_waiting[t],tasks_ready[t],tasks_finished[t],tasks_running[t])
     print
 
 def init():
