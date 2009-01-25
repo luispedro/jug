@@ -106,9 +106,8 @@ def execute():
                 print 'No tasks can be run!'
                 return
         locked = False
-        if not t.can_load():
-            locked = t.lock()
         try:
+            locked = t.lock()
             if t.can_load():
                 print 'Loadable %s...' % t.name
                 tasks_loaded[t.name] += 1
@@ -118,6 +117,8 @@ def execute():
                 tasks_executed[t.name] += 1
                 if options.aggressive_unload:
                     t.unload_recursive()
+            else:
+                print 'Already in execution %s...' % t.name
         except Exception, e:
             print >>sys.stderr, 'Exception while running %s: %s' % (repr(t),e)
             raise
