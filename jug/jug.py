@@ -159,6 +159,8 @@ def status():
     print ('-' * (40+12+12+12+12))
     for t in task_names:
         print '%-40s%12s%12s%12s%12s' % (t[:40],tasks_waiting[t],tasks_ready[t],tasks_finished[t],tasks_running[t])
+    print ('.' * (40+12+12+12+12))
+    print '%-40s%12s%12s%12s%12s' % ('Total:',sum(tasks_waiting.values()),sum(tasks_ready.values()),sum(tasks_finished.values()),sum(tasks_running.values()))
     print
 
 def init():
@@ -189,5 +191,9 @@ def main():
         print >>sys.stderr, 'Jug: unknown command: \'%s\'' % options.cmd
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception, exc:
+        print >>sys.stderr, 'Jug Error!'
+        raise
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
