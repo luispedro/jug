@@ -118,6 +118,7 @@ tricky to support since the general code relies on the function name)'''
         Unload results (can be useful for saving memory)
         '''
         self._result = None
+        self.finished = False
 
     def unload_recursive(self):
         '''

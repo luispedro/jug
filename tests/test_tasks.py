@@ -105,3 +105,14 @@ def test_taskgenerator():
     assert type(T) == juglib.task.Task
     assert T.print_result
 
+
+def test_unload():
+    T0 = juglib.task.Task(add1,0)
+    assert not T0.finished
+    assert T0.can_run()
+    T0.run()
+    assert T0.finished
+    assert T0.result == 1
+    T0.unload()
+    assert T0.result == 1
+
