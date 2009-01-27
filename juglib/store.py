@@ -30,9 +30,10 @@ except:
     import pickle
 import os
 from os import path, mkdir, fdopen
-from os.path import dirname
+from os.path import dirname, exists
 import tempfile
 import options
+from gzip import GzipFile
 
 def create_directories(dname):
     '''
@@ -62,12 +63,51 @@ def atomic_pickle_dump(object, outname):
     # the same directory as the result.
     #
     # Don't mess unless you know what you are doing!
-    fd, fname = tempfile.mkstemp('.pp','jugtemp',options.tempdir)
-    F = fdopen(fd,'w')
+
+    # Format:
+    #   If extension is .pp.gz, then it's a gzipped python pickle
+    #   If extension is .pp, then it's a python pickle
+    #   If extension is empty and file is empty, then it's None
+    if object is None:
+        create_directories(dirname(outname))
+        F=file(outname,'w')
+        F.close()
+        return
+    outname = outname + '.pp.gz'
+    fd, fname = tempfile.mkstemp('.pp.gz','jugtemp',options.tempdir)
+    os.close(fd)
+    F = GzipFile(fname,'w')
     pickle.dump(object,F)
     F.close()
     create_directories(dirname(outname))
     os.rename(fname,outname)
+dump = atomic_pickle_dump
+
+def _fsize(fname):
+    '''Returns file size'''
+    return os.stat_result(os.stat(fname)).st_size
+
+def can_load(fname):
+    '''
+    can = can_load(fname)
+
+    '''
+    return exists(fname + '.pp.gz') or exists(fname) or exists(fname + '.pp')
+
+def load(fname):
+    '''
+    obj = load(fname)
+
+    Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
+    '''
+    if exists(fname + '.pp'):
+        return pickle.load(fname + '.pp')
+    if exists(fname + '.pp.gz'):
+        return pickle.load(GzipFile(fname + '.pp.gz'))
+    elif _fsize(fname) == 0:
+        return None
+    else:
+        return pickle.load(fname)
 
 def obj2fname(obj):
     '''

@@ -27,10 +27,9 @@ This is the main unit of jug.
 from __future__ import division
 import md5
 import os
-from os.path import exists
-import pickle
-from store import atomic_pickle_dump
+import store
 import options
+import pickle
 import lock
 
 alltasks = []
@@ -77,7 +76,7 @@ tricky to support since the general code relies on the function name)'''
         kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
         self._result = self.f(*args,**kwargs)
         name = self.filename()
-        atomic_pickle_dump(self._result,name)
+        store.dump(self._result,name)
         self.finished = True
         if self.print_result:
             print self._result
@@ -108,7 +107,7 @@ tricky to support since the general code relies on the function name)'''
         Loads the results from file.
         '''
         assert self.can_load()
-        self._result = pickle.load(file(self.filename()))
+        self._result = store.load(self.filename())
         self.finished = True
 
     def unload(self):
@@ -141,7 +140,7 @@ tricky to support since the general code relies on the function name)'''
         '''
         bool = task.can_load()
         '''
-        return exists(self.filename())
+        return store.can_load(self.filename())
 
     def filename(self,hash_only=False):
         '''
