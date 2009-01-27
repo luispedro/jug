@@ -80,15 +80,15 @@ def test_hash_same_func():
     T0 = juglib.task.Task(add1,0)
     T1 = juglib.task.Task(add1,1)
 
-    assert T0._filename(hash_only=True) != T1._filename(hash_only=True)
-    assert T0._filename(hash_only=False) != T1._filename(hash_only=False)
+    assert T0.filename(hash_only=True) != T1.filename(hash_only=True)
+    assert T0.filename(hash_only=False) != T1.filename(hash_only=False)
     
 def test_hash_different_func():
     T0 = juglib.task.Task(add1,0)
     T1 = juglib.task.Task(add2,0)
 
-    assert T0._filename(hash_only=True) != T1._filename(hash_only=True)
-    assert T0._filename(hash_only=False) != T1._filename(hash_only=False)
+    assert T0.filename(hash_only=True) != T1.filename(hash_only=True)
+    assert T0.filename(hash_only=False) != T1.filename(hash_only=False)
 
 
 def test_taskgenerator():
