@@ -125,10 +125,10 @@ def execute():
         finally:
             if locked: t.unlock()
 
-    print '%-20s%12s%12s' %('Task name','Executed','Loaded')
-    print ('-' * (20+12+12))
+    print '%-40s%12s%12s' %('Task name','Executed','Loaded')
+    print ('-' * (40+12+12))
     for t in task_names:
-        print '%-20s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
+        print '%-40s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
     if not task_names:
         print '<no tasks>'
 
