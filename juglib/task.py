@@ -25,11 +25,11 @@ This is the main unit of jug.
 '''
 
 from __future__ import division
-import md5
+import hashlib
 import os
 import store
 import options
-import pickle
+import cPickle as pickle
 import lock
 
 alltasks = []
@@ -148,7 +148,7 @@ tricky to support since the general code relies on the function name)'''
 
         Returns the filename that holds the result of this task.
         '''
-        M = md5.md5()
+        M = hashlib.md5()
         def update(*args):
             if not args: return
             names,elems = args
