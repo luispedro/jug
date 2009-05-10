@@ -61,6 +61,7 @@ tricky to support since the general code relies on the function name)'''
         self.kwdependencies = kwdependencies
         self.finished = False
         self.loaded = False
+        self._can_load = False
         self.print_result = kwargs.get('task_print_result',False)
         alltasks.append(self)
 
@@ -140,7 +141,10 @@ tricky to support since the general code relies on the function name)'''
         '''
         bool = task.can_load()
         '''
-        return store.can_load(self.filename())
+        if self.finished: return True
+        if not self._can_load:
+            self._can_load = store.can_load(self.filename())
+        return self._can_load
 
     def filename(self,hash_only=False):
         '''
