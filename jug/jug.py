@@ -100,16 +100,27 @@ def execute():
     task.topological_sort(tasks)
     print 'Execute start'
     signal(SIGTERM,_sigterm)
-    for t in tasks:
-        if not t.can_run():
-            waits = [4,8,16,32,64,128,128,128,128,1024,2048]
-            for w in waits:
-                print 'waiting...', w, 'for', t.name
-                sleep(w)
-                if t.can_run(): break
-            if not t.can_run(): # This was about an hour wait
-                print 'No tasks can be run!'
-                return
+    upnext = set()
+    while tasks:
+        if not upnext:
+            if tasks[0].can_run():
+                t = tasks.pop(0)
+            else:
+                waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
+                t = None
+                for w in waits:
+                    if w:
+                        print 'waiting...', w, 'for', t.name
+                        sleep(w)
+                    for i,t_ in enumerate(tasks):
+                        if t_.can_run():
+                            t = t_
+                            del tasks[i]
+                            break
+                    if t is not None: break
+                if t is None:
+                    print 'No tasks can be run!'
+                    return
         locked = False
         try:
             locked = t.lock()
