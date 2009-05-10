@@ -110,7 +110,7 @@ def execute():
                 t = None
                 for w in waits:
                     if w:
-                        print 'waiting...', w, 'for', t.name
+                        print 'waiting...', w, 'for an open task'
                         sleep(w)
                     for i,t_ in enumerate(tasks):
                         if t_.can_run():
