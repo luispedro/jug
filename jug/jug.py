@@ -22,6 +22,7 @@
 
 from __future__ import division
 from collections import defaultdict
+from signal import signal, SIGTERM
 from time import sleep
 import sys
 import os
@@ -98,6 +99,7 @@ def execute():
         random.shuffle(tasks)
     task.topological_sort(tasks)
     print 'Execute start'
+    signal(SIGTERM,_sigterm)
     for t in tasks:
         if not t.can_run():
             waits = [4,8,16,32,64,128,128,128,128,1024,2048]
@@ -179,9 +181,13 @@ def init():
     jugfile = jugfile[:-len('.py')]
     __import__(jugfile)
 
+def _sigterm(_,__):
+    sys.exit(1)
+
 def main():
     options.parse()
     init()
+
     if options.cmd == 'execute':
         execute()
     elif options.cmd == 'count':
