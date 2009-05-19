@@ -1,0 +1,4 @@
+#!/usr/bin/python
+
+import jug.jug
+jug.jug.main()

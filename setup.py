@@ -64,7 +64,7 @@ setuptools.setup(name = 'Jug',
       classifiers = classifiers,
       url = 'http://luispedro.org/jug',
       packages = setuptools.find_packages(exclude='tests'),
-      scripts = ['jug/jug.py'],
+      scripts = ['bin/jug'],
       test_suite = 'nose.collector',
       )
 

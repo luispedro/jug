@@ -271,7 +271,7 @@ def load_recursive(elem):
 
     Loads a task object recursively.
     '''
-    if type(elem) is juglib.task.Task:
+    if type(elem) is Task:
         return elem.result
     elif type(elem) is list:
         return [load_recursive(e) for e in elem]

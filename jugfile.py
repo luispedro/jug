@@ -1,4 +1,4 @@
-from juglib.task import Task, TaskGenerator
+from jug.task import Task, TaskGenerator
 from time import sleep
 
 @TaskGenerator

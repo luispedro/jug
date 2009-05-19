@@ -29,9 +29,9 @@ import os
 import os.path
 import random
 
-import juglib.options as options
-from juglib.store import create_directories
-import juglib.task as task
+from . import options
+from . import task
+from .store import create_directories
 
 def do_print():
     '''
