@@ -265,6 +265,21 @@ def recursive_dependencies(t):
         for d in recursive_dependencies(dep):
             yield d
 
+def load_recursive(elem):
+    '''
+    value = load_recursive(task)
+
+    Loads a task object recursively.
+    '''
+    if type(elem) is juglib.task.Task:
+        return elem.result
+    elif type(elem) is list:
+        return [load_recursive(e) for e in elem]
+    elif type(elem) is dict:
+        return dict((x,load_recursive(y)) for x,y in elem.iteritems())
+    else:
+        return elem
+
 def TaskGenerator(*args,**kwargs):
     '''
     TaskGenerator
@@ -297,4 +312,5 @@ def TaskGenerator(*args,**kwargs):
     def gen_task(*args,**kwargs):
         return Task(func,*args,**kwargs)
     return gen_task
+
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
