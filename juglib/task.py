@@ -65,14 +65,18 @@ tricky to support since the general code relies on the function name)'''
         self.print_result = kwargs.get('task_print_result',False)
         alltasks.append(self)
 
-    def run(self):
+    def run(self, force=False):
         '''
-        task.run()
+        task.run(force=False)
 
         Performs the task.
+
+        Parameters
+        ----------
+          * force: if True, always run the task (even if it ran before)
         '''
         assert self.can_run()
-        assert not self.finished
+        assert False or not self.finished
         args = [value(dep) for dep in self.dependencies]
         kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
         self._result = self.f(*args,**kwargs)
@@ -81,6 +85,7 @@ tricky to support since the general code relies on the function name)'''
         self.finished = True
         if self.print_result:
             print self._result
+        return self._result
 
     def _get_result(self):
         if not self.finished: self.load()
