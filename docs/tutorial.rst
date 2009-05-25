@@ -52,7 +52,7 @@ The main unit of jug is a Task. Any function can be used to generate a Task. A T
 
 The original idea for jug was a Makefile-like environment for declaring Tasks. I have moved beyond that, but it might help you think about what Tasks are.
 
-You create a Task by giving it a function which performs the work and its arguments. The arguments can be either literal values or other tasks (in which case, the function will be called with the *result* of those tasks!). Jug also understands lists of tasks (all standard Python containers will be supported in a later version). For example, the following code declares the necessary tasks for our problem:
+You create a Task by giving it a function which performs the work and its arguments. The arguments can be either literal values or other tasks (in which case, the function will be called with the *result* of those tasks!). Jug also understands lists of tasks and dictionaries with tasks. For example, the following code declares the necessary tasks for our problem:
 
 ::
 
@@ -132,7 +132,7 @@ Intermediate and Final Results
 
 You can obtain the final results of your computation by setting up a task that saves them to disk and loading them from there. If the results of your computation are simple enough, this might be the simplest way.
 
-Another way, which is also the way to access the intermediate results if you want them, is to run the jug script and then call the *load()* method on Tasks. For example,
+Another way, which is also the way to access the intermediate results if you want them, is to run the jug script and then access the *result* property of the Task object. For example,
 
 ::
 
@@ -140,7 +140,7 @@ Another way, which is also the way to access the intermediate results if you wan
     features = [computefeatures(img,parameter=2) for img in imgs]
     ...
     
-    feature_values = [feat.load() for feat in features]
+    feature_values = [feat.result for feat in features]
 
 If the values are not accessible, this raises an exception.
 
@@ -152,7 +152,7 @@ jug is an attempt to get something that works in the setting that I have found m
 Limitations
 -----------
 
-This is not an attempt to replace MPI in any way. For code that has more merge points, this won't do. It also won't do if the individual tasks are so small that the over-head of managing them swamps out the performance gains of parallelisation. In my code, most of the times, each task takes 20 seconds to a few minutes. Just enough to make the managing time irrelevant, but fast enough that the main job can be broken into thousands of tiny pieces.
+This is not an attempt to replace MPI in any way. For code that has more merge points, this won't do. It also won't do if the individual tasks are so small that the over-head of managing them swamps out the performance gains of parallelisation. In my code, most of the times, each task takes 20 seconds to a few minutes. Just enough to make the managing time irrelevant, but fast enough that the main job can be broken into thousands of tiny pieces. As a rule of thumb, tasks that last less than 5 seconds should probably be merged together.
 
 The system makes it too easy to save all intermediate results and run out of disk space.
 
