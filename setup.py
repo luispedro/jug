@@ -43,7 +43,7 @@ different machines.
 '''
 
 classifiers = [
-'Development Status :: 2 - Pre-Alpha',
+'Development Status :: 3 - Alpha',
 'Environment :: Console',
 'License :: OSI Approved :: MIT License',
 'Operating System :: POSIX',
@@ -54,7 +54,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.3-git',
+      version = '0.4-rc0',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
