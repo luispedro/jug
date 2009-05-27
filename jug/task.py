@@ -276,6 +276,24 @@ def value(elem):
     else:
         return elem
 
+def CachedFunction(f,*args,**kwargs):
+    '''
+    value = CachedFunction(f, *args, **kwargs)
+
+    is the same as
+
+    value = Task(f, *args, **kwargs).result
+
+    That is, it calls the function if the value is available,
+    but caches the result for the future.
+    '''
+    t = Task(f,*args, **kwargs)
+    if not t.can_load():
+        if not t.can_run():
+            raise ValueError('jug.CachedFunction: unable to run task %s' % t)
+        t.run()
+    return t.result
+
 def TaskGenerator(*args,**kwargs):
     '''
     TaskGenerator
