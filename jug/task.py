@@ -47,9 +47,11 @@ class Task(object):
 
     '''
     def __init__(self,f,*dependencies, **kwdependencies):
-        assert f.func_name != '<lambda>', '''jug.Task does not work with lambda functions!
+        if f.func_name == '<lambda>':
+            raise ValueError('''jug.Task does not work with lambda functions!
+
 Write an email to the authors if you feel you have a strong reason to use them (they are a bit
-tricky to support since the general code relies on the function name)'''
+tricky to support since the general code relies on the function name)''')
 
         kwargs = dict( (k,v) for k,v in kwdependencies.iteritems() if k.startswith('task_') )
         for k in kwargs:
@@ -209,15 +211,6 @@ tricky to support since the general code relies on the function name)'''
     def is_locked(self):
         return lock.is_locked(self.filename(hash_only=True))
 
-def value(obj):
-    if type(obj) == Task:
-        assert obj.finished or obj.can_load()
-        return obj.result
-    if type(obj) == list:
-        return [value(elem) for elem in obj]
-    if type(obj) == tuple:
-        return tuple(value(elem) for elem in obj)
-    return obj
 
 def topological_sort(tasks):
     '''
@@ -265,18 +258,21 @@ def recursive_dependencies(t):
         for d in recursive_dependencies(dep):
             yield d
 
-def load_recursive(elem):
+
+def value(elem):
     '''
-    value = load_recursive(task)
+    value = value(task)
 
     Loads a task object recursively.
     '''
     if type(elem) is Task:
         return elem.result
     elif type(elem) is list:
-        return [load_recursive(e) for e in elem]
+        return [value(e) for e in elem]
+    elif type(elem) is tuple:
+        return tuple([value(e) for e in elem])
     elif type(elem) is dict:
-        return dict((x,load_recursive(y)) for x,y in elem.iteritems())
+        return dict((x,value(y)) for x,y in elem.iteritems())
     else:
         return elem
 
