@@ -40,6 +40,8 @@ tasks and run different tasks on different processors.
 It uses the filesystem to communicate between processes and
 works correctly over NFS, so you can coordinate processes on
 different machines.
+
+Jug is a pure Python implementation and should work on any platform.
 '''
 
 classifiers = [
@@ -54,7 +56,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.4-rc0',
+      version = '0.4',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
