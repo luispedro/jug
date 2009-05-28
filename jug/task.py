@@ -66,6 +66,7 @@ tricky to support since the general code relies on the function name)''')
         self._can_load = False
         self.print_result = kwargs.get('task_print_result',False)
         alltasks.append(self)
+        self.hash = None
 
     def run(self, force=False):
         '''
@@ -142,7 +143,6 @@ tricky to support since the general code relies on the function name)''')
             if type(dep) == Task:
                 dep.unload()
         self.unload()
-            
 
     def can_load(self):
         '''
@@ -159,27 +159,28 @@ tricky to support since the general code relies on the function name)''')
 
         Returns the filename that holds the result of this task.
         '''
-        M = hashlib.md5()
-        def update(*args):
-            if not args: return
-            names,elems = args
-            for n,e in zip(names,elems):
-                M.update(pickle.dumps(n))
-                if type(e) == Task: 
-                    M.update(e.filename())
-                elif type(e) == list:
-                    update(*zip(*enumerate(e)))
-                elif type(e) == dict:
-                    update(e.keys(),e.values())
-                else:
-                    M.update(pickle.dumps(e))
-        M.update(self.name)
-        update(*zip(*enumerate(self.dependencies)))
-        update(*zip(*self.kwdependencies.items()))
-        M.update(pickle.dumps(self.name))
-        D = M.hexdigest()
-        if hash_only: return D
-        return os.path.join(options.jugdir,D[0],D[1],D[2:])
+        if self.hash is None:
+            M = hashlib.md5()
+            def update(*args):
+                if not args: return
+                names,elems = args
+                for n,e in zip(names,elems):
+                    M.update(pickle.dumps(n))
+                    if type(e) == Task:
+                        M.update(e.filename())
+                    elif type(e) == list:
+                        update(*zip(*enumerate(e)))
+                    elif type(e) == dict:
+                        update(e.keys(),e.values())
+                    else:
+                        M.update(pickle.dumps(e))
+            M.update(self.name)
+            update(*zip(*enumerate(self.dependencies)))
+            update(*zip(*self.kwdependencies.items()))
+            M.update(pickle.dumps(self.name))
+            self.hash = M.hexdigest()
+        if hash_only: return self.hash
+        return os.path.join(options.jugdir,self.hash[0],self.hash[1],self.hash[2:])
 
     def __str__(self):
         '''String representation'''
@@ -304,7 +305,7 @@ def TaskGenerator(*args,**kwargs):
     def f():
         pass
 
-    or 
+    or
 
     @TaskGenerator(arg=1)
     def f():
