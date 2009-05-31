@@ -116,9 +116,14 @@ def test_unload():
     T0.unload()
     assert T0.result == 1
 
+def identity(x):
+    return x
 
 def test_cachedfunction():
-    def identity(x):
-        return x
     assert jug.task.CachedFunction(identity,123) == 123
     assert jug.task.CachedFunction(identity,'mixture') == 'mixture'
+
+def test_npyload():
+    import numpy as np
+    A = np.arange(23)
+    assert np.all(jug.task.CachedFunction(identity,A) == A)

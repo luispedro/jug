@@ -69,7 +69,7 @@ def invalidate():
     task_counts = defaultdict(int)
     for t in invalid:
         fname = t.filename()
-        possible = [fname,fname+'.pp.gz',fname+'.pp']
+        possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
         for p in possible:
             if os.path.exists(p):
                 os.unlink(p)

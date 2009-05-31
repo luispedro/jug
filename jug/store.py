@@ -28,6 +28,7 @@ try:
     import cPickle as pickle
 except:
     import pickle
+import numpy as np
 import os
 from os import path, mkdir, fdopen
 from os.path import dirname, exists
@@ -65,6 +66,7 @@ def atomic_pickle_dump(object, outname):
     # Don't mess unless you know what you are doing!
 
     # Format:
+    #   If extension is .npy.gz, then it's a gzipped numpy npy file
     #   If extension is .pp.gz, then it's a gzipped python pickle
     #   If extension is .pp, then it's a python pickle
     #   If extension is empty and file is empty, then it's None
@@ -73,11 +75,16 @@ def atomic_pickle_dump(object, outname):
         F=file(outname,'w')
         F.close()
         return
-    outname = outname + '.pp.gz'
-    fd, fname = tempfile.mkstemp('.pp.gz','jugtemp',options.tempdir)
+    extension = '.pp.gz'
+    write = pickle.dump
+    if isinstance(object, np.ndarray):
+        extension = '.npy.gz'
+        write = (lambda f,a: np.save(a,f))
+    outname = outname + extension
+    fd, fname = tempfile.mkstemp(extension,'jugtemp',options.tempdir)
     os.close(fd)
     F = GzipFile(fname,'w')
-    pickle.dump(object,F)
+    write(object,F)
     F.close()
     create_directories(dirname(outname))
     os.rename(fname,outname)
@@ -92,7 +99,7 @@ def can_load(fname):
     can = can_load(fname)
 
     '''
-    return exists(fname + '.pp.gz') or exists(fname) or exists(fname + '.pp')
+    return exists(fname + '.pp.gz') or exists(fname) or exists(fname + '.npy.gz')
 
 def load(fname):
     '''
@@ -100,12 +107,16 @@ def load(fname):
 
     Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
     '''
-    if exists(fname + '.pp'):
-        return pickle.load(fname + '.pp')
-    if exists(fname + '.pp.gz'):
-        return pickle.load(GzipFile(fname + '.pp.gz'))
-    elif _fsize(fname) == 0:
+    if exists(fname) and _fsize(fname) == 0:
         return None
+    elif exists(fname + '.pp.gz'):
+        return pickle.load(GzipFile(fname + '.pp.gz'))
+    elif exists(fname + '.pp'):
+        return pickle.load(fname + '.pp')
+    elif exists(fname + '.npy'):
+        return np.load(fname + '.npy')
+    elif exists(fname + '.npy.gz'):
+        return np.load(GzipFile(fname + '.npy.gz'))
     else:
         return pickle.load(fname)
 
