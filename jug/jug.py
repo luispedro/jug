@@ -95,36 +95,34 @@ def execute():
     tasks = task.alltasks
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
-    if options.shuffle:
-        random.shuffle(tasks)
     task.topological_sort(tasks)
     print 'Execute start'
     signal(SIGTERM,_sigterm)
-    upnext = set()
+    waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
+    upnext = []
     while tasks:
         if not upnext:
-            if tasks[0].can_run():
-                t = tasks.pop(0)
-            else:
-                waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
-                t = None
-                for w in waits:
-                    if w:
-                        print 'waiting...', w, 'for an open task'
-                        sleep(w)
-                    for i,t_ in enumerate(tasks):
-                        if t_.can_run():
-                            t = t_
-                            del tasks[i]
-                            break
-                    if t is not None: break
-                if t is None:
-                    print 'No tasks can be run!'
-                    return
+            for w in waits:
+                if w:
+                    print 'waiting...', w, 'for an open task'
+                    sleep(w)
+                upnext = [t for t in tasks if t.can_run()]
+                if upnext:
+                    for t in upnext:
+                        tasks.remove(t)
+                    break
+            if not upnext:
+                print 'No tasks can be run!'
+                return
+        t = upnext.pop(0)
+        if t.can_load():
+            print 'Loadable %s...' % t.name
+            tasks_loaded[t.name] += 1
+            continue
         locked = False
         try:
             locked = t.lock()
-            if t.can_load():
+            if t.can_load(): # This can be true if the task run between the check above and this one
                 print 'Loadable %s...' % t.name
                 tasks_loaded[t.name] += 1
             elif locked:

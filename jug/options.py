@@ -29,7 +29,6 @@ Variables
     * lockdir: directory for lock files.
     * jugfile: filesystem name for the Jugfile
     * cmd: command to run.
-    * shuffle: --shuffle argument (None if not set)
     * aggressive_unload: --aggressive-unload
     * invalid_name: --invalid
     * other_args: Arguments not captured by jug (for script use)
@@ -41,7 +40,6 @@ tempdir = jugdir + '/tempfiles/'
 lockdir = jugdir + '/locks/'
 jugfile = 'jugfile.py'
 cmd = None
-shuffle = None
 aggressive_unload = False
 invalid_name = None
 other_args = None
@@ -65,8 +63,6 @@ Possible commands:
     Invalidate the results of a task
 
 Options:
---shuffle[=N]
-    Shuffle the task order using N as the seed (default: 0)
 --jugfile=JUGFILE
     Name of the jugfile to use (if not given, use jugfile.py)
 --aggressive-unload
@@ -102,9 +98,8 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global cmd, shuffle, jugfile, aggressive_unload, invalid_name, other_args
+    global cmd, jugfile, aggressive_unload, invalid_name, other_args
     parser = optparse.OptionParser()
-    parser.add_option('--shuffle',action='store',type='int',dest='shuffle',default=False)
     parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
@@ -122,11 +117,6 @@ def parse():
     if cmd == 'invalidate' and not options.invalid_name:
         usage()
         return
-
-    if options.shuffle is not False:
-        import random
-        random.seed(options.shuffle)
-        shuffle = options.shuffle
 
     aggressive_unload = options.aggressive_unload
     jugfile = find_jugfile(options)
