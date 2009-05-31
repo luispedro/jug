@@ -134,7 +134,7 @@ def execute():
             else:
                 print 'Already in execution %s...' % t.name
         except Exception, e:
-            print >>sys.stderr, 'Exception while running %s: %s' % (repr(t),e)
+            print >>sys.stderr, 'Exception while running %s: %s' % (t.name,e)
             raise
         finally:
             if locked: t.unlock()
