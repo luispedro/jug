@@ -96,7 +96,7 @@ def execute():
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
     task.topological_sort(tasks)
-    print 'Execute start'
+    print 'Execute start (%s tasks)' % len(tasks)
     signal(SIGTERM,_sigterm)
     waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
     upnext = []
@@ -106,11 +106,12 @@ def execute():
                 if w:
                     print 'waiting...', w, 'for an open task'
                     sleep(w)
-                upnext = [t for t in tasks if t.can_run()]
-                if upnext:
-                    for t in upnext:
-                        tasks.remove(t)
-                    break
+                upnext = []
+                for t in tasks:
+                    if t.can_run():
+                        upnext.append(t)
+                        if len(upnext) > 10:
+                            break
             if not upnext:
                 print 'No tasks can be run!'
                 return
@@ -140,7 +141,7 @@ def execute():
             if locked: t.unlock()
 
     print '%-52s%12s%12s' %('Task name','Executed','Loaded')
-    print ('-' * (40+12+12))
+    print ('-' * (52+12+12))
     for t in task_names:
         print '%-52s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
     if not task_names:
