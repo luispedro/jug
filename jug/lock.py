@@ -39,7 +39,7 @@ from store import create_directories
 import tempfile
 
 def _fullname(name):
-    return path.join(options.lockdir,name[0],name[1],name[2:]+'.lock')
+    return path.join(options.lockdir,name+'.lock')
 
 def get(name):
     '''
