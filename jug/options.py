@@ -56,7 +56,7 @@ Possible commands:
 * counts:
     Simply count tasks
 * cleanup:
-    Cleanup [Not implemented]
+    Cleanup
 * stats
     Print statistics [Not implemented]
 * invalidate

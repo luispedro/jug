@@ -107,11 +107,17 @@ def execute():
                     print 'waiting...', w, 'for an open task'
                     sleep(w)
                 upnext = []
-                for t in tasks:
-                    if t.can_run():
-                        upnext.append(t)
+                i = 0
+                while i < len(tasks):
+                    if tasks[i].can_run():
+                        upnext.append(tasks[i])
+                        del tasks[i]
                         if len(upnext) > 10:
                             break
+                    else:
+                        i += 1
+                if upnext:
+                    break
             if not upnext:
                 print 'No tasks can be run!'
                 return
@@ -178,6 +184,29 @@ def status():
     print '%-40s%12s%12s%12s%12s' % ('Total:',sum(tasks_waiting.values()),sum(tasks_ready.values()),sum(tasks_finished.values()),sum(tasks_running.values()))
     print
 
+def cleanup():
+    '''
+    cleanup()
+
+    Implement 'cleanup' command
+    '''
+    tasks = task.alltasks
+    files = set()
+    for path,_,fs in os.walk('jugdata/'):
+        for f in fs:
+            files.add(path+'/'+f)
+    for t in tasks:
+        fname = t.filename()
+        possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
+        for p in possible:
+            try:
+                files.remove(p)
+            except:
+                pass
+    for f in files:
+        os.unlink(f)
+    print 'Removed %s files' % len(files)
+
 def init():
     '''
     init()
@@ -190,6 +219,7 @@ def init():
     assert jugfile.endswith('.py'), 'Jugfiles must have the .py extension!'
     jugfile = jugfile[:-len('.py')]
     __import__(jugfile)
+
 
 def _sigterm(_,__):
     sys.exit(1)
@@ -206,6 +236,8 @@ def main():
         status()
     elif options.cmd == 'invalidate':
         invalidate()
+    elif options.cmd == 'cleanup':
+        cleanup()
     else:
         print >>sys.stderr, 'Jug: unknown command: \'%s\'' % options.cmd
 
