@@ -69,6 +69,8 @@ Options:
     Aggressively unload data from memory
 --invalid=TASK-NAME
     Task name to invalidate (for invalidate command only)
+--jugdir=JUGDIR
+    Directory in which to save intermediate files
 '''
 
 def usage():
@@ -99,10 +101,12 @@ def parse():
     '''
     import optparse
     global cmd, jugfile, aggressive_unload, invalid_name, other_args
+    global jugdir, tempdir, lockdir
     parser = optparse.OptionParser()
     parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
+    parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -122,5 +126,8 @@ def parse():
     jugfile = find_jugfile(options)
     invalid_name = options.invalid_name
     other_args = args[1:]
+    jugdir = options.jugdir
+    tempdir = jugdir + '/tempfiles/'
+    lockdir = jugdir + '/locks/'
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

@@ -192,7 +192,7 @@ def cleanup():
     '''
     tasks = task.alltasks
     files = set()
-    for path,_,fs in os.walk('jugdata/'):
+    for path,_,fs in os.walk(options.jugdir):
         for f in fs:
             files.add(path+'/'+f)
     for t in tasks:
