@@ -223,7 +223,7 @@ def topological_sort(tasks):
     sorted = []
     whites = set(tasks)
     def dfs(t):
-        for dep in recursive_dependencies(t):
+        for dep in recursive_dependencies(t, 1):
             if dep in whites:
                 whites.remove(dep)
                 dfs(dep)
@@ -233,30 +233,39 @@ def topological_sort(tasks):
         dfs(next)
     tasks[:] = sorted
 
-def recursive_dependencies(t):
+def recursive_dependencies(t, max_level=-1):
     '''
-    for dep in recursive_dependencies(t):
+    for dep in recursive_dependencies(t, max_level=None):
         ...
 
     Returns a generator that lists all recursive dependencies of task
+
+    Parameters
+    ----------
+        * t: task
+        * max_level: Maximum recursion depth. Set to -1 or None for no recursion limit.
     '''
+    if max_level is None:
+        max_level = -1
     if type(t) is list:
         for d in t:
-            for dd in recursive_dependencies(d):
+            for dd in recursive_dependencies(d, max_level):
                 yield dd
         return
     if type(t) is dict:
         for d in t.itervalues():
-            for dd in recursive_dependencies(d):
+            for dd in recursive_dependencies(d, max_level):
                 yield dd
         return
     if type(t) is Task:
         yield t
+        if max_level == 0:
+            return
         for dep in t.dependencies:
-            for d in recursive_dependencies(dep):
+            for d in recursive_dependencies(dep, max_level-1):
                 yield d
         for dep in t.kwdependencies.itervalues():
-            for d in recursive_dependencies(dep):
+            for d in recursive_dependencies(dep, max_level-1):
                 yield d
 
 
