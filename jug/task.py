@@ -221,26 +221,17 @@ def topological_sort(tasks):
     there is never a dependency between tasks[i] and tasks[j] if i < j.
     '''
     sorted = []
-    def walk(task,level = 0):
-        if level > len(tasks):
-            raise ValueError, 'tasks.topological_sort: Cycle detected.'
-        for dep in list(task.dependencies) + task.kwdependencies.values():
-            if type(dep) is list:
-                for ddep in dep:
-                    if ddep in tasks:
-                        return walk(ddep, level + 1)
-            else:
-                if dep in tasks:
-                    return walk(dep, level + 1)
-        return task
-    try:
-        while tasks:
-            t = walk(tasks[0])
-            tasks.remove(t)
-            sorted.append(t)
-    finally:
-        # This ensures that even if an exception is raised, we don't lose tasks
-        tasks.extend(sorted)
+    whites = set(tasks)
+    def dfs(t):
+        for dep in recursive_dependencies(t):
+            if dep in whites:
+                whites.remove(dep)
+                dfs(dep)
+        sorted.append(t)
+    while whites:
+        next = whites.pop()
+        dfs(next)
+    tasks[:] = sorted
 
 def recursive_dependencies(t):
     '''
@@ -249,15 +240,24 @@ def recursive_dependencies(t):
 
     Returns a generator that lists all recursive dependencies of task
     '''
-    if type(t) is not Task:
+    if type(t) is list:
+        for d in t:
+            for dd in recursive_dependencies(d):
+                yield dd
         return
-    yield t
-    for dep in t.dependencies:
-        for d in recursive_dependencies(dep):
-            yield d
-    for dep in t.kwdependencies.itervalues():
-        for d in recursive_dependencies(dep):
-            yield d
+    if type(t) is dict:
+        for d in t.itervalues():
+            for dd in recursive_dependencies(d):
+                yield dd
+        return
+    if type(t) is Task:
+        yield t
+        for dep in t.dependencies:
+            for d in recursive_dependencies(dep):
+                yield d
+        for dep in t.kwdependencies.itervalues():
+            for d in recursive_dependencies(dep):
+                yield d
 
 
 def value(elem):
