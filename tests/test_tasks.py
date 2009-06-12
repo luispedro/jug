@@ -21,27 +21,33 @@ def test_topological_sort():
     
     alltasks = bases + derived
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
     
     alltasks.reverse()
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
     alltasks = bases + derived
     alltasks.reverse()
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
     alltasks = derived + bases
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
     alltasks = derived + bases + derived2
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived) + len(derived2)
     _assert_tsorted(alltasks)
 
     alltasks = derived + bases + derived2 + derived3
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived) + len(derived2) + len(derived3)
     _assert_tsorted(alltasks)
 
 def test_topological_sort_kwargs():
@@ -55,19 +61,23 @@ def test_topological_sort_kwargs():
 
     alltasks = bases + derived
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
     
     alltasks.reverse()
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
     alltasks = bases + derived
     alltasks.reverse()
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
     alltasks = derived + bases
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
 
