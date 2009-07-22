@@ -216,8 +216,9 @@ def init():
     '''
     create_directories(options.tempdir)
     jugfile = options.jugfile
-    assert jugfile.endswith('.py'), 'Jugfiles must have the .py extension!'
-    jugfile = jugfile[:-len('.py')]
+    if jugfile.endswith('.py'):
+        jugfile = jugfile[:-len('.py')]
+    
     __import__(jugfile)
 
 
