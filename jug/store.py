@@ -19,14 +19,14 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from __future__ import division
-
 '''
 Store: handle the file-system based backstore.
 '''
+from __future__ import division
+
 try:
     import cPickle as pickle
-except:
+except ImportError:
     import pickle
 import numpy as np
 import os
@@ -119,17 +119,5 @@ def load(fname):
         return np.load(GzipFile(fname + '.npy.gz'))
     else:
         return pickle.load(fname)
-
-def obj2fname(obj):
-    '''
-    fname = obj2fname(obj)
-
-    Returns the filename used to save the object obj
-    '''
-    M = md5.md5()
-    S = pickle.dumps(func,args)
-    M.update(S)
-    D = M.hexdigest()
-    return D[0] + '/' + D[1] + '/' + D[2:] + '.pp'
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
