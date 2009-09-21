@@ -100,7 +100,7 @@ def execute():
     signal(SIGTERM,_sigterm)
     waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
     upnext = []
-    while tasks:
+    while tasks or upnext:
         if not upnext:
             for w in waits:
                 if w:
