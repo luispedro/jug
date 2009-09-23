@@ -47,8 +47,9 @@ def create_directories(dname):
     if head: create_directories(head)
     try:
         mkdir(dname)
-    except OSError:
-        pass
+    except OSError, e:
+        if e.errno != os.errno.EEXIST:
+            raise
 
 def atomic_pickle_dump(object, outname):
     '''
