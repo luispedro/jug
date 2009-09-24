@@ -68,12 +68,8 @@ def invalidate():
         return
     task_counts = defaultdict(int)
     for t in invalid:
-        fname = t.filename()
-        possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
-        for p in possible:
-            if os.path.exists(p):
-                os.unlink(p)
-                task_counts[t.name] += 1
+        if store.remove(t.filename()):
+            task_counts[t.name] += 1
     if sum(task_counts.values()) == 0:
         print 'Tasks invalidated, but no results removed'
     else:

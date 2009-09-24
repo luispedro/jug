@@ -112,13 +112,29 @@ def load(fname):
         return None
     elif exists(fname + '.pp.gz'):
         return pickle.load(GzipFile(fname + '.pp.gz'))
+    elif exists(fname + '.npy.gz'):
+        return np.load(GzipFile(fname + '.npy.gz'))
     elif exists(fname + '.pp'):
         return pickle.load(fname + '.pp')
     elif exists(fname + '.npy'):
         return np.load(fname + '.npy')
-    elif exists(fname + '.npy.gz'):
-        return np.load(GzipFile(fname + '.npy.gz'))
     else:
         return pickle.load(fname)
+
+def remove(fname):
+    '''
+    was_removed = remove(fname)
+
+    Remove the entry associated with fname.
+
+    Returns whether any entry was actually removed.
+    '''
+    possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
+    for p in possible:
+        if os.path.exists(p):
+            os.unlink(p)
+            return True
+    return False
+
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
