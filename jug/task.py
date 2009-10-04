@@ -167,7 +167,7 @@ tricky to support since the general code relies on the function name)''')
                 for n,e in zip(names,elems):
                     M.update(pickle.dumps(n))
                     if type(e) == Task:
-                        M.update(e.filename())
+                        M.update(e.filename(hash_only=True))
                     elif type(e) == list:
                         update(*zip(*enumerate(e)))
                     elif type(e) == dict:
