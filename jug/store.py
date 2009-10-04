@@ -30,6 +30,7 @@ except ImportError:
     import pickle
 import numpy as np
 import os
+import errno
 from os import path, mkdir, fdopen
 from os.path import dirname, exists
 import tempfile
@@ -48,7 +49,7 @@ def create_directories(dname):
     try:
         mkdir(dname)
     except OSError, e:
-        if e.errno != os.errno.EEXIST:
+        if e.errno != errno.EEXIST:
             raise
 
 def atomic_pickle_dump(object, outname):
