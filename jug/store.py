@@ -19,14 +19,14 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from __future__ import division
-
 '''
 Store: handle the file-system based backstore.
 '''
+from __future__ import division
+
 try:
     import cPickle as pickle
-except:
+except ImportError:
     import pickle
 import numpy as np
 import os
@@ -47,8 +47,9 @@ def create_directories(dname):
     if head: create_directories(head)
     try:
         mkdir(dname)
-    except OSError:
-        pass
+    except OSError, e:
+        if e.errno != os.errno.EEXIST:
+            raise
 
 def atomic_pickle_dump(object, outname):
     '''
@@ -111,25 +112,29 @@ def load(fname):
         return None
     elif exists(fname + '.pp.gz'):
         return pickle.load(GzipFile(fname + '.pp.gz'))
+    elif exists(fname + '.npy.gz'):
+        return np.load(GzipFile(fname + '.npy.gz'))
     elif exists(fname + '.pp'):
         return pickle.load(fname + '.pp')
     elif exists(fname + '.npy'):
         return np.load(fname + '.npy')
-    elif exists(fname + '.npy.gz'):
-        return np.load(GzipFile(fname + '.npy.gz'))
     else:
         return pickle.load(fname)
 
-def obj2fname(obj):
+def remove(fname):
     '''
-    fname = obj2fname(obj)
+    was_removed = remove(fname)
 
-    Returns the filename used to save the object obj
+    Remove the entry associated with fname.
+
+    Returns whether any entry was actually removed.
     '''
-    M = md5.md5()
-    S = pickle.dumps(func,args)
-    M.update(S)
-    D = M.hexdigest()
-    return D[0] + '/' + D[1] + '/' + D[2:] + '.pp'
+    possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
+    for p in possible:
+        if os.path.exists(p):
+            os.unlink(p)
+            return True
+    return False
+
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

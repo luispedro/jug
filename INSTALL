@@ -1,0 +1,5 @@
+INSTALL
+========
+
+Follow the typical
+    python setup.py install

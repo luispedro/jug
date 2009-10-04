@@ -79,7 +79,7 @@ tricky to support since the general code relies on the function name)''')
           * force: if True, always run the task (even if it ran before)
         '''
         assert self.can_run()
-        assert False or not self.finished
+        assert force or not self.finished
         args = [value(dep) for dep in self.dependencies]
         kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
         self._result = self.f(*args,**kwargs)
@@ -167,7 +167,7 @@ tricky to support since the general code relies on the function name)''')
                 for n,e in zip(names,elems):
                     M.update(pickle.dumps(n))
                     if type(e) == Task:
-                        M.update(e.filename())
+                        M.update(e.filename(hash_only=True))
                     elif type(e) == list:
                         update(*zip(*enumerate(e)))
                     elif type(e) == dict:

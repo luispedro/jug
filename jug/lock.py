@@ -67,7 +67,7 @@ def release(name):
     '''
     try:
         os.unlink(_fullname(name))
-    except:
+    except OSError:
         pass
 
 def is_locked(name):
