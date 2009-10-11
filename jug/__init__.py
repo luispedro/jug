@@ -20,5 +20,6 @@
 #  THE SOFTWARE.
 
 from __future__ import division
+from .task import TaskGenerator, Task
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
