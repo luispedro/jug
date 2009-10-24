@@ -1,4 +1,9 @@
 import jug.task
+import jug.store
+
+
+jug.task.Task.store = jug.store.file_store('jugtest')
+
 def add1(x):
     return x + 1
 def add2(x):
@@ -90,15 +95,13 @@ def test_hash_same_func():
     T0 = jug.task.Task(add1,0)
     T1 = jug.task.Task(add1,1)
 
-    assert T0.filename(hash_only=True) != T1.filename(hash_only=True)
-    assert T0.filename(hash_only=False) != T1.filename(hash_only=False)
+    assert T0.hash() != T1.hash()
     
 def test_hash_different_func():
     T0 = jug.task.Task(add1,0)
     T1 = jug.task.Task(add2,0)
 
-    assert T0.filename(hash_only=True) != T1.filename(hash_only=True)
-    assert T0.filename(hash_only=False) != T1.filename(hash_only=False)
+    assert T0.hash() != T1.hash()
 
 
 def test_taskgenerator():

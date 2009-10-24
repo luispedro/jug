@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008, Luís Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2009, Luís Pedro Coelho <lpc@cmu.edu>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.4.1+git',
+      version = '0.4.9-git',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',

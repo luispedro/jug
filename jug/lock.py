@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008, Luís Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2009, Luís Pedro Coelho <lpc@cmu.edu>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -41,42 +41,46 @@ import tempfile
 def _fullname(name):
     return path.join(options.lockdir,name+'.lock')
 
-def get(name):
-    '''
-    get(name)
+class file_based_lock(object):
+    def __init__(self, name):
+        self.fullname = _fullname(name)
 
-    Create a lock for name in an NFS compatible way.
-    '''
-    fullname = _fullname(name)
-    if exists(fullname): return False
-    create_directories(path.dirname(fullname))
-    try:
-        fd = os.open(fullname,os.O_RDWR|os.O_CREAT|os.O_EXCL)
-        F = os.fdopen(fd,'w')
-        print >>F, 'Lock', os.getpid()
-        F.close()
-        return True
-    except OSError:
-        return False
+    def get(self):
+        '''
+        lock.get()
 
-def release(name):
-    '''
-    release(name)
+        Create a lock for name in an NFS compatible way.
+        '''
+        if exists(self.fullname): return False
+        create_directories(path.dirname(self.fullname))
+        try:
+            fd = os.open(self.fullname,os.O_RDWR|os.O_CREAT|os.O_EXCL)
+            F = os.fdopen(fd,'w')
+            print >>F, 'Lock', os.getpid()
+            F.close()
+            return True
+        except OSError:
+            return False
 
-    Removes lock
-    '''
-    try:
-        os.unlink(_fullname(name))
-    except OSError:
-        pass
+    def release(self):
+        '''
+        lock.release()
 
-def is_locked(name):
-    '''
-    locked = is_locked(name)
+        Removes lock
+        '''
+        try:
+            os.unlink(self.fullname)
+        except OSError:
+            pass
 
-    Returns whether a lock exists for name. Note that the answer can
-    be invalid by the time this function returns. Only by trying to
-    acquire the lock can you avoid race-conditions. See the get() function.
-    '''
-    return path.exists(_fullname(name))
+    def is_locked(self):
+        '''
+        locked = lock.is_locked()
+
+        Returns whether a lock exists for name. Note that the answer can
+        be invalid by the time this function returns. Only by trying to
+        acquire the lock can you avoid race-conditions. See the get() function.
+        '''
+        return path.exists(self.fullname)
+
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

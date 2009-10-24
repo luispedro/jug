@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008, Luís Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2009, Luís Pedro Coelho <lpc@cmu.edu>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ from __future__ import division
 import hashlib
 import os
 import store
-import options
 import cPickle as pickle
 import lock
 
@@ -46,6 +45,7 @@ class Task(object):
     f( *[dep() for dep in dependencies], **fkwargs)
 
     '''
+    store = None
     def __init__(self,f,*dependencies, **kwdependencies):
         if f.func_name == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
@@ -63,10 +63,11 @@ tricky to support since the general code relies on the function name)''')
         self.kwdependencies = kwdependencies
         self.finished = False
         self.loaded = False
+        self._hash = None
+        self._lock = None
         self._can_load = False
         self.print_result = kwargs.get('task_print_result',False)
         alltasks.append(self)
-        self.hash = None
 
     def run(self, force=False):
         '''
@@ -83,8 +84,8 @@ tricky to support since the general code relies on the function name)''')
         args = [value(dep) for dep in self.dependencies]
         kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
         self._result = self.f(*args,**kwargs)
-        name = self.filename()
-        store.dump(self._result,name)
+        name = self.hash()
+        self.store.dump(self._result, name)
         self.finished = True
         if self.print_result:
             print self._result
@@ -116,7 +117,7 @@ tricky to support since the general code relies on the function name)''')
         Loads the results from file.
         '''
         assert self.can_load()
-        self._result = store.load(self.filename())
+        self._result = self.store.load(self.hash())
         self.finished = True
 
     def unload(self):
@@ -150,16 +151,16 @@ tricky to support since the general code relies on the function name)''')
         '''
         if self.finished: return True
         if not self._can_load:
-            self._can_load = store.can_load(self.filename())
+            self._can_load = self.store.can_load(self.hash())
         return self._can_load
 
-    def filename(self,hash_only=False):
+    def hash(self):
         '''
-        fname = t.filename()
+        fname = t.hash()
 
-        Returns the filename that holds the result of this task.
+        Returns the hash for this task
         '''
-        if self.hash is None:
+        if self._hash is None:
             M = hashlib.md5()
             def update(*args):
                 if not args: return
@@ -167,7 +168,7 @@ tricky to support since the general code relies on the function name)''')
                 for n,e in zip(names,elems):
                     M.update(pickle.dumps(n))
                     if type(e) == Task:
-                        M.update(e.filename(hash_only=True))
+                        M.update(e.hash())
                     elif type(e) == list:
                         update(*zip(*enumerate(e)))
                     elif type(e) == dict:
@@ -178,9 +179,8 @@ tricky to support since the general code relies on the function name)''')
             update(*zip(*enumerate(self.dependencies)))
             update(*zip(*self.kwdependencies.items()))
             M.update(pickle.dumps(self.name))
-            self.hash = M.hexdigest()
-        if hash_only: return self.hash
-        return os.path.join(options.jugdir,self.hash[0],self.hash[1],self.hash[2:])
+            self._hash = M.hexdigest()
+        return self._hash
 
     def __str__(self):
         '''String representation'''
@@ -197,7 +197,9 @@ tricky to support since the general code relies on the function name)''')
         Tries to lock the task for the current process.
         Returns true if the lock was obtained.
         '''
-        return lock.get(self.filename(hash_only=True))
+        if self._lock is None:
+            self._lock = lock.file_based_lock(self.hash())
+        return self._lock.get()
 
     def unlock(self):
         '''
@@ -207,10 +209,12 @@ tricky to support since the general code relies on the function name)''')
         If the lock was not held, this may remove another
         thread's lock!
         '''
-        lock.release(self.filename(hash_only=True))
+        self._lock.release()
 
     def is_locked(self):
-        return lock.is_locked(self.filename(hash_only=True))
+        if self._lock is None:
+            self._lock = lock.file_based_lock(self.hash())
+        return self._lock.is_locked()
 
 
 def topological_sort(tasks):

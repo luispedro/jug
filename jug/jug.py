@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008, Luís Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2009, Luís Pedro Coelho <lpc@cmu.edu>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -31,11 +31,13 @@ import random
 
 from . import options
 from . import task
+from . import store
 from .store import create_directories
+from .task import Task
 
-def do_print():
+def do_print(store):
     '''
-    do_print()
+    do_print(store)
 
     Print a count of task names.
     '''
@@ -45,7 +47,7 @@ def do_print():
     for tnc in task_counts.items():
         print 'Task %s: %s' % tnc
 
-def invalidate():
+def invalidate(store):
     '''
     invalidate()
 
@@ -68,7 +70,7 @@ def invalidate():
         return
     task_counts = defaultdict(int)
     for t in invalid:
-        if store.remove(t.filename()):
+        if store.remove(t.hash()):
             task_counts[t.name] += 1
     if sum(task_counts.values()) == 0:
         print 'Tasks invalidated, but no results removed'
@@ -81,9 +83,9 @@ def invalidate():
             print '%21s: %12s' % n_c
 
 
-def execute():
+def execute(store):
     '''
-    execute()
+    execute(store)
 
     Implement 'execute' command
     '''
@@ -149,9 +151,9 @@ def execute():
     if not task_names:
         print '<no tasks>'
 
-def status():
+def status(store):
     '''
-    status()
+    status(store)
 
     Implements the status command.
     '''
@@ -180,28 +182,15 @@ def status():
     print '%-40s%12s%12s%12s%12s' % ('Total:',sum(tasks_waiting.values()),sum(tasks_ready.values()),sum(tasks_finished.values()),sum(tasks_running.values()))
     print
 
-def cleanup():
+def cleanup(store):
     '''
-    cleanup()
+    cleanup(store)
 
     Implement 'cleanup' command
     '''
     tasks = task.alltasks
-    files = set()
-    for path,_,fs in os.walk(options.jugdir):
-        for f in fs:
-            files.add(path+'/'+f)
-    for t in tasks:
-        fname = t.filename()
-        possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
-        for p in possible:
-            try:
-                files.remove(p)
-            except:
-                pass
-    for f in files:
-        os.unlink(f)
-    print 'Removed %s files' % len(files)
+    removed = store.cleanup(tasks)
+    print 'Removed %s files' % removed
 
 def init():
     '''
@@ -210,12 +199,13 @@ def init():
     Initializes jug (creates needed directories &c).
     Imports jugfile
     '''
-    create_directories(options.tempdir)
     jugfile = options.jugfile
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
-    
     __import__(jugfile)
+    filebstore = store.file_store(options.jugdir)
+    Task.store = filebstore
+    return filebstore
 
 
 def _sigterm(_,__):
@@ -223,18 +213,18 @@ def _sigterm(_,__):
 
 def main():
     options.parse()
-    init()
+    store = init()
 
     if options.cmd == 'execute':
-        execute()
+        execute(store)
     elif options.cmd == 'count':
-        do_print()
+        do_print(store)
     elif options.cmd == 'status':
-        status()
+        status(store)
     elif options.cmd == 'invalidate':
-        invalidate()
+        invalidate(store)
     elif options.cmd == 'cleanup':
-        cleanup()
+        cleanup(store)
     else:
         print >>sys.stderr, 'Jug: unknown command: \'%s\'' % options.cmd
 

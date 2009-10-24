@@ -1,18 +1,21 @@
-from jug import lock
+from jug.lock import file_based_lock
 def test_twice():
-    assert lock.get('foo')
-    assert not lock.get('foo')
-    lock.release('foo')
+    lock = file_based_lock('foo')
+    assert lock.get()
+    assert not lock.get()
+    lock.release()
 
-    assert lock.get('foo')
-    assert not lock.get('foo')
-    lock.release('foo')
+    assert lock.get()
+    assert not lock.get()
+    lock.release()
 
 def test_twolocks():
-    assert lock.get('foo')
-    assert lock.get('bar')
-    assert not lock.get('foo')
-    assert not lock.get('bar')
-    lock.release('foo')
-    lock.release('bar')
+    foo = file_based_lock('foo')
+    bar = file_based_lock('bar')
+    assert foo.get()
+    assert bar.get()
+    assert not foo.get()
+    assert not bar.get()
+    foo.release()
+    bar.release()
 
