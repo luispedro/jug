@@ -27,9 +27,7 @@ This is the main unit of jug.
 from __future__ import division
 import hashlib
 import os
-import store
 import cPickle as pickle
-import lock
 
 alltasks = []
 
@@ -198,7 +196,7 @@ tricky to support since the general code relies on the function name)''')
         Returns true if the lock was obtained.
         '''
         if self._lock is None:
-            self._lock = lock.file_based_lock(self.hash())
+            self._lock = self.store.getlock(self.hash())
         return self._lock.get()
 
     def unlock(self):
@@ -213,7 +211,7 @@ tricky to support since the general code relies on the function name)''')
 
     def is_locked(self):
         if self._lock is None:
-            self._lock = lock.file_based_lock(self.hash())
+            self._lock = self.store.getlock(self.hash())
         return self._lock.is_locked()
 
 

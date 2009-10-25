@@ -31,8 +31,7 @@ import random
 
 from . import options
 from . import task
-from . import store
-from .store import create_directories
+from . import file_based_store
 from .task import Task
 
 def do_print(store):
@@ -203,7 +202,7 @@ def init():
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
     __import__(jugfile)
-    filebstore = store.file_store(options.jugdir)
+    filebstore = file_based_store.file_store(options.jugdir)
     Task.store = filebstore
     return filebstore
 

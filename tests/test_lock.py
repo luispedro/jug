@@ -1,4 +1,5 @@
-from jug.lock import file_based_lock
+from jug.file_based_store import file_based_lock
+
 def test_twice():
     lock = file_based_lock('foo')
     assert lock.get()
