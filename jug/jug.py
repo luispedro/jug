@@ -202,7 +202,11 @@ def init():
     jugfile = options.jugfile
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
-    __import__(jugfile)
+    try:
+        __import__(jugfile)
+    except ImportError:
+        print >>sys.stderr, "Could not import file '%s'" % jugfile
+        sys.exit(1)
     jugdir = options.jugdir
     if jugdir.startswith('redis:'):
         store = redis_store.redis_store(options.jugdir)
