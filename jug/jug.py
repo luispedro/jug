@@ -32,6 +32,7 @@ import random
 from . import options
 from . import task
 from . import file_based_store
+from . import redis_store
 from .task import Task
 
 def do_print(store):
@@ -202,9 +203,13 @@ def init():
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
     __import__(jugfile)
-    filebstore = file_based_store.file_store(options.jugdir)
-    Task.store = filebstore
-    return filebstore
+    jugdir = options.jugdir
+    if jugdir.startswith('redis:'):
+        store = redis_store.redis_store(options.jugdir)
+    else:
+        store = file_based_store.file_store(options.jugdir)
+    Task.store = store
+    return store
 
 
 def _sigterm(_,__):
