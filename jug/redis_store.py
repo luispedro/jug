@@ -125,7 +125,7 @@ class redis_lock(object):
     '''
 
     def __init__(self, redis, name):
-        self.name = name
+        self.name = _lockname(name)
         self.redis = redis
         # set with preserve=True is SETNX
         self.redis.set(self.name, _NOT_LOCKED, preserve=True)
