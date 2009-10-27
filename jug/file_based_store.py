@@ -142,7 +142,7 @@ class file_store(object):
         elif exists(fname + '.npy.gz'):
             return np.load(GzipFile(fname + '.npy.gz'))
         else:
-            return pickle.load(fname)
+            return pickle.load(file(fname))
 
     def remove(self, fname):
         '''
