@@ -24,10 +24,8 @@ redis_store: store based on a redis backend
 '''
 from __future__ import division
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import re
+import cPickle as pickle
 
 try:
     import redis
@@ -39,9 +37,14 @@ except ImportError:
 
 def _resultname(name):
     return 'result:' + name
+
 def _lockname(name):
     return 'lock:' + name
-_LOCKED, _NOT_LOCKED = 0,1
+
+_NOT_LOCKED, _LOCKED = 0,1
+
+_redis_urlpat = re.compile('redis://(?P<host>[A-Za-z0-9\.]+)(?P<port>\:[0-9]+)?/')
+
 
 class redis_store(object):
     def __init__(self, url):
@@ -49,7 +52,12 @@ class redis_store(object):
         '''
         if redis is None:
             raise IOError, 'jug.redis_store: redis module is not found!'
-        self.redis = redis.Redis()
+        redis_params = {}
+        match = _redis_urlpat.match(url)
+        if match:
+            redis_params = match.groupdict()
+        print 'connecting to %s' % redis_params
+        self.redis = redis.Redis(**redis_params)
 
     def dump(self, object, outname):
         '''
@@ -125,7 +133,7 @@ class redis_lock(object):
     '''
 
     def __init__(self, redis, name):
-        self.name = _lockname(name)
+        self.name = name
         self.redis = redis
         # set with preserve=True is SETNX
         self.redis.set(self.name, _NOT_LOCKED, preserve=True)
