@@ -199,6 +199,13 @@ def init():
     Initializes jug (creates needed directories &c).
     Imports jugfile
     '''
+    jugdir = options.jugdir
+    if jugdir.startswith('redis:'):
+        store = redis_store.redis_store(options.jugdir)
+    else:
+        store = file_based_store.file_store(options.jugdir)
+    Task.store = store
+
     jugfile = options.jugfile
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
@@ -207,12 +214,6 @@ def init():
     except ImportError:
         print >>sys.stderr, "Could not import file '%s'" % jugfile
         sys.exit(1)
-    jugdir = options.jugdir
-    if jugdir.startswith('redis:'):
-        store = redis_store.redis_store(options.jugdir)
-    else:
-        store = file_based_store.file_store(options.jugdir)
-    Task.store = store
     return store
 
 
