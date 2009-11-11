@@ -37,9 +37,11 @@ Jug: A Task-Based Parallelization Framework
 Jug allows you to write code that is broken up into
 tasks and run different tasks on different processors.
 
-It uses the filesystem to communicate between processes and
-works correctly over NFS, so you can coordinate processes on
-different machines.
+It has two storage backends: One uses the filesystem to
+communicate between processes and works correctly over NFS,
+so you can coordinate processes on different machines. The
+other uses a redis database and all it needs is for different
+processes to be able to communicate with a common redis server.
 
 Jug is a pure Python implementation and should work on any platform.
 '''
