@@ -28,12 +28,18 @@ import sys
 import os
 import os.path
 import random
+import logging
 
 from . import options
 from . import task
 from . import file_based_store
 from . import redis_store
 from .task import Task
+
+silent = False
+def print_out(s):
+    if not silent:
+        print s
 
 def do_print(store):
     '''
@@ -94,7 +100,7 @@ def execute(store):
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
     task.topological_sort(tasks)
-    print 'Execute start (%s tasks)' % len(tasks)
+    logging.info('Execute start (%s tasks)' % len(tasks))
     signal(SIGTERM,_sigterm)
     waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
     upnext = []
@@ -102,7 +108,7 @@ def execute(store):
         if not upnext:
             for w in waits:
                 if w:
-                    print 'waiting...', w, 'for an open task'
+                    logging.info('waiting...', w, 'for an open task')
                     sleep(w)
                 upnext = []
                 i = 0
@@ -117,39 +123,39 @@ def execute(store):
                 if upnext:
                     break
             if not upnext:
-                print 'No tasks can be run!'
+                logging.info('No tasks can be run!')
                 return
         t = upnext.pop(0)
         if t.can_load():
-            print 'Loadable %s...' % t.name
+            logging.info('Loadable %s...' % t.name)
             tasks_loaded[t.name] += 1
             continue
         locked = False
         try:
             locked = t.lock()
             if t.can_load(): # This can be true if the task run between the check above and this one
-                print 'Loadable %s...' % t.name
+                logging.info('Loadable %s...' % t.name)
                 tasks_loaded[t.name] += 1
             elif locked:
-                print 'Executing %s...' % t.name
+                logging.info('Executing %s...' % t.name)
                 t.run()
                 tasks_executed[t.name] += 1
                 if options.aggressive_unload:
                     t.unload_recursive()
             else:
-                print 'Already in execution %s...' % t.name
+                logging.info('Already in execution %s...' % t.name)
         except Exception, e:
             print >>sys.stderr, 'Exception while running %s: %s' % (t.name,e)
             raise
         finally:
             if locked: t.unlock()
 
-    print '%-52s%12s%12s' %('Task name','Executed','Loaded')
-    print ('-' * (52+12+12))
+    print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
+    print_out('-' * (52+12+12))
     for t in task_names:
-        print '%-52s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t])
+        print_out('%-52s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t]))
     if not task_names:
-        print '<no tasks>'
+        print_out('<no tasks>')
 
 def status(store):
     '''
