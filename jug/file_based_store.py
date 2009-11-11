@@ -185,6 +185,14 @@ class file_store(object):
     def getlock(self, name):
         return file_based_lock(name)
 
+    def close(self):
+        '''
+        store.close()
+
+        Has no effect on file based stores.
+        '''
+        pass
+
 
 def _fullname(name):
     return path.join(options.lockdir,name+'.lock')
