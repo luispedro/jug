@@ -215,6 +215,7 @@ def init():
     jugfile = options.jugfile
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
+    sys.path.insert(0, os.path.abspath('.'))
     try:
         __import__(jugfile)
     except ImportError:
