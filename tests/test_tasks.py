@@ -140,3 +140,16 @@ def test_npyload():
     import numpy as np
     A = np.arange(23)
     assert np.all(jug.task.CachedFunction(identity,A) == A)
+
+@jug.task.TaskGenerator
+def double(x):
+    return 2 * x
+
+def test_value():
+    two = double(1)
+    four = double(two)
+    eight = double(four)
+    two.run()
+    four.run()
+    eight.run()
+    assert jug.task.value(eight) == 8
