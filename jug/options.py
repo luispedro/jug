@@ -29,7 +29,7 @@ Variables
     * cmd: command to run.
     * aggressive_unload: --aggressive-unload
     * invalid_name: --invalid
-    * other_args: Arguments not captured by jug (for script use)
+    * argv: Arguments not captured by jug (for script use)
 '''
 from __future__ import division
 
@@ -38,7 +38,8 @@ jugfile = 'jugfile.py'
 cmd = None
 aggressive_unload = False
 invalid_name = None
-other_args = None
+argv = None
+other_args = argv
 
 _Commands = ('execute','status','stats','cleanup','count','invalidate')
 _Usage_string = \
@@ -96,7 +97,7 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global cmd, jugfile, aggressive_unload, invalid_name, other_args
+    global cmd, jugfile, aggressive_unload, invalid_name, other_args, argv
     global jugdir
     parser = optparse.OptionParser()
     parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
@@ -121,7 +122,8 @@ def parse():
     aggressive_unload = options.aggressive_unload
     jugfile = find_jugfile(options)
     invalid_name = options.invalid_name
-    other_args = args[1:]
+    argv = args[1:]
+    other_args = argv
     jugdir = options.jugdir
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
