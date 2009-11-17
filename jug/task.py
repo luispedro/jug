@@ -105,6 +105,7 @@ tricky to support since the general code relies on the function name)''')
         def is_available(dep):
             if type(dep) == Task: return dep.finished or dep.can_load()
             if type(dep) == list: return all(is_available(sub) for sub in dep)
+            if type(dep) == dict: return is_available(dep.values())
             return True # If dependency is not list nor task, it's a literal value
         return all(is_available(dep) for dep in (list(self.dependencies) + self.kwdependencies.values()))
 
