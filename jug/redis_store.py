@@ -41,7 +41,7 @@ def _resultname(name):
 def _lockname(name):
     return 'lock:' + name
 
-_NOT_LOCKED, _LOCKED = 0,1
+_LOCKED = 1
 
 _redis_urlpat = re.compile('redis://(?P<host>[A-Za-z0-9\.]+)(?P<port>\:[0-9]+)?/')
 
@@ -135,15 +135,13 @@ class redis_lock(object):
     def __init__(self, redis, name):
         self.name = _lockname(name)
         self.redis = redis
-        # set with preserve=True is SETNX
-        self.redis.set(self.name, _NOT_LOCKED, preserve=True)
 
     def get(self):
         '''
         lock.get()
         '''
         previous = self.redis.getset(self.name, _LOCKED)
-        return previous == _NOT_LOCKED
+        return (previous is None)
 
 
     def release(self):
@@ -152,7 +150,7 @@ class redis_lock(object):
 
         Removes lock
         '''
-        self.redis.set(self.name, _NOT_LOCKED)
+        self.redis.delete(self.name)
 
     def is_locked(self):
         '''
