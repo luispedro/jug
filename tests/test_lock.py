@@ -1,7 +1,7 @@
 from jug.file_based_store import file_based_lock
 
 def test_twice():
-    lock = file_based_lock('foo')
+    lock = file_based_lock('jugtests', 'foo')
     assert lock.get()
     assert not lock.get()
     lock.release()
@@ -11,8 +11,8 @@ def test_twice():
     lock.release()
 
 def test_twolocks():
-    foo = file_based_lock('foo')
-    bar = file_based_lock('bar')
+    foo = file_based_lock('jugtests', 'foo')
+    bar = file_based_lock('jugtests', 'bar')
     assert foo.get()
     assert bar.get()
     assert not foo.get()

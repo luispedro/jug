@@ -69,12 +69,15 @@ class file_store(object):
         self.jugdir = dname
         head, tail = path.split(dname)
         if head: create_directories(head)
-        create_directories(options.tempdir)
+        create_directories(self.tempdir())
         try:
             mkdir(dname)
         except OSError, e:
             if e.errno != errno.EEXIST:
                 raise
+
+    def tempdir(self):
+        return path.join(self.jugdir, 'tempfiles')
 
     def _getfname(self, outname):
         return path.join(self.jugdir, outname[0], outname[1], outname[2:])
@@ -112,7 +115,7 @@ class file_store(object):
             extension = '.npy.gz'
             write = (lambda f,a: np.save(a,f))
         outname = outname + extension
-        fd, fname = tempfile.mkstemp(extension,'jugtemp',options.tempdir)
+        fd, fname = tempfile.mkstemp(extension, 'jugtemp', self.tempdir())
         os.close(fd)
         F = GzipFile(fname,'w')
         write(object,F)
@@ -183,7 +186,7 @@ class file_store(object):
         print 'Removed %s files' % len(files)
 
     def getlock(self, name):
-        return file_based_lock(name)
+        return file_based_lock(self.jugdir, name)
 
     def close(self):
         '''
@@ -193,9 +196,6 @@ class file_store(object):
         '''
         pass
 
-
-def _fullname(name):
-    return path.join(options.lockdir,name+'.lock')
 
 class file_based_lock(object):
     '''
@@ -209,8 +209,8 @@ class file_based_lock(object):
         * is_locked(): check lock state
     '''
 
-    def __init__(self, name):
-        self.fullname = _fullname(name)
+    def __init__(self, jugdir, name):
+        self.fullname = path.join(jugdir, 'locks', name + '.lock')
 
     def get(self):
         '''

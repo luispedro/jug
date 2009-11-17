@@ -25,8 +25,6 @@ Variables
 ---------
 
     * jugdir: main jug directory.
-    * tempdir: directory for temporary files.
-    * lockdir: directory for lock files.
     * jugfile: filesystem name for the Jugfile
     * cmd: command to run.
     * aggressive_unload: --aggressive-unload
@@ -36,8 +34,6 @@ Variables
 from __future__ import division
 
 jugdir = 'jugdata'
-tempdir = jugdir + '/tempfiles/'
-lockdir = jugdir + '/locks/'
 jugfile = 'jugfile.py'
 cmd = None
 aggressive_unload = False
@@ -101,7 +97,7 @@ def parse():
     '''
     import optparse
     global cmd, jugfile, aggressive_unload, invalid_name, other_args
-    global jugdir, tempdir, lockdir
+    global jugdir
     parser = optparse.OptionParser()
     parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
@@ -127,7 +123,5 @@ def parse():
     invalid_name = options.invalid_name
     other_args = args[1:]
     jugdir = options.jugdir
-    tempdir = jugdir + '/tempfiles/'
-    lockdir = jugdir + '/locks/'
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
