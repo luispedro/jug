@@ -198,21 +198,29 @@ def cleanup(store):
     removed = store.cleanup(tasks)
     print 'Removed %s files' % removed
 
-def init():
+def init(jugfile, jugdir, on_error='exit'):
     '''
-    init()
+    store = init(jugfile, jugdir, on_error='exit')
 
-    Initializes jug (creates needed directories &c).
+    Initializes jug (create backend connection, ...).
     Imports jugfile
+
+    Parameters
+    ----------
+    `jugfile` : jugfile to import
+    `jugdir` : jugdir to use (could be a path)
+    `on_error` : What to do if import fails (default: exit)
+
+    Returns
+    -------
+    `store` : storage object
     '''
-    jugdir = options.jugdir
     if jugdir.startswith('redis:'):
         store = redis_store.redis_store(options.jugdir)
     else:
         store = file_based_store.file_store(options.jugdir)
     Task.store = store
 
-    jugfile = options.jugfile
     if jugfile.endswith('.py'):
         jugfile = jugfile[:-len('.py')]
     sys.path.insert(0, os.path.abspath('.'))
@@ -229,7 +237,7 @@ def _sigterm(_,__):
 
 def main():
     options.parse()
-    store = init()
+    store = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
         execute(store)
