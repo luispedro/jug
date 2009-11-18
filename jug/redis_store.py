@@ -26,6 +26,7 @@ from __future__ import division
 
 import re
 import cPickle as pickle
+import logging
 
 try:
     import redis
@@ -56,7 +57,7 @@ class redis_store(object):
         match = _redis_urlpat.match(url)
         if match:
             redis_params = match.groupdict()
-        print 'connecting to %s' % redis_params
+        logging.info('connecting to %s' % redis_params)
         self.redis = redis.Redis(**redis_params)
 
     def dump(self, object, outname):

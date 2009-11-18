@@ -37,7 +37,7 @@ from . import redis_store
 from .task import Task
 
 silent = False
-def print_out(s):
+def print_out(s=''):
     if not silent:
         print s
 
@@ -51,7 +51,7 @@ def do_print(store):
     for t in task.alltasks:
         task_counts[t.name] += 1
     for tnc in task_counts.items():
-        print 'Task %s: %s' % tnc
+        print_out('Task %s: %s' % tnc)
 
 def invalidate(store):
     '''
@@ -72,21 +72,21 @@ def invalidate(store):
                         invalid.add(t)
                         break
     if not invalid:
-        print 'No results invalidated.'
+        print_out('No results invalidated.')
         return
     task_counts = defaultdict(int)
     for t in invalid:
         if store.remove(t.hash()):
             task_counts[t.name] += 1
     if sum(task_counts.values()) == 0:
-        print 'Tasks invalidated, but no results removed'
+        print_out('Tasks invalidated, but no results removed')
     else:
-        print 'Tasks Invalidated'
-        print
-        print '    Task Name          Count'
-        print '----------------------------'
+        print_out('Tasks Invalidated')
+        print_out()
+        print_out('    Task Name          Count')
+        print_out('----------------------------')
         for n_c in task_counts.items():
-            print '%21s: %12s' % n_c
+            print_out('%21s: %12s' % n_c)
 
 
 def execute(store):
@@ -180,13 +180,13 @@ def status(store):
         else:
             tasks_waiting[t.name] += 1
 
-    print '%-40s%12s%12s%12s%12s' %('Task name','Waiting','Ready','Finished','Running')
-    print ('-' * (40+12+12+12+12))
+    print_out('%-40s%12s%12s%12s%12s' % ('Task name','Waiting','Ready','Finished','Running'))
+    print_out('-' * (40+12+12+12+12))
     for t in task_names:
-        print '%-40s%12s%12s%12s%12s' % (t[:40],tasks_waiting[t],tasks_ready[t],tasks_finished[t],tasks_running[t])
-    print ('.' * (40+12+12+12+12))
-    print '%-40s%12s%12s%12s%12s' % ('Total:',sum(tasks_waiting.values()),sum(tasks_ready.values()),sum(tasks_finished.values()),sum(tasks_running.values()))
-    print
+        print_out('%-40s%12s%12s%12s%12s' % (t[:40],tasks_waiting[t],tasks_ready[t],tasks_finished[t],tasks_running[t]))
+    print_out('.' * (40+12+12+12+12))
+    print_out('%-40s%12s%12s%12s%12s' % ('Total:',sum(tasks_waiting.values()),sum(tasks_ready.values()),sum(tasks_finished.values()),sum(tasks_running.values())))
+    print_out()
 
 def cleanup(store):
     '''
@@ -196,7 +196,7 @@ def cleanup(store):
     '''
     tasks = task.alltasks
     removed = store.cleanup(tasks)
-    print 'Removed %s files' % removed
+    print_out('Removed %s files' % removed)
 
 def init(jugfile, jugdir, on_error='exit'):
     '''
@@ -227,7 +227,7 @@ def init(jugfile, jugdir, on_error='exit'):
     try:
         __import__(jugfile)
     except ImportError:
-        print >>sys.stderr, "Could not import file '%s'" % jugfile
+        logging.critical("Could not import file '%s'" % jugfile)
         sys.exit(1)
     return store
 
@@ -250,12 +250,12 @@ def main():
     elif options.cmd == 'cleanup':
         cleanup(store)
     else:
-        print >>sys.stderr, 'Jug: unknown command: \'%s\'' % options.cmd
+        logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
 
 if __name__ == '__main__':
     try:
         main()
     except Exception, exc:
-        print >>sys.stderr, 'Jug Error!'
+        logging.critical('Unhandled Jug Error!')
         raise
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
