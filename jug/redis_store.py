@@ -60,12 +60,12 @@ class redis_store(object):
         logging.info('connecting to %s' % redis_params)
         self.redis = redis.Redis(**redis_params)
 
-    def dump(self, object, outname):
+    def dump(self, object, name):
         '''
-        dump(outname, object)
+        dump(object, name)
         '''
         s = pickle.dumps(object)
-        self.redis.set(_resultname(outname), s)
+        self.redis.set(_resultname(name), s)
 
 
     def can_load(self, name):

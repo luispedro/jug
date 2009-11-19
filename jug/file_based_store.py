@@ -79,17 +79,17 @@ class file_store(object):
     def tempdir(self):
         return path.join(self.jugdir, 'tempfiles')
 
-    def _getfname(self, outname):
-        return path.join(self.jugdir, outname[0], outname[1], outname[2:])
+    def _getfname(self, name):
+        return path.join(self.jugdir, name[0], name[1], name[2:])
 
 
-    def dump(self, object, outname):
+    def dump(self, object, name):
         '''
-        dump(outname, object)
+        dump(object, name)
 
         Performs the same as
 
-        pickle.dump(object, file(outname,'w')
+        pickle.dump(object, file(name,'w')
 
         but does it in a way that is guaranteed to be atomic even over NFS.
         '''
@@ -97,7 +97,7 @@ class file_store(object):
         # the same directory as the result.
         #
         # Don't mess unless you know what you are doing!
-        outname = self._getfname(outname)
+        name = self._getfname(name)
 
         # Format:
         #   If extension is .npy.gz, then it's a gzipped numpy npy file
@@ -105,8 +105,8 @@ class file_store(object):
         #   If extension is .pp, then it's a python pickle
         #   If extension is empty and file is empty, then it's None
         if object is None:
-            create_directories(dirname(outname))
-            F=file(outname,'w')
+            create_directories(dirname(name))
+            F=file(name,'w')
             F.close()
             return
         extension = '.pp.gz'
@@ -114,14 +114,14 @@ class file_store(object):
         if isinstance(object, np.ndarray):
             extension = '.npy.gz'
             write = (lambda f,a: np.save(a,f))
-        outname = outname + extension
+        name = name + extension
         fd, fname = tempfile.mkstemp(extension, 'jugtemp', self.tempdir())
         os.close(fd)
         F = GzipFile(fname,'w')
         write(object,F)
         F.close()
-        create_directories(dirname(outname))
-        os.rename(fname,outname)
+        create_directories(dirname(name))
+        os.rename(fname, name)
 
 
     def can_load(self, fname):

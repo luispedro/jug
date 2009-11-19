@@ -26,6 +26,7 @@ Does not support multiple processes!
 '''
 from __future__ import division
 import cPickle as pickle
+from collections import defaultdict
 
 def _resultname(name):
     return 'result:' + name
@@ -39,18 +40,21 @@ class dict_store(object):
         '''
         '''
         self.store = {}
+        self.counts = defaultdict(int)
 
-    def dump(self, object, outname):
+    def dump(self, object, name):
         '''
-        dump(outname, object)
+        self.dump(object, name)
         '''
-        self.store[_resultname(outname)] = pickle.dumps(object)
+        self.store[_resultname(name)] = pickle.dumps(object)
+        self.counts['dump:' + name] += 1
 
 
     def can_load(self, name):
         '''
         can = can_load(name)
         '''
+        self.counts['exists:' + name] += 1
         return _resultname(name) in self.store
 
 
@@ -60,6 +64,7 @@ class dict_store(object):
 
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
+        self.counts['load:' + name] += 1
         return pickle.loads(self.store[_resultname(name)])
 
 
@@ -71,7 +76,9 @@ class dict_store(object):
 
         Returns whether any entry was actually removed.
         '''
+        self.counts['del:' + name] += 1
         if self.can_load(name):
+            self.counts['true-del:' + name] += 1
             del self.store[_resultname(name)]
 
 
@@ -92,7 +99,7 @@ class dict_store(object):
 
 
     def getlock(self, name):
-        return dict_lock(self.store, name)
+        return dict_lock(self.store, self.counts, name)
 
 
     def close(self):
@@ -112,14 +119,17 @@ class dict_lock(object):
         * is_locked(): check lock state
     '''
 
-    def __init__(self, store, name):
+    def __init__(self, store, counts, name):
         self.name = _lockname(name)
         self.store = store
+        self.counts = counts
 
     def get(self):
         '''
         lock.get()
         '''
+
+        self.counts['lock:' + self.name] += 1
 
         previous = self.store.get(self.name, _NOT_LOCKED)
         self.store[self.name] = _LOCKED
@@ -132,12 +142,14 @@ class dict_lock(object):
 
         Removes lock
         '''
+        self.counts['unlock:' + self.name] += 1
         del self.store[self.name]
 
     def is_locked(self):
         '''
         locked = lock.is_locked()
         '''
+        self.counts['islock:' + self.name] += 1
         return (self.store.get(self.name, _NOT_LOCKED) == _LOCKED)
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
