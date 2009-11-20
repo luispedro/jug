@@ -28,7 +28,7 @@ def test_stores():
         store.close()
 
     functions = (test_load_get, test_lock)
-    stores = (lambda: jug.redis_store.redis_store('redis:'), lambda: jug.file_based_store.file_store('jugtest'), jug.dict_store.dict_store)
+    stores = (lambda: jug.redis_store.redis_store('redis:'), lambda: jug.file_based_store.file_store('jugtests'), jug.dict_store.dict_store)
     for f in functions:
         for s in stores:
             yield f, s()
