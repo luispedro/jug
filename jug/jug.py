@@ -52,13 +52,12 @@ def do_print(store):
     for tnc in task_counts.items():
         print_out('Task %s: %s' % tnc)
 
-def invalidate(store):
+def invalidate(store, invalid_name):
     '''
     invalidate()
 
     Implement 'invalidate' command
     '''
-    invalid_name = options.invalid_name
     invalid = set()
     tasks = task.alltasks
     for t in tasks:
@@ -88,9 +87,9 @@ def invalidate(store):
             print_out('%21s: %12s' % n_c)
 
 
-def execute(store):
+def execute(store, aggressive_unload=False):
     '''
-    execute(store)
+    execute(store, aggressive_unload=False)
 
     Implement 'execute' command
     '''
@@ -135,7 +134,7 @@ def execute(store):
                     logging.info('Executing %s...' % t.name)
                     t.run()
                     tasks_executed[t.name] += 1
-                    if options.aggressive_unload:
+                    if aggressive_unload:
                         t.unload_recursive()
                 else:
                     logging.info('Already in execution %s...' % t.name)
@@ -232,13 +231,13 @@ def main():
     store = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
-        execute(store)
+        execute(store, options.aggressive_unload)
     elif options.cmd == 'count':
         do_print(store)
     elif options.cmd == 'status':
         status(store)
     elif options.cmd == 'invalidate':
-        invalidate(store)
+        invalidate(store, options.invalid_name)
     elif options.cmd == 'cleanup':
         cleanup(store)
     else:

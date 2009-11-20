@@ -97,32 +97,32 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global cmd, jugfile, aggressive_unload, invalid_name, other_args, argv
-    global jugdir
+    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, other_args
     parser = optparse.OptionParser()
-    parser.add_option('--jugfile',action='store',type='string',dest='jugfile',default=None)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
-    options,args = parser.parse_args()
+    opts,args = parser.parse_args()
     if not args:
         usage()
         return
-    cmd = args[0]
+    cmd = args.pop(0)
+    jugfile = args.pop(0)
     if cmd not in _Commands:
         usage()
         return
-    if options.invalid_name and cmd != 'invalidate':
+    if opts.invalid_name and cmd != 'invalidate':
         usage()
         return
-    if cmd == 'invalidate' and not options.invalid_name:
+    if cmd == 'invalidate' and not opts.invalid_name:
         usage()
         return
 
-    aggressive_unload = options.aggressive_unload
-    jugfile = find_jugfile(options)
+    cmd = cmd
+    aggressive_unload = opts.aggressive_unload
+    jugfile = find_jugfile(jugfile)
     invalid_name = options.invalid_name
-    argv = args[1:]
+    argv = args
     other_args = argv
     jugdir = options.jugdir
 
