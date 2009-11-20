@@ -34,6 +34,7 @@ from os.path import dirname, exists
 import errno
 import tempfile
 import numpy as np
+import shutil
 from gzip import GzipFile
 
 def _fsize(fname):
@@ -194,6 +195,10 @@ class file_store(object):
         Has no effect on file based stores.
         '''
         pass
+
+    @staticmethod
+    def remove_store(jugdir):
+        shutil.rmtree(jugdir)
 
 
 class file_based_lock(object):
