@@ -32,7 +32,7 @@ try:
     import redis
 except ImportError:
     try:
-        from .thirdparty import redis
+        from ..thirdparty import redis
     except ImportError:
         redis = None
 

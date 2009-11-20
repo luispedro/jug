@@ -33,7 +33,6 @@ from os import path, mkdir, fdopen
 from os.path import dirname, exists
 import errno
 import tempfile
-import options
 import numpy as np
 from gzip import GzipFile
 

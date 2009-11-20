@@ -1,6 +1,6 @@
-import jug.redis_store
-import jug.file_based_store
-import jug.dict_store
+import jug.backends.redis_store
+import jug.backends.file_store
+import jug.backends.dict_store
 import pickle
 
 def test_stores():
@@ -28,7 +28,7 @@ def test_stores():
         store.close()
 
     functions = (test_load_get, test_lock)
-    stores = (lambda: jug.redis_store.redis_store('redis:'), lambda: jug.file_based_store.file_store('jugtests'), jug.dict_store.dict_store)
+    stores = (lambda: jug.redis_store.redis_store('redis:'), lambda: jug.backends.file_store.file_store('jugtests'), jug.backends.dict_store.dict_store)
     for f in functions:
         for s in stores:
             yield f, s()

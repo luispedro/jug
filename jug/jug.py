@@ -32,8 +32,7 @@ import logging
 
 from . import options
 from . import task
-from . import file_based_store
-from . import redis_store
+from . import backends
 from .task import Task
 
 silent = False
@@ -216,10 +215,7 @@ def init(jugfile, jugdir, on_error='exit'):
     -------
     `store` : storage object
     '''
-    if jugdir.startswith('redis:'):
-        store = redis_store.redis_store(options.jugdir)
-    else:
-        store = file_based_store.file_store(options.jugdir)
+    store = backends.select(jugdir)
     Task.store = store
 
     if jugfile.endswith('.py'):

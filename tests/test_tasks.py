@@ -1,8 +1,8 @@
 import jug.task
-import jug.dict_store
+from jug.backends.dict_store import dict_store
 
 
-jug.task.Task.store = jug.dict_store.dict_store()
+jug.task.Task.store = dict_store()
 
 def add1(x):
     return x + 1

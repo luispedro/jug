@@ -1,7 +1,7 @@
 import jug.jug
 import jug.task
 from jug.task import Task
-import jug.dict_store
+from jug.backends.dict_store import dict_store
 import random
 jug.jug.silent = True
 
@@ -12,7 +12,7 @@ def test_jug_execute_simple():
     def setAi(i):
         A[i] = True
     setall = [Task(setAi, i) for i in xrange(N)]
-    store = jug.dict_store.dict_store()
+    store = dict_store()
     jug.task.Task.store = store
     jug.jug.execute(store)
     assert False not in A
@@ -29,7 +29,7 @@ def test_jug_execute_deps():
     prev = None
     for idx in idxs:
         prev = Task(setAi, idx, prev)
-    store = jug.dict_store.dict_store()
+    store = dict_store()
     jug.task.Task.store = store
     jug.jug.execute(store)
     assert False not in A
