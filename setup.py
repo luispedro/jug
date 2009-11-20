@@ -47,7 +47,7 @@ Jug is a pure Python implementation and should work on any platform.
 '''
 
 classifiers = [
-'Development Status :: 3 - Alpha',
+'Development Status :: 4 - Beta',
 'Environment :: Console',
 'License :: OSI Approved :: MIT License',
 'Operating System :: POSIX',
@@ -58,7 +58,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.5.0-beta-0',
+      version = '0.5.0-beta-1',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
