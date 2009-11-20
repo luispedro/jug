@@ -16,6 +16,7 @@ def test_jug_execute_simple():
     jug.task.Task.store = store
     jug.jug.execute(store)
     assert False not in A
+    assert max(store.counts.values()) < 4
 
 def test_jug_execute_deps():
     N = 256
@@ -32,3 +33,5 @@ def test_jug_execute_deps():
     jug.task.Task.store = store
     jug.jug.execute(store)
     assert False not in A
+    assert max(store.counts.values()) < 4
+

@@ -103,52 +103,43 @@ def execute(store):
     logging.info('Execute start (%s tasks)' % len(tasks))
     signal(SIGTERM,_sigterm)
     waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
-    upnext = []
-    while tasks or upnext:
+    while tasks:
+        upnext = []
+        for w in waits:
+            if w:
+                logging.info('waiting...', w, 'for an open task')
+                sleep(w)
+            while tasks and tasks[0].can_run():
+                upnext.append(tasks.pop(0))
+            if upnext:
+                break
         if not upnext:
-            for w in waits:
-                if w:
-                    logging.info('waiting...', w, 'for an open task')
-                    sleep(w)
-                upnext = []
-                i = 0
-                while i < len(tasks):
-                    if tasks[i].can_run():
-                        upnext.append(tasks[i])
-                        del tasks[i]
-                        if len(upnext) > 10:
-                            break
-                    else:
-                        i += 1
-                if upnext:
-                    break
-            if not upnext:
-                logging.info('No tasks can be run!')
-                return
-        t = upnext.pop(0)
-        if t.can_load():
-            logging.info('Loadable %s...' % t.name)
-            tasks_loaded[t.name] += 1
-            continue
-        locked = False
-        try:
-            locked = t.lock()
-            if t.can_load(): # This can be true if the task run between the check above and this one
+            logging.info('No tasks can be run!')
+            return
+        for t in upnext:
+            if t.can_load():
                 logging.info('Loadable %s...' % t.name)
                 tasks_loaded[t.name] += 1
-            elif locked:
-                logging.info('Executing %s...' % t.name)
-                t.run()
-                tasks_executed[t.name] += 1
-                if options.aggressive_unload:
-                    t.unload_recursive()
-            else:
-                logging.info('Already in execution %s...' % t.name)
-        except Exception, e:
-            print >>sys.stderr, 'Exception while running %s: %s' % (t.name,e)
-            raise
-        finally:
-            if locked: t.unlock()
+                continue
+            locked = False
+            try:
+                locked = t.lock()
+                if t.can_load(): # This can be true if the task ran between the check above and this one
+                    logging.info('Loadable %s...' % t.name)
+                    tasks_loaded[t.name] += 1
+                elif locked:
+                    logging.info('Executing %s...' % t.name)
+                    t.run()
+                    tasks_executed[t.name] += 1
+                    if options.aggressive_unload:
+                        t.unload_recursive()
+                else:
+                    logging.info('Already in execution %s...' % t.name)
+            except Exception, e:
+                logging.critical('Exception while running %s: %s' % (t.name,e))
+                raise
+            finally:
+                if locked: t.unlock()
 
     print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
     print_out('-' * (52+12+12))
