@@ -85,6 +85,25 @@ def test_topological_sort_kwargs():
     assert len(alltasks) == len(bases) + len(derived)
     _assert_tsorted(alltasks)
 
+def data():
+    return range(20)
+def mult(r,f):
+    return [f*rr for rr in r]
+def reduce(r):
+    return sum(r)
+
+def test_topological_sort_canrun():
+
+    Task = jug.task.Task
+    input = Task(data)
+    for f in xrange(80):
+        Task(reduce, Task(mult,input,f))
+
+    alltasks = jug.task.alltasks
+    jug.task.topological_sort(alltasks)
+    for t in alltasks:
+        assert t.can_run()
+        t.run()
 
 def test_load_after_run():
     T = jug.task.Task(add1,1)
