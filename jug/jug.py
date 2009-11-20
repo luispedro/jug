@@ -101,25 +101,20 @@ def execute(store):
     task.topological_sort(tasks)
     logging.info('Execute start (%s tasks)' % len(tasks))
     signal(SIGTERM,_sigterm)
-    waits = [0,4,8,16,32,64,128,128,128,128,1024,2048]
+    waits = [0,8,16,32,64,128,128,128,128,1024,2048]
     while tasks:
         upnext = []
         for w in waits:
             if w:
                 logging.info('waiting...', w, 'for an open task')
                 sleep(w)
+            cannot_run = 0
+            max_cannot_run = max(128, min(len(tasks)//4+2, 32))
+            while not tasks[0].can_run() and cannot_run < max_cannot_run:
+                tasks.append(tasks.pop(0))
+                cannot_run += 1
             while tasks and tasks[0].can_run():
                 upnext.append(tasks.pop(0))
-            if not upnext:
-                i = 1
-                while i < len(tasks):
-                    if tasks[i].can_run():
-                        upnext.append(tasks[i])
-                        del tasks[i]
-                        if len(upnext) > 32 or i > 64:
-                            break
-                    else:
-                        i += 1
             if upnext:
                 break
         if not upnext:
