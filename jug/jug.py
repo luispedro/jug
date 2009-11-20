@@ -117,7 +117,7 @@ def execute(store):
                     if tasks[i].can_run():
                         upnext.append(tasks[i])
                         del tasks[i]
-                        if len(upnext) > 32:
+                        if len(upnext) > 32 or i > 64:
                             break
                     else:
                         i += 1
