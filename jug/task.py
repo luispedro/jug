@@ -28,6 +28,7 @@ from __future__ import division
 import hashlib
 import os
 import cPickle as pickle
+import itertools
 
 alltasks = []
 
@@ -138,10 +139,9 @@ tricky to support since the general code relies on the function name)''')
                 if type(dep) == Task:
                     for d in _dependency_walk(dep):
                         yield d
-                yield dep
+                    yield dep
         for dep in _dependency_walk(self):
-            if type(dep) == Task:
-                dep.unload()
+            dep.unload()
         self.unload()
 
     def can_load(self):
@@ -250,26 +250,19 @@ def recursive_dependencies(t, max_level=-1):
     '''
     if max_level is None:
         max_level = -1
-    if type(t) is list:
+
+    if type(t) in (list, dict):
+        if type(t) is dict:
+            t = t.itervalue()
         for d in t:
             for dd in recursive_dependencies(d, max_level):
                 yield dd
-        return
-    if type(t) is dict:
-        for d in t.itervalues():
-            for dd in recursive_dependencies(d, max_level):
-                yield dd
-        return
-    if type(t) is Task:
+    elif type(t) is Task:
         yield t
-        if max_level == 0:
-            return
-        for dep in t.dependencies:
-            for d in recursive_dependencies(dep, max_level-1):
-                yield d
-        for dep in t.kwdependencies.itervalues():
-            for d in recursive_dependencies(dep, max_level-1):
-                yield d
+        if max_level:
+            for dep in itertools.chain(t.dependencies, t.kwdependencies.itervalues()):
+                for d in recursive_dependencies(dep, max_level-1):
+                    yield d
 
 
 def value(elem):
