@@ -111,6 +111,16 @@ def execute(store):
                 sleep(w)
             while tasks and tasks[0].can_run():
                 upnext.append(tasks.pop(0))
+            if not upnext:
+                i = 1
+                while i < len(tasks):
+                    if tasks[i].can_run():
+                        upnext.append(tasks[i])
+                        del tasks[i]
+                        if len(upnext) > 32:
+                            break
+                    else:
+                        i += 1
             if upnext:
                 break
         if not upnext:
