@@ -26,5 +26,5 @@ from . import file_store
 
 def select(jugdir):
     if jugdir.startswith('redis:'):
-       return redis_store.redis_store(options.jugdir)
-    return file_store.file_store(options.jugdir)
+       return redis_store.redis_store(jugdir)
+    return file_store.file_store(jugdir)
