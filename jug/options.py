@@ -80,16 +80,6 @@ def usage():
     print _Usage_string % sys.argv[0]
     sys.exit(1)
 
-def find_jugfile(options):
-    '''
-    jugfile = find_jugfile(options)
-
-    Returns the filename of the Jugfile or None if it is not found.
-    '''
-    if options.jugfile:
-        return options.jugfile
-    return 'jugfile.py'
-
 def parse():
     '''
     options.parse()
@@ -102,25 +92,25 @@ def parse():
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
-    opts,args = parser.parse_args()
+    options,args = parser.parse_args()
     if not args:
         usage()
         return
+
     cmd = args.pop(0)
     jugfile = args.pop(0)
+
     if cmd not in _Commands:
         usage()
         return
-    if opts.invalid_name and cmd != 'invalidate':
+    if options.invalid_name and cmd != 'invalidate':
         usage()
         return
-    if cmd == 'invalidate' and not opts.invalid_name:
+    if cmd == 'invalidate' and not options.invalid_name:
         usage()
         return
 
-    cmd = cmd
-    aggressive_unload = opts.aggressive_unload
-    jugfile = find_jugfile(jugfile)
+    aggressive_unload = options.aggressive_unload
     invalid_name = options.invalid_name
     argv = args
     other_args = argv
