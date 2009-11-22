@@ -293,37 +293,21 @@ def CachedFunction(f,*args,**kwargs):
         t.run()
     return t.result
 
-def TaskGenerator(*args,**kwargs):
+def TaskGenerator(f):
     '''
     TaskGenerator
 
-    Use as either
+    Use as
 
     @TaskGenerator
     def f():
         pass
-
-    or
-
-    @TaskGenerator(arg=1)
-    def f():
-        pass
-
-    TaskGenerator does not take any non-keyword arguments
     '''
-    assert not (args and kwargs), '''TaskGenerator called in a weird way.'''
-    if kwargs:
-        task_args = [('task_' + k,v) for k,v in kwargs.iteritems()]
-        def task_generator(f):
-            def gen_task(*args,**kwargs):
-                kwargs.update(task_args)
-                return Task(f,*args,**kwargs)
-            return gen_task
-        return task_generator
-    assert len(args) == 1, '''TaskGenerator called in a weird way.'''
-    func = args[0]
+    from functools import wraps
+    @wraps(f)
     def gen_task(*args,**kwargs):
-        return Task(func,*args,**kwargs)
+        return Task(f,*args,**kwargs)
+    gen_task.__name__ = ('TaskGenerator(%s)' % gen_task.__name__)
     return gen_task
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
