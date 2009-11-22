@@ -129,13 +129,6 @@ def test_taskgenerator():
         return 2*x
     T=double(2)
     assert type(T) == jug.task.Task
-    assert not T.print_result
-    @jug.task.TaskGenerator(print_result=True)
-    def square(x):
-        return x*x
-    T=square(2)
-    assert type(T) == jug.task.Task
-    assert T.print_result
 
 
 def test_unload():

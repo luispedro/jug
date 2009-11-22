@@ -52,10 +52,6 @@ class Task(object):
 Write an email to the authors if you feel you have a strong reason to use them (they are a bit
 tricky to support since the general code relies on the function name)''')
 
-        kwargs = dict( (k,v) for k,v in kwdependencies.iteritems() if k.startswith('task_') )
-        for k in kwargs:
-            del kwdependencies[k]
-
         self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
         self.dependencies = dependencies
@@ -65,7 +61,6 @@ tricky to support since the general code relies on the function name)''')
         self._hash = None
         self._lock = None
         self._can_load = False
-        self.print_result = kwargs.get('task_print_result',False)
         alltasks.append(self)
 
     def run(self, force=False):
@@ -86,8 +81,6 @@ tricky to support since the general code relies on the function name)''')
         name = self.hash()
         self.store.dump(self._result, name)
         self.finished = True
-        if self.print_result:
-            print self._result
         return self._result
 
     def _get_result(self):
