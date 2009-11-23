@@ -33,6 +33,7 @@ import logging
 from . import options
 from . import task
 from . import backends
+from .backends import memoize_store
 from .task import Task
 
 silent = False
@@ -157,6 +158,7 @@ def status(store):
 
     Implements the status command.
     '''
+    Task.store = memoize_store(store)
     task_names = set(t.name for t in task.alltasks)
     tasks = task.alltasks
     tasks_ready = defaultdict(int)

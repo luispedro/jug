@@ -22,3 +22,4 @@
 
 from __future__ import division
 from .select import select
+from .memoize_store import memoize_store
