@@ -154,22 +154,23 @@ tricky to support since the general code relies on the function name)''')
         '''
         if self._hash is None:
             M = hashlib.md5()
-            def update(*args):
-                if not args: return
-                names,elems = args
-                for n,e in zip(names,elems):
+            def update(elems):
+                for el in elems:
+                    n,e = el
                     M.update(pickle.dumps(n))
                     if type(e) == Task:
                         M.update(e.hash())
                     elif type(e) == list:
-                        update(*zip(*enumerate(e)))
+                        update(enumerate(e))
                     elif type(e) == dict:
-                        update(e.keys(),e.values())
+                        update(e.iteritems())
                     else:
                         M.update(pickle.dumps(e))
             M.update(self.name)
-            update(*zip(*enumerate(self.dependencies)))
-            update(*zip(*self.kwdependencies.items()))
+            update(enumerate(self.dependencies))
+            update(self.kwdependencies.iteritems())
+            # FIXME: Remove the line below (This will change
+            # the hash format!)
             M.update(pickle.dumps(self.name))
             self._hash = M.hexdigest()
         return self._hash
