@@ -94,7 +94,14 @@ def execute(store, aggressive_unload=False):
 
     Implement 'execute' command
     '''
-    task_names = set(t.name for t in task.alltasks)
+
+    MAX_TASK_NAME_LEN = 52
+    task_names = set()
+    for t in task.alltasks:
+        n = t.name
+        if len(n) > MAX_TASK_NAME_LEN - 3:
+            n = n[:-3] + '...'
+        task_names.add(n)
     tasks = task.alltasks
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
@@ -211,6 +218,7 @@ def init(jugfile, jugdir, on_error='exit'):
     -------
     `store` : storage object
     '''
+    assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
     store = backends.select(jugdir)
     Task.store = store
 
@@ -221,7 +229,10 @@ def init(jugfile, jugdir, on_error='exit'):
         __import__(jugfile)
     except ImportError:
         logging.critical("Could not import file '%s'" % jugfile)
-        sys.exit(1)
+        if on_error == 'exit':
+            sys.exit(1)
+        else:
+            raise
     return store
 
 
