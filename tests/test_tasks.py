@@ -1,7 +1,7 @@
 import jug.task
 from jug.backends.dict_store import dict_store
 
-
+Task = jug.task.Task
 jug.task.Task.store = dict_store()
 
 def add1(x):
@@ -165,3 +165,12 @@ def test_value():
     four.run()
     eight.run()
     assert jug.task.value(eight) == 8
+
+def test_dict_sort_run():
+    tasks = [double(1), double(2)]
+    tasks += [Task(identity,{ 'one' : Task(identity,2), 'two' : tasks[0], 'three' : { 1 : tasks[1], 0 : tasks[0] }})]
+    jug.task.topological_sort(tasks)
+    for t in tasks:
+        t.run()
+    assert tasks[-1].result == { 'one' : 2, 'two' : 4, 'three' : {1 : 4, 0: 2}}
+
