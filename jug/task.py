@@ -247,7 +247,7 @@ def recursive_dependencies(t, max_level=-1):
 
     if type(t) in (list, dict):
         if type(t) is dict:
-            t = t.itervalue()
+            t = t.itervalues()
         for d in t:
             for dd in recursive_dependencies(d, max_level):
                 yield dd
