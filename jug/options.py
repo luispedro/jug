@@ -32,6 +32,8 @@ Variables
     * argv: Arguments not captured by jug (for script use)
 '''
 from __future__ import division
+import logging
+import string
 
 jugdir = 'jugdata'
 jugfile = 'jugfile.py'
@@ -68,6 +70,8 @@ Options:
     Task name to invalidate (for invalidate command only)
 --jugdir=JUGDIR
     Directory in which to save intermediate files
+--verbose=LEVEL
+    Verbosity level ('DEBUG', 'INFO', 'QUIET')
 '''
 
 def usage():
@@ -92,6 +96,7 @@ def parse():
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
+    parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -109,6 +114,15 @@ def parse():
     if cmd == 'invalidate' and not options.invalid_name:
         usage()
         return
+    try:
+        nlevel = {
+            'DEBUG' : logging.DEBUG,
+            'INFO' : logging.INFO,
+        }[string.upper(options.verbosity)]
+        root = logging.getLogger()
+        root.level = nlevel
+    except KeyError:
+        pass
 
     aggressive_unload = options.aggressive_unload
     invalid_name = options.invalid_name
