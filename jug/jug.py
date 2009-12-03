@@ -113,7 +113,7 @@ def execute(store, aggressive_unload=False):
         upnext = []
         for w in waits:
             if w:
-                logging.info('waiting...', w, 'for an open task')
+                logging.info('waiting %w secs for an open task...', w)
                 sleep(w)
             cannot_run = 0
             max_cannot_run = max(128, min(len(tasks)//4+2, 32))
