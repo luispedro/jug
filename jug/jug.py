@@ -108,13 +108,9 @@ def execute(store, aggressive_unload=False):
     task.topological_sort(tasks)
     logging.info('Execute start (%s tasks)' % len(tasks))
     signal(SIGTERM,_sigterm)
-    waits = [0,8,16,32,64,128,128,128,128,1024,2048]
     while tasks:
         upnext = []
-        for w in waits:
-            if w:
-                logging.info('waiting %w secs for an open task...', w)
-                sleep(w)
+        for i in xrange(300*60//12): #This is at most half-an-hour
             cannot_run = 0
             max_cannot_run = max(128, min(len(tasks)//4+2, 32))
             while not tasks[0].can_run() and cannot_run < max_cannot_run:
@@ -124,6 +120,8 @@ def execute(store, aggressive_unload=False):
                 upnext.append(tasks.pop(0))
             if upnext:
                 break
+            logging.info('waiting 12 secs for an open task...')
+            sleep(12)
         if not upnext:
             logging.info('No tasks can be run!')
             return
@@ -227,8 +225,8 @@ def init(jugfile, jugdir, on_error='exit'):
     sys.path.insert(0, os.path.abspath('.'))
     try:
         __import__(jugfile)
-    except ImportError:
-        logging.critical("Could not import file '%s'" % jugfile)
+    except ImportError, e:
+        logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
         if on_error == 'exit':
             sys.exit(1)
         else:
