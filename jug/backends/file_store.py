@@ -141,11 +141,17 @@ class file_store(object):
         if exists(fname) and _fsize(fname) == 0:
             return None
         elif exists(fname + '.pp.gz'):
-            return pickle.load(GzipFile(fname + '.pp.gz'))
+            f = GzipFile(fname + '.pp.gz')
+            load = pickle.load
         elif exists(fname + '.npy.gz'):
-            return np.load(GzipFile(fname + '.npy.gz'))
+            f = GzipFile(fname + '.npy.gz')
+            load = np.load
         else:
-            return pickle.load(file(fname))
+            f = file(fname)
+            load = pickle.load
+        res = load(f)
+        f.close()
+        return res
 
     def remove(self, fname):
         '''
