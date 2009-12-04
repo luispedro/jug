@@ -110,7 +110,7 @@ def execute(store, aggressive_unload=False):
     signal(SIGTERM,_sigterm)
     while tasks:
         upnext = []
-        for i in xrange(300*60//12): #This is at most half-an-hour
+        for i in xrange(30*60//12): #This is at most half-an-hour
             cannot_run = 0
             max_cannot_run = max(128, min(len(tasks)//4+2, 32))
             while not tasks[0].can_run() and cannot_run < max_cannot_run:
