@@ -112,7 +112,7 @@ def execute(store, aggressive_unload=False):
         upnext = []
         for i in xrange(30*60//12): #This is at most half-an-hour
             cannot_run = 0
-            max_cannot_run = max(128, min(len(tasks)//4+2, 32))
+            max_cannot_run = min(len(tasks), 128)
             while not tasks[0].can_run() and cannot_run < max_cannot_run:
                 tasks.append(tasks.pop(0))
                 cannot_run += 1
