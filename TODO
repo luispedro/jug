@@ -1,9 +1,25 @@
+For 0.5:
+
+- Review documentation of jug.Task. [Dec 7 2009]
+
+For 0.6:
+
+- Parse a configuration file. [Dec 7 2009]
+
+- Configure the nr. of tasks that can be pending before bailing out. [Dec 7 2009]
+
+- Configure the parameters of the execute loop. [Dec 7 2009]
+
+For 1.0:
+
+- Do a showmedo or similar video. [Dec 7 2009]
+
 - A status option (or a new command) that signals through its exit status whether it is finished. [Dec 3 2009]
 
 - When running the execute loop, the results of store lookup should be cached. If 100 tasks are all dependent on
     this one unfinished initial task, then we shouldn't query the store 100 times. [Dec 3 2009]
 
-- Think about how to use weak references to make the results be simpler [Dec 3 2009]
+- Think about how to use weak references to keep the results luke-warm [Dec 3 2009]
 
 - Time tasks and display them with the status. This is actually very easy to implement with redis (with assynchronous
   increment operations), but not so much with a file based store, so it might be 'optional' depending on the backend.
