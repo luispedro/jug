@@ -147,7 +147,7 @@ If the values are not accessible, this raises an exception.
 Advantages
 ----------
 
-jug is an attempt to get something that works in the setting that I have found myself in: code that is *embarissingly parallel* with a couple of points where all the results of previous processing are merged, often in a simple way.  It is also a way for me to manage either the explosion of temporary files that plagued my code and the brittleness of making sure that all results from separate processors are merged correctly in my *ad hoc* scripts.
+jug is an attempt to get something that works in the setting that I have found myself in: code that is *embarrassingly parallel* with a couple of points where all the results of previous processing are merged, often in a simple way.  It is also a way for me to manage either the explosion of temporary files that plagued my code and the brittleness of making sure that all results from separate processors are merged correctly in my *ad hoc* scripts.
 
 Limitations
 -----------
