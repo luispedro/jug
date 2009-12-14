@@ -71,7 +71,7 @@ tricky to support since the general code relies on the function name)''')
 
         Parameters
         ----------
-          * force: if True, always run the task (even if it ran before)
+          force : if True, always run the task (even if it ran before)
         '''
         assert self.can_run()
         assert force or not self.finished
@@ -107,7 +107,7 @@ tricky to support since the general code relies on the function name)''')
         '''
         t.load()
 
-        Loads the results from file.
+        Loads the results from the storage backend.
         '''
         assert self.can_load()
         self._result = self.store.load(self.hash())
@@ -117,7 +117,7 @@ tricky to support since the general code relies on the function name)''')
         '''
         t.unload()
 
-        Unload results (can be useful for saving memory)
+        Unload results (can be useful for saving memory).
         '''
         self._result = None
         self.finished = False
@@ -126,7 +126,11 @@ tricky to support since the general code relies on the function name)''')
         '''
         t.unload_recursive()
 
+        Equivalent to
+
+        for tt in recursive_dependencies(t): tt.unload()
         '''
+        # FIXME: Could this be replaced by recursive_dependencies()?
         def _dependency_walk(task):
             for dep in list(task.dependencies) + task.kwdependencies.values():
                 if type(dep) == Task:
@@ -140,6 +144,7 @@ tricky to support since the general code relies on the function name)''')
     def can_load(self):
         '''
         bool = task.can_load()
+        Returns whether result is available.
         '''
         if self.finished: return True
         if not self._can_load:
@@ -205,6 +210,17 @@ tricky to support since the general code relies on the function name)''')
         self._lock.release()
 
     def is_locked(self):
+        '''
+        is_locked = t.is_locked()
+
+        Note that only calling lock() and checking the result atomically checks
+        for the lock(). This function can be much faster, though, and, therefore
+        is sometimes useful.
+
+        Returns
+        -------
+            Whether the task **appears** to be locked.
+        '''
         if self._lock is None:
             self._lock = self.store.getlock(self.hash())
         return self._lock.is_locked()
@@ -239,8 +255,8 @@ def recursive_dependencies(t, max_level=-1):
 
     Parameters
     ----------
-        * t: task
-        * max_level: Maximum recursion depth. Set to -1 or None for no recursion limit.
+        t : task
+        max_level : Maximum recursion depth. Set to -1 or None for no recursion limit.
     '''
     if max_level is None:
         max_level = -1
@@ -263,7 +279,8 @@ def value(elem):
     '''
     value = value(task)
 
-    Loads a task object recursively.
+    Loads a task object recursively. This correcly handles lists,
+    dictonaries and eny other type handled by the tasks themselves.
     '''
     if type(elem) is Task:
         return elem.result
@@ -280,9 +297,12 @@ def CachedFunction(f,*args,**kwargs):
     '''
     value = CachedFunction(f, *args, **kwargs)
 
-    is the same as
+    is equivalent to:
 
-    value = Task(f, *args, **kwargs).result
+    task = Task(f, *args, **kwargs)
+    if not task.can_load():
+        task.run()
+    value = task.result
 
     That is, it calls the function if the value is available,
     but caches the result for the future.
