@@ -44,6 +44,8 @@ other uses a redis database and all it needs is for different
 processes to be able to communicate with a common redis server.
 
 Jug is a pure Python implementation and should work on any platform.
+
+*Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
 '''
 
 classifiers = [
@@ -58,7 +60,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.5.0-beta-1',
+      version = '0.5.0-rc-0',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',

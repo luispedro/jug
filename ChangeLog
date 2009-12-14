@@ -1,0 +1,5 @@
+version 0.5 Sun Dec 13 2009 by luispedro
+	* redis backend
+	* dictionary dependencies
+	* changed command-line interface (jug command jugfile ...)
+
