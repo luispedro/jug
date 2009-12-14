@@ -167,11 +167,11 @@ def test_value():
     assert jug.task.value(eight) == 8
 
 def test_dict_sort_run():
-    tasks = [double(1), double(2)]
-    tasks += [Task(identity,{ 'one' : Task(identity,2), 'two' : tasks[0], 'three' : { 1 : tasks[1], 0 : tasks[0] }})]
+    tasks = [double(1), double(2), Task(identity,2) ]
+    tasks += [Task(identity,{ 'one' : tasks[2], 'two' : tasks[0], 'three' : { 1 : tasks[1], 0 : tasks[0] }})]
     jug.task.topological_sort(tasks)
     for t in tasks:
         assert t.can_run()
         t.run()
-    assert tasks[-1].result == { 'one' : 2, 'two' : 4, 'three' : {1 : 4, 0: 2}}
+    assert tasks[-1].result == { 'one' : 2, 'two' : 2, 'three' : {1 : 4, 0: 2}}
 
