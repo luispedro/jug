@@ -6,6 +6,8 @@ For 0.6:
 
 - Configure the parameters of the execute loop. [Dec 7 2009]
 
+- Have a 'shell' command (like django's shell command) [Dec 29 2009]
+
 For 1.0:
 
 - Do a showmedo or similar video. [Dec 7 2009]
