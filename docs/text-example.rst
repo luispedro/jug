@@ -1,11 +1,14 @@
+Worked-Out Example 0
+====================
+Processing text
+...............
+
 Problem: Take a list of the British members of Parliament (MPs) in the last
 decade and characterise each by a couple of *meaningful* word from their
 wikipedia pages. Meaningful words are those that appear in the article for the
 the particular MP but not everywhere else.
 
-So the algorithm looks like this:
-
-::
+So the algorithm looks like this::
 
     allcounts = []
     for mp in MPs:
@@ -28,10 +31,8 @@ Very simple. It's also *embarassingly parallel*, except for the line where
 
 To use ``jug``, we write the above, including the functions, to a file (in this
 case, the file is ``jugfile.py``). Now, I can call ``jug status jugfile.py`` to
-see the state of the computation:
+see the state of the computation::
 
-::
-    
     Task name                                    Waiting       Ready    Finished     Running
     ----------------------------------------------------------------------------------------
     jugfile.getdata                                    0         657           0           0
@@ -43,9 +44,7 @@ see the state of the computation:
 
 
 Unsurprisingly, no task is finished and only the ``getdata`` task is ready to
-run. No nodes are running. So, let's start a couple of processes `[#]`_:
-
-::
+run. No nodes are running. So, let's start a couple of processes [#]_::
 
     jug execute jugfile.py &
     jug execute jugfile.py &
@@ -56,9 +55,8 @@ run. No nodes are running. So, let's start a couple of processes `[#]`_:
     sleep 48
     jug status jugfile.py
 
-This prints out first:
+This prints out first::
 
-:: 
     Task name                                    Waiting       Ready    Finished     Running
     ----------------------------------------------------------------------------------------
     jugfile.getdata                                    0         653           0           4
@@ -82,7 +80,7 @@ This prints out first:
 
 
 So, we can see that almost immediately after the four background processes were
-started, 4 of them were working on the ``getdata`` task`[#]`_.
+started, 4 of them were working on the ``getdata`` task [#]_.
 
 Forty-eight seconds later, some of the ``getdata`` calls are finished, which
 makes some ``countwords`` tasks be callable and some have been executed. The
@@ -91,9 +89,7 @@ order in which tasks are executed is decided by ``jug`` itself.
 At this point, we can add a couple more nodes to the process if we want for no
 other reason than to demonstrate this capability (maybe you have a dynamic
 clustering system and a whole lot more nodes have become available). The nodes
-will happily chug along until we get to the following situation:
-
-::
+will happily chug along until we get to the following situation::
 
     Task name                                    Waiting       Ready    Finished     Running
     ----------------------------------------------------------------------------------------
@@ -107,10 +103,8 @@ will happily chug along until we get to the following situation:
 
 This is the bottleneck in the programme: Notice how there is only one node
 running, it is computing ``addcounts()``. Everyone else is waiting (there are no
-*ready* tasks) `[#]`_. Fortunately, once that node finishes, everyone else can get to
-work computing ``divergence``:
-
-::
+*ready* tasks) [#]_. Fortunately, once that node finishes, everyone else can get to
+work computing ``divergence``::
 
     Task name                                    Waiting       Ready    Finished     Running
     ----------------------------------------------------------------------------------------
@@ -122,9 +116,7 @@ work computing ``divergence``:
     Total:                                             0         653        1315           4
 
 Eventually, all the nodes finish and we are done. All the results are now left
-inside ``jugdata``. To access it, we can write a little script:
-
-::
+inside ``jugdata``. To access it, we can write a little script::
 
     import jug
     import jug.task
@@ -150,10 +142,10 @@ output format.
 Besides serving to demonstrate, ``jug``'s abilities, this is actually a very
 convenient format for organising computations:
 
-    1. Have a master jugfile.py that does all the computations that take a long
+1.  Have a master jugfile.py that does all the computations that take a long
     time.
-    2. Have a secondary outputresult.py that loads the results and does the
-    pretty printing. This should run fast and not do much computation.
+2.  Have a secondary outputresult.py that loads the results and does the pretty
+    printing. This should run fast and not do much computation.
 
 The reason why it's good to have the second step as a separate process is that
 you often want fast iteration on the output or even interactive use (if tyou are
