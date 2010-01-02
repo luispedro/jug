@@ -5,19 +5,35 @@ from time import sleep
 import re
 from string import lower
 from os.path import exists
-
+import json
+from os import mkdir
 
 def getdata(title):
     sleep(8)
-    if exists('text-data'):
-        return file('text-data/' + title).read()
+    # The reason for this cache is to avoid hitting Wikipedia too much in
+    # case we are playing around with testing.
+    # In a real example, we would *not* have a cache, of course.
+    cache = 'text-data/' + title
+    if exists(cache):
+        return unicode(file(cache).read(), 'utf-8')
 
     title = urllib2.quote(title)
-    url = 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=txt&titles=' + title
+    url = 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=' + title
     text = urllib2.urlopen(url).read()
+    data = json.loads(text)
+    data = data['query']['pages'].values()[0]
+    text = data['revisions'][0]['*']
     text = re.sub(ur'(?x) \[ [^]] *? \]\]', '', text)
     text = re.sub('(?x) {{ [^}]*? }}', '', text)
     text = text.strip()
+
+    try:
+        mkdir('text-data')
+    except:
+        pass
+    cache = file(cache, 'w')
+    cache.write(text.encode('utf-8'))
+    cache.close()
     return text
 
 def isstopword(titlewords, w):
