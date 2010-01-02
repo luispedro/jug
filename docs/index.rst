@@ -16,6 +16,16 @@ the capability to connect to a common redis server.
 Jug also takes care of saving all the intermediate results to the backend in a
 way that allows them to be retrieved later.
 
+Contents:
+---------
+
+.. toctree::
+    :maxdepth: 2
+
+    tutorial.rst
+    text-example.rst
+    backends.rst
+
 Examples
 --------
 
@@ -62,14 +72,6 @@ and wouldn't now start any other project without using jug. It's become a major
 part of the way I handle projects with a large number of computations and
 cluster usage.
 
-
-Contents:
----------
-
-.. toctree::
-   :maxdepth: 2
-
-   tutorial
 
 Indices and tables
 ==================
