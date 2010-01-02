@@ -61,7 +61,8 @@ def divergence(global_counts, nr_documents, counts):
         if n > global_counts[w]//100:
             specific.append(w)
     specific.sort(key=counts.get)
-    return list(reversed(specific))
+    specific.reverse()
+    return specific
 
 counts = []
 for mp in file('MPs.txt'):
