@@ -57,10 +57,11 @@ classifiers = [
 'Programming Language :: Python',
 'Topic :: Scientific/Engineering',
 'Topic :: Software Development',
+'Intended Audience :: Science/Research',
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.5.0-rc-0',
+      version = '0.5.0-rc-1',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',

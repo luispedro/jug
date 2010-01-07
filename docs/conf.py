@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# Jug documentation build configuration file, created by
-# sphinx-quickstart on Mon Dec 22 17:33:27 2008.
-#
 # This file is execfile()d with the current directory set to its containing dir.
 #
 # The contents of this file are pickled, so don't put values in the namespace
@@ -16,7 +12,6 @@ import sys, os
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-#sys.path.append(os.path.abspath('some/directory'))
 
 # General configuration
 # ---------------------
@@ -25,26 +20,18 @@ import sys, os
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc']
 
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
 
-# The suffix of source filenames.
 source_suffix = '.rst'
-
-# The master toctree document.
 master_doc = 'index'
 
-# General substitutions.
 project = 'Jug'
-copyright = '2008, Luis Pedro Coelho'
+copyright = '2008-2010, Luis Pedro Coelho'
 
-# The default replacements for |version| and |release|, also used in various
-# other places throughout the built documents.
-#
 # The short X.Y version.
-version = '0.4'
+version = '0.5'
 # The full version, including alpha/beta/rc tags.
-release = '0.4-rc0'
+release = '0.5-rc-1'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

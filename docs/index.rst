@@ -5,15 +5,32 @@ Jug: A Task-Based Parallelization Framework
 What is Jug?
 ------------
 
-Jug allows you to write code that is broken up into
-tasks and run different tasks on different processors.
+Jug allows you to write code that is broken up into tasks and run different
+tasks on different processors.
 
-It uses the filesystem to communicate between processes and
-works correctly over NFS, so you can coordinate processes on
-different machines.
+It currently has two backends. The first uses the filesystem to communicate
+between processes and works correctly over NFS, so you can coordinate processes
+on different machines. The second is based on redis so the processes only need
+the capability to connect to a common redis server.
 
-Jug also takes care of saving all the intermediate results to
-disk in a way that allows them to be retrieved later.
+Jug also takes care of saving all the intermediate results to the backend in a
+way that allows them to be retrieved later.
+
+Contents:
+---------
+
+.. toctree::
+    :maxdepth: 2
+
+    tutorial.rst
+    text-example.rst
+    backends.rst
+
+Examples
+--------
+
+There is a worked out example in the `tutorial`_, and another, fully functioning in
+the `examples/` directory.
 
 How do I get Jug?
 -----------------
@@ -22,7 +39,8 @@ You can either get the git repository at
 
 git://github.com/luispedro/jug
 
-Or download the package from PyPI_.
+Or download the package from PyPI_. You can use `easy_instal jug` or `pip
+install jug` if you'd like.
 
 .. _PyPI: http://pypi.python.org/pypi/Jug
 
@@ -44,23 +62,16 @@ Read the tutorial_.
 What's the status of the project?
 ---------------------------------
 
-Alpha (or thereabouts).
+Beta (or thereabouts).
 
-This is still in heavy development and APIs are not fixed.
+This is still in development and APIs are not fixed, but are in less flux than
+they were earlier in the project.
 
-It is usable, though. I have used it for my academic projects for
-the past months and wouldn't now start any other project without 
-using jug. It's become a major part of the way I handle projects with
-a large number of computations and cluster usage.
+It is usable, though. I have used it for my academic projects for the past year
+and wouldn't now start any other project without using jug. It's become a major
+part of the way I handle projects with a large number of computations and
+cluster usage.
 
-
-Contents:
----------
-
-.. toctree::
-   :maxdepth: 2
-
-   tutorial
 
 Indices and tables
 ==================
