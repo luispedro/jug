@@ -174,9 +174,6 @@ tricky to support since the general code relies on the function name)''')
             M.update(self.name)
             update(enumerate(self.dependencies))
             update(self.kwdependencies.iteritems())
-            # FIXME: Remove the line below (This will change
-            # the hash format!)
-            M.update(pickle.dumps(self.name))
             self._hash = M.hexdigest()
         return self._hash
 
