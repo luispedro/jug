@@ -20,4 +20,5 @@ def decrypt(prefix, suffix_size):
 def join(partials):
     return list(chain(*partials))
 
-fullresults = join([decrypt( [let], 3) for let in letters])
+fullresults = join([decrypt([let], 4) for let in letters])
+
