@@ -1,9 +1,8 @@
-import numpy as np
 from itertools import product
-from crypt import decode, letters, isgood
+from crypt import decode, letters, isgood, preprocess
 
 ciphertext = file('secret.msg').read()
-ciphertext = np.array(map(ord,ciphertext), np.uint8)
+ciphertext = preprocess(ciphertext)
 
 for p in product(letters, repeat=5):
     text = decode(ciphertext, p)

@@ -1,10 +1,9 @@
 from jug import TaskGenerator
-import numpy as np
 from itertools import product, chain
-from crypt import decode, letters, isgood
+from crypt import decode, letters, isgood, preprocess
 
 ciphertext = file('secret.msg').read()
-ciphertext = np.array(map(ord,ciphertext), np.uint8)
+ciphertext = preprocess(ciphertext)
 
 @TaskGenerator
 def decrypt(prefix, suffix_size):

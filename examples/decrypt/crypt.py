@@ -6,6 +6,9 @@ def decode(text, passwd):
     return "".join(map(chr, text))
 encode = decode
 
+def preprocess(ciphertext):
+    return np.array(map(ord,ciphertext), np.uint8)
+
 def isgood(text):
     return text.find('Luis Pedro Coelho') >= 0
 
