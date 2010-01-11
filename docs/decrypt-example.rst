@@ -47,6 +47,38 @@ Here, the ``decrypt`` function returns a list of all the good passwords it
 found. To simplify things, we call the ``join`` function which concatenates all
 the partial results into a single list for convenience.
 
+Now, run ``jug``::
+
+    jug execute jugfile.py &
+    jug execute jugfile.py &
+    jug execute jugfile.py &
+    jug execute jugfile.py &
+
+You can run as many simultaneous processes as you have processors. To see what
+is happening, type::
+
+    jug status jugfile.py
+
+And you will get an output such as::
+
+    Task name                                    Waiting       Ready    Finished     Running
+    ----------------------------------------------------------------------------------------
+    jugfile.join                                       1           0           0           0
+    jugfile.decrypt                                    0          14           8           4
+    ........................................................................................
+    Total:                                             1          14           8           4
+
+
+There are two task functions: ``decrypt``, of which 8 are finished, 14 are ready
+to run, and 4 are currently running; and ``join`` which has a single instance,
+which is ``waiting``: it cannot run until all the ``decrypt`` tasks have
+finished.
+
+Eventually, everyone will be finished and your results will be saved in
+directory ``jugdata`` in files with names such as
+``jugdata/5/4/a1266debc307df7c741cb7b997004f.pp.gz``. The name is simply a hash
+of the task description (function and its arguments).
+
 In order to make sense of all of this, we write a final script, which loads the
 results and prints them on stdout::
 
