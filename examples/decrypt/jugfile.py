@@ -12,7 +12,7 @@ def decrypt(prefix, suffix_size):
     for p in product(letters, repeat=suffix_size):
         text = decode(ciphertext, np.concatenate([prefix, p]))
         if isgood(text):
-            passwd = "".join(map(chr,p))
+            passwd = "".join(map(chr,np.concatenate([prefix, p])))
             res.append((passwd, text))
     return res
 
