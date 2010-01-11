@@ -23,6 +23,7 @@ Contents:
     :maxdepth: 2
 
     tutorial.rst
+    decrypt-example.rst
     text-example.rst
     backends.rst
 
