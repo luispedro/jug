@@ -28,3 +28,6 @@ For 1.0:
 Sometime:
 
 - Write an SQL backend [Dec 13 2009]
+
+- Unload leaf-task results but not others [Dec 28 2009]
+
