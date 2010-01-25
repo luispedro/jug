@@ -46,7 +46,9 @@ processes to be able to communicate with a common redis server.
 Jug is a pure Python implementation and should work on any platform.
 
 *Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
-'''
+
+*Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
+<http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_ '''
 
 classifiers = [
 'Development Status :: 4 - Beta',
@@ -61,7 +63,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.5.0-rc-1',
+      version = '0.5.0',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
