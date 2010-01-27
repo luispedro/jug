@@ -21,7 +21,13 @@
 '''
 Task: contains the Task class.
 
-This is the main unit of jug.
+This is the main class for using jug.
+
+There are two main alternatives:
+
+- Use the ``Task`` class directly to build up tasks, such as
+  ``Task(function, arg0, ...)``.
+- Rely on the ``TaskGenerator`` decorator as a shortcut for this.
 '''
 
 from __future__ import division
@@ -94,7 +100,7 @@ tricky to support since the general code relies on the function name)''')
         '''
         bool = task.can_run()
 
-        Returns true if all the dependencies are finished.
+        Returns true if all the dependencies have their results available.
         '''
         def is_available(dep):
             if type(dep) == Task: return dep.finished or dep.can_load()
@@ -144,6 +150,7 @@ tricky to support since the general code relies on the function name)''')
     def can_load(self):
         '''
         bool = task.can_load()
+
         Returns whether result is available.
         '''
         if self.finished: return True
@@ -155,7 +162,10 @@ tricky to support since the general code relies on the function name)''')
         '''
         fname = t.hash()
 
-        Returns the hash for this task
+        Returns the hash for this task.
+
+        The results are cached, so the first call can be much slower than
+        subsequent calls.
         '''
         if self._hash is None:
             M = hashlib.md5()
@@ -190,7 +200,21 @@ tricky to support since the general code relies on the function name)''')
         locked = task.lock()
 
         Tries to lock the task for the current process.
-        Returns true if the lock was obtained.
+
+        Returns True if the lock was acquired. The correct usage pattern is::
+
+            locked = task.lock()
+            if locked:
+                task.run()
+            else:
+                # someone else is already running this task!
+
+        Not that using can_lock() can lead to race conditions. The above
+        is the only fully correct method.
+
+        Returns
+        -------
+          Whether the lock was obtained.
         '''
         if self._lock is None:
             self._lock = self.store.getlock(self.hash())
@@ -201,8 +225,8 @@ tricky to support since the general code relies on the function name)''')
         task.unlock()
 
         Releases the lock.
-        If the lock was not held, this may remove another
-        thread's lock!
+
+        If the lock was not held, this may remove another thread's lock!
         '''
         self._lock.release()
 
@@ -217,6 +241,11 @@ tricky to support since the general code relies on the function name)''')
         Returns
         -------
             Whether the task **appears** to be locked.
+
+        See Also
+        --------
+        - lock()
+        - unlock()
         '''
         if self._lock is None:
             self._lock = self.store.getlock(self.hash())
@@ -252,13 +281,16 @@ def recursive_dependencies(t, max_level=-1):
 
     Parameters
     ----------
-        t : task
-        max_level : Maximum recursion depth. Set to -1 or None for no recursion limit.
+      t : task
+      max_level : Maximum recursion depth. Set to -1 or None for no recursion limit.
+    Returns
+    -------
+      A generator
     '''
     if max_level is None:
         max_level = -1
 
-    if type(t) in (list, dict):
+    if type(t) in (list, tuple, dict):
         if type(t) is dict:
             t = t.itervalues()
         for d in t:
@@ -313,19 +345,20 @@ def CachedFunction(f,*args,**kwargs):
 
 def TaskGenerator(f):
     '''
-    TaskGenerator
-
-    Use as
-
     @TaskGenerator
-    def f():
-        pass
+    def f(arg0, arg1, ...)
+        ...
+
+    Turns f from a function into a task generator.
+
+    This means that calling ``f(arg0, arg1)`` results in:
+    ``Task(f, arg0, arg1)``
     '''
     from functools import wraps
     @wraps(f)
-    def gen_task(*args,**kwargs):
-        return Task(f,*args,**kwargs)
-    gen_task.__name__ = ('TaskGenerator(%s)' % gen_task.__name__)
-    return gen_task
+    def task_generator(*args, **kwargs):
+        return Task(f, *args, **kwargs)
+    task_generator.__name__ = ('TaskGenerator(%s)' % task_generator.__name__)
+    return task_generator 
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
