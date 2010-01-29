@@ -1,0 +1,323 @@
+\documentclass{beamer}
+\usetheme{CMU}
+
+\usepackage{slpython}
+\usepackage{underscore}
+
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+
+\newcommand*{\True}{\mbox{True}}
+\newcommand*{\False}{\mbox{False}}
+\newcommand*{\Expected}{\ensuremath{\mathbb{E}}}
+\newcommand{\pd}[2]{\frac{\partial#1}{\partial#2}}
+\newcommand{\pdd}[2]{\frac{\partial^2 #1}{\partial #2^2}} 
+
+\newcommand*{\error}[1]{{\color{red}\textbf{#1}}}
+\newcommand*{\Assign}{\ensuremath\,:=\,}
+\newcommand*{\Dkl}{\ensuremath{D_{\text{\textsc{kl}}}}}
+\newcommand*{\vect}[1]{{\vec{#1}}}
+
+\title[Jug Tutorial 0]{Jug Tutorial: Coarse-Level Parallel Programming in Python}
+\author{Luis Pedro Coelho}
+\institute{lpc@cmu.edu}
+%\date{}
+
+\graphicspath{{figures/}{figures/generated/}{../images/}}
+
+\AtBeginSection[] % Do nothing for \subsection*
+{
+	\begin{frame}<beamer>
+		\frametitle{Outline}
+		\tableofcontents[currentsection,currentsubsection]
+	\end{frame}
+}
+
+
+\begin{document}
+\frame{\titlepage}
+\begin{frame}[fragile]
+\frametitle{Problem}
+Brute force a password.
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Assumptions}
+The \alert{crypt} module exists with elements:
+\begin{itemize}
+\item decrypt: decrtypt ciphertext given a password.
+\item isgood: test whether this text could be the plaintext.
+\item letters: just the letters.
+\end{itemize}
+
+Also, we know that the password is five letters.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Simple Solution}
+
+\begin{python}
+import itertools
+from crypt import decode, letters, isgood, preprocess
+
+ciphertext = file('secret.msg').read()
+ciphertext = preprocess(ciphertext)
+
+for p in itertools.product(letters, repeat=5):
+    text = decode(ciphertext, p)
+    if isgood(text):
+        passwd = "".join(map(chr,p))
+        print '%s:%s' % (passwd, text)
+\end{python}
+\end{frame}
+
+\begin{frame}[fragile]
+
+This solution does not take advantage of multiple processors.
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Tasks}
+\begin{python}
+import itertools
+from crypt import decode, letters, isgood, preprocess
+
+ciphertext = file('secret.msg').read()
+ciphertext = preprocess(ciphertext)
+
+def decrypt(ciphertext, p):
+    text = decode(ciphertext, p)
+    if isgood(text):
+        passwd = "".join(map(chr,p))
+        return (passwd, text)
+    # else: return None
+
+results = []
+for p in itertools.product(letters, repeat=5):
+    results.append(Task(decrypt,ciphertext,p))
+\end{python}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Python Magic}
+
+\begin{python}
+from jug import TaskGenerator
+import itertools
+from crypt import decode, letters, isgood, preprocess
+
+ciphertext = file('secret.msg').read()
+ciphertext = preprocess(ciphertext)
+
+@TaskGenerator
+def decrtypt(ciphertext, p):
+    text = decode(ciphertext, p)
+    if isgood(text):
+        passwd = "".join(map(chr,p))
+        return (passwd, text)
+    # else: return None
+
+results = []
+for p in itertools.product(letters, repeat=5):
+    results.append(decrypt(ciphertext,p))
+
+\end{python}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Enter Jug}
+
+You give it the Jugfile, it runs the tasks for you!
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Jug Loop}
+
+\begin{python}
+while len(tasks) > 0:
+    ready = [t for t in tasks if can_run(t)]
+    for t in ready:
+        if not is_running(t):
+            t.run()
+        tasks.remove(t)
+\end{python}
+
+Except jug is much fancier!
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Jug Advantages}
+\begin{enumerate}
+\item Automatic task-level parallelization with dependency tracking.
+\item Remember all intermediate results.
+\item Makes writing parallel code look like writing sequential code.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+This example is actually not so good.
+
+We have $26^5 \approx 11M$ tasks, all of which run very fast.
+
+As a rule of thumb, your tasks should take at least a couple of seconds.
+\end{frame}
+
+\begin{frame}[fragile]
+
+\alert{Solution} each task will be:
+
+Given a letter, try \alert{all passwords} beginning with that letter.
+
+Now, we have 26 tasks. Much better.
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{python}
+@TaskGenerator
+def decrypt(prefix):
+    res = []
+    for suffix in product(letters, repeat=5-len(prefix)):
+        passwd = np.concatenate([prefix, suffix])
+        text = decode(ciphertext, passwd)
+        if isgood(text):
+            passwd = "".join(map(chr, passwd))
+            res.append( (passwd, text) )
+    return res
+
+@TaskGenerator
+def join(partials):
+    return list(chain(*partials))
+
+results = join([decrypt([p]) for p in letters])
+\end{python}
+\end{frame}
+
+
+\begin{frame}[fragile]
+
+Let's call \alert{jug} now.
+
+(Assuming our code is in a file called \alert{jugfile.py})
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+$jug status
+Task name      Waiting  Ready  Finished Running
+-----------------------------------------------
+jugfile.join         1      0         0       0
+jugfile.decrypt      0     26         0       0
+...............................................
+Total:               1     26         0       0
+
+\end{verbatim}
+
+Some tasks are ready. None are running.
+
+\end{frame}
+\begin{frame}[fragile]
+
+\begin{verbatim}
+$jug execute &
+[1] 29501
+$jug execute &
+[2] 29502
+\end{verbatim}
+
+Executing in the background\dots
+
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+$jug status
+Task name      Waiting  Ready  Finished Running
+-----------------------------------------------
+jugfile.join         1      0         0       0
+jugfile.decrypt      0     24         0       2
+...............................................
+Total:               1     24         0       2
+
+\end{verbatim}
+
+Two tasks running. Good.
+\end{frame}
+
+\begin{frame}[fragile]
+Wait a few minutes\dots
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+$jug status
+Task name      Waiting  Ready  Finished Running
+-----------------------------------------------
+jugfile.join         1      0         0       0
+jugfile.decrypt      0     14        10       2
+...............................................
+Total:               1     14        10       2
+\end{verbatim}
+
+Ten tasks have finished.
+
+Notice how the \alert{join} task must wait for all the others.
+\end{frame}
+
+\begin{frame}[fragile]
+A few more minutes\dots
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+$jug status
+Task name      Waiting  Ready  Finished Running
+-----------------------------------------------
+jugfile.join         0      0         1       0
+jugfile.decrypt      0      0        26       0
+...............................................
+Total:               0      0        27       0
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{What Now?}
+
+All tasks are finished!
+
+How do I get to the results?
+\end{frame} 
+
+\begin{frame}[fragile]
+\begin{python}
+import jug
+jug.init('jugfile', 'jugdata')
+import jugfile
+results = jug.task.value(jugfile.results)
+for p,t in results:
+        print "%s\n\n    Password was '%s'" % (t,p)
+\end{python}
+
+\alert{jug.init} is necessary to initialise the jug backend.
+
+Then, the \alert{jugfile can be directly imported as a Python module}.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{For more information}
+
+\href{http://luispedro.org/software/jug}{http://luispedro.org/software/jug}
+
+\href{http://github.com/luispedro/jug}{http://github.com/luispedro/jug}
+\end{frame}
+\end{document}
+
