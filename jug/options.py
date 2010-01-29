@@ -45,25 +45,16 @@ other_args = argv
 
 _Commands = ('execute','status','stats','cleanup','count','invalidate')
 _Usage_string = \
-'''python %s COMMAND OPTIONS...
+'''python %s COMMAND JUGFILE OPTIONS...
 
-Possible commands:
-* execute
-    Execute tasks
-* status:
-    Print status
-* counts:
-    Simply count tasks
-* cleanup:
-    Cleanup
-* stats
-    Print statistics [Not implemented]
-* invalidate
-    Invalidate the results of a task
+Commands:
+* execute:     Execute tasks
+* status:      Print status
+* counts:      Simply count tasks
+* cleanup:     Cleanup
+* invalidate:  Invalidate the results of a task
 
 Options:
---jugfile=JUGFILE
-    Name of the jugfile to use (if not given, use jugfile.py)
 --aggressive-unload
     Aggressively unload data from memory
 --invalid=TASK-NAME
@@ -103,7 +94,9 @@ def parse():
         return
 
     cmd = args.pop(0)
-    jugfile = args.pop(0)
+    jugfile = 'jugfile.py'
+    if args:
+        jugfile = args.pop(0)
 
     if cmd not in _Commands:
         usage()
