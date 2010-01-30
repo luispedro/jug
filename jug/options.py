@@ -23,13 +23,12 @@ Options
 
 Variables
 ---------
-
-    * jugdir: main jug directory.
-    * jugfile: filesystem name for the Jugfile
-    * cmd: command to run.
-    * aggressive_unload: --aggressive-unload
-    * invalid_name: --invalid
-    * argv: Arguments not captured by jug (for script use)
+- jugdir: main jug directory.
+- jugfile: filesystem name for the Jugfile
+- cmd: command to run.
+- aggressive_unload: --aggressive-unload
+- invalid_name: --invalid
+- argv: Arguments not captured by jug (for script use)
 '''
 from __future__ import division
 import logging
