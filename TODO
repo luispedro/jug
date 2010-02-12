@@ -8,6 +8,10 @@ For 0.6:
 
 - Switch from a TODO file to dizt [Jan 6 2010]
 
+For 0.7:
+
+- Have the shell command preload the jugfile under its actual name (instead of `jugfile`). [Feb 12 2010]
+
 For 1.0:
 
 - A status option (or a new command) that signals through its exit status whether it is finished. [Dec 3 2009]
