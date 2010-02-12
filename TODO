@@ -6,13 +6,9 @@ For 0.6:
 
 - Configure the parameters of the execute loop. [Dec 7 2009]
 
-- Have a 'shell' command (like django's shell command) [Dec 29 2009]
-
 - Switch from a TODO file to dizt [Jan 6 2010]
 
 For 1.0:
-
-- Do a showmedo or similar video. [Dec 7 2009]
 
 - A status option (or a new command) that signals through its exit status whether it is finished. [Dec 3 2009]
 

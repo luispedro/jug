@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -199,6 +200,37 @@ def cleanup(store):
     removed = store.cleanup(tasks)
     print_out('Removed %s files' % removed)
 
+
+def shell(store, jugmodule):
+    '''
+    shell(store, jugmodule)
+
+    Implement 'shell' command.
+
+    Currently depends on Ipython being installed.
+    '''
+    try:
+        from IPython.Shell import IPShellEmbed
+    except ImportError:
+        print >>sys.stderr, "Could not import IPython libraries"
+        sys.exit(1)
+    ipshell = IPShellEmbed(banner='''
+=========
+Jug Shell
+=========
+
+The jugfile is available as jugfile.
+
+Enjoy...
+''')
+
+    # Clean up the namespace:
+    jugfile = jugmodule
+    del store
+    del jugmodule
+    ipshell()
+
+
 def init(jugfile, jugdir, on_error='exit'):
     '''
     store = init(jugfile, jugdir, on_error='exit')
@@ -224,14 +256,14 @@ def init(jugfile, jugdir, on_error='exit'):
         jugfile = jugfile[:-len('.py')]
     sys.path.insert(0, os.path.abspath('.'))
     try:
-        __import__(jugfile)
+        jugmodule = __import__(jugfile)
     except ImportError, e:
         logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
         if on_error == 'exit':
             sys.exit(1)
         else:
             raise
-    return store
+    return store, jugmodule
 
 
 def _sigterm(_,__):
@@ -239,7 +271,7 @@ def _sigterm(_,__):
 
 def main():
     options.parse()
-    store = init(options.jugfile, options.jugdir)
+    store,jugmodule = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
         execute(store, options.aggressive_unload)
@@ -251,6 +283,8 @@ def main():
         invalidate(store, options.invalid_name)
     elif options.cmd == 'cleanup':
         cleanup(store)
+    elif options.cmd == 'shell':
+        shell(store, jugmodule)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
 
@@ -260,4 +294,3 @@ if __name__ == '__main__':
     except Exception, exc:
         logging.critical('Unhandled Jug Error!')
         raise
-# vim: set ts=4 sts=4 sw=4 expandtab smartindent:

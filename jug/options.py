@@ -42,16 +42,17 @@ invalid_name = None
 argv = None
 other_args = argv
 
-_Commands = ('execute','status','stats','cleanup','count','invalidate')
+_Commands = ('execute','status','stats','cleanup','count','invalidate','shell')
 _Usage_string = \
 '''python %s COMMAND JUGFILE OPTIONS...
 
 Commands:
-* execute:     Execute tasks
-* status:      Print status
-* counts:      Simply count tasks
-* cleanup:     Cleanup
-* invalidate:  Invalidate the results of a task
+- execute:      Execute tasks
+- status:       Print status
+- counts:       Simply count tasks
+- cleanup:      Cleanup
+- invalidate:   Invalidate the results of a task
+- shell:        Run a shell after initialization
 
 Options:
 --aggressive-unload
