@@ -231,9 +231,9 @@ Enjoy...
     ipshell()
 
 
-def init(jugfile, jugdir, on_error='exit'):
+def init(jugfile, jugdir=None, on_error='exit'):
     '''
-    store = init(jugfile, jugdir, on_error='exit')
+    store = init(jugfile, jugdir={'jugdata'}, on_error='exit')
 
     Initializes jug (create backend connection, ...).
     Imports jugfile
@@ -249,6 +249,8 @@ def init(jugfile, jugdir, on_error='exit'):
     `store` : storage object
     '''
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
+    if jugdir is None:
+        jugdir = 'jugdata'
     store = backends.select(jugdir)
     Task.store = store
 
