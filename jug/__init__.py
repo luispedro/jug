@@ -21,9 +21,9 @@
 #  THE SOFTWARE.
 
 from __future__ import division
-from .task import TaskGenerator, Task
+from .task import TaskGenerator, Task, value
 from .jug import init
 from .backends import file_store, dict_store, redis_store
 
-__version__ = '0.5.0'
+__version__ = '0.5.9-git'
 
