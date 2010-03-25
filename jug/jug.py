@@ -62,15 +62,26 @@ def invalidate(store, invalid_name):
     '''
     invalid = set()
     tasks = task.alltasks
-    for t in tasks:
+    cache = {}
+    def isinvalid(t):
+        h = t.hash()
+        if h in cache:
+            return cache[h]
         if t.name == invalid_name:
+            cache[h] = True
+            return True
+        for dep in task.recursive_dependencies(t):
+            if type(dep) is task.Task:
+                if dep is t: continue
+                if isinvalid(dep):
+                    cache[h] = True
+                    return True
+        cache[h] = False
+        return False
+
+    for t in tasks:
+        if isinvalid(t):
             invalid.add(t)
-        else:
-            for dep in task.recursive_dependencies(t):
-                if type(dep) is task.Task:
-                    if dep.name == invalid_name:
-                        invalid.add(t)
-                        break
     if not invalid:
         print_out('No results invalidated.')
         return
