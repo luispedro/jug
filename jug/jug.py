@@ -70,7 +70,7 @@ def invalidate(store, invalid_name):
         if t.name == invalid_name:
             cache[h] = True
             return True
-        for dep in task.recursive_dependencies(t):
+        for dep in task.recursive_dependencies(t, 1):
             if type(dep) is task.Task:
                 if dep is t: continue
                 if isinvalid(dep):
