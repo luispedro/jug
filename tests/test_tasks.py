@@ -1,8 +1,16 @@
+from nose.tools import with_setup
 import jug.task
 from jug.backends.dict_store import dict_store
 
 Task = jug.task.Task
 jug.task.Task.store = dict_store()
+def _setup():
+    jug.task.Task.store = dict_store()
+
+def _teardown():
+    jug.task.alltasks = []
+
+task_reset = with_setup(_setup, _teardown)
 
 def add1(x):
     return x + 1
@@ -17,7 +25,8 @@ def _assert_tsorted(tasks):
                     assert tasks[j] not in dep
                 else:
                     assert tasks[j] is not dep
-            
+
+@task_reset
 def test_topological_sort():
     bases = [jug.task.Task(add1,i) for i in xrange(10)]
     derived = [jug.task.Task(add1,t) for t in bases]
@@ -55,6 +64,7 @@ def test_topological_sort():
     assert len(alltasks) == len(bases) + len(derived) + len(derived2) + len(derived3)
     _assert_tsorted(alltasks)
 
+@task_reset
 def test_topological_sort_kwargs():
     def add2(x):
         return x + 2
@@ -92,8 +102,8 @@ def mult(r,f):
 def reduce(r):
     return sum(r)
 
+@task_reset
 def test_topological_sort_canrun():
-
     Task = jug.task.Task
     input = Task(data)
     for f in xrange(80):
@@ -101,21 +111,25 @@ def test_topological_sort_canrun():
 
     alltasks = jug.task.alltasks
     jug.task.topological_sort(alltasks)
+    assert len(alltasks) == len(set(t.hash() for t in alltasks))
     for t in alltasks:
         assert t.can_run()
         t.run()
 
+@task_reset
 def test_load_after_run():
     T = jug.task.Task(add1,1)
     T.run()
     assert T.can_load()
 
+@task_reset
 def test_hash_same_func():
     T0 = jug.task.Task(add1,0)
     T1 = jug.task.Task(add1,1)
 
     assert T0.hash() != T1.hash()
     
+@task_reset
 def test_hash_different_func():
     T0 = jug.task.Task(add1,0)
     T1 = jug.task.Task(add2,0)
@@ -123,6 +137,7 @@ def test_hash_different_func():
     assert T0.hash() != T1.hash()
 
 
+@task_reset
 def test_taskgenerator():
     @jug.task.TaskGenerator
     def double(x):
@@ -131,6 +146,7 @@ def test_taskgenerator():
     assert type(T) == jug.task.Task
 
 
+@task_reset
 def test_unload():
     T0 = jug.task.Task(add1,0)
     assert not T0.finished
@@ -144,10 +160,12 @@ def test_unload():
 def identity(x):
     return x
 
+@task_reset
 def test_cachedfunction():
     assert jug.task.CachedFunction(identity,123) == 123
     assert jug.task.CachedFunction(identity,'mixture') == 'mixture'
 
+@task_reset
 def test_npyload():
     import numpy as np
     A = np.arange(23)
@@ -157,6 +175,7 @@ def test_npyload():
 def double(x):
     return 2 * x
 
+@task_reset
 def test_value():
     two = double(1)
     four = double(two)
@@ -166,6 +185,7 @@ def test_value():
     eight.run()
     assert jug.task.value(eight) == 8
 
+@task_reset
 def test_dict_sort_run():
     tasks = [double(1), double(2), Task(identity,2) ]
     tasks += [Task(identity,{ 'one' : tasks[2], 'two' : tasks[0], 'three' : { 1 : tasks[1], 0 : tasks[0] }})]
