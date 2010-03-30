@@ -164,9 +164,11 @@ class file_store(object):
         fname = self._getfname(fname)
         possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
         for p in possible:
-            if os.path.exists(p):
+            try:
                 os.unlink(p)
                 return True
+            except OSError:
+                pass
         return False
 
     def cleanup(self, active):
