@@ -8,11 +8,20 @@ It uses the filesystem to communicate between processes and
 works correctly over NFS, so you can coordinate processes on
 different machines.
 
-
 Jug is a pure Python implementation and should work on any platform.
 
 *Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
 
 *Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
 <http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_
+
+
+What's New
+..........
+
+Version 0.5.2:
+- New `shell` command.
+- Compression in redis backend
+- Improvements in speed for 'invalidate' command: previously, it was so bad as
+  to be deemed *scalability bug.*
 

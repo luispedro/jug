@@ -1,3 +1,9 @@
+
+version 0.5.2 Tue Mar 30 2010 by luispedro
+	* New `shell` command.
+	* Compression in redis backend
+	* Improvements in speed for 'invalidate' command
+
 version 0.5 Sun Dec 13 2009 by luispedro
 	* redis backend
 	* dictionary dependencies
