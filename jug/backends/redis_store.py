@@ -27,6 +27,8 @@ from __future__ import division
 import re
 import cPickle as pickle
 import logging
+from zlib import compress, decompress
+from base64 import b64encode, b64decode
 
 try:
     import redis
@@ -60,11 +62,17 @@ class redis_store(object):
         logging.info('connecting to %s' % redis_params)
         self.redis = redis.Redis(**redis_params)
 
+
     def dump(self, object, name):
         '''
         dump(object, name)
         '''
-        s = pickle.dumps(object)
+        if object is None:
+            s = ''
+        else:
+            s = pickle.dumps(object)
+            s = compress(s)
+            s = b64encode(s)
         self.redis.set(_resultname(name), s)
 
 
@@ -82,7 +90,13 @@ class redis_store(object):
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
         s = self.redis.get(_resultname(name))
-        return pickle.loads(str(s))
+        if s:
+            s = str(s)
+            s = b64decode(s)
+            s = decompress(s)
+            return pickle.loads(s)
+        else:
+            return None
 
 
     def remove(self, name):
