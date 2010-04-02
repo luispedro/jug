@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -24,18 +25,14 @@ file_store : file-system based data store & locks.
 '''
 from __future__ import division
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
 import os
 from os import path, mkdir, fdopen
 from os.path import dirname, exists
 import errno
 import tempfile
-import numpy as np
 import shutil
-from gzip import GzipFile
+
+from jug.backends.encode import encode, decode
 
 def _fsize(fname):
     '''Returns file size'''
@@ -89,38 +86,23 @@ class file_store(object):
 
         Performs the same as
 
-        pickle.dump(object, file(name,'w')
+        pickle.dump(object, file(name,'w'))
 
         but does it in a way that is guaranteed to be atomic even over NFS.
         '''
-        # Rename is atomic in NFS, but we need to create the temporary file in
-        # the same directory as the result.
-        #
-        # Don't mess unless you know what you are doing!
         name = self._getfname(name)
-
-        # Format:
-        #   If extension is .npy.gz, then it's a gzipped numpy npy file
-        #   If extension is .pp.gz, then it's a gzipped python pickle
-        #   If extension is .pp, then it's a python pickle
-        #   If extension is empty and file is empty, then it's None
-        if object is None:
-            create_directories(dirname(name))
-            F=file(name,'w')
-            F.close()
-            return
-        extension = '.pp.gz'
-        write = pickle.dump
-        if isinstance(object, np.ndarray):
-            extension = '.npy.gz'
-            write = (lambda f,a: np.save(a,f))
-        name = name + extension
-        fd, fname = tempfile.mkstemp(extension, 'jugtemp', self.tempdir())
-        os.close(fd)
-        F = GzipFile(fname,'w')
-        write(object,F)
-        F.close()
         create_directories(dirname(name))
+        s = encode(object)
+        if not s:
+            file(name,'w').close()
+            return
+
+        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
+        output = os.fdopen(fd, 'w')
+        output.write(s)
+        output.close()
+
+        # Rename is atomic even over NFS.
         os.rename(fname, name)
 
 
@@ -129,7 +111,7 @@ class file_store(object):
         can = can_load(fname)
         '''
         fname = self._getfname(fname)
-        return exists(fname + '.pp.gz') or exists(fname) or exists(fname + '.npy.gz')
+        return exists(fname)
 
     def load(self, fname):
         '''
@@ -138,20 +120,10 @@ class file_store(object):
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
         fname = self._getfname(fname)
-        if exists(fname) and _fsize(fname) == 0:
-            return None
-        elif exists(fname + '.pp.gz'):
-            f = GzipFile(fname + '.pp.gz')
-            load = pickle.load
-        elif exists(fname + '.npy.gz'):
-            f = GzipFile(fname + '.npy.gz')
-            load = np.load
-        else:
-            f = file(fname)
-            load = pickle.load
-        res = load(f)
-        f.close()
-        return res
+        input = file(fname)
+        s = input.read()
+        input.close()
+        return decode(s)
 
     def remove(self, fname):
         '''
@@ -161,15 +133,12 @@ class file_store(object):
 
         Returns whether any entry was actually removed.
         '''
-        fname = self._getfname(fname)
-        possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
-        for p in possible:
-            try:
-                os.unlink(p)
-                return True
-            except OSError:
-                pass
-        return False
+        try:
+            fname = self._getfname(fname)
+            os.unlink(fname)
+            return True
+        except OSError:
+            return False
 
     def cleanup(self, active):
         '''
@@ -178,20 +147,16 @@ class file_store(object):
         Implement 'cleanup' command
         '''
         files = set()
-        for path,_,fs in os.walk(self.jugdir):
+        for dir,_,fs in os.walk(self.jugdir):
             for f in fs:
-                files.add(path+'/'+f)
-        for t in tasks:
-            fname = t.hash()
-            possible = [fname,fname+'.pp.gz',fname+'.npy.gz']
-            for p in possible:
-                try:
-                    files.remove(p)
-                except:
-                    pass
+                files.add(path.join(dir,f))
+        for t in active:
+            fname = self._getfname(t.hash())
+            if fname in files:
+                files.remove(fname)
         for f in files:
             os.unlink(f)
-        print 'Removed %s files' % len(files)
+        return len(files)
 
     def getlock(self, name):
         return file_based_lock(self.jugdir, name)
@@ -262,4 +227,3 @@ class file_based_lock(object):
         '''
         return path.exists(self.fullname)
 
-# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
