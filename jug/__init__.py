@@ -25,5 +25,5 @@ from .task import TaskGenerator, Task, value
 from .jug import init
 from .backends import file_store, dict_store, redis_store
 
-__version__ = '0.5.2'
+__version__ = '0.5.9-git'
 
