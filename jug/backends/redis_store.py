@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 # Copyright (C) 2009-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +26,8 @@ redis_store: store based on a redis backend
 from __future__ import division
 
 import re
-import cPickle as pickle
 import logging
-from zlib import compress, decompress
+from jug.backends.encode import encode, decode
 from base64 import b64encode, b64decode
 
 try:
@@ -60,6 +60,7 @@ class redis_store(object):
         if match:
             redis_params = match.groupdict()
         logging.info('connecting to %s' % redis_params)
+
         self.redis = redis.Redis(**redis_params)
 
 
@@ -67,11 +68,8 @@ class redis_store(object):
         '''
         dump(object, name)
         '''
-        if object is None:
-            s = ''
-        else:
-            s = pickle.dumps(object)
-            s = compress(s)
+        s = encode(object)
+        if s:
             s = b64encode(s)
         self.redis.set(_resultname(name), s)
 
@@ -87,16 +85,13 @@ class redis_store(object):
         '''
         obj = load(name)
 
-        Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
+        Loads the object identified by `name`.
         '''
         s = self.redis.get(_resultname(name))
         if s:
             s = str(s)
             s = b64decode(s)
-            s = decompress(s)
-            return pickle.loads(s)
-        else:
-            return None
+        return decode(s)
 
 
     def remove(self, name):
@@ -151,6 +146,7 @@ class redis_lock(object):
         self.name = _lockname(name)
         self.redis = redis
 
+
     def get(self):
         '''
         lock.get()
@@ -167,6 +163,7 @@ class redis_lock(object):
         '''
         self.redis.delete(self.name)
 
+
     def is_locked(self):
         '''
         locked = lock.is_locked()
@@ -174,4 +171,3 @@ class redis_lock(object):
         status = self.redis.get(self.name)
         return status is not None and status == _LOCKED
 
-# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
