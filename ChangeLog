@@ -1,6 +1,8 @@
+version 0.5.3 Mon Apr 26 2010 by luispedro
+	* New backend compression methods
 
 version 0.5.2 Tue Mar 30 2010 by luispedro
-	* New `shell` command.
+	* New `shell` command
 	* Compression in redis backend
 	* Improvements in speed for 'invalidate' command
 

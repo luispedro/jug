@@ -31,6 +31,8 @@ setuptools not found. Please install it.
 On linux, the package is often called python-setuptools'''
     exit(1)
 
+execfile('jug/jug_version.py')
+
 long_description = '''\
 Jug: A Task-Based Parallelization Framework
 -------------------------------------------
@@ -64,7 +66,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = '0.5.9-git',
+      version = __version__,
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
