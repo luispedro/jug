@@ -202,6 +202,6 @@ def test_unload_recursive():
     two.run()
     four.run()
     four.unload_recursive ()
-    assert not four.can_load()
-    assert not two.can_load()
+    assert not four.loaded
+    assert not two.loaded
 
