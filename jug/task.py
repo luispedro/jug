@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -43,11 +44,11 @@ class Task(object):
     Task
     ----
 
-    T = Task(f, dependencies, fwkwargs)
+    T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
     Defines a task, which is roughly equivalent to
 
-    f( *[dep() for dep in dependencies], **fkwargs)
+    f(dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
     '''
     store = None
@@ -136,16 +137,9 @@ tricky to support since the general code relies on the function name)''')
 
         for tt in recursive_dependencies(t): tt.unload()
         '''
-        # FIXME: Could this be replaced by recursive_dependencies()?
-        def _dependency_walk(task):
-            for dep in list(task.dependencies) + task.kwdependencies.values():
-                if type(dep) == Task:
-                    for d in _dependency_walk(dep):
-                        yield d
-                    yield dep
-        for dep in _dependency_walk(self):
-            dep.unload()
         self.unload()
+        for dep in chain(task.dependencies, task.kwdependencies.itervalues()):
+            dep.unload_recursive()
 
     def can_load(self):
         '''
@@ -361,4 +355,3 @@ def TaskGenerator(f):
     task_generator.__name__ = ('TaskGenerator(%s)' % task_generator.__name__)
     return task_generator 
 
-# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
