@@ -138,7 +138,7 @@ tricky to support since the general code relies on the function name)''')
         for tt in recursive_dependencies(t): tt.unload()
         '''
         self.unload()
-        for dep in chain(task.dependencies, task.kwdependencies.itervalues()):
+        for dep in itertools.chain(task.dependencies, task.kwdependencies.itervalues()):
             dep.unload_recursive()
 
     def can_load(self):
