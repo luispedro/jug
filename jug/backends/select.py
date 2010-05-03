@@ -25,6 +25,18 @@ from . import redis_store
 from . import file_store
 
 def select(jugdir):
+    '''
+    store = select(jugdir)
+
+    Returns a store object appropriate for `jugdir`
+
+    Parameters
+    ----------
+      jugdir : string representation of jugdir
+    Returns
+    -------
+      store : A jug data store
+    '''
     if jugdir.startswith('redis:'):
        return redis_store.redis_store(jugdir)
     return file_store.file_store(jugdir)
