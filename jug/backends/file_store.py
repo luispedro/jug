@@ -34,11 +34,6 @@ import shutil
 
 from jug.backends.encode import encode, decode
 
-def _fsize(fname):
-    '''Returns file size'''
-    return os.stat_result(os.stat(fname)).st_size
-
-
 def create_directories(dname):
     '''
     create_directories(dname)
