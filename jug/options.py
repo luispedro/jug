@@ -29,10 +29,13 @@ Variables
 - aggressive_unload: --aggressive-unload
 - invalid_name: --invalid
 - argv: Arguments not captured by jug (for script use)
+- print_out: Print function to be used for output (behaves like Python3's print)
 '''
 from __future__ import division
 import logging
 import string
+
+from .p3 import nprint
 
 jugdir = 'jugdata'
 jugfile = 'jugfile.py'
@@ -41,6 +44,7 @@ aggressive_unload = False
 invalid_name = None
 argv = None
 other_args = argv
+print_out = nprint
 
 _Commands = ('execute','status','stats','cleanup','count','invalidate','shell')
 _Usage_string = \

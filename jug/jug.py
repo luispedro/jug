@@ -36,11 +36,8 @@ from . import task
 from . import backends
 from .backends import memoize_store
 from .task import Task
+from .options import print_out
 
-silent = False
-def print_out(s=''):
-    if not silent:
-        print s
 
 def do_print(store):
     '''
