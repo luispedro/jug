@@ -36,8 +36,8 @@ from . import task
 from . import backends
 from .backends import memoize_store
 from .task import Task
+from .subcommands.status import status
 from .options import print_out
-
 
 def do_print(store):
     '''
@@ -166,37 +166,6 @@ def execute(store, aggressive_unload=False):
     if not task_names:
         print_out('<no tasks>')
 
-def status(store):
-    '''
-    status(store)
-
-    Implements the status command.
-    '''
-    Task.store = memoize_store(store)
-    task_names = set(t.name for t in task.alltasks)
-    tasks = task.alltasks
-    tasks_ready = defaultdict(int)
-    tasks_finished = defaultdict(int)
-    tasks_running = defaultdict(int)
-    tasks_waiting = defaultdict(int)
-    for t in tasks:
-        if t.can_load():
-            tasks_finished[t.name] += 1
-        elif t.can_run():
-            if t.is_locked():
-                tasks_running[t.name] += 1
-            else:
-                tasks_ready[t.name] += 1
-        else:
-            tasks_waiting[t.name] += 1
-
-    print_out('%-40s%12s%12s%12s%12s' % ('Task name','Waiting','Ready','Finished','Running'))
-    print_out('-' * (40+12+12+12+12))
-    for t in task_names:
-        print_out('%-40s%12s%12s%12s%12s' % (t[:40],tasks_waiting[t],tasks_ready[t],tasks_finished[t],tasks_running[t]))
-    print_out('.' * (40+12+12+12+12))
-    print_out('%-40s%12s%12s%12s%12s' % ('Total:',sum(tasks_waiting.values()),sum(tasks_ready.values()),sum(tasks_finished.values()),sum(tasks_running.values())))
-    print_out()
 
 def cleanup(store):
     '''
@@ -283,14 +252,15 @@ def _sigterm(_,__):
 
 def main():
     options.parse()
-    store,jugmodule = init(options.jugfile, options.jugdir)
+    if options.cmd != 'status':
+        store,jugmodule = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
         execute(store, options.aggressive_unload)
     elif options.cmd == 'count':
         do_print(store)
     elif options.cmd == 'status':
-        status(store)
+        status()
     elif options.cmd == 'invalidate':
         invalidate(store, options.invalid_name)
     elif options.cmd == 'cleanup':

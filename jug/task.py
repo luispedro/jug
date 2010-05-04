@@ -289,15 +289,15 @@ def recursive_dependencies(t, max_level=-1):
         if type(t) is dict:
             t = t.itervalues()
         for d in t:
+            if type(d) is Task:
+                yield d
             for dd in recursive_dependencies(d, max_level):
                 yield dd
     elif type(t) is Task:
-        yield t
         if max_level:
             for dep in itertools.chain(t.dependencies, t.kwdependencies.itervalues()):
                 for d in recursive_dependencies(dep, max_level-1):
                     yield d
-
 
 def value(elem):
     '''

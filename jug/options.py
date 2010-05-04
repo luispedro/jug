@@ -34,6 +34,7 @@ Variables
 from __future__ import division
 import logging
 import string
+import sys
 
 from .p3 import nprint
 
@@ -44,6 +45,7 @@ aggressive_unload = False
 invalid_name = None
 argv = None
 print_out = nprint
+status_mode = 'cached'
 
 _Commands = ('execute','status','stats','cleanup','count','invalidate','shell')
 _Usage_string = \
@@ -85,12 +87,13 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv
+    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, status_mode
     parser = optparse.OptionParser()
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
+    parser.add_option('--no-cache',action='store_true',dest='cache',default=False)
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -124,6 +127,8 @@ def parse():
     invalid_name = options.invalid_name
     argv = args
     sys.argv = args
+    status_mode = ('no-cached' if options.cache else 'cached')
     jugdir = options.jugdir
+
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

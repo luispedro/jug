@@ -28,4 +28,6 @@ def nprint(*args):
 
     Works like Python3k's print
     '''
-    print args
+    for arg in args:
+        print arg,
+    print
