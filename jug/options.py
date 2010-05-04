@@ -43,7 +43,6 @@ cmd = None
 aggressive_unload = False
 invalid_name = None
 argv = None
-other_args = argv
 print_out = nprint
 
 _Commands = ('execute','status','stats','cleanup','count','invalidate','shell')
@@ -86,7 +85,7 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, other_args
+    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv
     parser = optparse.OptionParser()
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
@@ -124,7 +123,7 @@ def parse():
     aggressive_unload = options.aggressive_unload
     invalid_name = options.invalid_name
     argv = args
-    other_args = argv
+    sys.argv = args
     jugdir = options.jugdir
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
