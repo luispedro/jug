@@ -104,14 +104,8 @@ def execute(store, aggressive_unload=False):
     Implement 'execute' command
     '''
 
-    MAX_TASK_NAME_LEN = 52
-    task_names = set()
-    for t in task.alltasks:
-        n = t.name
-        if len(n) > MAX_TASK_NAME_LEN - 3:
-            n = n[:-3] + '...'
-        task_names.add(n)
     tasks = task.alltasks
+    task_names = set(t.name for t in tasks)
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
     task.topological_sort(tasks)
@@ -162,7 +156,8 @@ def execute(store, aggressive_unload=False):
     print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
     print_out('-' * (52+12+12))
     for t in task_names:
-        print_out('%-52s%12s%12s' % (t,tasks_executed[t],tasks_loaded[t]))
+        name_cut = t[:52]
+        print_out('%-52s%12s%12s' % (name_cut,tasks_executed[t],tasks_loaded[t]))
     if not task_names:
         print_out('<no tasks>')
 
