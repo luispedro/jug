@@ -181,26 +181,35 @@ def shell(store, jugmodule):
 
     Currently depends on Ipython being installed.
     '''
+    jugfilename = jugmodule.__name__
     try:
         from IPython.Shell import IPShellEmbed
     except ImportError:
-        print >>sys.stderr, "Could not import IPython libraries"
+        print >>sys.stderr, '''\
+jug: Error: could not import IPython libraries
+
+IPython is necessary for `shell` command.
+'''
         sys.exit(1)
+    if jugfilename == 'jugfile':
+        msg = 'The jugfile is available as `jugfile`.'
+    else:
+        msg = 'The jugfile is available as `jugfile` and as `%s`.' % jugfilename
     ipshell = IPShellEmbed(banner='''
 =========
 Jug Shell
 =========
 
-The jugfile is available as jugfile.
+%s
 
 Enjoy...
-''')
+''' % msg)
 
-    # Clean up the namespace:
-    jugfile = jugmodule
-    del store
-    del jugmodule
-    ipshell()
+    local_ns = {
+        'jugfile' : jugmodule,
+        jugfilename : jugmodule,
+    }
+    ipshell(local_ns=local_ns)
 
 
 def init(jugfile=None, jugdir=None, on_error='exit'):
