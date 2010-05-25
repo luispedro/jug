@@ -130,11 +130,12 @@ def _update_status(store, ht, deps, rdeps):
             nstatus = finished
         else:
             can_run = True
-            for dep in deps.get(i, []):
-                _,_,dhash,dstatus = ht[dep]
-                if dstatus != finished and not store.can_load(dhash):
-                    can_run = False
-                    break
+            if status != ready:
+                for dep in deps.get(i, []):
+                    _,_,dhash,dstatus = ht[dep]
+                    if dstatus != finished and not store.can_load(dhash):
+                        can_run = False
+                        break
             if can_run:
                 lock = store.getlock(hash)
                 if lock.is_locked():
