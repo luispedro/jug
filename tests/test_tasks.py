@@ -18,13 +18,14 @@ def add2(x):
     return x + 2
 
 def _assert_tsorted(tasks):
-    for i in xrange(len(tasks)):
-        for j in xrange(i+1,len(tasks)):
-            for dep in list(tasks[i].dependencies) + tasks[i].kwdependencies.values():
+    from itertools import chain
+    for i,ti in enumerate(tasks):
+        for j,tj in enumerate(tasks[i+1:]):
+            for dep in chain(ti.args, ti.kwargs.values()):
                 if type(dep) is list:
-                    assert tasks[j] not in dep
+                    assert tj not in dep
                 else:
-                    assert tasks[j] is not dep
+                    assert tj is not dep
 
 @task_reset
 def test_topological_sort():

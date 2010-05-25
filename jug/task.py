@@ -52,7 +52,7 @@ class Task(object):
 
     '''
     store = None
-    def __init__(self,f,*dependencies, **kwdependencies):
+    def __init__(self, f, *args, **kwargs):
         if f.func_name == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
 
@@ -61,8 +61,8 @@ tricky to support since the general code relies on the function name)''')
 
         self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
-        self.dependencies = dependencies
-        self.kwdependencies = kwdependencies
+        self.args = args
+        self.kwargs = kwargs
         self.finished = False
         self.loaded = False
         self._hash = None
@@ -82,8 +82,8 @@ tricky to support since the general code relies on the function name)''')
         '''
         assert self.can_run()
         assert force or not self.finished
-        args = [value(dep) for dep in self.dependencies]
-        kwargs = dict((key,value(dep)) for key,dep in self.kwdependencies.iteritems())
+        args = [value(dep) for dep in self.args]
+        kwargs = dict((key,value(dep)) for key,dep in self.kwargs.iteritems())
         self._result = self.f(*args,**kwargs)
         name = self.hash()
         self.store.dump(self._result, name)
@@ -103,12 +103,10 @@ tricky to support since the general code relies on the function name)''')
 
         Returns true if all the dependencies have their results available.
         '''
-        def is_available(dep):
-            if type(dep) == Task: return dep.finished or dep.can_load()
-            if type(dep) == list: return all(is_available(sub) for sub in dep)
-            if type(dep) == dict: return is_available(dep.values())
-            return True # If dependency is not list nor task, it's a literal value
-        return all(is_available(dep) for dep in (list(self.dependencies) + self.kwdependencies.values()))
+        for dep in self.dependencies():
+            if not dep.finished and not dep.can_load():
+                return False
+        return True
 
     def load(self):
         '''
@@ -138,9 +136,38 @@ tricky to support since the general code relies on the function name)''')
         for tt in recursive_dependencies(t): tt.unload()
         '''
         self.unload()
-        for dep in itertools.chain(self.dependencies, self.kwdependencies.itervalues()):
-            if type(dep) is Task:
-                dep.unload_recursive()
+        for dep in self.dependencies():
+            dep.unload_recursive()
+
+
+    def dependencies(self):
+        '''
+        for dep in task.dependencies():
+            ...
+
+        Iterates over all the first-level dependencies of task `t`
+
+        Parameters
+        ----------
+          self : Task
+        Returns
+        -------
+          A generator over all of `self`'s dependencies
+        See Also
+        --------
+          `recursive_dependencies`
+        '''
+        queue = [self.args, self.kwargs.values()]
+        while queue:
+            deps = queue.pop()
+            for dep in deps:
+                if type(dep) is Task:
+                    yield dep
+                elif type(dep) in (list,tuple):
+                    queue.append(dep)
+                elif type(dep) is dict:
+                    queue.append(dep.itervalues())
+
 
     def can_load(self):
         '''
@@ -177,8 +204,8 @@ tricky to support since the general code relies on the function name)''')
                     else:
                         M.update(pickle.dumps(e))
             M.update(self.name)
-            update(enumerate(self.dependencies))
-            update(self.kwdependencies.iteritems())
+            update(enumerate(self.args))
+            update(self.kwargs.iteritems())
             self._hash = M.hexdigest()
         return self._hash
 
@@ -188,7 +215,7 @@ tricky to support since the general code relies on the function name)''')
 
     def __repr__(self):
         '''Detailed representation'''
-        return 'Task(%s,dependencies=%s,kwdependencies=%s)' % (self.name,self.dependencies,self.kwdependencies)
+        return 'Task(%s, args=%s, kwargs=%s)' % (self.name, self.args, self.kwargs)
 
     def lock(self):
         '''
@@ -257,7 +284,7 @@ def topological_sort(tasks):
     sorted = []
     whites = set(tasks)
     def dfs(t):
-        for dep in recursive_dependencies(t, 1):
+        for dep in t.dependencies():
             if dep in whites:
                 whites.remove(dep)
                 dfs(dep)
@@ -269,7 +296,7 @@ def topological_sort(tasks):
 
 def recursive_dependencies(t, max_level=-1):
     '''
-    for dep in recursive_dependencies(t, max_level=None):
+    for dep in recursive_dependencies(t, max_level=-1):
         ...
 
     Returns a generator that lists all recursive dependencies of task
@@ -284,20 +311,13 @@ def recursive_dependencies(t, max_level=-1):
     '''
     if max_level is None:
         max_level = -1
+    if max_level == 0:
+        return
 
-    if type(t) in (list, tuple, dict):
-        if type(t) is dict:
-            t = t.itervalues()
-        for d in t:
-            if type(d) is Task:
-                yield d
-            for dd in recursive_dependencies(d, max_level):
-                yield dd
-    elif type(t) is Task:
-        if max_level:
-            for dep in itertools.chain(t.dependencies, t.kwdependencies.itervalues()):
-                for d in recursive_dependencies(dep, max_level-1):
-                    yield d
+    for dep in t.dependencies():
+        yield dep
+        for d2 in recursive_dependencies(dep, max_level - 1):
+            yield d2
 
 def value(elem):
     '''
