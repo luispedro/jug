@@ -67,12 +67,10 @@ def invalidate(store, invalid_name):
         if t.name == invalid_name:
             cache[h] = True
             return True
-        for dep in task.recursive_dependencies(t, 1):
-            if type(dep) is task.Task:
-                if dep is t: continue
-                if isinvalid(dep):
-                    cache[h] = True
-                    return True
+        for dep in t.dependencies():
+            if isinvalid(dep):
+                cache[h] = True
+                return True
         cache[h] = False
         return False
 
@@ -91,10 +89,10 @@ def invalidate(store, invalid_name):
     else:
         print_out('Tasks Invalidated')
         print_out()
-        print_out('    Task Name          Count')
-        print_out('----------------------------')
+        print_out('Task Name                                   Count')
+        print_out('-------------------------------------------------')
         for n_c in task_counts.items():
-            print_out('%21s: %12s' % n_c)
+            print_out('%42s: %12s' % n_c)
 
 
 def execute(store, aggressive_unload=False):
