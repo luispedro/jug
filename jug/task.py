@@ -192,12 +192,11 @@ tricky to support since the general code relies on the function name)''')
         if self._hash is None:
             M = hashlib.md5()
             def update(elems):
-                for el in elems:
-                    n,e = el
+                for n,e in elems:
                     M.update(pickle.dumps(n))
                     if type(e) == Task:
                         M.update(e.hash())
-                    elif type(e) == list:
+                    elif type(e) in (list, tuple):
                         update(enumerate(e))
                     elif type(e) == dict:
                         update(e.iteritems())
