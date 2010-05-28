@@ -1,3 +1,6 @@
+version 0.5.5-git Wed May 5 2010 by luispedro
+	* New cached status subcommand. Much faster.
+
 version 0.5.3 Mon Apr 26 2010 by luispedro
 	* New backend compression methods
 
