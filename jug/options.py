@@ -45,7 +45,7 @@ aggressive_unload = False
 invalid_name = None
 argv = None
 print_out = nprint
-status_mode = 'cached'
+status_mode = 'no-cached'
 
 _Commands = ('execute','status','stats','cleanup','count','invalidate','shell')
 _Usage_string = \
@@ -93,7 +93,7 @@ def parse():
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
-    parser.add_option('--no-cache',action='store_true',dest='cache',default=False)
+    parser.add_option('--cache', action='store_true', dest='cache', default=False)
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -127,7 +127,7 @@ def parse():
     invalid_name = options.invalid_name
     argv = args
     sys.argv = args
-    status_mode = ('no-cached' if options.cache else 'cached')
+    status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
 
 
