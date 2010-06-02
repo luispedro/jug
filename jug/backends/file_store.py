@@ -72,7 +72,7 @@ class file_store(object):
         return path.join(self.jugdir, 'tempfiles')
 
     def _getfname(self, name):
-        return path.join(self.jugdir, name[0], name[1], name[2:])
+        return path.join(self.jugdir, name[:2], name[2:])
 
 
     def dump(self, object, name):
