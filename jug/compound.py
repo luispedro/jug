@@ -24,6 +24,11 @@ from __future__ import division
 from .task import Task, alltasks
 
 def compound_task_execute(x, h):
+    '''
+    compound_task_execute
+
+    This is an internal function. Do **not** use directly.
+    '''
     Task.store.dump(x, h)
     return x
 
