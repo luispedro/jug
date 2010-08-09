@@ -169,15 +169,17 @@ tricky to support since the general code relies on the function name)''')
                     queue.append(dep.itervalues())
 
 
-    def can_load(self):
+    def can_load(self, store=None):
         '''
         bool = task.can_load()
 
         Returns whether result is available.
         '''
+        if store is None:
+            store = self.store
         if self.finished: return True
         if not self._can_load:
-            self._can_load = self.store.can_load(self.hash())
+            self._can_load = store.can_load(self.hash())
         return self._can_load
 
     def hash(self):
