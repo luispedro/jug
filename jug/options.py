@@ -47,17 +47,27 @@ argv = None
 print_out = nprint
 status_mode = 'no-cached'
 
-_Commands = ('execute','status','stats','cleanup','count','invalidate','shell')
+_Commands = (
+    'execute',
+    'status',
+    'check',
+    'stats',
+    'cleanup',
+    'count',
+    'invalidate',
+    'shell',
+    )
 _Usage_string = \
 '''python %s COMMAND JUGFILE OPTIONS...
 
 Commands:
-- execute:      Execute tasks
-- status:       Print status
-- counts:       Simply count tasks
-- cleanup:      Cleanup
-- invalidate:   Invalidate the results of a task
-- shell:        Run a shell after initialization
+   execute:      Execute tasks
+   status:       Print status
+   check:        Returns 0 if all tasks are finished. 1 otherwise.
+   counts:       Simply count tasks
+   cleanup:      Cleanup
+   invalidate:   Invalidate the results of a task
+   shell:        Run a shell after initialization
 
 Options:
 --aggressive-unload

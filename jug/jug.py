@@ -210,6 +210,24 @@ Enjoy...
     ipshell(local_ns=local_ns)
 
 
+def check(store):
+    '''
+    check(store)
+
+    Executes check subcommand
+    '''
+    tasks = task.alltasks
+    while tasks:
+        t = tasks.pop()
+        if not t.can_load(store):
+            sys.exit(1)
+        else:
+            for dep in t.dependencies():
+                if dep in tasks:
+                    del tasks[tasks.index(dep)]
+    sys.exit(0)
+
+
 def init(jugfile=None, jugdir=None, on_error='exit'):
     '''
     store = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit')
@@ -261,6 +279,8 @@ def main():
         execute(store, options.aggressive_unload)
     elif options.cmd == 'count':
         do_print(store)
+    elif options.cmd == 'check':
+        check(store)
     elif options.cmd == 'status':
         status()
     elif options.cmd == 'invalidate':

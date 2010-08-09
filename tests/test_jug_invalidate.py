@@ -3,14 +3,10 @@ import jug.jug
 import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
+from tests.task_reset import task_reset
 import random
 jug.jug.silent = True
 
-def _setup():
-    jug.task.Task.store = dict_store()
-def _teardown():
-    jug.task.alltasks = []
-task_reset = with_setup(_setup, _teardown)
 
 @task_reset
 def test_jug_invalidate():
