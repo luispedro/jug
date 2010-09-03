@@ -89,8 +89,10 @@ def invalidate(store, invalid_name):
         print_out()
         print_out('Task Name                                   Count')
         print_out('-------------------------------------------------')
+        #          0         1         2         3         4         5
+        #          012345678901234567890123456789012345678901234567890123456789
         for n_c in task_counts.items():
-            print_out('%42s: %12s' % n_c)
+            print_out('%-40s: %7s' % n_c)
 
 
 def execute(store, aggressive_unload=False):
