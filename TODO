@@ -9,8 +9,6 @@ For 0.7:
 
 For 1.0:
 
-- A status option (or a new command) that signals through its exit status whether it is finished. [Dec 3 2009]
-
 - When running the execute loop, the results of store lookup should be cached. If 100 tasks are all dependent on
     this one unfinished initial task, then we shouldn't query the store 100 times. [Dec 3 2009]
 
