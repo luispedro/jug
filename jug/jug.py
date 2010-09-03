@@ -74,9 +74,7 @@ def invalidate(store, invalid_name):
         cache[h] = False
         return False
 
-    for t in tasks:
-        if isinvalid(t):
-            invalid.add(t)
+    invalid = filter(isinvalid, tasks)
     if not invalid:
         print_out('No results invalidated.')
         return
