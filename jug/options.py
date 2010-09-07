@@ -136,7 +136,7 @@ def parse():
     aggressive_unload = options.aggressive_unload
     invalid_name = options.invalid_name
     argv = args
-    sys.argv = args
+    sys.argv = [jugfile] + args
     status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
 
