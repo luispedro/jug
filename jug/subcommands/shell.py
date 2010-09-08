@@ -21,6 +21,23 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+
+from ..task import value
+
+def load_all(jugfile):
+    '''
+    load_all(jugfile)
+
+    Loads the result of all tasks.
+    '''
+    for elem in dir(jugfile):
+        try:
+            v = value(getattr(jugfile, elem))
+            setattr(jugfile, elem, v)
+        except Exception as e:
+            print 'Error while loading %s: %s' % (elem, e)
+
+
 def shell(store, jugmodule):
     '''
     shell(store, jugmodule)
@@ -43,6 +60,15 @@ IPython is necessary for `shell` command.
         msg = 'The jugfile is available as `jugfile`.'
     else:
         msg = 'The jugfile is available as `jugfile` and as `%s`.' % jugfilename
+
+    def _load_all():
+        '''
+        load_all()
+
+        Loads all task results.
+        '''
+        load_all(jugmodule)
+
     ipshell = IPShellEmbed(banner='''
 =========
 Jug Shell
@@ -56,6 +82,7 @@ Enjoy...
     local_ns = {
         'jugfile' : jugmodule,
         jugfilename : jugmodule,
+        'load_all' : _load_all,
     }
     ipshell(local_ns=local_ns)
 
