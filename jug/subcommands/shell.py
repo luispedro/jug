@@ -76,6 +76,10 @@ Jug Shell
 
 %s
 
+Available jug functions:
+    - value() : loads a specific object
+    - load_all() : loads all objects
+
 Enjoy...
 ''' % msg)
 
@@ -83,6 +87,7 @@ Enjoy...
         'jugfile' : jugmodule,
         jugfilename : jugmodule,
         'load_all' : _load_all,
+        'value' : value,
     }
     ipshell(local_ns=local_ns)
 
