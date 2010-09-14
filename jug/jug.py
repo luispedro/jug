@@ -178,15 +178,17 @@ def check(store):
 
     Executes check subcommand
     '''
-    tasks = task.alltasks
+    tasks = set(task.alltasks)
     while tasks:
         t = tasks.pop()
         if not t.can_load(store):
             sys.exit(1)
         else:
             for dep in t.dependencies():
-                if dep in tasks:
-                    del tasks[tasks.index(dep)]
+                try:
+                    tasks.remove(dep)
+                except KeyError:
+                    pass
     sys.exit(0)
 
 
