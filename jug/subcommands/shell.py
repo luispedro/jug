@@ -34,7 +34,7 @@ def load_all(jugfile):
         try:
             v = value(getattr(jugfile, elem))
             setattr(jugfile, elem, v)
-        except Exception as e:
+        except Exception, e:
             print 'Error while loading %s: %s' % (elem, e)
 
 
