@@ -183,15 +183,18 @@ def check(store):
 
     Executes check subcommand
     '''
-    tasks = set(task.alltasks)
-    while tasks:
-        t = tasks.pop()
+    from .task import recursive_dependencies
+    tasks = task.alltasks
+    active = set(tasks)
+    for t in reversed(tasks):
+        if t not in active:
+            continue
         if not t.can_load(store):
             sys.exit(1)
         else:
-            for dep in t.dependencies():
+            for dep in recursive_dependencies(t):
                 try:
-                    tasks.remove(dep)
+                    active.remove(dep)
                 except KeyError:
                     pass
     sys.exit(0)
