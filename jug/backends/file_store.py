@@ -137,9 +137,19 @@ class file_store(object):
 
     def cleanup(self, active):
         '''
-        cleanup()
+        nr_removed = store.cleanup(active)
 
         Implement 'cleanup' command
+
+        Parameters
+        ----------
+        active : sequence
+                 files *not to remove*
+
+        Returns
+        -------
+        nr_removed : integer
+                     number of removed files
         '''
         files = set()
         for dir,_,fs in os.walk(self.jugdir):

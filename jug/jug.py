@@ -54,11 +54,16 @@ def do_print(store):
 
 def invalidate(store, invalid_name):
     '''
-    invalidate()
+    invalidate(store, invalid_name)
 
     Implement 'invalidate' command
+
+    Parameters
+    ----------
+    store : jug.backend
+    invalid_name : string
+           exact (i.e., module qualified) name of function to invalidate
     '''
-    invalid = set()
     tasks = task.alltasks
     cache = {}
     def isinvalid(t):
@@ -182,6 +187,11 @@ def check(store):
     check(store)
 
     Executes check subcommand
+
+    Parameters
+    ----------
+    store : jug.backend
+            backend to use
     '''
     from .task import recursive_dependencies
     tasks = task.alltasks
