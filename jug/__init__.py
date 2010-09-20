@@ -21,7 +21,7 @@
 #  THE SOFTWARE.
 
 from __future__ import division
-from .task import TaskGenerator, Task, value
+from .task import TaskGenerator, Task, value, CachedFunction
 from .jug import init
 from .backends import file_store, dict_store, redis_store
 from .barrier import barrier
