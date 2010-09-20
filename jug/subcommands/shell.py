@@ -46,7 +46,6 @@ def shell(store, jugmodule):
 
     Currently depends on Ipython being installed.
     '''
-    jugfilename = jugmodule.__name__
     try:
         from IPython.Shell import IPShellEmbed
     except ImportError:
@@ -56,10 +55,6 @@ jug: Error: could not import IPython libraries
 IPython is necessary for `shell` command.
 '''
         sys.exit(1)
-    if jugfilename == 'jugfile':
-        msg = 'The jugfile is available as `jugfile`.'
-    else:
-        msg = 'The jugfile is available as `jugfile` and as `%s`.' % jugfilename
 
     def _load_all():
         '''
@@ -68,6 +63,19 @@ IPython is necessary for `shell` command.
         Loads all task results.
         '''
         load_all(jugmodule)
+
+    if jugmodule is None:
+        print >>sys.stderr, '''\
+jug shell only works correctly only all the barriers have passed.'''
+        jugfilename = '<jugfile>'
+        msg = 'The jugfile is UNAVAILABLE.'
+    else:
+        jugfilename = jugmodule.__name__
+        if jugfilename == 'jugfile':
+            msg = 'The jugfile is available as `jugfile`.'
+        else:
+            msg = 'The jugfile is available as `jugfile` and as `%s`.' % jugfilename
+
 
     ipshell = IPShellEmbed(banner='''
 =========

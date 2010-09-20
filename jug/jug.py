@@ -39,6 +39,7 @@ from .task import Task
 from .subcommands.status import status
 from .subcommands.shell import shell
 from .options import print_out
+from .barrier import BarrierError
 
 def do_print(store):
     '''
@@ -246,6 +247,8 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
             sys.exit(1)
         else:
             raise
+    except BarrierError:
+        jugmodule = None
     return store, jugmodule
 
 
