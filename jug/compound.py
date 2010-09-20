@@ -21,7 +21,7 @@
 #  THE SOFTWARE.
 
 from __future__ import division
-from .task import Task, alltasks
+from .task import Task
 
 def compound_task_execute(x, h):
     '''
@@ -51,6 +51,7 @@ def CompoundTask(f, *args, **kwargs):
     -------
       task : A `Task`
     '''
+    from .task import alltasks
     task = Task(f, *args, **kwargs)
     if task.can_load():
         return task

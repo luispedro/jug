@@ -19,7 +19,6 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
-from .task import alltasks
 
 class BarrierError(Exception):
     '''
@@ -34,6 +33,11 @@ def barrier():
     In a jug file, it assures that all tasks defined up to now have been
     completed.
     ''' 
+    # The reason to import here instead of at module level is that if some
+    # other code does
+    # jug.task.alltasks = []
+    # we would still be referring to the old version
+    from .task import alltasks
     for t in reversed(alltasks):
         if not t.can_load():
             raise BarrierError

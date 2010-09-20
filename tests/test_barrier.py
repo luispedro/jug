@@ -1,5 +1,7 @@
 import jug.jug
+from tests.task_reset import task_reset
 
+@task_reset
 def test_barrier():
     store, module = jug.jug.init('tests.jugfiles.wbarrier', 'dict_store')
     assert module is None

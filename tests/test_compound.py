@@ -2,8 +2,11 @@ import jug.compound
 import jug.mapreduce
 import numpy as np
 from jug.backends.dict_store import dict_store
-from jug.compound import *
+from jug.compound import CompoundTask
 from tests.test_mapreduce import mapper, reducer, dfs_run
+from tests.task_reset import task_reset
+
+@task_reset
 def test_compound():
     jug.task.Task.store = dict_store()
     A = np.random.rand(10000)
