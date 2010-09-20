@@ -23,6 +23,7 @@
 from __future__ import division
 from . import redis_store
 from . import file_store
+from .dict_store import dict_store
 
 def select(jugdir):
     '''
@@ -32,11 +33,18 @@ def select(jugdir):
 
     Parameters
     ----------
-      jugdir : string representation of jugdir
+      jugdir : string
+            representation of jugdir.
+            Alternatively, if not a string, a data store
+
     Returns
     -------
       store : A jug data store
     '''
+    if type(jugdir) != str:
+        return jugdir
     if jugdir.startswith('redis:'):
        return redis_store.redis_store(jugdir)
+    if jugdir == 'dict_store':
+        return dict_store()
     return file_store.file_store(jugdir)
