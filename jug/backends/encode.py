@@ -40,6 +40,7 @@ def encode(object):
     Parameters
     ----------
       object : Any thing that is pickle()able
+
     Returns
     -------
       s : string (byte array).
@@ -64,9 +65,11 @@ def decode(s):
     object = decode(s)
 
     Reverses `encode`.
+
     Parameters
     ----------
       s : a string representation of the object.
+
     Returns
     -------
       object : the object
