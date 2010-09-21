@@ -23,7 +23,7 @@
 from __future__ import division
 import os
 
-from .task import Task
+from .task import Task, TaskGenerator
 
 def _return_first(one, two):
     '''
@@ -52,3 +52,23 @@ def timed_path(path):
     mtime = os.stat_result(os.stat(path)).st_mtime
     return Task(_return_first, path, mtime)
 
+@TaskGenerator
+def identity(x):
+    '''
+    x = identity(x)
+
+    `identity` implements the identity function as a Task
+    (i.e., value(identity(x)) == x)
+
+    This seems pointless, but if x is, for example, a very large list, then
+    using the output of this function might be much faster than using x directly.
+
+    Parameters
+    ----------
+    x : any object
+
+    Returns
+    -------
+    x : x
+    '''
+    return x
