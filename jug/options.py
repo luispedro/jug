@@ -57,10 +57,11 @@ _Commands = (
     'invalidate',
     'shell',
     )
-_Usage_string = \
-'''python %s COMMAND JUGFILE OPTIONS...
+_usage_string = \
+'''jug SUBCOMMAND JUGFILE OPTIONS...
 
-Commands:
+Subcommands
+-----------
    execute:      Execute tasks
    status:       Print status
    check:        Returns 0 if all tasks are finished. 1 otherwise.
@@ -69,15 +70,33 @@ Commands:
    invalidate:   Invalidate the results of a task
    shell:        Run a shell after initialization
 
-Options:
---aggressive-unload
-    Aggressively unload data from memory
---invalid=TASK-NAME
-    Task name to invalidate (for invalidate command only)
+General Options
+---------------
 --jugdir=JUGDIR
     Directory in which to save intermediate files
 --verbose=LEVEL
     Verbosity level ('DEBUG', 'INFO', 'QUIET')
+
+execute OPTIONS
+---------------
+--aggressive-unload
+    Aggressively unload data from memory
+--pdb
+    Call python debugger on errors
+
+invalidate OPTIONS
+------------------
+--invalid=TASK-NAME
+    Task name to invalidate
+
+
+Examples
+--------
+
+  jug status script.py
+  jug execute script.py &
+  jug execute script.py &
+  jug status script.py
 '''
 
 def usage():
@@ -87,7 +106,7 @@ def usage():
     Print an usage string and exit.
     '''
     import sys
-    print _Usage_string % sys.argv[0]
+    print _usage_string
     sys.exit(1)
 
 def parse():
@@ -97,13 +116,14 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, status_mode
+    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, status_mode, pdb
     parser = optparse.OptionParser()
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
     parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
     parser.add_option('--cache', action='store_true', dest='cache', default=False)
+    parser.add_option('--pdb', action='store_true', dest='pdb', default=False)
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -139,6 +159,7 @@ def parse():
     sys.argv = [jugfile] + args
     status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
+    pdb = options.pdb
 
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

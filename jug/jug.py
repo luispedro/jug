@@ -153,12 +153,17 @@ def execute(store, aggressive_unload=False):
                 else:
                     logging.info('Already in execution %s...' % t.name)
             except Exception, e:
-                import itertools
-                logging.critical('Exception while running %s: %s' % (t.name,e))
-                for other in itertools.chain(upnext, tasks):
-                    for dep in other.dependencies():
-                        if dep is t:
-                            logging.critical('Other tasks are dependent on this one! Parallel processors will be held waiting!')
+                if options.pdb:
+                    import pdb, sys
+                    _,_, tb = sys.exc_info()
+                    pdb.post_mortem(tb)
+                else:
+                    import itertools
+                    logging.critical('Exception while running %s: %s' % (t.name,e))
+                    for other in itertools.chain(upnext, tasks):
+                        for dep in other.dependencies():
+                            if dep is t:
+                                logging.critical('Other tasks are dependent on this one! Parallel processors will be held waiting!')
                 raise
             finally:
                 if locked: t.unlock()
