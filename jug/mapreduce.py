@@ -38,16 +38,15 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
         reduce(reducer, map(mapper, inputs))
 
     Roughly because the order of operations might be different. In particular,
-    `reducer` should be a true `reducer` functions (i.e., cumutative and
+    `reducer` should be a true `reducer` functions (i.e., commutative and
     associative).
 
     Parameters
     ----------
-      reducer : associative, comutative function mapping
-                    [Y_0,Y_1...] -> Y
+      reducer : associative, commutative function mapping
+                    Y_0,Y_1 -> Y'
       mapper : function from X -> Y
       inputs : list of X
-    
       map_step : Number of mapping operations to do in one go.
                  This is what defines an inner task. (default: 4)
       reduce_step : Number of reduce operations to do in one go.
