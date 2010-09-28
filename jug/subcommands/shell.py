@@ -22,6 +22,7 @@
 #  THE SOFTWARE.
 
 
+import sys
 from ..task import value
 
 def load_all(jugfile):
