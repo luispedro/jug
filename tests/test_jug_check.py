@@ -6,13 +6,18 @@ from tests.task_reset import task_reset
 import random
 jug.jug.silent = True
 
-
 def test_jug_check():
-    N = 1024
+    N = 16
     A = [False for i in xrange(N)]
     def setAi(i):
         A[i] = True
+        return i
+    def first_two(one, two):
+        return one+two
+
     setall = [Task(setAi, i) for i in xrange(N)]
+    check = Task(first_two, setall[0], setall[1])
+    check2 = Task(first_two, setall[1], setall[2])
     store = dict_store()
     jug.task.Task.store = store
     e = None
@@ -22,11 +27,14 @@ def test_jug_check():
         pass
     assert e is not None
     assert e.code == 1
+    savedtasks = jug.task.alltasks[:]
     jug.jug.execute(store)
+    jug.task.alltasks = savedtasks
 
     e = None
     try:
         jug.jug.check(store)
+        assert False
     except SystemExit, e:
         pass
     assert e is not None
