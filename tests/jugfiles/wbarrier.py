@@ -1,10 +1,16 @@
-from jug import barrier, TaskGenerator
+from jug import barrier, Task
+import math
 
-@TaskGenerator
 def double(x):
-    return x*2
+# this tests an important regression:
+# using __import__ for the jugfile with barrier() would make this code **not** work
+    val = math.sqrt(2.)*math.sqrt(2.)
+    return x*val
 
-two = double(1)
+two = Task(double,1)
 barrier()
-four = double(two)
+four = Task(double, two)
 
+def make_call(f, arg):
+    return f(arg)
+eight = Task(make_call, double, four)
