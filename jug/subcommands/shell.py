@@ -83,6 +83,7 @@ Enjoy...
         'load_all' : _load_all,
         'value' : value,
     }
+    local_ns.update(jugspace)
     ipshell(global_ns=jugspace, local_ns=local_ns)
 
 
