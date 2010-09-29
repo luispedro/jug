@@ -24,10 +24,18 @@ from __future__ import division
 from jug import Task
 from itertools import chain
 
-def _jug_map(mapper, inputs):
-     return map(mapper, inputs)
+def _jug_map_reduce(reducer, mapper, inputs):
+     return reduce(reducer, map(mapper, inputs))
 def _jug_reduce(reducer, inputs):
     return reduce(reducer, chain(inputs))
+
+def _break_up(lst, step):
+    start = 0
+    next = step
+    while start < len(lst):
+        yield lst[start:next]
+        start = next
+        next += step
 
 def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     '''
@@ -60,11 +68,8 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     -------
     task : jug.Task object
     '''
-    def _task_map(jug_op, func, args, step):
-        nsteps = len(args)//step + bool(len(args) % step)
-        return [Task(jug_op, func, args[i*step:(i+1)*step]) for i in xrange(nsteps)]
-    reducers = [Task(_jug_reduce, reducer, mapped) for mapped in _task_map(_jug_map, mapper, inputs, map_step)]
+    reducers = [Task(_jug_map_reduce, reducer, mapper, input_i) for input_i in _break_up(inputs, map_step)]
     while len(reducers) > 1:
-        reducers = _task_map(_jug_reduce, reducer, reducers, reduce_step)
+        reducers = [Task(_jug_reduce, reducer, reduce_i) for reduce_i in _break_up(reducers, reduce_step)]
     return reducers[0]
 
