@@ -83,6 +83,13 @@ Enjoy...
         'load_all' : _load_all,
         'value' : value,
     }
+
+    # This is necessary for some versions of Ipython. See:
+    # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
+    try:
+        del jugspace['__builtins__']
+    except KeyError:
+        pass
     local_ns.update(jugspace)
     ipshell(global_ns=jugspace, local_ns=local_ns)
 
