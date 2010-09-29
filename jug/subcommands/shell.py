@@ -22,7 +22,6 @@
 #  THE SOFTWARE.
 
 
-import sys
 from ..task import value
 
 def load_all(jugspace):
@@ -31,10 +30,9 @@ def load_all(jugspace):
 
     Loads the result of all tasks.
     '''
-    for elem in jugspace:
+    for k,v in jugspace.iteritems():
         try:
-            v = value(getattr(jugfile, elem))
-            setattr(jugfile, elem, v)
+            jugspace[k] = value(v)
         except Exception, e:
             print 'Error while loading %s: %s' % (elem, e)
 
@@ -50,6 +48,7 @@ def shell(store, jugspace):
     try:
         from IPython.Shell import IPShellEmbed
     except ImportError:
+        import sys
         print >>sys.stderr, '''\
 jug: Error: could not import IPython libraries
 
