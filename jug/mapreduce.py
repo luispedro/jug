@@ -43,17 +43,22 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
 
     Parameters
     ----------
-      reducer : associative, commutative function mapping
-                    Y_0,Y_1 -> Y'
-      mapper : function from X -> Y
-      inputs : list of X
-      map_step : Number of mapping operations to do in one go.
-                 This is what defines an inner task. (default: 4)
-      reduce_step : Number of reduce operations to do in one go.
-                 (default: 8)
+    reducer : associative, commutative function
+            This should map
+                  Y_0,Y_1 -> Y'
+    mapper : function from X -> Y
+    inputs : list of X
+
+    map_step : integer, optional
+            Number of mapping operations to do in one go.
+            This is what defines an inner task. (default: 4)
+    reduce_step : integer, optional
+            Number of reduce operations to do in one go.
+            (default: 8)
+
     Returns
     -------
-      A task
+    task : jug.Task object
     '''
     def _task_map(jug_op, func, args, step):
         nsteps = len(args)//step + bool(len(args) % step)
