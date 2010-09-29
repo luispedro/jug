@@ -193,7 +193,7 @@ def _status_cached():
 
 
 def _status_nocache():
-    store,jugmodule = jug.init(options.jugfile, options.jugdir)
+    store,_ = jug.init(options.jugfile, options.jugdir)
     Task.store = memoize_store(store)
 
     task_names = set(t.name for t in task.alltasks)
