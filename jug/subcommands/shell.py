@@ -25,13 +25,13 @@
 import sys
 from ..task import value
 
-def load_all(jugfile):
+def load_all(jugspace):
     '''
-    load_all(jugfile)
+    load_all(jugspace)
 
     Loads the result of all tasks.
     '''
-    for elem in dir(jugfile):
+    for elem in jugspace:
         try:
             v = value(getattr(jugfile, elem))
             setattr(jugfile, elem, v)
@@ -39,9 +39,9 @@ def load_all(jugfile):
             print 'Error while loading %s: %s' % (elem, e)
 
 
-def shell(store, jugmodule):
+def shell(store, jugspace):
     '''
-    shell(store, jugmodule)
+    shell(store, jugspace)
 
     Implement 'shell' command.
 
@@ -63,19 +63,7 @@ IPython is necessary for `shell` command.
 
         Loads all task results.
         '''
-        load_all(jugmodule)
-
-    if jugmodule is None:
-        print >>sys.stderr, '''\
-jug shell only works correctly only all the barriers have passed.'''
-        jugfilename = '<jugfile>'
-        msg = 'The jugfile is UNAVAILABLE.'
-    else:
-        jugfilename = jugmodule.__name__
-        if jugfilename == 'jugfile':
-            msg = 'The jugfile is available as `jugfile`.'
-        else:
-            msg = 'The jugfile is available as `jugfile` and as `%s`.' % jugfilename
+        load_all(jugspace)
 
 
     ipshell = IPShellEmbed(banner='''
@@ -83,21 +71,18 @@ jug shell only works correctly only all the barriers have passed.'''
 Jug Shell
 =========
 
-%s
 
 Available jug functions:
     - value() : loads a specific object
     - load_all() : loads all objects
 
 Enjoy...
-''' % msg)
+''')
 
     local_ns = {
-        'jugfile' : jugmodule,
-        jugfilename : jugmodule,
         'load_all' : _load_all,
         'value' : value,
     }
-    ipshell(local_ns=local_ns)
+    ipshell(global_ns=jugspace, local_ns=local_ns)
 
 

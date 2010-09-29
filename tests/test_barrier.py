@@ -3,9 +3,9 @@ from tests.task_reset import task_reset
 
 @task_reset
 def test_barrier():
-    store, module = jug.jug.init('tests.jugfiles.wbarrier', 'dict_store')
-    assert module is None
+    store, space = jug.jug.init('tests/jugfiles/wbarrier.py', 'dict_store')
+    assert 'four' not in space
     jug.task.alltasks[0].run()
-    store, module = jug.jug.init('tests.jugfiles.wbarrier', store)
-    assert module is not None
+    store, space = jug.jug.init('tests/jugfiles/wbarrier.py', store)
+    assert 'four' in space
 

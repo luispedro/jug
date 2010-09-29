@@ -23,12 +23,9 @@
 
 from __future__ import division
 from collections import defaultdict
-from signal import signal, SIGTERM
-from time import sleep
 import sys
 import os
 import os.path
-import random
 import logging
 
 from . import options
@@ -102,12 +99,17 @@ def invalidate(store, invalid_name):
             print_out('%-40s: %7s' % n_c)
 
 
+def _sigterm(_,__):
+    sys.exit(1)
+
 def execute(store, aggressive_unload=False):
     '''
     execute(store, aggressive_unload=False)
 
     Implement 'execute' command
     '''
+    from time import sleep
+    from signal import signal, SIGTERM
 
     tasks = task.alltasks
     task_names = set(t.name for t in tasks)
@@ -218,7 +220,7 @@ def check(store):
 
 def init(jugfile=None, jugdir=None, on_error='exit'):
     '''
-    store = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit')
+    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit')
 
     Initializes jug (create backend connection, ...).
     Imports jugfile
@@ -232,38 +234,53 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
     Returns
     -------
     `store` : storage object
+    `jugspace` : dictionary
     '''
+    import imp
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
+
     if jugfile is None:
         jugfile = 'jugfile'
     if jugdir is None:
         jugdir = 'jugdata'
     store = backends.select(jugdir)
     Task.store = store
-
-    if jugfile.endswith('.py'):
-        jugfile = jugfile[:-len('.py')]
     sys.path.insert(0, os.path.abspath('.'))
+
+    # The reason for this implementation is that it is the only that seems to
+    # work with both barrier and pickle()ing of functions inside the jugfile
+    #
+    # Just doing __import__() will not work because if there is a BarrierError
+    # thrown, then functions defined inside the jugfile end up in a confusing
+    # state.
+    #
+    # Alternatively, just execfile()ing will make any functions defined in the
+    # jugfile unpickle()able which makes mapreduce not work
+    #
+    # Therefore, we simulate (partially) __import__ and set sys.modules *even*
+    # if BarrierError is raised.
+    #
+    jugmodname = os.path.basename(jugfile[:-len('.py')])
+    jugmodule = imp.new_module(jugmodname)
+    jugspace = jugmodule.__dict__
     try:
-        jugmodule = __import__(jugfile)
-    except ImportError, e:
+        execfile(jugfile, jugspace, jugspace)
+    except BarrierError:
+        pass
+    except Exception, e:
         logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
         if on_error == 'exit':
             sys.exit(1)
         else:
             raise
-    except BarrierError:
-        jugmodule = None
-    return store, jugmodule
+    sys.modules[jugmodname] = jugmodule
+    return store, jugspace
 
-
-def _sigterm(_,__):
-    sys.exit(1)
 
 def main():
     options.parse()
     if options.cmd != 'status':
-        store,jugmodule = init(options.jugfile, options.jugdir)
+        store,jugspace = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
         execute(store, options.aggressive_unload)
@@ -278,7 +295,7 @@ def main():
     elif options.cmd == 'cleanup':
         cleanup(store)
     elif options.cmd == 'shell':
-        shell(store, jugmodule)
+        shell(store, jugspace)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
 
