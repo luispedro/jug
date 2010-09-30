@@ -20,6 +20,33 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+'''
+JUG: Coarse Level Paralelisation for Python
+===========================================
+
+The main use of jug is from the command line:
+
+jug status jugfile.py
+jug execute jugfile.py
+
+You import jug to help you write your jugfiles.
+
+Main Contents
+-------------
+
+Task : Task class
+    Task(function, arg0, arg1, arg2,...)
+
+TaskGenerator : functional decorator
+
+CachedFunction : load a function result from disk, running it if needed
+
+barrier : function
+    if you place this anywhere in a jugfile, it assures that all tasks up to
+    this point have completed before proceeding.
+
+'''
+
 from __future__ import division
 from .task import TaskGenerator, Task, value, CachedFunction
 from .jug import init
