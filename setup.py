@@ -32,26 +32,7 @@ On linux, the package is often called python-setuptools'''
     exit(1)
 
 execfile('jug/jug_version.py')
-
-long_description = '''\
-Jug: A Task-Based Parallelization Framework
--------------------------------------------
-
-Jug allows you to write code that is broken up into
-tasks and run different tasks on different processors.
-
-It has two storage backends: One uses the filesystem to
-communicate between processes and works correctly over NFS,
-so you can coordinate processes on different machines. The
-other uses a redis database and all it needs is for different
-processes to be able to communicate with a common redis server.
-
-Jug is a pure Python implementation and should work on any platform.
-
-*Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
-
-*Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
-<http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_ '''
+long_description = file('README.rst').read()
 
 classifiers = [
 'Development Status :: 4 - Beta',
