@@ -12,6 +12,8 @@ Jug is a pure Python implementation and should work on any platform.
 
 *Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
 
+*Documentation*: `http://packages.python.org/Jug <http://packages.python.org/Jug>`_
+
 *Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
 <http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_
 
