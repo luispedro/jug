@@ -42,6 +42,7 @@ def create_directories(dname):
     '''
     if dname.endswith('/'): dname = dname[:-1]
     head, tail = path.split(dname)
+    if path.exists(dname): return
     if head: create_directories(head)
     try:
         mkdir(dname)
@@ -59,14 +60,8 @@ class file_store(object):
         '''
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
-        head, tail = path.split(dname)
-        if head: create_directories(head)
+        create_directories(self.jugdir)
         create_directories(self.tempdir())
-        try:
-            mkdir(dname)
-        except OSError, e:
-            if e.errno != errno.EEXIST:
-                raise
 
     def tempdir(self):
         return path.join(self.jugdir, 'tempfiles')
@@ -77,7 +72,7 @@ class file_store(object):
 
     def dump(self, object, name):
         '''
-        dump(object, name)
+        store.dump(object, name)
 
         Performs the same as
 
@@ -186,9 +181,9 @@ class file_based_lock(object):
     Functions:
     ----------
 
-        * get(): acquire the lock
-        * release(): release the lock
-        * is_locked(): check lock state
+    - get(): acquire the lock
+    - release(): release the lock
+    - is_locked(): check lock state
     '''
 
     def __init__(self, jugdir, name):
