@@ -15,6 +15,8 @@ Jug is a pure Python implementation and should work on any platform.
 *Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
 <http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_
 
+*Mailing List*: `http://groups.google.com/group/jug-users
+<http://groups.google.com/group/jug-users>`_
 
 Short Example
 .............
