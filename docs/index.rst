@@ -28,6 +28,15 @@ Contents:
     backends.rst
     barrier.rst
 
+Links
+-----
+
+- `Mailing list <http://groups.google.com/group/jug-users>`__
+- `Github <http://github.com/luispedro/jug>`__
+- `Freshmeat <http://freshmeat.net/projects/jug>`__
+- `Documentation <http://packages.python.org/Jug/>`__
+- `Homepage <http://luispedro.org/software/jug>`__
+
 Examples
 --------
 
