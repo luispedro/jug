@@ -63,8 +63,6 @@ tricky to support since the general code relies on the function name)''')
         self.f = f
         self.args = args
         self.kwargs = kwargs
-        self.finished = False
-        self.loaded = False
         self._hash = None
         self._lock = None
         self._can_load = False
@@ -81,17 +79,16 @@ tricky to support since the general code relies on the function name)''')
           force : if True, always run the task (even if it ran before)
         '''
         assert self.can_run()
-        assert force or not self.finished
         args = [value(dep) for dep in self.args]
         kwargs = dict((key,value(dep)) for key,dep in self.kwargs.iteritems())
         self._result = self.f(*args,**kwargs)
         name = self.hash()
         self.store.dump(self._result, name)
-        self.finished = True
         return self._result
 
     def _get_result(self):
-        if not self.finished: self.load()
+        if not hasattr(self, '_result'):
+            self.load()
         return self._result
 
     result = property(_get_result,doc='Result value')
@@ -104,7 +101,7 @@ tricky to support since the general code relies on the function name)''')
         Returns true if all the dependencies have their results available.
         '''
         for dep in self.dependencies():
-            if not dep.finished and not dep.can_load():
+            if not hasattr(dep, '_result') and not dep.can_load():
                 return False
         return True
 
@@ -116,7 +113,6 @@ tricky to support since the general code relies on the function name)''')
         '''
         assert self.can_load()
         self._result = self.store.load(self.hash())
-        self.finished = True
 
     def unload(self):
         '''
@@ -124,8 +120,7 @@ tricky to support since the general code relies on the function name)''')
 
         Unload results (can be useful for saving memory).
         '''
-        self._result = None
-        self.finished = False
+        del self._result
 
     def unload_recursive(self):
         '''
@@ -177,7 +172,6 @@ tricky to support since the general code relies on the function name)''')
         '''
         if store is None:
             store = self.store
-        if self.finished: return True
         if not self._can_load:
             self._can_load = store.can_load(self.hash())
         return self._can_load
