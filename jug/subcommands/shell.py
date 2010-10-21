@@ -34,7 +34,7 @@ def load_all(jugspace):
         try:
             jugspace[k] = value(v)
         except Exception, e:
-            print 'Error while loading %s: %s' % (elem, e)
+            print 'Error while loading %s: %s' % (k, e)
 
 
 def shell(store, jugspace):
@@ -89,7 +89,6 @@ Enjoy...
         del jugspace['__builtins__']
     except KeyError:
         pass
-    local_ns.update(jugspace)
     ipshell(global_ns=jugspace, local_ns=local_ns)
 
 

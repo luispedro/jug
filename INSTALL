@@ -1,5 +1,19 @@
 INSTALL
 ========
 
+Preferred Method
+----------------
+
+The preferred method is that you use pip or easy_install::
+
+    pip install jug
+
+or
+
+    easy_install jug
+
+From Source
+-----------
+
 Follow the typical
     python setup.py install

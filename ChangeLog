@@ -1,3 +1,9 @@
+version 0.7
+	* `barrier()`
+	* better ``shell`` command
+	* Rewrote method for loading jugfiles
+	* Tasks have original function accessible as `f`
+
 version 0.6.1 Mon Sep 13 2010 by luispedro
 	* New check command
 	* load_all() inside shell

@@ -26,6 +26,7 @@ Contents:
     decrypt-example.rst
     text-example.rst
     backends.rst
+    barrier.rst
 
 Examples
 --------
