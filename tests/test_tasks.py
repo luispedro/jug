@@ -150,10 +150,10 @@ def test_taskgenerator():
 @task_reset
 def test_unload():
     T0 = jug.task.Task(add1,0)
-    assert not T0.finished
+    assert not hasattr(T0, '_result')
     assert T0.can_run()
     T0.run()
-    assert T0.finished
+    assert hasattr(T0, '_result')
     assert T0.result == 1
     T0.unload()
     assert T0.result == 1
@@ -203,6 +203,6 @@ def test_unload_recursive():
     two.run()
     four.run()
     four.unload_recursive ()
-    assert not four.loaded
-    assert not two.loaded
+    assert not hasattr(four, '_result')
+    assert not hasattr(two, '_result')
 
