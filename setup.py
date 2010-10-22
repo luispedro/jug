@@ -43,6 +43,7 @@ classifiers = [
 'Programming Language :: Python',
 'Topic :: Scientific/Engineering',
 'Topic :: Software Development',
+'Topic :: System :: Distributed Computing',
 'Intended Audience :: Science/Research',
 ]
 
