@@ -31,6 +31,8 @@ def load_all(jugspace):
     Loads the result of all tasks.
     '''
     for k,v in jugspace.iteritems():
+        # ignore objects name like __this__
+        if k.startswith('__') and k.endswith('__'): continue
         try:
             jugspace[k] = value(v)
         except Exception, e:
