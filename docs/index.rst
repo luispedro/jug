@@ -16,26 +16,6 @@ the capability to connect to a common redis server.
 Jug also takes care of saving all the intermediate results to the backend in a
 way that allows them to be retrieved later.
 
-Contents:
----------
-
-.. toctree::
-    :maxdepth: 2
-
-    tutorial.rst
-    decrypt-example.rst
-    text-example.rst
-    backends.rst
-    barrier.rst
-
-Links
------
-
-- `Mailing list <http://groups.google.com/group/jug-users>`__
-- `Github <http://github.com/luispedro/jug>`__
-- `Freshmeat <http://freshmeat.net/projects/jug>`__
-- `Documentation <http://packages.python.org/Jug/>`__
-- `Homepage <http://luispedro.org/software/jug>`__
 
 Examples
 --------
@@ -64,11 +44,11 @@ fast.
 
 Now type ``jug status primes.py`` to get::
 
-    Task name                                    Waiting       Ready    Finished     Running
-    ----------------------------------------------------------------------------------------
-    primes.is_prime                                    0          99           0           0
-    ........................................................................................
-    Total:                                             0          99           0           0
+    Task name                     Waiting       Ready    Finished     Running
+    -------------------------------------------------------------------------
+    primes.is_prime                     0          99           0           0
+    .........................................................................
+    Total:                              0          99           0           0
 
 
 This tells you that you have 99 tasks called ``primes.is_prime`` ready to run.
@@ -77,11 +57,11 @@ background (if you have multiple cores, for example). After starting 4
 instances and waiting a few seconds, you can check the status again (with ``jug
 status primes.py``)::
 
-    Task name                                    Waiting       Ready    Finished     Running
-    ----------------------------------------------------------------------------------------
-    primes.is_prime                                    0          63          32           4
-    ........................................................................................
-    Total:                                             0          63          32           4
+    Task name                     Waiting       Ready    Finished     Running
+    -------------------------------------------------------------------------
+    primes.is_prime                     0          63          32           4
+    .........................................................................
+    Total:                              0          63          32           4
 
 
 Now you have 32 tasks finished, 4 running, and 63 still ready. Eventually, they
@@ -95,12 +75,33 @@ the `value` function::
     In [2]: primes100[:10]
     Out[2]: [True, True, False, True, False, True, False, False, False, True]
 
-
 More Examples
 ~~~~~~~~~~~~~
 
 There is a worked out example in the `tutorial`_, and another, fully functioning in
 the `examples/` directory.
+
+
+Contents:
+---------
+
+.. toctree::
+    :maxdepth: 2
+
+    tutorial.rst
+    decrypt-example.rst
+    text-example.rst
+    backends.rst
+    barrier.rst
+
+Links
+-----
+
+- `Mailing list <http://groups.google.com/group/jug-users>`__
+- `Github <http://github.com/luispedro/jug>`__
+- `Freshmeat <http://freshmeat.net/projects/jug>`__
+- `Documentation <http://packages.python.org/Jug/>`__
+- `Homepage <http://luispedro.org/software/jug>`__
 
 How do I get Jug?
 -----------------
