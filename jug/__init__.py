@@ -47,11 +47,24 @@ barrier : function
 
 '''
 
-from __future__ import division
 from .task import TaskGenerator, Task, value, CachedFunction
-from .jug import init
-from .backends import file_store, dict_store, redis_store
 from .barrier import barrier
 
+from .jug import init
+from .backends import file_store, dict_store, redis_store
+
 from .jug_version import __version__
+
+__all__ = [
+    'Task',
+    'TaskGenerator',
+    'value',
+    'CachedFunction',
+    'barrier',
+
+    'init',
+    'file_store',
+    'dict_store',
+    'redis_store',
+    ]
 
