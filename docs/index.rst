@@ -91,8 +91,9 @@ Contents:
     tutorial.rst
     decrypt-example.rst
     text-example.rst
-    backends.rst
+    subcommands.rst
     barrier.rst
+    backends.rst
 
 Links
 -----
