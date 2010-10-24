@@ -36,10 +36,23 @@ def _lockname(name):
 
 
 class dict_store(object):
-    def __init__(self):
+    def __init__(self, backend=None):
         '''
+        dict_store(backend=None)
+
+        Parameters
+        ----------
+        backend : str, optional
+                  filename to load/save to
         '''
-        self.store = {}
+        if backend is not None:
+            try:
+                self.store = pickle.load(file(backend))
+            except IOError:
+                self.store = {}
+        else:
+            self.store = {}
+        self.backend = backend
         self.counts = defaultdict(int)
 
     def dump(self, object, name):
@@ -103,7 +116,8 @@ class dict_store(object):
 
 
     def close(self):
-        pass
+        if self.backend is not None:
+            pickle.dump(self.store, file(self.backend, 'w'))
 
 
 _NOT_LOCKED, _LOCKED = 0,1

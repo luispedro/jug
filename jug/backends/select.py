@@ -47,4 +47,7 @@ def select(jugdir):
        return redis_store.redis_store(jugdir)
     if jugdir == 'dict_store':
         return dict_store()
+    if jugdir.startswith('dict_store:'):
+        return dict_store(jugdir[len('dict_store:'):])
     return file_store.file_store(jugdir)
+
