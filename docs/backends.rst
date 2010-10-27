@@ -10,8 +10,9 @@ synchronises the running processes when needed.
 What Backends Are Available?
 ----------------------------
 
-There are two backend available: one is based on the filesystem, the other is a
-`redis`_ backend.
+There are three backend available: one is based on the filesystem, the other is a
+`redis`_ backend and a simple in-memory backend which does not allow sharing
+across processes.
 
 Filesystem
 ..........
@@ -29,6 +30,16 @@ is even easier).
     1. Run a redis server (see its docs for how to control it, but simply calling
     ``redis-server`` should work).
     2. Now start your jug jobs with the ``--jugdir=redis://127.0.0.1/``.
+
+In Memory Store
+---------------
+
+If you just want an in-memory store, use ``--jugdir=dict_store:filename`` and
+the results will be loaded and saved into ``filename`` (use just
+``--jugdir=dict_store`` to get a run where results are *not* saved to file.
+
+This is only appropriate for small projects, but has the lowest maintenance of
+any system.
 
 Which Backend Should I Use?
 ---------------------------
@@ -48,3 +59,4 @@ significantly less space.
 So the tradeoffs are speed and space vs. convenience. 
 
 .. _redis: http://code.google.com/p/redis
+
