@@ -119,11 +119,17 @@ def execute(store, aggressive_unload=False):
     logging.info('Execute start (%s tasks)' % len(tasks))
     signal(SIGTERM,_sigterm)
     while tasks:
-        upnext = []
+        upnext = [] # tasks that can be run
         for i in xrange(30*60//12): #This is at most half-an-hour
             cannot_run = 0
             max_cannot_run = min(len(tasks), 128)
             while not tasks[0].can_run() and cannot_run < max_cannot_run:
+                # The argument for this is the following:
+                # if T' is dependent on the result of T', it is better if the
+                # processor that ran T, also runs T'. By having everyone else
+                # push T' to the end of tasks, this is more likely to happen.
+                #
+                # Furthermore, this avoids always querying the same tasks.
                 tasks.append(tasks.pop(0))
                 cannot_run += 1
             while tasks and tasks[0].can_run():
