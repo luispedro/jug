@@ -44,11 +44,11 @@ fast.
 
 Now type ``jug status primes.py`` to get::
 
-    Task name                                    Waiting       Ready    Finished     Running
-    ----------------------------------------------------------------------------------------
-    primes.is_prime                                    0          99           0           0
-    ........................................................................................
-    Total:                                             0          99           0           0
+    Task name                  Waiting       Ready    Finished     Running
+    ----------------------------------------------------------------------
+    primes.is_prime                  0          99           0           0
+    ......................................................................
+    Total:                           0          99           0           0
 
 
 This tells you that you have 99 tasks called ``primes.is_prime`` ready to run.
@@ -57,11 +57,11 @@ background (if you have multiple cores, for example). After starting 4
 instances and waiting a few seconds, you can check the status again (with ``jug
 status primes.py``)::
 
-    Task name                                    Waiting       Ready    Finished     Running
-    ----------------------------------------------------------------------------------------
-    primes.is_prime                                    0          63          32           4
-    ........................................................................................
-    Total:                                             0          63          32           4
+    Task name                  Waiting       Ready    Finished     Running
+    ----------------------------------------------------------------------
+    primes.is_prime                  0          63          32           4
+    ......................................................................
+    Total:                           0          63          32           4
 
 
 Now you have 32 tasks finished, 4 running, and 63 still ready. Eventually, they
