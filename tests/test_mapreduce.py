@@ -3,6 +3,7 @@ import numpy as np
 import jug.mapreduce
 from jug.backends.dict_store import dict_store
 from jug.mapreduce import _break_up
+from jug import value
 from task_reset import task_reset
 
 def mapper(x):
@@ -22,6 +23,16 @@ def test_mapreduce():
     t = jug.mapreduce.mapreduce(reducer, mapper, A)
     dfs_run(t)
     assert np.abs(t.result - (A**2).sum()) < 1.
+
+@task_reset
+def test_map():
+    np.random.seed(33)
+    jug.task.Task.store = dict_store()
+    A = np.random.rand(10000)
+    t = jug.mapreduce.map(mapper, A)
+    dfs_run(t)
+    ts = value(t)
+    assert np.all(ts == np.array(map(mapper,A)))
 
 
 

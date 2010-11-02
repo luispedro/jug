@@ -10,11 +10,13 @@ mapreduce: Build tasks that follow a map-reduce pattern.
 from __future__ import division
 from jug import Task
 from itertools import chain
+import operator
 
-__all__ = ['mapreduce']
+__all__ = ['mapreduce', 'map']
 
 def _jug_map_reduce(reducer, mapper, inputs):
-     return reduce(reducer, map(mapper, inputs))
+    import __builtin__
+    return reduce(reducer, __builtin__.map(mapper, inputs))
 def _jug_reduce(reducer, inputs):
     return reduce(reducer, chain(inputs))
 
@@ -25,6 +27,12 @@ def _break_up(lst, step):
         yield lst[start:next]
         start = next
         next += step
+
+class _jug_map(object):
+    def __init__(self, mapper):
+        self.mapper = mapper
+    def __call__(self, e):
+        return [self.mapper(e)]
 
 def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     '''
@@ -61,4 +69,34 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     while len(reducers) > 1:
         reducers = [Task(_jug_reduce, reducer, reduce_i) for reduce_i in _break_up(reducers, reduce_step)]
     return reducers[0]
+
+def map(mapper, sequence, map_step=4):
+    '''
+    sequence' = map(mapper, sequence, map_step=4)
+
+    Roughly equivalent to::
+
+        sequence' = [Task(mapper,s) for s in sequence]
+
+    except that the tasks are grouped in groups of `map_step`
+    
+    Parameters
+    ----------
+    mapper : function
+        functions from A -> B
+    sequence : list of A
+    map_step : integer, optional
+        nr of elements to process per task. This should be set so that each
+        task takes the right amount of time.
+    
+    Returns
+    -------
+    sequence' : list of B
+        sequence'[i] = mapper(sequence[i])
+    
+    See Also
+    --------
+    mapreduce    
+    '''
+    return mapreduce(operator.add, _jug_map(mapper), sequence, map_step=map_step, reduce_step=(len(sequence)//map_step+1))
 
