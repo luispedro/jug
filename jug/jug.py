@@ -207,14 +207,34 @@ def check(store):
     store : jug.backend
             backend to use
     '''
+    _check_or_sleep_until(store, False)
+
+def sleep_until(store):
+    '''
+    sleep_until(store)
+
+    Execute sleep-until subcommand
+
+    Parameters
+    ----------
+    store : jug.backend
+            backend to use
+    '''
+    _check_or_sleep_until(store, True)
+
+def _check_or_sleep_until(store, sleep_until):
     from .task import recursive_dependencies
     tasks = task.alltasks
     active = set(tasks)
     for t in reversed(tasks):
         if t not in active:
             continue
-        if not t.can_load(store):
-            sys.exit(1)
+        while not t.can_load(store):
+            if sleep_until:
+                from time import sleep
+                sleep(12)
+            else:
+                sys.exit(1)
         else:
             for dep in recursive_dependencies(t):
                 try:
@@ -294,6 +314,8 @@ def main():
         do_print(store)
     elif options.cmd == 'check':
         check(store)
+    elif options.cmd == 'sleep-until':
+        sleep_until(store)
     elif options.cmd == 'status':
         status()
     elif options.cmd == 'invalidate':

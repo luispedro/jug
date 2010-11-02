@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +52,7 @@ _Commands = (
     'execute',
     'status',
     'check',
+    'sleep-until',
     'stats',
     'cleanup',
     'count',
@@ -65,6 +67,7 @@ Subcommands
    execute:      Execute tasks
    status:       Print status
    check:        Returns 0 if all tasks are finished. 1 otherwise.
+   sleep-until:  Wait until all tasks are done, then exit.
    counts:       Simply count tasks
    cleanup:      Cleanup
    invalidate:   Invalidate the results of a task
@@ -162,4 +165,3 @@ def parse():
     pdb = options.pdb
 
 
-# vim: set ts=4 sts=4 sw=4 expandtab smartindent:

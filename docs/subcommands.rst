@@ -51,6 +51,14 @@ check
 Check is simple: it returns 0 if all tasks have run, 1 otherwise. Useful for
 shell scripting.
 
+sleep-until
+~~~~~~~~~~~
+
+This subcommand will simply wait until all tasks are finished before exiting.
+It is useful for monitoring a computation (especially if your terminal has an
+option to display a pop-up or bell when it detects activity). It **does not**
+monitor whether errors occur!
+
 invalidate
 ~~~~~~~~~~
 
