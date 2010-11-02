@@ -114,10 +114,11 @@ class dict_store(object):
     def getlock(self, name):
         return dict_lock(self.store, self.counts, name)
 
-
     def close(self):
         if self.backend is not None:
             pickle.dump(self.store, file(self.backend, 'w'))
+            self.backend = None
+    __del__ = close
 
 
 _NOT_LOCKED, _LOCKED = 0,1
