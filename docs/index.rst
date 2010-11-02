@@ -92,6 +92,7 @@ Contents:
     decrypt-example.rst
     text-example.rst
     subcommands.rst
+    tasks.rst
     barrier.rst
     backends.rst
 
