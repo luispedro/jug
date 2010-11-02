@@ -1,4 +1,7 @@
-version 0.7
+version 0.7.1
+	* sleep-until subcommand
+
+version 0.7 by luispedro
 	* `barrier()`
 	* better ``shell`` command
 	* Rewrote method for loading jugfiles
