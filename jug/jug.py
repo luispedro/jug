@@ -269,6 +269,7 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
     jugmodname = os.path.basename(jugfile[:-len('.py')])
     jugmodule = imp.new_module(jugmodname)
     jugspace = jugmodule.__dict__
+    sys.modules[jugmodname] = jugmodule
     try:
         execfile(jugfile, jugspace, jugspace)
     except BarrierError:
@@ -279,7 +280,6 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
             sys.exit(1)
         else:
             raise
-    sys.modules[jugmodname] = jugmodule
     return store, jugspace
 
 
