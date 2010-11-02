@@ -1,5 +1,7 @@
-version 0.7.1
+version 0.7.1 Mon Nov 2 2010 by luispedro
 	* sleep-until subcommand
+	* Fix for barrier() and mapreduce interaction
+	* Documentation improvement
 
 version 0.7 by luispedro
 	* `barrier()`
