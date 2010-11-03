@@ -17,6 +17,22 @@ Jug also takes care of saving all the intermediate results to the backend in a
 way that allows them to be retrieved later.
 
 
+Documentation Contents
+----------------------
+
+.. toctree::
+    :maxdepth: 2
+
+    tutorial.rst
+    decrypt-example.rst
+    text-example.rst
+    subcommands.rst
+    types.rst
+    tasks.rst
+    barrier.rst
+    backends.rst
+    faq.rst
+
 Examples
 --------
 
@@ -80,22 +96,6 @@ More Examples
 
 There is a worked out example in the `tutorial`_, and another, fully functioning in
 the `examples/` directory.
-
-
-Contents:
----------
-
-.. toctree::
-    :maxdepth: 2
-
-    tutorial.rst
-    decrypt-example.rst
-    text-example.rst
-    subcommands.rst
-    types.rst
-    tasks.rst
-    barrier.rst
-    backends.rst
 
 Links
 -----
