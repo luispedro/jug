@@ -79,6 +79,13 @@ the `value` function::
 What's New
 ..........
 
+Version 0.7.2:
+- included missing files in the distribution
+
+Version 0.7.1:
+- ``sleep-until`` subcommand
+- bugfixes
+
 Version 0.7 (starting with 0.6.9 in testing):
 - `barrier()`
 - better ``shell`` command
