@@ -102,14 +102,17 @@ def invalidate(store, invalid_name):
 def _sigterm(_,__):
     sys.exit(1)
 
-def execute(store, aggressive_unload=False):
+def execute(store, aggressive_unload=False, options=None):
     '''
-    execute(store, aggressive_unload=False)
+    execute(store, aggressive_unload=False, options=None)
 
     Implement 'execute' command
     '''
     from time import sleep
     from signal import signal, SIGTERM
+    if options is None:
+        from . import options as default_options
+        options = default_options
 
     tasks = task.alltasks
     task_names = set(t.name for t in tasks)
@@ -120,7 +123,7 @@ def execute(store, aggressive_unload=False):
     signal(SIGTERM,_sigterm)
     while tasks:
         upnext = [] # tasks that can be run
-        for i in xrange(30*60//12): #This is at most half-an-hour
+        for i in xrange(options.execute_nr_wait_cycles):
             cannot_run = 0
             max_cannot_run = min(len(tasks), 128)
             while not tasks[0].can_run() and cannot_run < max_cannot_run:
@@ -137,7 +140,7 @@ def execute(store, aggressive_unload=False):
             if upnext:
                 break
             logging.info('waiting 12 secs for an open task...')
-            sleep(12)
+            sleep(options.execute_wait_cycle_time_secs)
         if not upnext:
             logging.info('No tasks can be run!')
             return
@@ -309,7 +312,7 @@ def main():
         store,jugspace = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
-        execute(store, options.aggressive_unload)
+        execute(store, options.aggressive_unload, options)
     elif options.cmd == 'count':
         do_print(store)
     elif options.cmd == 'check':

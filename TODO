@@ -4,9 +4,6 @@ For 0.7:
 
 - Configure the nr. of tasks that can be pending before bailing out. [Dec 7 2009]
 
-- Configure the parameters of the execute loop. [Dec 7 2009]
-
-
 For 1.0:
 
 - When running the execute loop, the results of store lookup should be cached. If 100 tasks are all dependent on

@@ -48,6 +48,9 @@ argv = None
 print_out = nprint
 status_mode = 'no-cached'
 
+execute_wait_cycle_time_secs = 12
+execute_nr_wait_cycles = (30*60) // execute_wait_cycle_time_secs
+
 _Commands = (
     'execute',
     'status',
@@ -119,7 +122,7 @@ def parse():
     Parse the command line options and set the option variables.
     '''
     import optparse
-    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, status_mode, pdb
+    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, status_mode, pdb, execute_wait_cycle_time_secs, execute_nr_wait_cycles
     parser = optparse.OptionParser()
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
@@ -127,6 +130,8 @@ def parse():
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
     parser.add_option('--cache', action='store_true', dest='cache', default=False)
     parser.add_option('--pdb', action='store_true', dest='pdb', default=False)
+    parser.add_option('--nr-wait-cycles', action='store', dest='nr_wait_cycles', default=execute_wait_cycle_time_secs)
+    parser.add_option('--wait-cycle-time', action='store', dest='wait_cycle_time', default=execute_nr_wait_cycles)
     options,args = parser.parse_args()
     if not args:
         usage()
@@ -163,5 +168,7 @@ def parse():
     status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
     pdb = options.pdb
+    execute_wait_cycle_time_secs = int(options.wait_cycle_time)
+    execute_nr_wait_cycles = int(options.nr_wait_cycles)
 
 
