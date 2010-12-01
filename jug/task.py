@@ -33,9 +33,7 @@ There are two main alternatives:
 
 from __future__ import division
 import hashlib
-import os
 import cPickle as pickle
-import itertools
 
 alltasks = []
 
