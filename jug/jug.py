@@ -329,6 +329,8 @@ def main():
         shell(store, jugspace)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
+    if options.cmd != 'status':
+        store.close()
 
 if __name__ == '__main__':
     try:
