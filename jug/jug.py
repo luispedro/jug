@@ -128,7 +128,7 @@ def execute(store, aggressive_unload=False, options=None):
             max_cannot_run = min(len(tasks), 128)
             while not tasks[0].can_run() and cannot_run < max_cannot_run:
                 # The argument for this is the following:
-                # if T' is dependent on the result of T', it is better if the
+                # if T' is dependent on the result of T, it is better if the
                 # processor that ran T, also runs T'. By having everyone else
                 # push T' to the end of tasks, this is more likely to happen.
                 #
@@ -143,7 +143,7 @@ def execute(store, aggressive_unload=False, options=None):
             sleep(options.execute_wait_cycle_time_secs)
         if not upnext:
             logging.info('No tasks can be run!')
-            return
+            break
         for t in upnext:
             if t.can_load():
                 logging.info('Loadable %s...' % t.name)
