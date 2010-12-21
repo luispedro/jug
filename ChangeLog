@@ -1,3 +1,6 @@
+version 0.7.2+
+	* Add more expressive jugdir syntax
+
 version 0.7.2 Wed Nov 3 2010 by luispedro
 	* Add missing files to distribution
 
