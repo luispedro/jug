@@ -34,12 +34,13 @@ Variables
 '''
 from __future__ import division
 import logging
+from datetime import datetime
 import string
 import sys
 
 from .p3 import nprint
 
-jugdir = 'jugdata'
+jugdir = '%(jugfile)s.jugdata'
 jugfile = 'jugfile.py'
 cmd = None
 aggressive_unload = False
@@ -72,7 +73,7 @@ Subcommands
    check:        Returns 0 if all tasks are finished. 1 otherwise.
    sleep-until:  Wait until all tasks are done, then exit.
    counts:       Simply count tasks
-   cleanup:      Cleanup
+   cleanup:      Cleanup: remove result files that are not used.
    invalidate:   Invalidate the results of a task
    shell:        Run a shell after initialization
 
@@ -80,13 +81,19 @@ General Options
 ---------------
 --jugdir=JUGDIR
     Directory in which to save intermediate files
+    You can use Python format syntax, the following variables are available:
+        - date
+        - jugfile (without extension)
+    By default, the value of `jugdir` is "%(jugfile)s.jugdata"
 --verbose=LEVEL
     Verbosity level ('DEBUG', 'INFO', 'QUIET')
 
 execute OPTIONS
 ---------------
 --aggressive-unload
-    Aggressively unload data from memory
+    Aggressively unload data from memory. This causes many more reloading of
+    information, but is necessary if keeping too much in memory is leading to
+    memory errors.
 --pdb
     Call python debugger on errors
 
@@ -126,7 +133,7 @@ def parse():
     parser = optparse.OptionParser()
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
-    parser.add_option('--jugdir',action='store',dest='jugdir',default='jugdata/')
+    parser.add_option('--jugdir',action='store',dest='jugdir',default=jugdir)
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
     parser.add_option('--cache', action='store_true', dest='cache', default=False)
     parser.add_option('--pdb', action='store_true', dest='pdb', default=False)
@@ -167,6 +174,10 @@ def parse():
     sys.argv = [jugfile] + args
     status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
+    jugdir = jugdir % {
+                'date': datetime.now().strftime('%Y-%m-%d'),
+                'jugfile': jugfile[:-3],
+                }
     pdb = options.pdb
     execute_wait_cycle_time_secs = int(options.wait_cycle_time)
     execute_nr_wait_cycles = int(options.nr_wait_cycles)
