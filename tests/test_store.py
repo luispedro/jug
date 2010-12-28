@@ -61,6 +61,7 @@ def test_numpy_array():
         raise SkipTest()
     store = jug.backends.file_store.file_store(_storedir)
     arr = np.arange(100) % 17
+    arr = arr.reshape((10,10))
     key = 'mykey'
     store.dump(arr, key)
     arr2 = store.load(key)
