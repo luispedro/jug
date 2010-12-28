@@ -137,8 +137,8 @@ def parse():
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
     parser.add_option('--cache', action='store_true', dest='cache', default=False)
     parser.add_option('--pdb', action='store_true', dest='pdb', default=False)
-    parser.add_option('--nr-wait-cycles', action='store', dest='nr_wait_cycles', default=execute_wait_cycle_time_secs)
-    parser.add_option('--wait-cycle-time', action='store', dest='wait_cycle_time', default=execute_nr_wait_cycles)
+    parser.add_option('--nr-wait-cycles', action='store', dest='nr_wait_cycles', default=execute_nr_wait_cycles)
+    parser.add_option('--wait-cycle-time', action='store', dest='wait_cycle_time', default=execute_wait_cycle_time_secs)
     options,args = parser.parse_args()
     if not args:
         usage()
