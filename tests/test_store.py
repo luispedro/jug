@@ -2,6 +2,7 @@ import jug.backends.redis_store
 import jug.backends.file_store
 import jug.backends.dict_store
 from jug.backends.redis_store import redis
+from nose.tools import with_setup
 from nose import SkipTest
 
 _storedir = 'jugtests'
@@ -52,3 +53,17 @@ def test_stores():
             f.teardown = tear
             yield f, s()
 
+@with_setup(teardown=_remove_file_store)
+def test_numpy_array():
+    try:
+        import numpy as np
+    except ImportError:
+        raise SkipTest()
+    store = jug.backends.file_store.file_store(_storedir)
+    arr = np.arange(100) % 17
+    key = 'mykey'
+    store.dump(arr, key)
+    arr2 = store.load(key)
+    assert np.all(arr2 == arr)
+    store.remove(key)
+    store.close()

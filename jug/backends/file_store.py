@@ -82,13 +82,27 @@ class file_store(object):
         '''
         name = self._getfname(name)
         create_directories(dirname(name))
+        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
+        output = os.fdopen(fd, 'w')
+        try:
+            import numpy as np
+            if type(object) == np.ndarray:
+                np.lib.format.write_array(output, object)
+                output.close()
+                os.rename(fname, name)
+                return
+        except ImportError:
+            pass
+        except OSError:
+            pass
+        except ValueError:
+            pass
+
         s = encode(object)
         if not s:
             file(name,'w').close()
             return
 
-        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
-        output = os.fdopen(fd, 'w')
         output.write(s)
         output.close()
 
@@ -111,6 +125,13 @@ class file_store(object):
         '''
         fname = self._getfname(fname)
         input = file(fname)
+        try:
+            import numpy as np
+            return np.lib.format.read_array(input)
+        except ValueError:
+            input.seek(0)
+        except ImportError:
+            pass
         s = input.read()
         input.close()
         return decode(s)
