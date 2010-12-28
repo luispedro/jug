@@ -124,17 +124,17 @@ def execute(store, aggressive_unload=False, options=None):
     while tasks:
         upnext = [] # tasks that can be run
         for i in xrange(options.execute_nr_wait_cycles):
-            cannot_run = 0
             max_cannot_run = min(len(tasks), 128)
-            while not tasks[0].can_run() and cannot_run < max_cannot_run:
+            for i in xrange(max_cannot_run):
                 # The argument for this is the following:
                 # if T' is dependent on the result of T, it is better if the
                 # processor that ran T, also runs T'. By having everyone else
                 # push T' to the end of tasks, this is more likely to happen.
                 #
                 # Furthermore, this avoids always querying the same tasks.
+                if tasks[0].can_run():
+                    break
                 tasks.append(tasks.pop(0))
-                cannot_run += 1
             while tasks and tasks[0].can_run():
                 upnext.append(tasks.pop(0))
             if upnext:
