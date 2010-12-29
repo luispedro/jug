@@ -28,8 +28,7 @@ rewriting this to::
         # complex image processing
 
     files = glob('inputs/*.png')
-    imgs = [Task(imread, f) for f in files]
-    props = [Task(process, img) for img in imgs]
+    props = [Task(process, f) for f in files]
 
 I have also moved the import of ``mahotas.imread`` to inside the ``process``
 function. This is another micro-optimisation: it makes ``jug status`` and
