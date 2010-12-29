@@ -1,4 +1,6 @@
 version 0.7.2+
+	* Fix bug with waiting times
+	* Special case saving of numpy arrays
 	* Add more expressive jugdir syntax
 
 version 0.7.2 Wed Nov 3 2010 by luispedro
