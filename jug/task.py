@@ -32,8 +32,6 @@ There are two main alternatives:
 '''
 
 from __future__ import division
-import hashlib
-import cPickle as pickle
 
 alltasks = []
 
@@ -50,6 +48,7 @@ class Task(object):
 
     '''
     store = None
+    # __slots__ = ('name', 'f', 'args', 'kwargs', '_hash','_lock')
     def __init__(self, f, *args, **kwargs):
         if f.func_name == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
@@ -61,35 +60,37 @@ tricky to support since the general code relies on the function name)''')
         self.f = f
         self.args = args
         self.kwargs = kwargs
-        self._hash = None
-        self._lock = None
-        self._can_load = False
         alltasks.append(self)
 
-    def run(self, force=False):
+    def run(self, force=False, save=True):
         '''
-        task.run(force=False)
+        task.run(force=False, save=True)
 
         Performs the task.
 
         Parameters
         ----------
-          force : if True, always run the task (even if it ran before)
+        force : boolean, optional
+            if true, always run the task (even if it ran before)
+            (default: False)
+        save : boolean, optional
+            if true, save the result to the store
+            (default: True)
         '''
         assert self.can_run()
         args = [value(dep) for dep in self.args]
         kwargs = dict((key,value(dep)) for key,dep in self.kwargs.iteritems())
         self._result = self.f(*args,**kwargs)
-        name = self.hash()
-        self.store.dump(self._result, name)
+        if save:
+            name = self.hash()
+            self.store.dump(self._result, name)
         return self._result
 
     def _get_result(self):
-        if not hasattr(self, '_result'):
-            self.load()
+        if not hasattr(self, '_result'): self.load()
         return self._result
 
-    result = property(_get_result,doc='Result value')
+    result = property(_get_result, doc='Result value')
 
 
     def can_run(self):
@@ -103,11 +104,27 @@ tricky to support since the general code relies on the function name)''')
                 return False
         return True
 
+    def is_loaded(self):
+        '''
+        loaded = task.is_loaded()
+
+        Returns True if the task is already loaded
+        '''
+        return hasattr(self, '_result')
+
     def load(self):
         '''
         t.load()
 
         Loads the results from the storage backend.
+
+        This function *always* loads from the backend even if the task is
+        already loaded. You can use `is_loaded` as a check if you want to avoid
+        this behaviour.
+
+        Returns
+        -------
+        Nothing
         '''
         assert self.can_load()
         self._result = self.store.load(self.hash())
@@ -142,10 +159,13 @@ tricky to support since the general code relies on the function name)''')
 
         Parameters
         ----------
-          self : Task
+        self : Task
+
         Returns
         -------
-          A generator over all of `self`'s dependencies
+        deps : generator
+            A generator over all of `self`'s dependencies
+
         See Also
         --------
           `recursive_dependencies`
@@ -170,9 +190,7 @@ tricky to support since the general code relies on the function name)''')
         '''
         if store is None:
             store = self.store
-        if not self._can_load:
-            self._can_load = store.can_load(self.hash())
-        return self._can_load
+        return store.can_load(self.hash())
 
     def hash(self):
         '''
@@ -183,24 +201,26 @@ tricky to support since the general code relies on the function name)''')
         The results are cached, so the first call can be much slower than
         subsequent calls.
         '''
-        if self._hash is None:
-            M = hashlib.md5()
-            def update(elems):
-                for n,e in elems:
-                    M.update(pickle.dumps(n))
-                    if type(e) == Task:
-                        M.update(e.hash())
-                    elif type(e) in (list, tuple):
-                        update(enumerate(e))
-                    elif type(e) == dict:
-                        update(e.iteritems())
-                    else:
-                        M.update(pickle.dumps(e))
-            M.update(self.name)
-            update(enumerate(self.args))
-            update(self.kwargs.iteritems())
-            self._hash = M.hexdigest()
-        return self._hash
+        import hashlib
+        import cPickle as pickle
+        M = hashlib.md5()
+        def update(elems):
+            for n,e in elems:
+                M.update(pickle.dumps(n))
+                if type(e) == Task:
+                    M.update(e.hash())
+                elif type(e) in (list, tuple):
+                    update(enumerate(e))
+                elif type(e) == dict:
+                    update(e.iteritems())
+                else:
+                    M.update(pickle.dumps(e))
+        M.update(self.name)
+        update(enumerate(self.args))
+        update(self.kwargs.iteritems())
+        self.hash = lambda : M.hexdigest()
+        return self.hash()
+
 
     def __str__(self):
         '''String representation'''
@@ -231,7 +251,7 @@ tricky to support since the general code relies on the function name)''')
         -------
           Whether the lock was obtained.
         '''
-        if self._lock is None:
+        if not hasattr(self, '_lock'):
             self._lock = self.store.getlock(self.hash())
         return self._lock.get()
 
@@ -262,7 +282,7 @@ tricky to support since the general code relies on the function name)''')
         - lock()
         - unlock()
         '''
-        if self._lock is None:
+        if not hasattr(self, '_lock'):
             self._lock = self.store.getlock(self.hash())
         return self._lock.is_locked()
 
