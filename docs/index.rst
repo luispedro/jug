@@ -29,6 +29,7 @@ Documentation Contents
     subcommands.rst
     types.rst
     tasks.rst
+    mapreduce.rst
     barrier.rst
     backends.rst
     faq.rst
