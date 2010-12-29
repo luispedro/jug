@@ -352,17 +352,27 @@ def value(elem):
 
 def CachedFunction(f,*args,**kwargs):
     '''
-    value = CachedFunction(f, *args, **kwargs)
+    value = CachedFunction(f, \*args, \*\*kwargs)
 
-    is equivalent to:
+    is equivalent to::
 
-    task = Task(f, *args, **kwargs)
-    if not task.can_load():
-        task.run()
-    value = task.result
+        task = Task(f, *args, **kwargs)
+        if not task.can_load():
+            task.run()
+        value = task.result
 
     That is, it calls the function if the value is available,
     but caches the result for the future.
+
+    Parameters
+    ----------
+    f : function
+        Any function except unnamed (lambda) functions
+
+    Returns
+    -------
+    value : result
+        Result of calling ``f(*args,**kwargs)``
     '''
     t = Task(f,*args, **kwargs)
     if not t.can_load():

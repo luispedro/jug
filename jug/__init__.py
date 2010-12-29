@@ -21,8 +21,9 @@
 #  THE SOFTWARE.
 
 '''
-JUG: Coarse Level Paralelisation for Python
-===========================================
+============================================
+JUG: Coarse Level Parallelisation for Python
+============================================
 
 The main use of jug is from the command line:
 

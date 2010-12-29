@@ -33,6 +33,7 @@ Documentation Contents
     barrier.rst
     backends.rst
     faq.rst
+    api.rst
 
 Examples
 --------
@@ -154,4 +155,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
