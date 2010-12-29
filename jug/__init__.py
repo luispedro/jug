@@ -25,10 +25,10 @@
 JUG: Coarse Level Parallelisation for Python
 ============================================
 
-The main use of jug is from the command line:
+The main use of jug is from the command line::
 
-jug status jugfile.py
-jug execute jugfile.py
+    jug status jugfile.py
+    jug execute jugfile.py
 
 You import jug to help you write your jugfiles.
 

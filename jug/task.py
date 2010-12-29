@@ -26,25 +26,28 @@ This is the main class for using jug.
 
 There are two main alternatives:
 
-- Use the ``Task`` class directly to build up tasks, such as
-  ``Task(function, arg0, ...)``.
+- Use the ``Task`` class directly to build up tasks, such as ``Task(function, arg0, ...)``.
 - Rely on the ``TaskGenerator`` decorator as a shortcut for this.
 '''
 
 from __future__ import division
 
+__all__ = [
+    'Task',
+    'recursive_dependencies',
+    'TaskGenerator',
+    'value',
+    ]
+
 alltasks = []
 
 class Task(object):
     '''
-    Task
-    ----
-
     T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
-    Defines a task, which is roughly equivalent to
+    Defines a task, which is roughly equivalent to::
 
-    f(dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
+        f(dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
     '''
     store = None
@@ -141,9 +144,9 @@ tricky to support since the general code relies on the function name)''')
         '''
         t.unload_recursive()
 
-        Equivalent to
+        Equivalent to::
 
-        for tt in recursive_dependencies(t): tt.unload()
+            for tt in recursive_dependencies(t): tt.unload()
         '''
         self.unload()
         for dep in self.dependencies():
@@ -168,7 +171,7 @@ tricky to support since the general code relies on the function name)''')
 
         See Also
         --------
-          `recursive_dependencies`
+        recursive_dependencies : retrieve dependecies recursively
         '''
         queue = [self.args, self.kwargs.values()]
         while queue:
@@ -249,7 +252,8 @@ tricky to support since the general code relies on the function name)''')
 
         Returns
         -------
-          Whether the lock was obtained.
+        locked : boolean
+            Whether the lock was obtained.
         '''
         if not hasattr(self, '_lock'):
             self._lock = self.store.getlock(self.hash())
@@ -275,12 +279,13 @@ tricky to support since the general code relies on the function name)''')
 
         Returns
         -------
+        is_locked : boolean
             Whether the task **appears** to be locked.
 
         See Also
         --------
-        - lock()
-        - unlock()
+        lock : create lock
+        unlock : destroy lock
         '''
         if not hasattr(self, '_lock'):
             self._lock = self.store.getlock(self.hash())
@@ -316,11 +321,15 @@ def recursive_dependencies(t, max_level=-1):
 
     Parameters
     ----------
-      t : task
-      max_level : Maximum recursion depth. Set to -1 or None for no recursion limit.
+    t : Task
+        input task
+    max_level : integer, optional
+      Maximum recursion depth. Set to -1 or None for no recursion limit.
+
     Returns
     -------
-      A generator
+    deps : generator
+        A generator over all dependencies
     '''
     if max_level is None:
         max_level = -1

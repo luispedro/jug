@@ -25,6 +25,11 @@ import os
 
 from .task import Task, TaskGenerator
 
+__all__ = [
+    'timed_path',
+    'identity',
+    ]
+
 def _return_first(one, two):
     '''
     one = _return_first(one, two)
@@ -43,11 +48,13 @@ def timed_path(path):
 
     Parameters
     ----------
-    `ipath` : A filesystem path
+    ipath : str
+        A filesystem path
 
     Returns
     -------
-    `opath` : A task equivalent to (lambda: ipath) 
+    opath : str
+        A task equivalent to ``(lambda: ipath)``.
     '''
     mtime = os.stat_result(os.stat(path)).st_mtime
     return Task(_return_first, path, mtime)
@@ -72,3 +79,4 @@ def identity(x):
     x : x
     '''
     return x
+

@@ -39,17 +39,20 @@ def CompoundTask(f, *args, **kwargs):
     `f` should be such that it returns a `Task`, which can be as complex as it
     wants.
 
-    If `f` cannot been loaded, then this becomes equivalent to
+    If `f` cannot been loaded, then this becomes equivalent to::
+
         f(*args, **kwargs)
+
     However, if it can, then we get a pseudo-task which returns the same value
     without `f` ever being executed.
 
     Parameters
     ----------
-      f : A function returning a `Task`
+    f : function returning a ``jug.Task``
+
     Returns
     -------
-      task : A `Task`
+    task : jug.Task
     '''
     from .task import alltasks
     task = Task(f, *args, **kwargs)
