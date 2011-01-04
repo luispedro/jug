@@ -48,6 +48,9 @@ of mapping and reducing more than one input. How many is controlled by the
 single task (by default, 8; reflecting the fact that reduce operations tend to
 be lighter than map operations).
 
+The `compound task <compound.html>`__ section has a worked out example of using
+map/reduce.
+
 Parameter Sweep
 ---------------
 
