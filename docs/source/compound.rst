@@ -13,7 +13,7 @@ do the same with some very small files:
     inputs = [
             "banana apple apple banana",
             "apple pear football",
-            "pear"
+            "pear",
             "banana apple apple",
             "football banana",
             "apple pear",
@@ -106,7 +106,7 @@ We left out the imports above, but other than that, it is a fully functional exa
     inputs = [
             "banana apple apple banana",
             "apple pear football",
-            "pear"
+            "pear",
             "banana apple apple",
             "football banana",
             "apple pear",
