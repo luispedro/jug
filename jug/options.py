@@ -125,6 +125,9 @@ def usage():
     print _usage_string
     sys.exit(1)
 
+def _str_to_bool(s):
+    return s in ('', '0', 'False', 'off')
+
 def read_configuration_file(fp=None):
     '''
     read_configuration_file(fp='~/.jug/configrc')
@@ -152,7 +155,7 @@ def read_configuration_file(fp=None):
     jugdir = attempt('main', 'jugdir', jugdir)
     jugfile = attempt('main', 'jugfile', jugfile)
     status_mode = attempt('status', 'cache', status_mode)
-    aggressive_unload = attempt('execute', 'aggressive_unload', aggressive_unload)
+    aggressive_unload = attempt('execute', 'aggressive-unload', aggressive_unload, _str_to_bool)
     pdb = attempt('execute', 'pbd', pdb, bool)
     execute_nr_wait_cycles = attempt('execute', 'nr-wait-cycles', execute_nr_wait_cycles, int)
     execute_wait_cycle_time_secs = attempt('execute', 'wait-cycle-time', execute_wait_cycle_time_secs, int)
