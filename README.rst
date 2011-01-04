@@ -79,13 +79,21 @@ the `value` function::
 What's New
 ..........
 
-Version 0.7.2:
+Version **0.7.3**:
+- Parse ~/.jug/configrc
+- Fix bug with waiting times
+- Special case saving of numpy arrays
+- Add more expressive jugdir syntax
+- Save dict_store backend to disk
+
+Version **0.7.2**:
 - included missing files in the distribution
 
-Version 0.7.1:
+Version **0.7.1**:
 - ``sleep-until`` subcommand
 - bugfixes
 
-Version 0.7 (starting with 0.6.9 in testing):
+Version **0.7 (starting with 0.6.9 in testing)**:
 - `barrier()`
 - better ``shell`` command
+

@@ -1,4 +1,4 @@
-version 0.7.2+
+version 0.7.3 Tue Jan 4 2011 by luispedro
 	* Parse ~/.jug/configrc
 	* Fix bug with waiting times
 	* Special case saving of numpy arrays
