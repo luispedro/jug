@@ -33,6 +33,7 @@ Documentation Contents
     barrier.rst
     compound.rst
     backends.rst
+    configuration.rst
     faq.rst
     api.rst
 
