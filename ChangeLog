@@ -1,4 +1,5 @@
 version 0.7.2+
+	* Parse ~/.jug/configrc
 	* Fix bug with waiting times
 	* Special case saving of numpy arrays
 	* Add more expressive jugdir syntax
