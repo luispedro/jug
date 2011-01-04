@@ -31,6 +31,7 @@ Documentation Contents
     tasks.rst
     idioms.rst
     barrier.rst
+    compound.rst
     backends.rst
     faq.rst
     api.rst
