@@ -8,6 +8,7 @@
 # serve to show the default value.
 
 import sys, os
+from jug.jug_version import __version__ as jug_version
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -38,7 +39,7 @@ copyright = '2008-2010, Luis Pedro Coelho'
 # The short X.Y version.
 version = '0.7'
 # The full version, including alpha/beta/rc tags.
-release = '0.7.3'
+release = jug_version
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
