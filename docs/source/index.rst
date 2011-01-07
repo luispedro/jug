@@ -32,6 +32,7 @@ Documentation Contents
     idioms.rst
     barrier.rst
     compound.rst
+    utilities.rst
     backends.rst
     configuration.rst
     faq.rst
