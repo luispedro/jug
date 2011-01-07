@@ -22,6 +22,7 @@ from jug.jug_version import __version__ as jug_version
 extensions = [
         'sphinx.ext.autodoc',
         'sphinx.ext.pngmath',
+        'sphinx.ext.autosummary',
         'numpydoc',
         'sphinx.ext.intersphinx',
         'sphinx.ext.coverage',
@@ -34,7 +35,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'Jug'
-copyright = '2008-2010, Luis Pedro Coelho'
+copyright = '2008-2011, Luis Pedro Coelho'
 
 # The short X.Y version.
 version = '0.7'
