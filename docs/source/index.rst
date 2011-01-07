@@ -35,6 +35,7 @@ Documentation Contents
     backends.rst
     configuration.rst
     faq.rst
+    why.rst
     api.rst
 
 Examples
