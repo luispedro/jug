@@ -1,3 +1,6 @@
+version 0.7.3+
+	* Fix mapreduce for empty input
+
 version 0.7.3 Tue Jan 4 2011 by luispedro
 	* Parse ~/.jug/configrc
 	* Fix bug with waiting times

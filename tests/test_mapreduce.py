@@ -39,3 +39,9 @@ def test_map():
 def test_break_up():
     for i in xrange(2,105):
         assert reduce(lambda a,b: a+b, _break_up(range(100), i), []) == range(100)
+
+@task_reset
+def test_empty_mapreduce():
+    store, space = jug.jug.init('tests/jugfiles/empty_mapreduce.py', 'dict_store')
+    space['two'].run()
+    assert space['two'].result == []

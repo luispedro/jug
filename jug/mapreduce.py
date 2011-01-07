@@ -9,6 +9,7 @@ mapreduce: Build tasks that follow a map-reduce pattern.
 
 from __future__ import division
 from jug import Task
+from .utils import identity
 from itertools import chain
 import operator
 
@@ -68,7 +69,12 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     reducers = [Task(_jug_map_reduce, reducer, mapper, input_i) for input_i in _break_up(inputs, map_step)]
     while len(reducers) > 1:
         reducers = [Task(_jug_reduce, reducer, reduce_i) for reduce_i in _break_up(reducers, reduce_step)]
-    return reducers[0]
+    if len(reducers) == 0:
+        return identity([])
+    elif len(reducers) == 1:
+        return reducers[0]
+    else:
+        assert False, 'This is a bug'
 
 def map(mapper, sequence, map_step=4):
     '''
