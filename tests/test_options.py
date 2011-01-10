@@ -1,4 +1,6 @@
 import jug.options
+
+from StringIO import StringIO
 from nose.tools import raises
 
 def test_chaining():
@@ -22,3 +24,22 @@ def test_chaining():
 
     yield not_present_key, first, 'two'
     yield not_present_key, second, 'three'
+
+_options_file = '''
+[main]
+jugfile=myjugfile.py
+
+[execute]
+wait-cycle-time=23
+'''
+
+def test_parse():
+    parsed = jug.options.parse(
+        ["execute", "--pdb"],
+        StringIO(_options_file))
+
+    assert parsed.jugfile == 'myjugfile.py'
+    assert parsed.pdb
+    assert parsed.execute_wait_cycle_time_secs == 23
+    assert not parsed.aggressive_unload
+

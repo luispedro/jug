@@ -62,6 +62,7 @@ default_options.argv = None
 default_options.print_out = nprint
 default_options.status_mode = 'no-cached'
 default_options.pdb = False
+default_options.verbose = 'quiet'
 
 default_options.execute_wait_cycle_time_secs = 12
 default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
@@ -171,9 +172,9 @@ def read_configuration_file(fp=None):
                 value = conv(value)
             setattr(infile, new_name, value)
         except ConfigParser.NoOptionError:
-            return default
+            pass
         except ConfigParser.NoSectionError:
-            return default
+            pass
     attempt('main', 'jugdir', 'jugdir')
     attempt('main', 'jugfile', 'jugfile')
     attempt('status', 'cache', 'status_mode')
@@ -184,29 +185,31 @@ def read_configuration_file(fp=None):
     return infile
 
 
-def parse():
+def parse(cmdlist=None, optionsfile=None):
     '''
-    options.parse()
+    options.parse(cmdlist={sys.argv[1:]}, optionsfile=None)
 
     Parse the command line options and set the option variables.
     '''
     import optparse
     from .jug_version import __version__
 
-    infile = read_configuration_file()
+    if cmdlist is None:
+        cmdlist = sys.argv[1:]
+    infile = read_configuration_file(optionsfile)
     infile.next = default_options
     cmdline = Options(infile)
 
     parser = optparse.OptionParser(usage=_usage_simple, version=__version__)
-    parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
-    parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
-    parser.add_option('--jugdir',action='store',dest='jugdir',default=default_options.jugdir)
-    parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
-    parser.add_option('--cache', action='store_true', dest='cache', default=False)
-    parser.add_option('--pdb', action='store_true', dest='pdb', default=False)
-    parser.add_option('--nr-wait-cycles', action='store', dest='nr_wait_cycles', default=default_options.execute_nr_wait_cycles)
-    parser.add_option('--wait-cycle-time', action='store', dest='wait_cycle_time', default=default_options.execute_wait_cycle_time_secs)
-    options,args = parser.parse_args()
+    parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload')
+    parser.add_option('--invalid',action='store',dest='invalid_name')
+    parser.add_option('--jugdir',action='store',dest='jugdir')
+    parser.add_option('--verbose',action='store',dest='verbose')
+    parser.add_option('--cache', action='store_true', dest='cache')
+    parser.add_option('--pdb', action='store_true', dest='pdb')
+    parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
+    parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
+    options,args = parser.parse_args(cmdlist)
     if not args:
         usage()
         return
@@ -224,30 +227,37 @@ def parse():
     if cmdline.cmd == 'invalidate' and not options.invalid_name:
         usage()
         return
+
+    cmdline.argv = args
+    sys.argv = [cmdline.jugfile] + args
+    if options.cache is not None:
+        cmdline.status_mode = ('cached' if options.cache else 'no-cached')
+    def _maybe_set(name):
+        if getattr(options, name) is not None:
+            setattr(cmdline, name, getattr(options, name))
+
+    _maybe_set('jugdir')
+
+    _maybe_set('verbose')
+    _maybe_set('aggressive_unload')
+    _maybe_set('invalid_name')
+    _maybe_set('pdb')
+    _maybe_set('execute_nr_wait_cycles')
+    _maybe_set('execute_wait_cycle_time_secs')
+
+    cmdline.jugdir = cmdline.jugdir % {
+                'date': datetime.now().strftime('%Y-%m-%d'),
+                'jugfile': cmdline.jugfile[:-3],
+                }
     try:
         nlevel = {
             'DEBUG' : logging.DEBUG,
             'INFO' : logging.INFO,
-        }[string.upper(options.verbosity)]
+        }[string.upper(cmdline.verbose)]
         root = logging.getLogger()
         root.level = nlevel
     except KeyError:
         pass
-
-    cmdline.aggressive_unload = options.aggressive_unload
-    cmdline.invalid_name = options.invalid_name
-    cmdline.argv = args
-    sys.argv = [cmdline.jugfile] + args
-    cmdline.status_mode = ('cached' if options.cache else 'no-cached')
-    jugdir = options.jugdir
-    cmdline.jugdir = jugdir % {
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'jugfile': cmdline.jugfile[:-3],
-                }
-    cmdline.pdb = options.pdb
-    cmdline.execute_wait_cycle_time_secs = int(options.wait_cycle_time)
-    cmdline.execute_nr_wait_cycles = int(options.nr_wait_cycles)
-
     return cmdline
 
 
