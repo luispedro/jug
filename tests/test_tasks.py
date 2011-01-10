@@ -207,6 +207,22 @@ def test_unload_recursive():
     assert not hasattr(two, '_result')
 
 # Crashed in version 0.7.3
+@task_reset
 def test_unload_wnoresult():
     t = Task(add2, 3)
     t.unload()
+
+@task_reset
+def test_starts_unloaded():
+    t = Task(add2, 3)
+    assert not t.is_loaded()
+
+@task_reset
+def test__str__repr__():
+    t = Task(add2, 3)
+    assert str(t).find('add2') >= 0
+    assert repr(t).find('add2') >= 0
+    assert repr(t).find('3') >= 0
+
+
+
