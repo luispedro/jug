@@ -28,40 +28,45 @@ import os
 import os.path
 import logging
 
-from . import options
 from . import task
 from . import backends
 from .backends import memoize_store
 from .task import Task
 from .subcommands.status import status
 from .subcommands.shell import shell
-from .options import print_out
 from .barrier import BarrierError
 
-def do_print(store):
+def do_print(store, options):
     '''
-    do_print(store)
+    do_print(store, options)
 
     Print a count of task names.
+
+    Parameters
+    ----------
+    store : jug backend
+    options : jug options
     '''
     task_counts = defaultdict(int)
     for t in task.alltasks:
         task_counts[t.name] += 1
     for tnc in task_counts.items():
-        print_out('Task %s: %s' % tnc)
+        options.print_out('Task %s: %s' % tnc)
 
-def invalidate(store, invalid_name):
+def invalidate(store, options):
     '''
-    invalidate(store, invalid_name)
+    invalidate(store, options)
 
     Implement 'invalidate' command
 
     Parameters
     ----------
     store : jug.backend
-    invalid_name : string
-           exact (i.e., module qualified) name of function to invalidate
+    options : options object
+        Most relevant option is `invalid_name`, a string  with the exact (i.e.,
+        module qualified) name of function to invalidate
     '''
+    invalid_name = options.invalid_name
     tasks = task.alltasks
     cache = {}
     def isinvalid(t):
@@ -80,39 +85,36 @@ def invalidate(store, invalid_name):
 
     invalid = filter(isinvalid, tasks)
     if not invalid:
-        print_out('No results invalidated.')
+        options.print_out('No results invalidated.')
         return
     task_counts = defaultdict(int)
     for t in invalid:
         if store.remove(t.hash()):
             task_counts[t.name] += 1
     if sum(task_counts.values()) == 0:
-        print_out('Tasks invalidated, but no results removed')
+        options.print_out('Tasks invalidated, but no results removed')
     else:
-        print_out('Tasks Invalidated')
-        print_out()
-        print_out('Task Name                                   Count')
-        print_out('-------------------------------------------------')
-        #          0         1         2         3         4         5
-        #          012345678901234567890123456789012345678901234567890123456789
+        options.print_out('Tasks Invalidated')
+        options.print_out()
+        options.print_out('Task Name                                   Count')
+        options.print_out('-------------------------------------------------')
+        #                  0         1         2         3         4         5
+        #                  012345678901234567890123456789012345678901234567890123456789
         for n_c in task_counts.items():
-            print_out('%-40s: %7s' % n_c)
+            options.print_out('%-40s: %7s' % n_c)
 
 
 def _sigterm(_,__):
     sys.exit(1)
 
-def execute(store, aggressive_unload=False, options=None):
+def execute(store, options):
     '''
-    execute(store, aggressive_unload=False, options=None)
+    execute(store, options)
 
     Implement 'execute' command
     '''
     from time import sleep
     from signal import signal, SIGTERM
-    if options is None:
-        from . import options as default_options
-        options = default_options
 
     tasks = task.alltasks
     task_names = set(t.name for t in tasks)
@@ -159,7 +161,7 @@ def execute(store, aggressive_unload=False, options=None):
                     logging.info('Executing %s...' % t.name)
                     t.run()
                     tasks_executed[t.name] += 1
-                    if aggressive_unload:
+                    if options.aggressive_unload:
                         t.unload_recursive()
                 else:
                     logging.info('Already in execution %s...' % t.name)
@@ -179,13 +181,13 @@ def execute(store, aggressive_unload=False, options=None):
             finally:
                 if locked: t.unlock()
 
-    print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
-    print_out('-' * (52+12+12))
+    options.print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
+    options.print_out('-' * (52+12+12))
     for t in task_names:
         name_cut = t[:52]
-        print_out('%-52s%12s%12s' % (name_cut,tasks_executed[t],tasks_loaded[t]))
+        options.print_out('%-52s%12s%12s' % (name_cut,tasks_executed[t],tasks_loaded[t]))
     if not task_names:
-        print_out('<no tasks>')
+        options.print_out('<no tasks>')
 
 
 def cleanup(store):
@@ -199,9 +201,9 @@ def cleanup(store):
     print_out('Removed %s files' % removed)
 
 
-def check(store):
+def check(store, options):
     '''
-    check(store)
+    check(store, options)
 
     Executes check subcommand
 
@@ -209,6 +211,7 @@ def check(store):
     ----------
     store : jug.backend
             backend to use
+    options : jug options
     '''
     _check_or_sleep_until(store, False)
 
@@ -307,26 +310,27 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
 
 
 def main():
-    options.parse()
+    from .options import parsecmd
+    options = parse()
     if options.cmd != 'status':
         store,jugspace = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
-        execute(store, options.aggressive_unload, options)
+        execute(store, options)
     elif options.cmd == 'count':
-        do_print(store)
+        do_print(store, options)
     elif options.cmd == 'check':
-        check(store)
+        check(store, options)
     elif options.cmd == 'sleep-until':
-        sleep_until(store)
+        sleep_until(store, options)
     elif options.cmd == 'status':
         status()
     elif options.cmd == 'invalidate':
-        invalidate(store, options.invalid_name)
+        invalidate(store, options)
     elif options.cmd == 'cleanup':
-        cleanup(store)
+        cleanup(store, options)
     elif options.cmd == 'shell':
-        shell(store, jugspace)
+        shell(store, options, jugspace)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
     if options.cmd != 'status':

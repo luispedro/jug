@@ -28,9 +28,7 @@ import jug
 from ..task import recursive_dependencies
 from .. import task
 from .. import backends
-from .. import options
 from ..task import Task
-from ..options import print_out
 from ..backends import memoize_store
 
 unknown,waiting,ready,running,finished = range(5)
@@ -153,25 +151,25 @@ def _update_status(store, ht, deps, rdeps):
     return tasks_waiting, tasks_ready, tasks_running, tasks_finished, dirty
 
 
-def _print_status(waiting, ready, running, finished):
+def _print_status(options, waiting, ready, running, finished):
     names = set(waiting.keys())
     names.update(ready.keys())
     names.update(running.keys())
     names.update(finished.keys())
     format      = '%-40s%12s%12s%12s%12s'
     format_size =    40 +12 +12 +12 +12
-    print_out(format % ('Task name','Waiting','Ready','Finished','Running'))
-    print_out('-' * format_size)
+    options.print_out(format % ('Task name','Waiting','Ready','Finished','Running'))
+    options.print_out('-' * format_size)
 
     for n in names:
         n_cut = n[:40]
-        print_out(format % (n_cut,waiting[n],ready[n],finished[n],running[n]))
-    print_out('.' * format_size)
-    print_out(format % ('Total:',sum(waiting.values()),sum(ready.values()),sum(finished.values()),sum(running.values())))
-    print_out()
+        options.print_out(format % (n_cut,waiting[n],ready[n],finished[n],running[n]))
+    options.print_out('.' * format_size)
+    options.print_out(format % ('Total:',sum(waiting.values()),sum(ready.values()),sum(finished.values()),sum(running.values())))
+    options.print_out()
 
 
-def _status_cached():
+def _status_cached(options):
     create, update = range(2)
     try:
         ht, deps, rdeps = _retrieve_sqlite3()
@@ -182,7 +180,7 @@ def _status_cached():
         mode = create
 
     tw,tre,tru,tf,dirty = _update_status(store, ht, deps, rdeps)
-    _print_status(tw, tre, tru, tf)
+    _print_status(options, tw, tre, tru, tf)
     if mode == update:
         _save_dirty3(dirty)
     else:
@@ -192,7 +190,7 @@ def _status_cached():
         _create_sqlite3(ht, deps, rdeps)
 
 
-def _status_nocache():
+def _status_nocache(options):
     store,_ = jug.init(options.jugfile, options.jugdir)
     Task.store = memoize_store(store)
 
@@ -211,16 +209,20 @@ def _status_nocache():
                 tasks_ready[t.name] += 1
         else:
             tasks_waiting[t.name] += 1
-    _print_status(tasks_waiting, tasks_ready, tasks_running, tasks_finished)
+    _print_status(options, tasks_waiting, tasks_ready, tasks_running, tasks_finished)
 
 
-def status():
+def status(options):
     '''
-    status(store)
+    status(options)
 
     Implements the status command.
+
+    Parameters
+    ----------
+    options : jug options
     '''
     if options.status_mode == 'cached':
-        _status_cached()
+        _status_cached(options)
     else:
-        _status_nocache()
+        _status_nocache(options)

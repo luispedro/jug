@@ -1,5 +1,6 @@
 import jug.jug
 import jug.task
+from jug.options import Options, default_options
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 import random
@@ -14,7 +15,7 @@ def test_jug_execute_simple():
     setall = [Task(setAi, i) for i in xrange(N)]
     store = dict_store()
     jug.task.Task.store = store
-    jug.jug.execute(store)
+    jug.jug.execute(store, default_options)
     assert False not in A
     assert max(store.counts.values()) < 4
 
@@ -31,7 +32,7 @@ def test_jug_execute_deps():
         prev = Task(setAi, idx, prev)
     store = dict_store()
     jug.task.Task.store = store
-    jug.jug.execute(store)
+    jug.jug.execute(store, default_options)
     assert False not in A
     assert max(store.counts.values()) < 4
 

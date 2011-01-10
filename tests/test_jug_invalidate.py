@@ -3,6 +3,7 @@ import jug.jug
 import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
+from jug.options import Options, default_options
 from tests.task_reset import task_reset
 import random
 jug.jug.silent = True
@@ -18,6 +19,9 @@ def test_jug_invalidate():
     store = dict_store()
     jug.task.Task.store = store
     for t in setall: t.run()
-    jug.jug.invalidate(store, setall[0].name)
+
+    opts = Options(default_options)
+    opts.invalid_name = setall[0].name
+    jug.jug.invalidate(store, opts)
     assert not store.store.keys(), store.store.keys()
     jug.task.Task.store = dict_store()

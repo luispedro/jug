@@ -22,8 +22,8 @@
 '''
 Options
 
-Variables
----------
+Options
+-------
 - jugdir: main jug directory.
 - jugfile: filesystem name for the Jugfile
 - cmd: command to run.
@@ -40,18 +40,31 @@ import sys
 
 from .p3 import nprint
 
-jugdir = '%(jugfile)s.jugdata'
-jugfile = 'jugfile.py'
-cmd = None
-aggressive_unload = False
-invalid_name = None
-argv = None
-print_out = nprint
-status_mode = 'no-cached'
-pdb = False
+class Options(object):
+    def __init__(self, next):
+        self.next = next
 
-execute_wait_cycle_time_secs = 12
-execute_nr_wait_cycles = (30*60) // execute_wait_cycle_time_secs
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
+        if self.__dict__['next'] is None:
+            raise KeyError('jug.options: Cannot find option value for `%s`' % name)
+        return getattr(self.__dict__['next'], name)
+
+default_options = Options(None)
+
+default_options.jugdir = '%(jugfile)s.jugdata'
+default_options.jugfile = 'jugfile.py'
+default_options.cmd = None
+default_options.aggressive_unload = False
+default_options.invalid_name = None
+default_options.argv = None
+default_options.print_out = nprint
+default_options.status_mode = 'no-cached'
+default_options.pdb = False
+
+default_options.execute_wait_cycle_time_secs = 12
+default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
 
 _Commands = (
     'execute',
@@ -130,35 +143,45 @@ def _str_to_bool(s):
 
 def read_configuration_file(fp=None):
     '''
-    read_configuration_file(fp='~/.jug/configrc')
+    options = read_configuration_file(fp='~/.jug/configrc')
 
     Parse configuration file.
+
+    Parameters
+    ----------
+    fp : inputfile, optional
+        File to read. If not given, use
     '''
     if fp is None:
         from os import path
         fp = path.expanduser('~/.jug/configrc')
-        fp = open(fp)
+        try:
+            fp = open(fp)
+        except IOError:
+            return Options(None)
     import ConfigParser
     config = ConfigParser.RawConfigParser()
     config.readfp(fp)
-    def attempt(section, entry, default, conv=None):
+    infile = Options(None)
+
+    def attempt(section, entry, new_name, conv=None):
         try:
             value = config.get(section, entry)
-            if conv is None:
-                return value
-            return conv(value)
+            if conv is not None:
+                value = conv(value)
+            setattr(infile, new_name, value)
         except ConfigParser.NoOptionError:
             return default
         except ConfigParser.NoSectionError:
             return default
-    global jugdir, jugfile, aggressive_unload, status_mode, pdb, execute_wait_cycle_time_secs, execute_nr_wait_cycles
-    jugdir = attempt('main', 'jugdir', jugdir)
-    jugfile = attempt('main', 'jugfile', jugfile)
-    status_mode = attempt('status', 'cache', status_mode)
-    aggressive_unload = attempt('execute', 'aggressive-unload', aggressive_unload, _str_to_bool)
-    pdb = attempt('execute', 'pbd', pdb, bool)
-    execute_nr_wait_cycles = attempt('execute', 'nr-wait-cycles', execute_nr_wait_cycles, int)
-    execute_wait_cycle_time_secs = attempt('execute', 'wait-cycle-time', execute_wait_cycle_time_secs, int)
+    attempt('main', 'jugdir', 'jugdir')
+    attempt('main', 'jugfile', 'jugfile')
+    attempt('status', 'cache', 'status_mode')
+    attempt('execute', 'aggressive-unload', 'aggressive_unload', _str_to_bool)
+    attempt('execute', 'pbd', 'pdb', bool)
+    attempt('execute', 'nr-wait-cycles', 'execute_nr_wait_cycles', int)
+    attempt('execute', 'wait-cycle-time', 'execute_wait_cycle_time_secs', int)
+    return infile
 
 
 def parse():
@@ -169,9 +192,11 @@ def parse():
     '''
     import optparse
     from .jug_version import __version__
-    global jugdir, jugfile, cmd, aggressive_unload, invalid_name, argv, status_mode, pdb, execute_wait_cycle_time_secs, execute_nr_wait_cycles
 
-    read_configuration_file()
+    infile = read_configuration_file()
+    infile.next = default_options
+    cmdline = Options(infile)
+
     parser = optparse.OptionParser(usage=_usage_simple, version=__version__)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
@@ -188,7 +213,7 @@ def parse():
 
     cmd = args.pop(0)
     if args:
-        jugfile = args.pop(0)
+        cmdline.jugfile = args.pop(0)
 
     if cmd not in _Commands:
         usage()
@@ -209,18 +234,20 @@ def parse():
     except KeyError:
         pass
 
-    aggressive_unload = options.aggressive_unload
-    invalid_name = options.invalid_name
-    argv = args
+    cmdline.aggressive_unload = options.aggressive_unload
+    cmdline.invalid_name = options.invalid_name
+    cmdline.argv = args
     sys.argv = [jugfile] + args
-    status_mode = ('cached' if options.cache else 'no-cached')
+    cmdline.status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
-    jugdir = jugdir % {
+    cmdline.jugdir = jugdir % {
                 'date': datetime.now().strftime('%Y-%m-%d'),
                 'jugfile': jugfile[:-3],
                 }
-    pdb = options.pdb
-    execute_wait_cycle_time_secs = int(options.wait_cycle_time)
-    execute_nr_wait_cycles = int(options.nr_wait_cycles)
+    cmdline.pdb = options.pdb
+    cmdline.execute_wait_cycle_time_secs = int(options.wait_cycle_time)
+    cmdline.execute_nr_wait_cycles = int(options.nr_wait_cycles)
+
+    return cmdline
 
 

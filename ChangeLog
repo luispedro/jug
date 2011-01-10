@@ -1,4 +1,5 @@
 version 0.7.3+
+	* Refactored implementation of options
 	* Fix mapreduce for empty input
 
 version 0.7.3 Tue Jan 4 2011 by luispedro

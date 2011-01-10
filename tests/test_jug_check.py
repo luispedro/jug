@@ -3,6 +3,8 @@ import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from tests.task_reset import task_reset
+from jug.options import Options, default_options
+
 import random
 jug.jug.silent = True
 
@@ -22,18 +24,18 @@ def test_jug_check():
     jug.task.Task.store = store
     e = None
     try:
-        jug.jug.check(store)
+        jug.jug.check(store, default_options)
     except SystemExit, e:
         pass
     assert e is not None
     assert e.code == 1
     savedtasks = jug.task.alltasks[:]
-    jug.jug.execute(store)
+    jug.jug.execute(store, default_options)
     jug.task.alltasks = savedtasks
 
     e = None
     try:
-        jug.jug.check(store)
+        jug.jug.check(store, default_options)
         assert False
     except SystemExit, e:
         pass
