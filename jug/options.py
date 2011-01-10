@@ -200,28 +200,28 @@ def parse():
     parser = optparse.OptionParser(usage=_usage_simple, version=__version__)
     parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload',default=False)
     parser.add_option('--invalid',action='store',dest='invalid_name',default=None)
-    parser.add_option('--jugdir',action='store',dest='jugdir',default=jugdir)
+    parser.add_option('--jugdir',action='store',dest='jugdir',default=default_options.jugdir)
     parser.add_option('--verbose',action='store',dest='verbosity',default='QUIET')
     parser.add_option('--cache', action='store_true', dest='cache', default=False)
     parser.add_option('--pdb', action='store_true', dest='pdb', default=False)
-    parser.add_option('--nr-wait-cycles', action='store', dest='nr_wait_cycles', default=execute_nr_wait_cycles)
-    parser.add_option('--wait-cycle-time', action='store', dest='wait_cycle_time', default=execute_wait_cycle_time_secs)
+    parser.add_option('--nr-wait-cycles', action='store', dest='nr_wait_cycles', default=default_options.execute_nr_wait_cycles)
+    parser.add_option('--wait-cycle-time', action='store', dest='wait_cycle_time', default=default_options.execute_wait_cycle_time_secs)
     options,args = parser.parse_args()
     if not args:
         usage()
         return
 
-    cmd = args.pop(0)
+    cmdline.cmd = args.pop(0)
     if args:
         cmdline.jugfile = args.pop(0)
 
-    if cmd not in _Commands:
+    if cmdline.cmd not in _Commands:
         usage()
         return
-    if options.invalid_name and cmd != 'invalidate':
+    if options.invalid_name and cmdline.cmd != 'invalidate':
         usage()
         return
-    if cmd == 'invalidate' and not options.invalid_name:
+    if cmdline.cmd == 'invalidate' and not options.invalid_name:
         usage()
         return
     try:
@@ -237,12 +237,12 @@ def parse():
     cmdline.aggressive_unload = options.aggressive_unload
     cmdline.invalid_name = options.invalid_name
     cmdline.argv = args
-    sys.argv = [jugfile] + args
+    sys.argv = [cmdline.jugfile] + args
     cmdline.status_mode = ('cached' if options.cache else 'no-cached')
     jugdir = options.jugdir
     cmdline.jugdir = jugdir % {
                 'date': datetime.now().strftime('%Y-%m-%d'),
-                'jugfile': jugfile[:-3],
+                'jugfile': cmdline.jugfile[:-3],
                 }
     cmdline.pdb = options.pdb
     cmdline.execute_wait_cycle_time_secs = int(options.wait_cycle_time)

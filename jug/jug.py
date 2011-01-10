@@ -310,7 +310,7 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
 
 
 def main():
-    from .options import parsecmd
+    from .options import parse
     options = parse()
     if options.cmd != 'status':
         store,jugspace = init(options.jugfile, options.jugdir)
