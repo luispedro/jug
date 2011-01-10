@@ -324,7 +324,7 @@ def main():
     elif options.cmd == 'sleep-until':
         sleep_until(store, options)
     elif options.cmd == 'status':
-        status()
+        status(options)
     elif options.cmd == 'invalidate':
         invalidate(store, options)
     elif options.cmd == 'cleanup':
