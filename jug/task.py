@@ -138,7 +138,8 @@ tricky to support since the general code relies on the function name)''')
 
         Unload results (can be useful for saving memory).
         '''
-        del self._result
+        if hasattr(self, '_result'):
+            del self._result
 
     def unload_recursive(self):
         '''

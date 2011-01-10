@@ -206,3 +206,7 @@ def test_unload_recursive():
     assert not hasattr(four, '_result')
     assert not hasattr(two, '_result')
 
+# Crashed in version 0.7.3
+def test_unload_wnoresult():
+    t = Task(add2, 3)
+    t.unload()
