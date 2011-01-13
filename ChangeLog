@@ -1,4 +1,5 @@
 version 0.7.3+
+	* Print host name to lock file on file_store
 	* Refactored implementation of options
 	* Fix unloading tasks that have not run
 	* Fix mapreduce for empty input
