@@ -158,6 +158,20 @@ def test_unload():
     T0.unload()
     assert T0.result == 1
 
+@task_reset
+def test_unload_recursive():
+    T0 = jug.task.Task(add1,0)
+    T1 = jug.task.Task(add1,T0)
+    T2 = jug.task.Task(add1,T1)
+    assert not hasattr(T0, '_result')
+    T0.run()
+    T1.run()
+    T2.run()
+    assert hasattr(T0, '_result')
+
+    T2.unload_recursive()
+    assert not hasattr(T0, '_result')
+
 def identity(x):
     return x
 
