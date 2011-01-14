@@ -239,4 +239,22 @@ def test__str__repr__():
     assert repr(t).find('3') >= 0
 
 
+def add_tuple((a,b)):
+    return a + b
+
+@task_reset
+def test_unload_recursive_tuple():
+    T0 = jug.task.Task(add1,0)
+    T1 = jug.task.Task(add1,T0)
+    T2 = jug.task.Task(add_tuple,(T0,T1))
+    T3 = jug.task.Task(add1, T2)
+    assert not hasattr(T0, '_result')
+    T0.run()
+    T1.run()
+    T2.run()
+    T3.run()
+    assert hasattr(T0, '_result')
+
+    T3.unload_recursive()
+    assert not hasattr(T0, '_result')
 
