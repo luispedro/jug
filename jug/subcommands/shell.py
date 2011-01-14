@@ -39,9 +39,9 @@ def load_all(jugspace):
             print 'Error while loading %s: %s' % (k, e)
 
 
-def shell(store, jugspace):
+def shell(store, options, jugspace):
     '''
-    shell(store, jugspace)
+    shell(store, options, jugspace)
 
     Implement 'shell' command.
 
