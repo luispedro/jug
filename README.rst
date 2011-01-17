@@ -79,6 +79,13 @@ the `value` function::
 What's New
 ..........
 
+version **0.7.4**:
+- Fix case where ~/.jug/configrc does not exist
+- Print host name to lock file on file_store
+- Refactored implementation of options
+- Fix unloading tasks that have not run
+- Fix mapreduce for empty input
+
 Version **0.7.3**:
 - Parse ~/.jug/configrc
 - Fix bug with waiting times
