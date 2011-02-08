@@ -431,3 +431,34 @@ def TaskGenerator(f):
     task_generator.f = f
     return task_generator 
 
+
+# This is lower case to be used like a function
+class iteratetask(object):
+    '''
+    for a in iteratetask(task, n):
+        ...
+
+    This creates an iterator that over the sequence ``task[0], task[1], ...,
+    task[n-1]``.
+
+    Parameters
+    ----------
+    task : Task(let)
+    n : integer
+
+    Returns
+    -------
+    iterator
+
+    Bugs
+    ----
+    There is no error checking that you have not missed elements at the end!
+    '''
+    def __init__(self, base, n):
+        self.base = base
+        self.n = n
+
+    def __getitem__(self, i):
+        if i >= self.n: raise IndexError
+        return self.base[i]
+
