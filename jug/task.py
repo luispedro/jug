@@ -17,6 +17,7 @@ from __future__ import division
 
 __all__ = [
     'Task',
+    'Tasklet',
     'recursive_dependencies',
     'TaskGenerator',
     'value',
@@ -24,7 +25,17 @@ __all__ = [
 
 alltasks = []
 
-class Task(object):
+class _getitem(object):
+    def __init__(self, slice):
+        self.slice = slice
+    def __call__(self, obj):
+        return obj[self.slice]
+
+class TaskletMixin(object):
+    def __getitem__(self, slice):
+        return Tasklet(self, _getitem(slice))
+
+class Task(TaskletMixin):
     '''
     T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
@@ -77,6 +88,8 @@ tricky to support since the general code relies on the function name)''')
         return self._result
 
     result = property(_get_result, doc='Result value')
+    def value(self):
+        return self.result
 
 
     def can_run(self):
@@ -196,6 +209,12 @@ tricky to support since the general code relies on the function name)''')
                 M.update(pickle.dumps(n))
                 if type(e) == Task:
                     M.update(e.hash())
+                elif type(e) == Tasklet:
+                    update([
+                            ('type', 'Tasklet'),
+                            ('base', e.base),
+                            ('f', e.f),
+                        ])
                 elif type(e) in (list, tuple):
                     update(enumerate(e))
                 elif type(e) == dict:
@@ -275,6 +294,25 @@ tricky to support since the general code relies on the function name)''')
             self._lock = self.store.getlock(self.hash())
         return self._lock.is_locked()
 
+class Tasklet(TaskletMixin):
+    '''
+    Tasklet
+
+    A Tasklet is a light-weight Task.
+    
+    It looks like a Task, behaves like a Task, but its results are not saved in the backend.
+    '''
+    def __init__(self, base, f):
+        '''
+        Tasklet equivalent to::
+        
+            f(value(base))
+        '''
+        self.base = base
+        self.f = f
+
+    def value(self):
+        return self.f(value(self.base))
 
 def topological_sort(tasks):
     '''
@@ -332,8 +370,8 @@ def value(elem):
     Loads a task object recursively. This correcly handles lists,
     dictonaries and eny other type handled by the tasks themselves.
     '''
-    if type(elem) is Task:
-        return elem.result
+    if type(elem) in (Task,Tasklet):
+        return elem.value()
     elif type(elem) is list:
         return [value(e) for e in elem]
     elif type(elem) is tuple:
