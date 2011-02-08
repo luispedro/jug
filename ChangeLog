@@ -1,3 +1,6 @@
+version 0.8
+	* Tasklets
+
 version 0.7.4 Sun Jan 16 2011 by luispedro
 	* Fix case where ~/.jug/configrc does not exist
 	* Print host name to lock file on file_store
