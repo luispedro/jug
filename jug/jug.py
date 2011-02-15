@@ -215,9 +215,9 @@ def check(store, options):
     '''
     _check_or_sleep_until(store, False)
 
-def sleep_until(store):
+def sleep_until(store, options):
     '''
-    sleep_until(store)
+    sleep_until(store, options)
 
     Execute sleep-until subcommand
 
@@ -225,6 +225,8 @@ def sleep_until(store):
     ----------
     store : jug.backend
             backend to use
+    options : jug options
+        ignored
     '''
     _check_or_sleep_until(store, True)
 
