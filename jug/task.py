@@ -462,3 +462,5 @@ class iteratetask(object):
         if i >= self.n: raise IndexError
         return self.base[i]
 
+    def __len__(self):
+        return self.n
