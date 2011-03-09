@@ -190,9 +190,9 @@ def execute(store, options):
         options.print_out('<no tasks>')
 
 
-def cleanup(store):
+def cleanup(store, options):
     '''
-    cleanup(store)
+    cleanup(store, options)
 
     Implement 'cleanup' command
     '''
