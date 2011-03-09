@@ -198,7 +198,7 @@ def cleanup(store, options):
     '''
     tasks = task.alltasks
     removed = store.cleanup(tasks)
-    print_out('Removed %s files' % removed)
+    options.print_out('Removed %s files' % removed)
 
 
 def check(store, options):
