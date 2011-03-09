@@ -29,6 +29,7 @@ Documentation Contents
     subcommands.rst
     types.rst
     tasks.rst
+    tasklets.rst
     idioms.rst
     barrier.rst
     compound.rst
