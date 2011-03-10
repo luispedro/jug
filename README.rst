@@ -79,6 +79,10 @@ the `value` function::
 What's New
 ..........
 
+version **0.8**:
+- Tasklets
+- Fix bugs in sleep-until and cleanup
+
 version **0.7.4**:
 - Fix case where ~/.jug/configrc does not exist
 - Print host name to lock file on file_store
