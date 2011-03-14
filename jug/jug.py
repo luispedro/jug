@@ -252,31 +252,36 @@ def _check_or_sleep_until(store, sleep_until):
     sys.exit(0)
 
 
-def init(jugfile=None, jugdir=None, on_error='exit'):
+def init(options, jugfile=None, jugdir=None, on_error='exit'):
     '''
-    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit')
+    store,jugspace = init(options, jugfile={options.jugfile}, jugdir={options.jugdata}, on_error='exit')
 
     Initializes jug (create backend connection, ...).
     Imports jugfile
 
     Parameters
     ----------
-    `jugfile` : jugfile to import (default: 'jugfile')
-    `jugdir` : jugdir to use (could be a path)
-    `on_error` : What to do if import fails (default: exit)
+    options : jug options
+    jugfile : str, optional
+        jugfile to import (default: options.jufile)
+    jugdir : str, optional
+        jugdir to use (could be a path), default: options.jugdir
+    on_error : str optional
+        What to do if import fails (default: 'exit')
 
     Returns
     -------
-    `store` : storage object
-    `jugspace` : dictionary
+    store : storage object
+    jugspace : dict
     '''
     import imp
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
 
     if jugfile is None:
-        jugfile = 'jugfile'
+        jugfile = options.jugfile
     if jugdir is None:
-        jugdir = 'jugdata'
+        jugdir = options.jugdata
+
     store = backends.select(jugdir)
     Task.store = store
     sys.path.insert(0, os.path.abspath('.'))
@@ -315,7 +320,7 @@ def main():
     from .options import parse
     options = parse()
     if options.cmd != 'status':
-        store,jugspace = init(options.jugfile, options.jugdir)
+        store,jugspace = init(options, options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
         execute(store, options)
