@@ -108,3 +108,19 @@ Version **0.7 (starting with 0.6.9 in testing)**:
 - `barrier()`
 - better ``shell`` command
 
+Roadmap
+.......
+
+Version 1.0
+'''''''''''
+
+Version 1.0 is just around the corner. After 0.8 is done, there really are not
+that many features left. More flexible configuration, a bit more caching, and
+we are done.
+
+After version 1.0
+'''''''''''''''''
+
+I want to start adding bells&whistles through extensions. Things like timing,
+more active monitoring, &c.
+
