@@ -81,7 +81,7 @@ def _save_dirty3(dirty):
     connection.commit()
 
 
-def _load_jugfile():
+def _load_jugfile(options):
     store,_ = jug.init(options.jugfile, options.jugdir)
     h2idx = {}
     ht = []
@@ -176,7 +176,7 @@ def _status_cached(options):
         store = backends.select(options.jugdir)
         mode = update
     except:
-        store, ht, deps, rdeps = _load_jugfile()
+        store, ht, deps, rdeps = _load_jugfile(options)
         mode = create
 
     tw,tre,tru,tf,dirty = _update_status(store, ht, deps, rdeps)
