@@ -36,8 +36,8 @@ def CompoundTask(f, *args, **kwargs):
     '''
     task = CompoundTask(f, *args, **kwargs)
 
-    `f` should be such that it returns a `Task`, which can be as complex as it
-    wants.
+    `f` should be such that it returns a `Task`, which can depend on other
+    Tasks (even recursively).
 
     If `f` cannot been loaded, then this becomes equivalent to::
 
@@ -45,6 +45,18 @@ def CompoundTask(f, *args, **kwargs):
 
     However, if it can, then we get a pseudo-task which returns the same value
     without `f` ever being executed.
+
+    Example
+    -------
+    ::
+
+        def complex_operation(input):
+            intermediates = [Task(process, parameter=i) for i in xrange(1000)]
+            mean = Task(compute_mean, intermediates)
+            return mean
+
+        mean_value = CompoundTask(complex_operation, input)
+
 
     Parameters
     ----------
@@ -62,5 +74,7 @@ def CompoundTask(f, *args, **kwargs):
     inner = f(*args, **kwargs)
     del alltasks[alltasks.index(task)]
     del task
-    return Task(compound_task_execute, inner, h)
+    compound = Task(compound_task_execute, inner, h)
+    compound._hash = h
+    return compound
 
