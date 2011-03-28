@@ -2,7 +2,7 @@ import jug.jug
 import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
-from tests.task_reset import task_reset
+from jug.tests.task_reset import task_reset
 from jug.options import Options, default_options
 
 import random

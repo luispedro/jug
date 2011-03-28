@@ -4,7 +4,7 @@ import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.options import Options, default_options
-from tests.task_reset import task_reset
+from jug.tests.task_reset import task_reset
 import random
 jug.jug.silent = True
 

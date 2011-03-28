@@ -3,8 +3,8 @@ import jug.mapreduce
 import numpy as np
 from jug.backends.dict_store import dict_store
 from jug.compound import CompoundTask
-from tests.test_mapreduce import mapper, reducer, dfs_run
-from tests.task_reset import task_reset
+from jug.tests.test_mapreduce import mapper, reducer, dfs_run
+from jug.tests.task_reset import task_reset
 
 @task_reset
 def test_compound():

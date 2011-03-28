@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <lpc@cmu.edu>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,7 +57,7 @@ setuptools.setup(name = 'Jug',
       platforms = ['Any'],
       classifiers = classifiers,
       url = 'http://luispedro.org/software/jug',
-      packages = setuptools.find_packages(exclude='tests'),
+      packages = setuptools.find_packages(),
       scripts = ['bin/jug'],
       test_suite = 'nose.collector',
       )

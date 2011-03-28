@@ -4,7 +4,7 @@ import jug.mapreduce
 from jug.backends.dict_store import dict_store
 from jug.mapreduce import _break_up
 from jug import value
-from task_reset import task_reset
+from jug.tests.task_reset import task_reset
 
 def mapper(x):
     return x**2
@@ -42,6 +42,6 @@ def test_break_up():
 
 @task_reset
 def test_empty_mapreduce():
-    store, space = jug.jug.init('tests/jugfiles/empty_mapreduce.py', 'dict_store')
+    store, space = jug.jug.init('jug/tests/jugfiles/empty_mapreduce.py', 'dict_store')
     space['two'].run()
     assert space['two'].result == []
