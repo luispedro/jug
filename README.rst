@@ -82,6 +82,7 @@ What's New
 version **0.8**:
 - Tasklets
 - Fix bugs in sleep-until and cleanup
+- Fix bugs with CompoundTask (you needed to run jug execute twice before)
 
 version **0.7.4**:
 - Fix case where ~/.jug/configrc does not exist

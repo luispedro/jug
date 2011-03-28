@@ -1,4 +1,4 @@
-version 0.8
+version 0.8 Sun Mar 27 2011 by luispedro
 	* Tasklets
 	* Fix bug in sleep-until
 	* Fix bug in cleanup
