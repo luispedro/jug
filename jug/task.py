@@ -14,6 +14,7 @@ There are two main alternatives:
 '''
 
 from __future__ import division
+from .hash import new_hash_object, hash_update
 
 __all__ = [
     'Task',
@@ -201,31 +202,25 @@ tricky to support since the general code relies on the function name)''')
         The results are cached, so the first call can be much slower than
         subsequent calls.
         '''
-        import hashlib
-        import cPickle as pickle
-        M = hashlib.md5()
-        def update(elems):
-            for n,e in elems:
-                M.update(pickle.dumps(n))
-                if type(e) == Task:
-                    M.update(e.hash())
-                elif type(e) == Tasklet:
-                    update([
-                            ('type', 'Tasklet'),
-                            ('base', e.base),
-                            ('f', e.f),
-                        ])
-                elif type(e) in (list, tuple):
-                    update(enumerate(e))
-                elif type(e) == dict:
-                    update(e.iteritems())
-                else:
-                    M.update(pickle.dumps(e))
+    def hash(self):
+        '''
+        fname = t.hash()
+
+        Returns the hash for this task.
+
+        The results are cached, so the first call can be much slower than
+        subsequent calls.
+        '''
+        return self.__jug_hash__()
+
+    def __jug_hash__(self):
+        M = new_hash_object()
         M.update(self.name)
-        update(enumerate(self.args))
-        update(self.kwargs.iteritems())
-        self.hash = lambda : M.hexdigest()
-        return self.hash()
+        hash_update(M, enumerate(self.args))
+        hash_update(M, self.kwargs.iteritems())
+        value = M.hexdigest()
+        self.__jug_hash__ = lambda : value
+        return value
 
 
     def __str__(self):
@@ -313,6 +308,15 @@ class Tasklet(TaskletMixin):
 
     def value(self):
         return self.f(value(self.base))
+
+    def __jug_hash__(self):
+        M = new_hash_object()
+        M.update('Tasklet')
+        hash_update(M, [
+                ('base', self.base),
+                ('f', self.f),
+            ])
+        return M.hexdigest()
 
 def topological_sort(tasks):
     '''
