@@ -120,7 +120,6 @@ def execute(store, options):
     task_names = set(t.name for t in tasks)
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
-    task.topological_sort(tasks)
     logging.info('Execute start (%s tasks)' % len(tasks))
     signal(SIGTERM,_sigterm)
     while tasks:
