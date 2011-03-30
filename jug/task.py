@@ -294,13 +294,26 @@ class Tasklet(TaskletMixin):
     Tasklet
 
     A Tasklet is a light-weight Task.
-    
-    It looks like a Task, behaves like a Task, but its results are not saved in the backend.
+
+    It looks like a Task, behaves like a Task, but its results are not saved in
+    the backend.
+
+    It is useful for very simple functions and is automatically generated on
+    subscripting a Task object::
+
+        t = Task(f, 1)
+        tlet = t[0]
+
+    ``tlet`` will be a ``Tasklet``
+
+    See Also
+    --------
+    Task
     '''
     def __init__(self, base, f):
         '''
         Tasklet equivalent to::
-        
+
             f(value(base))
         '''
         self.base = base
@@ -433,7 +446,7 @@ def TaskGenerator(f):
         return Task(f, *args, **kwargs)
     task_generator.__name__ = ('TaskGenerator(%s)' % task_generator.__name__)
     task_generator.f = f
-    return task_generator 
+    return task_generator
 
 
 # This is lower case to be used like a function
@@ -468,3 +481,4 @@ class iteratetask(object):
 
     def __len__(self):
         return self.n
+
