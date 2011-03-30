@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <lpc@cmu.edu>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -109,25 +109,49 @@ class file_store(object):
         # Rename is atomic even over NFS.
         os.rename(fname, name)
 
+    def list(self):
+        '''
+        keys = store.list()
 
-    def can_load(self, fname):
+        Returns a list of all the keys in the store
         '''
-        can = can_load(fname)
+        keys = []
+        for d in os.listdir(self.jugdir):
+            if len(d) == 2:
+                for f in os.listdir(d):
+                    keys.append(d+f)
+        return keys
+
+
+    def can_load(self, name):
         '''
-        fname = self._getfname(fname)
+        can = store.can_load(name)
+        '''
+        fname = self._getfname(name)
         return exists(fname)
 
-    def load(self, fname):
+    def load(self, name):
         '''
-        obj = load(fname)
+        obj = store.load(name)
 
-        Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
+        Loads the objects. Equivalent to pickle.load(), but a bit smarter at
+        times.
+
+        Parameters
+        ----------
+        name : str
+            Key to use
+
+        Returns
+        -------
+        obj : any
+            The object that was saved under ``name``
         '''
-        fname = self._getfname(fname)
+        fname = self._getfname(name)
         input = file(fname)
         try:
             import numpy as np
-            return np.lib.format.read_array(input)
+            return np.load(input, mmap_mode='r')
         except ValueError:
             input.seek(0)
         except ImportError:
@@ -136,16 +160,16 @@ class file_store(object):
         input.close()
         return decode(s)
 
-    def remove(self, fname):
+    def remove(self, name):
         '''
-        was_removed = remove(fname)
+        was_removed = store.remove(name)
 
-        Remove the entry associated with fname.
+        Remove the entry associated with name.
 
         Returns whether any entry was actually removed.
         '''
         try:
-            fname = self._getfname(fname)
+            fname = self._getfname(name)
             os.unlink(fname)
             return True
         except OSError:
@@ -160,12 +184,12 @@ class file_store(object):
         Parameters
         ----------
         active : sequence
-                 files *not to remove*
+            files *not to remove*
 
         Returns
         -------
         nr_removed : integer
-                     number of removed files
+            number of removed files
         '''
         files = set()
         for dir,_,fs in os.walk(self.jugdir):
@@ -180,6 +204,21 @@ class file_store(object):
         return len(files)
 
     def getlock(self, name):
+        '''
+        lock = store.getlock(name)
+
+        Retrieve a lock object associated with ``name``.
+
+        Parameters
+        ----------
+        name : str
+            Key
+
+        Returns
+        -------
+        lock : Lock object
+            This is a file_lock object
+        '''
         return file_based_lock(self.jugdir, name)
 
     def close(self):
@@ -192,6 +231,11 @@ class file_store(object):
 
     @staticmethod
     def remove_store(jugdir):
+        '''
+        file_store.remove_store(jugdir)
+
+        Removes from disk all the files associated with this jugdir.
+        '''
         shutil.rmtree(jugdir)
 
 
@@ -215,6 +259,15 @@ class file_based_lock(object):
         lock.get()
 
         Create a lock for name in an NFS compatible way.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        locked : bool
+            Whether the lock was created
         '''
         if exists(self.fullname): return False
         create_directories(path.dirname(self.fullname))
