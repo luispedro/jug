@@ -26,11 +26,14 @@ memoize_store: a wrapper that never repeats a lookup.
 from __future__ import division
 
 class memoize_store(object):
-    def __init__(self, base):
+    def __init__(self, base, list_base=False):
         '''
         '''
         self.base = base
         self.cache = {}
+        self.keys = None
+        if if list_base and hasattr(base, 'list'):
+            self.keys = set(base.list())
 
     def dump(self, object, outname):
         '''
@@ -43,6 +46,8 @@ class memoize_store(object):
         '''
         can = can_load(name)
         '''
+        if self.keys is not None:
+            return name in self.keys
         if ('can-load', name) not in self.cache:
             self.cache['can-load', name] = self.base.can_load(name)
         return self.cache['can-load',name]

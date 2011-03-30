@@ -30,7 +30,6 @@ import logging
 
 from . import task
 from . import backends
-from .backends import memoize_store
 from .task import Task
 from .subcommands.status import status
 from .subcommands.shell import shell
@@ -260,14 +259,17 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
 
     Parameters
     ----------
-    `jugfile` : jugfile to import (default: 'jugfile')
-    `jugdir` : jugdir to use (could be a path)
-    `on_error` : What to do if import fails (default: exit)
+    jugfile : str, optional
+        jugfile to import (default: 'jugfile')
+    jugdir : str, optional
+        jugdir to use (could be a path)
+    on_error : str, optional
+        What to do if import fails (default: exit)
 
     Returns
     -------
-    `store` : storage object
-    `jugspace` : dictionary
+    store : storage object
+    jugspace : dictionary
     '''
     import imp
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'

@@ -111,7 +111,7 @@ def _update_status(store, ht, deps, rdeps):
     tasks_running = defaultdict(int)
     tasks_finished = defaultdict(int)
 
-    store = memoize_store(store)
+    store = memoize_store(store, list_base=True)
     dirty = []
     active = []
     for h in ht:
@@ -192,7 +192,7 @@ def _status_cached(options):
 
 def _status_nocache(options):
     store,_ = jug.init(options.jugfile, options.jugdir)
-    Task.store = memoize_store(store)
+    Task.store = memoize_store(store, list_base=True)
 
     task_names = set(t.name for t in task.alltasks)
     tasks_waiting = defaultdict(int)
