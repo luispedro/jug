@@ -151,7 +151,7 @@ class file_store(object):
         input = file(fname)
         try:
             import numpy as np
-            return np.load(input, mmap_mode='r')
+            return np.lib.format.read_array(input)
         except ValueError:
             input.seek(0)
         except ImportError:
