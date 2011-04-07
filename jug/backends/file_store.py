@@ -115,11 +115,32 @@ class file_store(object):
 
         Returns a list of all the keys in the store
         '''
+        if not exists(self.jugdir):
+            return []
+
         keys = []
         for d in os.listdir(self.jugdir):
             if len(d) == 2:
-                for f in os.listdir(d):
+                for f in os.listdir(self.jugdir + '/' + d):
                     keys.append(d+f)
+        return keys
+
+
+    def listlocks(self):
+        '''
+        keys = store.listlocks()
+
+        Returns a list of all the locks in the store
+
+        This is an unsafe function as the results may be outdated by the time
+        the function returns.
+        '''
+        if not exists(self.jugdir + '/locks'):
+            return []
+
+        keys = []
+        for k in os.listdir(self.jugdir + '/locks'):
+            keys.append(k[:-len('.lock')])
         return keys
 
 

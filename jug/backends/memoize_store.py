@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <lpc@cmu.edu>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,8 +32,11 @@ class memoize_store(object):
         self.base = base
         self.cache = {}
         self.keys = None
-        if if list_base and hasattr(base, 'list'):
+        self.locks = None
+        if list_base and hasattr(base, 'list'):
             self.keys = set(base.list())
+        if list_base and hasattr(base, 'listlocks'):
+            self.locks = set(base.listlocks())
 
     def dump(self, object, outname):
         '''
@@ -83,7 +86,7 @@ class memoize_store(object):
 
 
     def getlock(self, name):
-        return cache_lock(self.base, name)
+        return cache_lock(self.base, name, self.locks)
 
 
     def close(self):
@@ -93,19 +96,20 @@ class memoize_store(object):
 _UNKNOWN, _NOT_LOCKED, _LOCKED = -1,False,True
 class cache_lock(object):
     '''
-    dict_lock
+    cache_lock
 
     Functions:
     ----------
-
-        * get(): acquire the lock
-        * release(): release the lock
-        * is_locked(): check lock state
+    get(): acquire the lock
+    release(): release the lock
+    is_locked(): check lock state
     '''
 
-    def __init__(self, base, name):
+    def __init__(self, base, name, locks):
         self.base = base.getlock(name)
         self.status = _UNKNOWN
+        if locks is not None:
+            self.status = (_LOCKED if (name in locks) else _NOT_LOCKED)
 
     def get(self):
         '''
@@ -130,4 +134,3 @@ class cache_lock(object):
             self.status = (_LOCKED if self.base.is_locked() else _NOT_LOCKED)
         return self.status
 
-# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
