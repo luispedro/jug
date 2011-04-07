@@ -48,7 +48,7 @@ barrier : function
 
 '''
 
-from .task import TaskGenerator, Task, Tasklet, value, CachedFunction
+from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask
 from .barrier import barrier
 
 from .jug import init
@@ -60,6 +60,7 @@ __all__ = [
     'Task',
     'Tasklet',
     'TaskGenerator',
+    'iteratetask',
     'value',
     'CachedFunction',
     'barrier',

@@ -21,6 +21,7 @@ __all__ = [
     'Tasklet',
     'recursive_dependencies',
     'TaskGenerator',
+    'iteratetask',
     'value',
     ]
 
