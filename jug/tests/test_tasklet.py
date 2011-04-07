@@ -18,3 +18,9 @@ def test_iteratetask():
     assert space['t0'].value() == 0
     assert space['t1'].value() == 2
     assert space['t2'].value() == 4
+
+@task_reset
+def test_tasklet_dependencies():
+    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', 'dict_store')
+    assert not space['t0_2'].can_run()
+

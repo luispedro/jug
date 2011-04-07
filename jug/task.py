@@ -176,7 +176,7 @@ tricky to support since the general code relies on the function name)''')
         while queue:
             deps = queue.pop()
             for dep in deps:
-                if type(dep) is Task:
+                if type(dep) in (Task, Tasklet):
                     yield dep
                 elif type(dep) in (list,tuple):
                     queue.append(dep)
@@ -322,6 +322,9 @@ class Tasklet(TaskletMixin):
 
     def value(self):
         return self.f(value(self.base))
+
+    def can_load(self):
+        return self.base.can_load()
 
     def __jug_hash__(self):
         M = new_hash_object()
