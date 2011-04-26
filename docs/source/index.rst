@@ -38,6 +38,7 @@ Documentation Contents
     configuration.rst
     faq.rst
     why.rst
+    writeabackend.rst
     api.rst
 
 Examples
