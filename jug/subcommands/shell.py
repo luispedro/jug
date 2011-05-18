@@ -56,8 +56,6 @@ Available jug functions:
 Enjoy...
 '''
 
-def _
-
 def shell(store, options, jugspace):
     '''
     shell(store, options, jugspace)
