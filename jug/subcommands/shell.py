@@ -24,9 +24,9 @@
 
 from ..task import value
 
-def load_all(jugspace):
+def load_all(jugspace, local_ns):
     '''
-    load_all(jugspace)
+    load_all(jugspace, local_ns)
 
     Loads the result of all tasks.
     '''
@@ -34,10 +34,29 @@ def load_all(jugspace):
         # ignore objects name like __this__
         if k.startswith('__') and k.endswith('__'): continue
         try:
-            jugspace[k] = value(v)
+            local_ns[k] = value(v)
         except Exception, e:
             print 'Error while loading %s: %s' % (k, e)
 
+_ipython_not_found_msg = '''\
+jug: Error: could not import IPython libraries
+
+IPython is necessary for `shell` command.
+'''
+_ipython_banner = '''
+=========
+Jug Shell
+=========
+
+
+Available jug functions:
+    - value() : loads a specific object
+    - load_all() : loads all objects
+
+Enjoy...
+'''
+
+def _
 
 def shell(store, options, jugspace):
     '''
@@ -49,14 +68,17 @@ def shell(store, options, jugspace):
     '''
     try:
         from IPython.Shell import IPShellEmbed
+        ipshell = IPShellEmbed(banner=_ipython_banner)
     except ImportError:
-        import sys
-        print >>sys.stderr, '''\
-jug: Error: could not import IPython libraries
-
-IPython is necessary for `shell` command.
-'''
-        sys.exit(1)
+        try:
+            # From ipython v0.11, the interface changed.
+            # So we try the new interface too
+            from IPython.frontend.terminal.embed import InteractiveShellEmbed
+            ipshell = InteractiveShellEmbed(display_banner=_ipython_banner)
+        except ImportError:
+            import sys
+            print >>sys.stderr, _ipython_not_found_msg
+            sys.exit(1)
 
     def _load_all():
         '''
@@ -64,33 +86,19 @@ IPython is necessary for `shell` command.
 
         Loads all task results.
         '''
-        load_all(jugspace)
-
-
-    ipshell = IPShellEmbed(banner='''
-=========
-Jug Shell
-=========
-
-
-Available jug functions:
-    - value() : loads a specific object
-    - load_all() : loads all objects
-
-Enjoy...
-''')
+        load_all(jugspace, local_ns)
 
     local_ns = {
         'load_all' : _load_all,
         'value' : value,
     }
-
     # This is necessary for some versions of Ipython. See:
     # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
     try:
         del jugspace['__builtins__']
     except KeyError:
         pass
-    ipshell(global_ns=jugspace, local_ns=local_ns)
 
+    local_ns.update(jugspace)
+    ipshell(global_ns=jugspace, local_ns=local_ns)
 
