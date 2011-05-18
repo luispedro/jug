@@ -2,7 +2,7 @@ version 0.8+
 	* Install tests and have them be runnable
 	* Changed hash computation method. This has a special case on numpy arrays
 	(for speed) and is more extensible through a __jug_hash__ hook
-	* Fix bug with Tasklets
+	* Fix bug with Tasklet dependencies not being properly taken into account
 	* Fix shell subcommand in newer versions of ipython
 
 version 0.8 Sun Mar 27 2011 by luispedro
