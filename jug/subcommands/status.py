@@ -89,7 +89,13 @@ def _load_jugfile(options):
     rdeps = {}
     for i,t in enumerate(task.alltasks):
         hash = t.hash()
-        curdeps = [h2idx[dep.hash()] for dep in recursive_dependencies(t, 1)]
+        curdeps = []
+        for dep in t.dependencies():
+            if type(dep) is Task:
+                h = dep.hash()
+            else:
+                h = dep._base_hash()
+            curdeps.append(h2idx[h])
         if curdeps:
             deps[i] = curdeps
         h = [i, t.name, hash, unknown]

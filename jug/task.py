@@ -331,6 +331,11 @@ class Tasklet(TaskletMixin):
     def can_load(self):
         return self.base.can_load()
 
+    def _base_hash(self):
+        if type(self.base) is Tasklet:
+            return self.base._base_hash()
+        return self.base.hash()
+
     def __jug_hash__(self):
         M = new_hash_object()
         M.update('Tasklet')
