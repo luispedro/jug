@@ -297,6 +297,7 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
     #
     jugmodname = os.path.basename(jugfile[:-len('.py')])
     jugmodule = imp.new_module(jugmodname)
+    jugmodule.__file__ = os.path.abspath(jugfile)
     jugspace = jugmodule.__dict__
     sys.modules[jugmodname] = jugmodule
     try:
