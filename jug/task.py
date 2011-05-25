@@ -33,6 +33,11 @@ class _getitem(object):
     def __call__(self, obj):
         return obj[self.slice]
 
+    def __repr__(self):
+        return 'jug.task._getitem(%s)' % self.slice
+    def __str__(self):
+        return 'jug.task._getitem(%s)' % self.slice
+
 class TaskletMixin(object):
     def __getitem__(self, slice):
         return Tasklet(self, _getitem(slice))
