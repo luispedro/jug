@@ -135,10 +135,18 @@ class decompress_stream(object):
 
     def readline(self):
         line = ''
-        nc = 'x'
-        while len(nc) and nc != '\n':
-            nc = self.read(1)
-            line += nc
+        while True:
+            block = self.read(self.block)
+            if not block:
+                return line
+            ln = block.find('\n')
+            if ln == -1:
+                line += block
+            else:
+                ln += 1
+                line += block[:ln]
+                self.seek(ln-len(block), 1)
+                return line
         return line
 
 def decode(s):
