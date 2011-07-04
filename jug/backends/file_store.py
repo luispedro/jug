@@ -32,7 +32,7 @@ import errno
 import tempfile
 import shutil
 
-from jug.backends.encode import encode, decode
+from jug.backends.encode import encode_to, decode_from
 
 def create_directories(dname):
     '''
@@ -98,12 +98,7 @@ class file_store(object):
         except ValueError:
             pass
 
-        s = encode(object)
-        if not s:
-            file(name,'w').close()
-            return
-
-        output.write(s)
+        encode_to(object, output)
         output.close()
 
         # Rename is atomic even over NFS.
@@ -177,9 +172,7 @@ class file_store(object):
             input.seek(0)
         except ImportError:
             pass
-        s = input.read()
-        input.close()
-        return decode(s)
+        return decode_from(input)
 
     def remove(self, name):
         '''

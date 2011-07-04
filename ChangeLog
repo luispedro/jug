@@ -1,4 +1,5 @@
 version 0.8+
+	* Faster file store for large files
 	* Fix `invalidate` with Tasklets
 	* Install tests and have them be runnable
 	* Changed hash computation method. This has a special case on numpy arrays
