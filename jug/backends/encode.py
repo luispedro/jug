@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <lpc@cmu.edu>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,10 +26,9 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
-import numpy as np
-from zlib import compress, decompress
+import zlib
 
-__all__ = ['encode', 'decode']
+__all__ = ['encode', 'decode', 'encode_to', 'decode_from']
 
 def encode(object):
     '''
@@ -49,16 +48,98 @@ def encode(object):
     ---
       `decode`
     '''
+    output = StringIO()
+    encode_to(object, output)
+    return output.getvalue()
+
+def encode_to(object, stream):
+    '''
+    encode_to(object, stream)
+
+    Encodes the object into the stream ``stream``
+
+    Parameters
+    ----------
+    object : Any object
+    stream : file-like object
+    '''
     if object is None:
-        return ''
+        return
     prefix = 'P'
     write = pickle.dump
-    if isinstance(object, np.ndarray):
-        prefix = 'N'
-        write = (lambda f,a: np.save(a,f))
-    output = StringIO()
-    write(object, output)
-    return compress(prefix + output.getvalue())
+    try:
+        import numpy as np
+        if isinstance(object, np.ndarray):
+            prefix = 'N'
+            write = (lambda f,a: np.save(a,f))
+    except ImportError:
+        pass
+    stream = compress_stream(stream)
+    stream.write(prefix)
+    write(object, stream)
+    stream.flush()
+
+class compress_stream(object):
+    def __init__(self, stream):
+        self.stream = stream
+        self.C = zlib.compressobj()
+
+    def write(self, s):
+        self.stream.write(self.C.compress(s))
+
+    def flush(self):
+        self.stream.write(self.C.flush())
+        self.stream.flush()
+
+class decompress_stream(object):
+    def __init__(self, stream, block=128):
+        self.stream = stream
+        self.D = zlib.decompressobj()
+        self.block = block
+        self.lastread = ''
+        self.queue = ''
+
+    def read(self, nbytes):
+        res = ''
+        if self.queue:
+            if len(self.queue) >= nbytes:
+                res = self.queue[:nbytes]
+                self.queue = self.queue[nbytes:]
+                return res
+            res = self.queue
+            self.queue = ''
+
+        if self.D.unconsumed_tail:
+            res += self.D.decompress(self.D.unconsumed_tail, nbytes - len(res))
+        while len(res) < nbytes:
+            buf = self.stream.read(self.block)
+            if not buf:
+                res += self.D.flush()
+                break
+            res += self.D.decompress(buf, nbytes - len(res))
+        self.lastread = res
+        return res
+
+    def seek(self, offset, whence):
+        if whence != 1:
+            raise NotImplementedError
+        while offset > 0:
+            nbytes = min(offset, self.block)
+            self.read(nbytes)
+            offset -= nbytes
+        if offset < 0:
+            if offset > len(self.lastread):
+                raise ValueError('seek too far')
+            skip = len(self.lastread) + offset
+            self.queue = self.lastread[skip:]
+
+    def readline(self):
+        line = ''
+        nc = 'x'
+        while len(nc) and nc != '\n':
+            nc = self.read(1)
+            line += nc
+        return line
 
 def decode(s):
     '''
@@ -74,16 +155,30 @@ def decode(s):
     -------
       object : the object
     '''
-    if not s:
+    return decode_from(StringIO(s))
+
+def decode_from(stream):
+    '''
+    object = decode_from(stream)
+
+    Decodes the object from the stream ``stream``
+
+    Parameters
+    ----------
+    stream : file-like object
+
+    Returns
+    -------
+    object : decoded object
+    '''
+    stream = decompress_stream(stream)
+    prefix = stream.read(1)
+    if not prefix:
         return None
-    s = decompress(s)
-    prefix = s[0]
-    s = s[1:]
-    if prefix == 'P':
-        return pickle.loads(s)
+    elif prefix == 'P':
+        return pickle.load(stream)
     elif prefix == 'N':
-        s = StringIO(s)
-        return np.load(s)
+        import numpy as np
+        return np.load(stream)
     else:
-        raise IOError("jug.backend.encode: unknown prefix '%s'" % prefix)
-    
+        raise IOError("jug.backend.decode_from: unknown prefix '%s'" % prefix)
