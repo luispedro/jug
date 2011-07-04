@@ -1,4 +1,5 @@
 version 0.8+
+	* Fix `invalidate` with Tasklets
 	* Install tests and have them be runnable
 	* Changed hash computation method. This has a special case on numpy arrays
 	(for speed) and is more extensible through a __jug_hash__ hook
