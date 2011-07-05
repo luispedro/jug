@@ -79,6 +79,17 @@ the `value` function::
 What's New
 ..........
 
+version **0.8.1**:
+- Fix redis backend for new version of client module
+- Faster file store for large files
+- Fix ``invalidate`` with Tasklets
+- Install tests and have them be runnable
+- Changed hash computation method. This has a special case on numpy arrays
+  (for speed) and is more extensible through a ``__jug_hash__`` hook
+- Fix bug with ``Tasklet`` dependencies not being properly taken into account
+- Fix ``shell`` subcommand in newer versions of ipython
+- Add ``__file__`` attribute to fake jugmodule
+
 version **0.8**:
 - Tasklets
 - Fix bugs in sleep-until and cleanup
@@ -105,9 +116,6 @@ Version **0.7.1**:
 - ``sleep-until`` subcommand
 - bugfixes
 
-Version **0.7 (starting with 0.6.9 in testing)**:
-- `barrier()`
-- better ``shell`` command
 
 Roadmap
 .......
