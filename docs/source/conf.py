@@ -38,7 +38,7 @@ project = 'Jug'
 copyright = '2008-2011, Luis Pedro Coelho'
 
 # The short X.Y version.
-version = '0.7'
+version = jug_version[:3]
 # The full version, including alpha/beta/rc tags.
 release = jug_version
 
