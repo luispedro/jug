@@ -126,7 +126,12 @@ class redis_store(object):
 
 
     def close(self):
-        self.redis.disconnect()
+        # It seems some versions of the protocol are implemented differently
+        # and do not have the ``disconnect`` method
+        try:
+            self.redis.disconnect()
+        except:
+            pass
 
 
 

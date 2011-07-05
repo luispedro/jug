@@ -1,4 +1,5 @@
 version 0.8+
+	* Fix redis backend for new version of client module
 	* Faster file store for large files
 	* Fix `invalidate` with Tasklets
 	* Install tests and have them be runnable
