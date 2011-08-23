@@ -181,11 +181,11 @@ tricky to support since the general code relies on the function name)''')
         while queue:
             deps = queue.pop()
             for dep in deps:
-                if type(dep) in (Task, Tasklet):
+                if isinstance(dep, (Task, Tasklet)):
                     yield dep
-                elif type(dep) in (list,tuple):
+                elif isinstance(dep, (list, tuple)):
                     queue.append(dep)
-                elif type(dep) is dict:
+                elif isinstance(dep, dict):
                     queue.append(dep.itervalues())
 
 
@@ -332,7 +332,7 @@ class Tasklet(TaskletMixin):
         return self.base.can_load()
 
     def _base_hash(self):
-        if type(self.base) is Tasklet:
+        if isinstance(self.base, Tasklet):
             return self.base._base_hash()
         return self.base.hash()
 
@@ -401,13 +401,13 @@ def value(elem):
     Loads a task object recursively. This correcly handles lists,
     dictonaries and eny other type handled by the tasks themselves.
     '''
-    if type(elem) in (Task,Tasklet):
+    if isinstance(elem, (Task, Tasklet)):
         return elem.value()
-    elif type(elem) is list:
+    elif type(elem) == list:
         return [value(e) for e in elem]
-    elif type(elem) is tuple:
+    elif type(elem) == tuple:
         return tuple([value(e) for e in elem])
-    elif type(elem) is dict:
+    elif type(elem) == dict:
         return dict((x,value(y)) for x,y in elem.iteritems())
     else:
         return elem

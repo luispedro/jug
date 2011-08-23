@@ -1,3 +1,6 @@
+version 0.8.1+
+	* Support subclassing of Task
+
 version 0.8.1 Tue Jul 5 2011 by luispedro
 	* Fix redis backend for new version of client module
 	* Faster file store for large files
