@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <lpc@cmu.edu>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,7 +52,7 @@ setuptools.setup(name = 'Jug',
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
-      author_email = 'lpc@cmu.edu',
+      author_email = 'luis@luispedro.org',
       license = 'MIT',
       platforms = ['Any'],
       classifiers = classifiers,
