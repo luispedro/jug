@@ -60,8 +60,20 @@ class file_store(object):
         '''
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
+
+    def create(self):
+        '''
+        Recursively create directories.
+        '''
         create_directories(self.jugdir)
         create_directories(self.tempdir())
+
+    def _maybe_create(self):
+        '''
+        Calls self.create() the first time it is called; then becomes a no-op.
+        '''
+        self.create()
+        self._maybe_create = (lambda : None)
 
     def tempdir(self):
         return path.join(self.jugdir, 'tempfiles')
@@ -82,6 +94,7 @@ class file_store(object):
         '''
         name = self._getfname(name)
         create_directories(dirname(name))
+        self._maybe_create()
         fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
         output = os.fdopen(fd, 'w')
         try:
@@ -145,6 +158,7 @@ class file_store(object):
         '''
         fname = self._getfname(name)
         return exists(fname)
+
 
     def load(self, name):
         '''
@@ -233,6 +247,7 @@ class file_store(object):
         lock : Lock object
             This is a file_lock object
         '''
+        self._maybe_create()
         return file_based_lock(self.jugdir, name)
 
     def close(self):
