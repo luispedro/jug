@@ -69,7 +69,7 @@ def invalidate(store, options):
     tasks = task.alltasks
     cache = {}
     def isinvalid(t):
-        if type(t) == task.Tasklet:
+        if isinstance(t, task.Tasklet):
             return isinvalid(t.base)
         h = t.hash()
         if h in cache:
