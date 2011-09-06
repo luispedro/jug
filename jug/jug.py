@@ -118,7 +118,7 @@ def execute(store, options):
     from signal import signal, SIGTERM
 
     tasks = task.alltasks
-    task_names = set(t.name for t in tasks)
+    task_names = sorted(set(t.name for t in tasks))
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
     logging.info('Execute start (%s tasks)' % len(tasks))

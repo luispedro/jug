@@ -167,7 +167,7 @@ def _print_status(options, waiting, ready, running, finished):
     options.print_out(format % ('Task name','Waiting','Ready','Finished','Running'))
     options.print_out('-' * format_size)
 
-    for n in names:
+    for n in sorted(names):
         n_cut = n[:40]
         options.print_out(format % (n_cut,waiting[n],ready[n],finished[n],running[n]))
     options.print_out('.' * format_size)
