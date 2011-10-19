@@ -70,11 +70,32 @@ def CompoundTask(f, *args, **kwargs):
     task = Task(f, *args, **kwargs)
     if task.can_load():
         return task
-    h = task.hash()
-    inner = f(*args, **kwargs)
     del alltasks[alltasks.index(task)]
+    h = task.hash()
     del task
+    inner = f(*args, **kwargs)
     compound = Task(compound_task_execute, inner, h)
     compound._hash = h
     return compound
 
+def CompoundTaskGenerator(f):
+    '''
+    @CompoundTaskGenerator
+    def f(arg0, arg1, ...)
+        ...
+
+    Turns f from a function into a compound task generator.
+
+    This means that calling ``f(arg0, arg1)`` results in:
+    ``CompoundTask(f, arg0, arg1)``
+
+    See Also
+    --------
+    TaskGenerator
+    '''
+    from functools import wraps
+    @wraps(f)
+    def ctask_generator(*args, **kwargs):
+        return CompoundTask(f, *args, **kwargs)
+    ctask_generator.f = f
+    return ctask_generator

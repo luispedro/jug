@@ -1,4 +1,5 @@
 version 0.8.1+
+	* Added CompoundTaskGenerator
 	* Support subclassing of Task
 	* Avoid creating directories in file backend unless it is necessary
 
