@@ -212,15 +212,6 @@ tricky to support since the general code relies on the function name)''')
         The results are cached, so the first call can be much slower than
         subsequent calls.
         '''
-    def hash(self):
-        '''
-        fname = t.hash()
-
-        Returns the hash for this task.
-
-        The results are cached, so the first call can be much slower than
-        subsequent calls.
-        '''
         return self.__jug_hash__()
 
     def __jug_hash__(self):
