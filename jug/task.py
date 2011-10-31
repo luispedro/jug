@@ -409,7 +409,7 @@ def value(elem):
 
 def CachedFunction(f,*args,**kwargs):
     '''
-    value = CachedFunction(f, \*args, \*\*kwargs)
+    value = CachedFunction(f, *args, **kwargs)
 
     is equivalent to::
 
@@ -436,7 +436,7 @@ def CachedFunction(f,*args,**kwargs):
         if not t.can_run():
             raise ValueError('jug.CachedFunction: unable to run task %s' % t)
         t.run()
-    return t.result
+    return value(t)
 
 def TaskGenerator(f):
     '''
