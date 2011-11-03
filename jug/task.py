@@ -82,13 +82,17 @@ tricky to support since the general code relies on the function name)''')
             (default: True)
         '''
         assert self.can_run()
-        args = [value(dep) for dep in self.args]
-        kwargs = dict((key,value(dep)) for key,dep in self.kwargs.iteritems())
-        self._result = self.f(*args,**kwargs)
+        self._result = self._execute()
         if save:
             name = self.hash()
             self.store.dump(self._result, name)
         return self._result
+
+    def _execute(self):
+        args = [value(dep) for dep in self.args]
+        kwargs = dict((key,value(dep)) for key,dep in self.kwargs.iteritems())
+        return self.f(*args,**kwargs)
+
 
     def _get_result(self):
         if not hasattr(self, '_result'): self.load()
