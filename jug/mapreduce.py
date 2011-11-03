@@ -13,13 +13,18 @@ from .utils import identity
 from itertools import chain
 import operator
 
-__all__ = ['mapreduce', 'map']
+__all__ = [
+    'mapreduce',
+    'map',
+    'reduce',
+    ]
 
 def _jug_map_reduce(reducer, mapper, inputs):
     import __builtin__
-    return reduce(reducer, __builtin__.map(mapper, inputs))
+    return __builtin__.reduce(reducer, __builtin__.map(mapper, inputs))
 def _jug_reduce(reducer, inputs):
-    return reduce(reducer, chain(inputs))
+    import __builtin__
+    return __builtin__.reduce(reducer, chain(inputs))
 
 def _break_up(lst, step):
     start = 0
@@ -85,7 +90,7 @@ def map(mapper, sequence, map_step=4):
         sequence' = [Task(mapper,s) for s in sequence]
 
     except that the tasks are grouped in groups of `map_step`
-    
+
     Parameters
     ----------
     mapper : function
@@ -94,15 +99,39 @@ def map(mapper, sequence, map_step=4):
     map_step : integer, optional
         nr of elements to process per task. This should be set so that each
         task takes the right amount of time.
-    
+
     Returns
     -------
     sequence' : list of B
         sequence'[i] = mapper(sequence[i])
-    
+
     See Also
     --------
-    mapreduce    
+    mapreduce
     '''
     return mapreduce(operator.add, _jug_map(mapper), sequence, map_step=map_step, reduce_step=(len(sequence)//map_step+1))
+
+def reduce(reducer, inputs, reduce_step=8):
+    '''
+    task = reduce(reducer, inputs, reduce_step=8)
+
+    Parameters
+    ----------
+    reducer : associative, commutative function
+            This should map
+                  Y_0,Y_1 -> Y'
+    inputs : list of X
+    reduce_step : integer, optional
+            Number of reduce operations to do in one go.
+            (default: 8)
+
+    Returns
+    -------
+    task : jug.Task object
+
+    See Also
+    --------
+    mapreduce
+    '''
+    return mapreduce(reducer, None, inputs, reduce_step=reduce_step)
 

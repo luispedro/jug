@@ -34,7 +34,15 @@ def test_map():
     ts = value(t)
     assert np.all(ts == np.array(map(mapper,A)))
 
-
+@task_reset
+def test_reduce():
+    np.random.seed(33)
+    jug.task.Task.store = dict_store()
+    A = np.random.rand(128)
+    A = (A*32).astype(int) # This makes the reduction exactly cummutative (instead of approximately so as with floating point)
+    t = jug.mapreduce.reduce(reducer, A)
+    dfs_run(t)
+    assert t.value() == reduce(reducer,A)
 
 def test_break_up():
     for i in xrange(2,105):

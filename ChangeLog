@@ -4,6 +4,7 @@ version 0.8.1+
 	* Added CompoundTaskGenerator
 	* Support subclassing of Task
 	* Avoid creating directories in file backend unless it is necessary
+	* Add jug.mapreduce.reduce (which mimicks the builtin reduce)
 
 version 0.8.1 Tue Jul 5 2011 by luispedro
 	* Fix redis backend for new version of client module
