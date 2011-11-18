@@ -261,3 +261,26 @@ def parse(cmdlist=None, optionsfile=None):
     return cmdline
 
 
+def set_jugdir(jugdir):
+    '''
+    store = set_jugdir(jugdir)
+
+    Sets the jugdir. This is the programmatic equivalent of passing
+    ``--jugdir=...`` on the command line.
+
+    Parameters
+    ----------
+    jugdir : str
+
+    Returns
+    -------
+    store : a jug backend
+    '''
+    from .task import Task
+    import backends
+    if jugdir is None:
+        jugdir = 'jugdata'
+    store = backends.select(jugdir)
+    Task.store = store
+    return store
+

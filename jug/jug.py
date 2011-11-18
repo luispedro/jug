@@ -29,7 +29,6 @@ import os.path
 import logging
 
 from . import task
-from . import backends
 from .task import Task
 from .subcommands.status import status
 from .subcommands.shell import shell
@@ -277,14 +276,12 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
     jugspace : dictionary
     '''
     import imp
+    from .options import set_jugdir
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
 
     if jugfile is None:
         jugfile = 'jugfile'
-    if jugdir is None:
-        jugdir = 'jugdata'
-    store = backends.select(jugdir)
-    Task.store = store
+    store = set_jugdir(jugdir)
     sys.path.insert(0, os.path.abspath('.'))
 
     # The reason for this implementation is that it is the only that seems to
