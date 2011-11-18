@@ -108,21 +108,8 @@ def invalidate(store, options):
 def _sigterm(_,__):
     sys.exit(1)
 
-def execute(store, options):
-    '''
-    execute(store, options)
-
-    Implement 'execute' command
-    '''
-    from time import sleep
-    from signal import signal, SIGTERM
-
-    tasks = task.alltasks
-    task_names = sorted(set(t.name for t in tasks))
-    tasks_executed = defaultdict(int)
-    tasks_loaded = defaultdict(int)
+def execution_loop(tasks, options, tasks_executed, tasks_loaded):
     logging.info('Execute start (%s tasks)' % len(tasks))
-    signal(SIGTERM,_sigterm)
     while tasks:
         upnext = [] # tasks that can be run
         for i in xrange(options.execute_nr_wait_cycles):
@@ -180,6 +167,22 @@ def execute(store, options):
                 raise
             finally:
                 if locked: t.unlock()
+def execute(store, options):
+    '''
+    execute(store, options)
+
+    Implement 'execute' command
+    '''
+    from time import sleep
+    from signal import signal, SIGTERM
+
+    signal(SIGTERM,_sigterm)
+
+    tasks = task.alltasks
+    task_names = sorted(set(t.name for t in tasks))
+    tasks_executed = defaultdict(int)
+    tasks_loaded = defaultdict(int)
+    execution_loop(tasks, options, tasks_executed, tasks_loaded)
 
     options.print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
     options.print_out('-' * (52+12+12))
