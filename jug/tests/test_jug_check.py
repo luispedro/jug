@@ -3,6 +3,7 @@ import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.tests.task_reset import task_reset
+from jug.tests.utils import simple_execute
 from jug.options import Options, default_options
 
 import random
@@ -30,7 +31,7 @@ def test_jug_check():
     assert e is not None
     assert e.code == 1
     savedtasks = jug.task.alltasks[:]
-    jug.jug.execute(store, default_options)
+    simple_execute()
     jug.task.alltasks = savedtasks
 
     e = None

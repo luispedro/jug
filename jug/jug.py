@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -166,9 +166,9 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                 raise
             finally:
                 if locked: t.unlock()
-def execute(store, options):
+def execute(options):
     '''
-    execute(store, options)
+    execute(options)
 
     Implement 'execute' command
     '''
@@ -176,15 +176,22 @@ def execute(store, options):
     from signal import signal, SIGTERM
 
     signal(SIGTERM,_sigterm)
-
     tasks = task.alltasks
-    task_names = sorted(set(t.name for t in tasks))
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
-    execution_loop(tasks, options, tasks_executed, tasks_loaded)
+    store = None
+    done = False
+    while not done:
+        del tasks[:]
+        store,jugspace = init(options.jugfile, options.jugdir, store=store)
+        execution_loop(tasks, options, tasks_executed, tasks_loaded)
+        done = not jugspace.get('__jug__hasbarrier__', False)
 
     options.print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
     options.print_out('-' * (52+12+12))
+    task_names = tasks_executed.keys()
+    task_names.extend(tasks_loaded.keys())
+    task_names = sorted(set(task_names))
     for t in task_names:
         name_cut = t[:52]
         options.print_out('%-52s%12s%12s' % (name_cut,tasks_executed[t],tasks_loaded[t]))
@@ -254,9 +261,9 @@ def _check_or_sleep_until(store, sleep_until):
     sys.exit(0)
 
 
-def init(jugfile=None, jugdir=None, on_error='exit'):
+def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     '''
-    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit')
+    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit', store=None)
 
     Initializes jug (create backend connection, ...).
     Imports jugfile
@@ -269,6 +276,8 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
         jugdir to use (could be a path)
     on_error : str, optional
         What to do if import fails (default: exit)
+    store : storage object, optional
+        If used, this is returned as ``store`` again.
 
     Returns
     -------
@@ -281,7 +290,8 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
 
     if jugfile is None:
         jugfile = 'jugfile'
-    store = set_jugdir(jugdir)
+    if store is None:
+        store = set_jugdir(jugdir)
     sys.path.insert(0, os.path.abspath('.'))
 
     # The reason for this implementation is that it is the only that seems to
@@ -305,7 +315,7 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
     try:
         execfile(jugfile, jugspace, jugspace)
     except BarrierError:
-        pass
+        jugspace['__jug__hasbarrier__'] = True
     except Exception, e:
         logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
         if on_error == 'exit':
@@ -318,11 +328,11 @@ def init(jugfile=None, jugdir=None, on_error='exit'):
 def main():
     from .options import parse
     options = parse()
-    if options.cmd != 'status':
+    if options.cmd not in ('status', 'execute'):
         store,jugspace = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
-        execute(store, options)
+        execute(options)
     elif options.cmd == 'count':
         do_print(store, options)
     elif options.cmd == 'check':
@@ -339,7 +349,7 @@ def main():
         shell(store, options, jugspace)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
-    if options.cmd != 'status':
+    if options.cmd not in ('status', 'execute'):
         store.close()
 
 if __name__ == '__main__':

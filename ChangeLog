@@ -1,4 +1,5 @@
 version 0.8.1+
+	* In the presence of a barrier(), rerun the jugfile
 	* Add set_jugdir to public API
 	* Added CompoundTaskGenerator
 	* Support subclassing of Task
