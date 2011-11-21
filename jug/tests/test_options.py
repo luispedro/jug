@@ -43,3 +43,10 @@ def test_parse():
     assert parsed.execute_wait_cycle_time_secs == 23
     assert not parsed.aggressive_unload
 
+def test_copy():
+    parsed = jug.options.parse(
+        ["execute", "--pdb"],
+        StringIO(_options_file))
+    copy = parsed.copy()
+    assert parsed.pdb
+    assert not parsed.aggressive_unload

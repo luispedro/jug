@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,7 +44,13 @@ class Options(object):
     def __init__(self, next):
         self.next = next
 
+    def copy(self):
+        from copy import deepcopy
+        return deepcopy(self)
+
     def __getattr__(self, name):
+        if name == '__deepcopy__':
+            raise AttributeError
         if name in self.__dict__:
             return self.__dict__[name]
         if self.__dict__['next'] is None:
