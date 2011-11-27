@@ -54,11 +54,15 @@ seeds. So, *this is a feature not a bug*.)
 Will jug work on batch cluster systems (like SGE or PBS)?
 ---------------------------------------------------------
 
-Yes, it was built for it. Submit jobs that look like::
+Yes, it was built for it.
+
+There is no interaction with the batch system, but if you submit jobs that look
+like::
 
     jug execute my_jug_script.py --jugdir=my_jug_dir
 
-And it will work fine. Jobs can join at any time too, which makes jug
+And it will work fine. Given that jobs can join the computation at any time and
+all of the communication is through the backend (file system by default), jug
 especially suited for these environments.
 
 Can jug handle non-pickle() objects?
