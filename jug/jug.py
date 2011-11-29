@@ -108,6 +108,8 @@ def _sigterm(_,__):
     sys.exit(1)
 
 def execution_loop(tasks, options, tasks_executed, tasks_loaded):
+    from time import sleep
+
     logging.info('Execute start (%s tasks)' % len(tasks))
     while tasks:
         upnext = [] # tasks that can be run
@@ -172,7 +174,6 @@ def execute(options):
 
     Implement 'execute' command
     '''
-    from time import sleep
     from signal import signal, SIGTERM
 
     signal(SIGTERM,_sigterm)
