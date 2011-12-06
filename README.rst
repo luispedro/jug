@@ -79,6 +79,15 @@ the `value` function::
 What's New
 ..........
 
+version **0.9**:
+- In the presence of a barrier(), rerun the jugfile. This makes barrier much
+  easier to use.
+- Add set_jugdir to public API
+- Added CompoundTaskGenerator
+- Support subclassing of Task
+- Avoid creating directories in file backend unless it is necessary
+- Add jug.mapreduce.reduce (which mimicks the builtin reduce)
+
 version **0.8.1**:
 - Fix redis backend for new version of client module
 - Faster file store for large files
