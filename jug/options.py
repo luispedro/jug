@@ -70,6 +70,8 @@ default_options.status_mode = 'no-cached'
 default_options.pdb = False
 default_options.verbose = 'quiet'
 
+default_options.cleanup_locks_only = False
+
 default_options.execute_wait_cycle_time_secs = 12
 default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
 
@@ -183,7 +185,11 @@ def read_configuration_file(fp=None):
             pass
     attempt('main', 'jugdir', 'jugdir')
     attempt('main', 'jugfile', 'jugfile')
+
     attempt('status', 'cache', 'status_mode')
+
+    attempt('cleanup', 'locks-only', 'cleanup_locks_only', bool)
+
     attempt('execute', 'aggressive-unload', 'aggressive_unload', _str_to_bool)
     attempt('execute', 'pbd', 'pdb', bool)
     attempt('execute', 'nr-wait-cycles', 'execute_nr_wait_cycles', int)
@@ -212,6 +218,7 @@ def parse(cmdlist=None, optionsfile=None):
     parser.add_option('--jugdir',action='store',dest='jugdir')
     parser.add_option('--verbose',action='store',dest='verbose')
     parser.add_option('--cache', action='store_true', dest='cache')
+    parser.add_option('--locks-only', action='store_true', dest='cleanup_locks_only')
     parser.add_option('--pdb', action='store_true', dest='pdb')
     parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
     parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')

@@ -1,3 +1,6 @@
+version 0.9+
+	* Add --locks-only option to cleanup subcommand
+
 version 0.9 Mon Dec 5 2011 by luispedro
 	* In the presence of a barrier(), rerun the jugfile
 	* Add set_jugdir to public API

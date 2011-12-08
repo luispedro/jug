@@ -206,8 +206,11 @@ def cleanup(store, options):
 
     Implement 'cleanup' command
     '''
-    tasks = task.alltasks
-    removed = store.cleanup(tasks)
+    if options.cleanup_locks_only:
+        removed = store.remove_locks()
+    else:
+        tasks = task.alltasks
+        removed = store.cleanup(tasks)
     options.print_out('Removed %s files' % removed)
 
 
