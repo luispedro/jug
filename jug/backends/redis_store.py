@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2011, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,8 +27,10 @@ from __future__ import division
 
 import re
 import logging
-from jug.backends.encode import encode, decode
 from base64 import b64encode, b64decode
+
+from jug.backends.encode import encode, decode
+from .base import base_store, base_lock
 
 try:
     import redis
@@ -49,7 +51,7 @@ _LOCKED = 1
 _redis_urlpat = re.compile('redis://(?P<host>[A-Za-z0-9\.]+)(?P<port>\:[0-9]+)?/')
 
 
-class redis_store(object):
+class redis_store(base_store):
     def __init__(self, url):
         '''
         '''
@@ -111,7 +113,7 @@ class redis_store(object):
 
         Implement 'cleanup' command
         '''
-        existing = self.redis.keys('result:*')
+        existing = list(self.list())
         for act in active:
             try:
                 existing.remove(_resultname(act))
@@ -120,6 +122,16 @@ class redis_store(object):
         for superflous in existing:
             self.redis.delete(_resultname(superflous))
 
+    def remove_locks(self):
+        locks = self.redis.keys('lock:*')
+        for lk in locks:
+            self.redis.delete(lk)
+        return len(locks)
+
+    def list(self):
+        existing = self.redis.keys('result:*')
+        for ex in existing:
+            yield ex[len('result:'):]
 
     def getlock(self, name):
         return redis_lock(self.redis, name)
@@ -135,7 +147,7 @@ class redis_store(object):
 
 
 
-class redis_lock(object):
+class redis_lock(base_lock):
     '''
     redis_lock
 

@@ -32,6 +32,7 @@ import errno
 import tempfile
 import shutil
 
+from .base import base_store
 from jug.backends.encode import encode_to, decode_from
 
 def create_directories(dname):
@@ -51,7 +52,7 @@ def create_directories(dname):
             raise
 
 
-class file_store(object):
+class file_store(base_store):
     def __init__(self, dname):
         '''
         file_store(dname)
@@ -230,6 +231,27 @@ class file_store(object):
         for f in files:
             os.unlink(f)
         return len(files)
+
+    def remove_locks(self):
+        '''
+        removed = store.remove_locks()
+
+        Remove all locks
+
+        Returns
+        -------
+        removed : int
+            Number of locks removed
+        '''
+
+        lockdir = path.join(self.jugdir, 'locks')
+        if not exists(lockdir): return 0
+
+        removed = 0
+        for f in os.listdir(lockdir):
+            os.unlink(path.join(lockdir, f))
+            removed += 1
+        return removed
 
     def getlock(self, name):
         '''

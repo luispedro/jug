@@ -27,10 +27,13 @@ backend.
 It can be used as a starting point (template) for writing new backends.
 '''
 
-class generic_backend(object):
+from abc import ABCMeta, abstractmethod
+
+class base_store(object):
+    __metaclass__ = ABCMeta
     def __init__(self, name):
         '''
-        generic_backend(name)
+        base_store(name)
 
         Initialise a backend
 
@@ -40,6 +43,7 @@ class generic_backend(object):
             Internal name to use
         '''
 
+    @abstractmethod
     def dump(self, object, name):
         '''
         store.dump(object, name)
@@ -53,14 +57,17 @@ class generic_backend(object):
             Key to use
         '''
 
+    @abstractmethod
     def list(self):
         '''
-        keys = store.list()
+        for key in store.list():
+            ...
 
-        Returns a list of all the keys in the store
+        Iterates over all the keys in the store
         '''
 
 
+    @abstractmethod
     def can_load(self, name):
         '''
         can = store.can_load(name)
@@ -75,6 +82,7 @@ class generic_backend(object):
         can : bool
         '''
 
+    @abstractmethod
     def load(self, name):
         '''
         obj = store.load(name)
@@ -92,6 +100,7 @@ class generic_backend(object):
             The object that was saved under ``name``
         '''
 
+    @abstractmethod
     def remove(self, name):
         '''
         was_removed = store.remove(name)
@@ -111,6 +120,7 @@ class generic_backend(object):
             Whether the key was present
         '''
 
+    @abstractmethod
     def cleanup(self, active):
         '''
         nr_removed = store.cleanup(active)
@@ -128,6 +138,22 @@ class generic_backend(object):
             number of removed files
         '''
 
+
+    @abstractmethod
+    def remove_locks(self):
+        '''
+        removed = store.remove_locks()
+
+        Remove all locks
+
+        Returns
+        -------
+        removed : int
+            Number of locks removed
+        '''
+
+
+    @abstractmethod
     def getlock(self, name):
         '''
         lock = store.getlock(name)
@@ -146,9 +172,10 @@ class generic_backend(object):
 
         See Also
         --------
-        generic_lock : Generic lock
+        base_lock : Generic lock
         '''
 
+    @abstractmethod
     def close(self):
         '''
         store.close()
@@ -170,7 +197,8 @@ class generic_backend(object):
         '''
 
 
-class generic_lock(object):
+class base_lock(object):
+    __metaclass__ = ABCMeta
     '''
 
     Functions:
@@ -187,6 +215,7 @@ class generic_lock(object):
         signature. It is only to be used from *within* store.lock().
         '''
 
+    @abstractmethod
     def get(self):
         '''
         locked = lock.get()
@@ -203,6 +232,7 @@ class generic_lock(object):
             Whether the lock was created
         '''
 
+    @abstractmethod
     def release(self):
         '''
         lock.release()
@@ -210,6 +240,7 @@ class generic_lock(object):
         Releases lock
         '''
 
+    @abstractmethod
     def is_locked(self):
         '''
         locked = lock.is_locked()

@@ -28,6 +28,9 @@ from __future__ import division
 import cPickle as pickle
 from collections import defaultdict
 
+from abc import ABCMeta, abstractmethod
+from .base import base_store
+
 def _resultname(name):
     return 'result:' + name
 
@@ -35,7 +38,7 @@ def _lockname(name):
     return 'lock:' + name
 
 
-class dict_store(object):
+class dict_store(base_store):
     def __init__(self, backend=None):
         '''
         dict_store(backend=None)
@@ -109,6 +112,35 @@ class dict_store(object):
                 pass
         for superflous in existing:
             del self.store[_resultname(superflous)]
+
+    def remove_locks(self):
+        '''
+        removed = store.remove_locks()
+
+        Remove all locks
+
+        Returns
+        -------
+        removed : int
+            Number of locks removed
+        '''
+        removed = 0
+        for k in self.store.keys():
+            if k.startswith('lock:'):
+                del self.store[k]
+                removed += 1
+        return removed
+
+    def list(self):
+        '''
+        for key in store.list():
+            ...
+
+        Iterates over all the keys in the store
+        '''
+        for k in self.store.keys():
+            if k.startswith('result:'):
+                yield k[len('result:')]
 
 
     def getlock(self, name):
