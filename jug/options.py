@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -74,6 +74,8 @@ default_options.cleanup_locks_only = False
 
 default_options.execute_wait_cycle_time_secs = 12
 default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
+
+default_options.status_cache_file = '.jugstatus.sqlite3'
 
 _Commands = (
     'execute',
