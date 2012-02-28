@@ -78,15 +78,16 @@ default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait
 default_options.status_cache_file = '.jugstatus.sqlite3'
 
 _Commands = (
-    'execute',
-    'status',
     'check',
-    'sleep-until',
-    'stats',
     'cleanup',
     'count',
+    'execute',
     'invalidate',
     'shell',
+    'sleep-until',
+    'status',
+    'stats',
+    'webstatus',
     )
 _usage_string = \
 '''jug SUBCOMMAND JUGFILE OPTIONS...

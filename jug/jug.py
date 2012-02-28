@@ -31,6 +31,7 @@ import logging
 from . import task
 from .task import Task
 from .subcommands.status import status
+from .subcommands.webstatus import webstatus
 from .subcommands.shell import shell
 from .barrier import BarrierError
 
@@ -332,7 +333,8 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
 def main():
     from .options import parse
     options = parse()
-    if options.cmd not in ('status', 'execute'):
+    store = None
+    if options.cmd not in ('status', 'execute', 'webstatus'):
         store,jugspace = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
@@ -351,9 +353,11 @@ def main():
         cleanup(store, options)
     elif options.cmd == 'shell':
         shell(store, options, jugspace)
+    elif options.cmd == 'webstatus':
+        webstatus(options)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
-    if options.cmd not in ('status', 'execute'):
+    if store is not None:
         store.close()
 
 if __name__ == '__main__':

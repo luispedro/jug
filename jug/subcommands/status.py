@@ -32,9 +32,13 @@ from .. import backends
 from ..task import Task
 from ..backends import memoize_store
 
+__all__ = [
+    'status'
+    ]
+
 unknown,waiting,ready,running,finished = range(5)
 
-def _create_sqlite3(connection, ht, deps, rdeps):
+def create_sqlite3(connection, ht, deps, rdeps):
     connection.executescript('''
     CREATE TABLE ht (
             id INTEGER PRIMARY KEY,
@@ -54,7 +58,7 @@ def _create_sqlite3(connection, ht, deps, rdeps):
                INSERT INTO dep(source, target) VALUES(?,?)
                 ''', [(i,cd) for cd in cdeps])
 
-def _retrieve_sqlite3(connection):
+def retrieve_sqlite3(connection):
     ht = connection. \
             execute('SELECT * FROM ht'). \
             fetchall()
@@ -65,7 +69,7 @@ def _retrieve_sqlite3(connection):
         rdeps[d1].append(d0)
     return ht, dict(deps), dict(rdeps)
 
-def _save_dirty3(connection, dirty):
+def save_dirty3(connection, dirty):
     connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', dirty)
 
 @contextmanager
@@ -76,7 +80,7 @@ def _open_connection(options):
     connection.close()
 
 
-def _load_jugfile(options):
+def load_jugfile(options):
     store,_ = jug.init(options.jugfile, options.jugdir)
     h2idx = {}
     ht = []
@@ -95,7 +99,7 @@ def _load_jugfile(options):
     return store, ht, deps, dict(rdeps)
 
 
-def _update_status(store, ht, deps, rdeps):
+def update_status(store, ht, deps, rdeps):
     tasks_waiting = defaultdict(int)
     tasks_ready = defaultdict(int)
     tasks_running = defaultdict(int)
@@ -127,7 +131,7 @@ def _update_status(store, ht, deps, rdeps):
             else:
                 tasks_waiting[name] += 1
                 nstatus = waiting
-        assert nstatus is not None, '_update_status: nstatus not assigned'
+        assert nstatus is not None, 'update_status: nstatus not assigned'
         if status != nstatus:
             dirty.append((nstatus,i))
     return tasks_waiting, tasks_ready, tasks_running, tasks_finished, dirty
@@ -155,24 +159,24 @@ def _status_cached(options):
     create, update = range(2)
     try:
         with _open_connection(options) as connection:
-            ht, deps, rdeps = _retrieve_sqlite3(connection)
+            ht, deps, rdeps = retrieve_sqlite3(connection)
         store = backends.select(options.jugdir)
         mode = update
     except:
-        store, ht, deps, rdeps = _load_jugfile(options)
+        store, ht, deps, rdeps = load_jugfile(options)
         mode = create
 
-    tw,tre,tru,tf,dirty = _update_status(store, ht, deps, rdeps)
+    tw,tre,tru,tf,dirty = update_status(store, ht, deps, rdeps)
     _print_status(options, tw, tre, tru, tf)
     if mode == update:
         with _open_connection(options) as connection:
-            _save_dirty3(connection, dirty)
+            save_dirty3(connection, dirty)
     else:
         for i,nstatus in dirty:
             _,name,hash,_ = ht[i]
             ht[i] = (i, name, hash, nstatus)
         with _open_connection(options) as connection:
-            _create_sqlite3(connection, ht, deps, rdeps)
+            create_sqlite3(connection, ht, deps, rdeps)
 
 
 def _status_nocache(options):
