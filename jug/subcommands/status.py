@@ -35,51 +35,44 @@ from ..backends import memoize_store
 unknown,waiting,ready,running,finished = range(5)
 
 def _create_sqlite3(connection, ht, deps, rdeps):
-    connection.execute('''
+    connection.executescript('''
     CREATE TABLE ht (
             id INTEGER PRIMARY KEY,
             name CHAR(128),
             hash CHAR(128),
-            status INT );
-    ''')
-    connection.execute('''
+            status INT);
     CREATE TABLE dep (
         source INT,
         target INT);
     ''')
 
-    for h in ht:
-        connection.execute('''
-       INSERT INTO ht(name, hash, status) VALUES(?,?,?)
-    ''', (h[1], h[2], h[3]))
+    connection.executemany('INSERT INTO ht VALUES(?,?,?,?)', ht)
 
     for i,cdeps in deps.iteritems():
-        for cd in cdeps:
-            connection.execute('''
-           INSERT INTO dep(source, target) VALUES(?,?)
-            ''', (i,cd))
-    connection.commit()
+        if len(cdeps):
+            connection.executemany('''
+               INSERT INTO dep(source, target) VALUES(?,?)
+                ''', [(i,cd) for cd in cdeps])
 
 def _retrieve_sqlite3(connection):
-    cursor = connection.execute('''SELECT * FROM ht''')
-    ht = cursor.fetchall()
-    cursor = connection.execute('''SELECT * FROM dep''')
+    ht = connection. \
+            execute('SELECT * FROM ht'). \
+            fetchall()
     deps = defaultdict(list)
     rdeps = defaultdict(list)
-    for d0,d1 in cursor:
+    for d0,d1 in connection.execute('SELECT * FROM dep'):
         deps[d0].append(d1)
         rdeps[d1].append(d0)
-    return ht, deps, rdeps
+    return ht, dict(deps), dict(rdeps)
 
 def _save_dirty3(connection, dirty):
-    for id,status in dirty:
-        connection.execute('''UPDATE ht SET STATUS = ? WHERE id = ?''', (status, id))
-    connection.commit()
+    connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', dirty)
 
 @contextmanager
 def _open_connection(options):
     connection = sqlite3.connect(options.status_cache_file)
     yield connection
+    connection.commit()
     connection.close()
 
 
@@ -88,29 +81,18 @@ def _load_jugfile(options):
     h2idx = {}
     ht = []
     deps = {}
-    rdeps = {}
     for i,t in enumerate(task.alltasks):
+        deps[i] = [h2idx[d.hash() if isinstance(d,Task) else d._base_hash()]
+                        for d in t.dependencies()]
         hash = t.hash()
-        curdeps = []
-        for dep in t.dependencies():
-            if type(dep) is Task:
-                h = dep.hash()
-            else:
-                h = dep._base_hash()
-            curdeps.append(h2idx[h])
-        if curdeps:
-            deps[i] = curdeps
-        h = [i, t.name, hash, unknown]
-        ht.append(h)
+        ht.append( (i, t.name, hash, unknown) )
         h2idx[hash] = i
 
+    rdeps = defaultdict(list)
     for k,v in deps.iteritems():
         for rv in v:
-            if rv not in rdeps:
-                rdeps[rv] = [k]
-            else:
-                rdeps[rv].append(k)
-    return store, ht, deps, rdeps
+            rdeps[rv].append(k)
+    return store, ht, deps, dict(rdeps)
 
 
 def _update_status(store, ht, deps, rdeps):
@@ -147,7 +129,7 @@ def _update_status(store, ht, deps, rdeps):
                 nstatus = waiting
         assert nstatus is not None, '_update_status: nstatus not assigned'
         if status != nstatus:
-            dirty.append((i,nstatus))
+            dirty.append((nstatus,i))
     return tasks_waiting, tasks_ready, tasks_running, tasks_finished, dirty
 
 
