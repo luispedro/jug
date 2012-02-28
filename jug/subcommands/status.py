@@ -23,6 +23,7 @@
 
 from collections import defaultdict
 import sqlite3
+from contextlib import contextmanager
 
 import jug
 from ..task import recursive_dependencies
@@ -33,8 +34,7 @@ from ..backends import memoize_store
 
 unknown,waiting,ready,running,finished = range(5)
 
-def _create_sqlite3(cachefile, ht, deps, rdeps):
-    connection = sqlite3.connect(cachefile)
+def _create_sqlite3(connection, ht, deps, rdeps):
     connection.execute('''
     CREATE TABLE ht (
             id INTEGER PRIMARY KEY,
@@ -59,35 +59,28 @@ def _create_sqlite3(cachefile, ht, deps, rdeps):
            INSERT INTO dep(source, target) VALUES(?,?)
             ''', (i,cd))
     connection.commit()
+
+def _retrieve_sqlite3(connection):
+    cursor = connection.execute('''SELECT * FROM ht''')
+    ht = cursor.fetchall()
+    cursor = connection.execute('''SELECT * FROM dep''')
+    deps = defaultdict(list)
+    rdeps = defaultdict(list)
+    for d0,d1 in cursor:
+        deps[d0].append(d1)
+        rdeps[d1].append(d0)
+    return ht, deps, rdeps
+
+def _save_dirty3(connection, dirty):
+    for id,status in dirty:
+        connection.execute('''UPDATE ht SET STATUS = ? WHERE id = ?''', (status, id))
+    connection.commit()
+
+@contextmanager
+def _open_connection(options):
+    connection = sqlite3.connect(options.status_cache_file)
+    yield connection
     connection.close()
-
-def _retrieve_sqlite3(cachefile):
-    try:
-        connection = None
-        connection = sqlite3.connect(cachefile)
-        cursor = connection.execute('''SELECT * FROM ht''')
-        ht = cursor.fetchall()
-        cursor = connection.execute('''SELECT * FROM dep''')
-        deps = defaultdict(list)
-        rdeps = defaultdict(list)
-        for d0,d1 in cursor:
-            deps[d0].append(d1)
-            rdeps[d1].append(d0)
-        return ht, deps, rdeps
-    finally:
-        if connection is not None:
-            connection.close()
-
-def _save_dirty3(cachefile, dirty):
-    connection = None
-    try:
-        connection = sqlite3.connect(cachefile)
-        for id,status in dirty:
-            connection.execute('''UPDATE ht SET STATUS = ? WHERE id = ?''', (status, id))
-        connection.commit()
-    finally:
-        if connection is not None:
-            connection.close()
 
 
 def _load_jugfile(options):
@@ -128,17 +121,9 @@ def _update_status(store, ht, deps, rdeps):
 
     store = memoize_store(store, list_base=True)
     dirty = []
-    active = []
-    for h in ht:
-        _,name,hash,status = h
-        if status == finished:
-            tasks_finished[name] += 1
-        else:
-            active.append(h)
-
-    for i,name,hash,status in active:
+    for i,name,hash,status in ht:
         nstatus = None
-        if store.can_load(hash):
+        if status == finished or store.can_load(hash):
             tasks_finished[name] += 1
             nstatus = finished
         else:
@@ -187,7 +172,8 @@ def _print_status(options, waiting, ready, running, finished):
 def _status_cached(options):
     create, update = range(2)
     try:
-        ht, deps, rdeps = _retrieve_sqlite3(options.status_cache_file)
+        with _open_connection(options) as connection:
+            ht, deps, rdeps = _retrieve_sqlite3(connection)
         store = backends.select(options.jugdir)
         mode = update
     except:
@@ -197,12 +183,14 @@ def _status_cached(options):
     tw,tre,tru,tf,dirty = _update_status(store, ht, deps, rdeps)
     _print_status(options, tw, tre, tru, tf)
     if mode == update:
-        _save_dirty3(options.status_cache_file, dirty)
+        with _open_connection(options) as connection:
+            _save_dirty3(connection, dirty)
     else:
         for i,nstatus in dirty:
             _,name,hash,_ = ht[i]
             ht[i] = (i, name, hash, nstatus)
-        _create_sqlite3(options.status_cache_file, ht, deps, rdeps)
+        with _open_connection(options) as connection:
+            _create_sqlite3(connection, ht, deps, rdeps)
 
 
 def _status_nocache(options):
