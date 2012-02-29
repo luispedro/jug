@@ -34,11 +34,32 @@ call and after the barrier call. When a barrier call is reached, if there are
 any tasks that have not run, then the jugfile is not loaded any further. This
 ensures that **after the call** you can load the results of previous tasks.
 
-Limitations
------------
+bvalue
+------
 
-Currently, to run a file like the one above you need to call ``jug execute``
-first to run all the tasks up to the barrier and then again to run it past the
-barrier (or more times if you have several barrier calls).
+.. versionadded:: 0.10
+   bvalue() was added in version 0.10. Before this version, you needed to call
+   barrier() & value() separately.
 
+``bvalue`` is a more targeted version of ``barrier``::
+
+    step1 = f(input)
+    step2 = g(step1)
+    other = h(step1)
+
+    step2 = bvalue(step2)
+    ...
+
+This is roughly equivalent to::
+
+    step1 = f(input)
+    step2 = g(step1)
+    other = h(step1)
+
+    barrier()
+    step2 = value(step2)
+    ...
+
+except that using ``bvalue``, the status of ``other`` is not checked! It might
+not have run yet and the ``bvalue(step2)`` will still return the result.
 
