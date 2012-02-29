@@ -26,10 +26,29 @@ from . import status as st
 template = '''
 <html>
 <head>
-<title>Jug Status</title>
+
+<title>Jug Status :: %(jugfile)s</title>
+<style>
+body {
+    width: 80%%;
+    margin: auto;
+    margin-top: 2em;
+    font-family: sans-serif;
+}
+H1 {
+    color: #D95550;
+}
+H1 .jugfile {
+    color: #647704;
+}
+
+TH {
+    color: #6d2243;
+}
+</style>
 </head>
 <body>
-<h1>Jug Status</h1>
+<h1>Jug Status for <span class="jugfile">%(jugfile)s</span></h1>
 <table>
 <tr>
     <th>Task Name</th>
@@ -38,10 +57,18 @@ template = '''
     <th>Completed</th>
     <th>Executing</th>
 </tr>
-%s
+%(table)s
 </table>
 </body>
 '''
+_row_template = '''
+<tr>
+    <th>%s</th>
+    <td>%s</td>
+    <td>%s</td>
+    <td>%s</td>
+    <td>%s</td>
+</tr>'''
 
 
 def _format_counts(tw, tre, tru, tf):
@@ -50,14 +77,13 @@ def _format_counts(tw, tre, tru, tf):
     for t in [tw,tre,tru,tf]:
         names.update(t.keys())
     for n in names:
-        r += '''
-<tr>
-    <th>%s</th>
-    <td>%s</td>
-    <td>%s</td>
-    <td>%s</td>
-    <td>%s</td>
-</tr>''' % (n, tw[n],tre[n],tru[n],tf[n])
+        r += _row_template % (n, tw[n], tre[n], tru[n], tf[n])
+    r += _row_template % ('', '', '', '', '')
+    r += _row_template % ('Total',
+                                sum(tw.itervalues()),
+                                sum(tre.itervalues()),
+                                sum(tru.itervalues()),
+                                sum(tf.itervalues()))
     return r
 
 
@@ -90,6 +116,9 @@ or
             ht, deps, rdeps = st.retrieve_sqlite3(connection)
             tw,tre,tru,tf,dirty = st.update_status(store, ht, deps, rdeps)
             st.save_dirty3(connection, dirty)
-            return template % _format_counts(tw, tre, tru, tf)
+            return template % {
+                    'jugfile' : options.jugfile,
+                    'table' : _format_counts(tw, tre, tru, tf),
+            }
     app = web.application(urls, {'status': Status})
     app.run()
