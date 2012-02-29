@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2010-2012, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -41,4 +41,22 @@ def barrier():
     for t in reversed(alltasks):
         if not t.can_load():
             raise BarrierError
+
+
+def bvalue(t):
+    '''
+    value = bvalue(t)
+
+    Works similarly to::
+
+        barrier()
+        value = value(t)
+
+    except that it only checks that `t` is complete.
+    '''
+    from .task import value
+    try:
+        return value(t)
+    except:
+        raise BarrierError
 

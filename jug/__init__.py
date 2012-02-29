@@ -49,7 +49,7 @@ barrier : function
 '''
 
 from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask
-from .barrier import barrier
+from .barrier import barrier, bvalue
 
 from .jug import init
 from .backends import file_store, dict_store, redis_store
@@ -64,6 +64,7 @@ __all__ = [
     'value',
     'CachedFunction',
     'barrier',
+    'bvalue'
 
     'init',
     'file_store',
