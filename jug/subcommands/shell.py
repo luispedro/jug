@@ -97,6 +97,6 @@ def shell(store, options, jugspace):
     except KeyError:
         pass
 
-    local_ns.update(jugspace)
+    jugspace.update(local_ns)
     ipshell(global_ns=jugspace, local_ns=local_ns)
 

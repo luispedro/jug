@@ -3,6 +3,7 @@ version 0.9+
 	* Make cache file (for `status` subcommand) configurable
 	* Add `webstatus` subcommand
 	* Add bvalue() function
+	* Fix bug in `shell` subcommand (`value` was not in global namespace)
 
 version 0.9 Mon Dec 5 2011 by luispedro
 	* In the presence of a barrier(), rerun the jugfile
