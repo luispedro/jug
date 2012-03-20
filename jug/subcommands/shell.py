@@ -98,5 +98,6 @@ def shell(store, options, jugspace):
         pass
 
     jugspace.update(local_ns)
+    local_ns['__name__'] = '__jugfile__'
     ipshell(global_ns=jugspace, local_ns=local_ns)
 
