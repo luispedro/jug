@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2012, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@
 from __future__ import division
 import os
 
-from .task import Task, TaskGenerator
+from .task import Task, Tasklet, TaskGenerator
 
 __all__ = [
     'timed_path',
@@ -59,7 +59,9 @@ def timed_path(path):
     mtime = os.stat_result(os.stat(path)).st_mtime
     return Task(_return_first, path, mtime)
 
-@TaskGenerator
+def _identity(x):
+    return x
+
 def identity(x):
     '''
     x = identity(x)
@@ -78,5 +80,9 @@ def identity(x):
     -------
     x : x
     '''
-    return x
+    if isinstance(x, (Task, Tasklet)):
+        return x
+    t = Task(_identity, x)
+    t.name = 'identity'
+    return t
 
