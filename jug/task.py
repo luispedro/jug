@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -319,6 +319,8 @@ class Tasklet(TaskletMixin):
         '''
         self.base = base
         self.f = f
+        self.unload = self.base.unload
+        self.unload_recursive = self.base.unload_recursive
 
     def value(self):
         return self.f(value(self.base))
