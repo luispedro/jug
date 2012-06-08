@@ -227,7 +227,7 @@ def check(store, options):
             backend to use
     options : jug options
     '''
-    _check_or_sleep_until(store, False)
+    sys.exit(_check_or_sleep_until(store, False))
 
 def sleep_until(store, options):
     '''
@@ -242,7 +242,7 @@ def sleep_until(store, options):
     options : jug options
         ignored
     '''
-    _check_or_sleep_until(store, True)
+    sys.exit(_check_or_sleep_until(store, True))
 
 def _check_or_sleep_until(store, sleep_until):
     from .task import recursive_dependencies
@@ -256,14 +256,14 @@ def _check_or_sleep_until(store, sleep_until):
                 from time import sleep
                 sleep(12)
             else:
-                sys.exit(1)
+                return 1
         else:
             for dep in recursive_dependencies(t):
                 try:
                     active.remove(dep)
                 except KeyError:
                     pass
-    sys.exit(0)
+    return 0
 
 
 def init(jugfile=None, jugdir=None, on_error='exit', store=None):

@@ -6,6 +6,7 @@ version 0.9+
 	* Fix bug in `shell` subcommand (`value` was not in global namespace)
 	* Improve identity()
 	* Fix bug in using Tasklets and --aggressive-unload
+	* Fix bug with Tasklets and sleep-until/check
 
 version 0.9 Mon Dec 5 2011 by luispedro
 	* In the presence of a barrier(), rerun the jugfile

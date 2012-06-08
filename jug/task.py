@@ -179,7 +179,7 @@ tricky to support since the general code relies on the function name)''')
 
         See Also
         --------
-        recursive_dependencies : retrieve dependecies recursively
+        recursive_dependencies : retrieve dependencies recursively
         '''
         queue = [self.args, self.kwargs.values()]
         while queue:
@@ -321,6 +321,9 @@ class Tasklet(TaskletMixin):
         self.f = f
         self.unload = self.base.unload
         self.unload_recursive = self.base.unload_recursive
+
+    def dependencies(self):
+        yield self.base
 
     def value(self):
         return self.f(value(self.base))

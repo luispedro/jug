@@ -43,3 +43,15 @@ def test_jug_check():
     assert e is not None
     assert e.code == 0
 
+
+@task_reset
+def test_tasklet():
+    jugfile = 'jug/tests/jugfiles/sleep_until_tasklet.py'
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    assert 'four' not in space
+    simple_execute()
+    store, space = jug.jug.init(jugfile, store)
+    assert jug.jug._check_or_sleep_until(store, False) == 0
+    assert jug.jug._check_or_sleep_until(store, True) == 0
+    
+    
