@@ -79,6 +79,16 @@ the `value` function::
 What's New
 ..........
 
+version **0.9.1** (Jun 11 2012):
+- Add --locks-only option to cleanup subcommand
+- Make cache file (for ``status`` subcommand) configurable
+- Add ``webstatus`` subcommand
+- Add bvalue() function
+- Fix bug in ``shell`` subcommand (``value`` was not in global namespace)
+- Improve identity()
+- Fix bug in using Tasklets and --aggressive-unload
+- Fix bug with Tasklets and sleep-until/check
+
 version **0.9**:
 - In the presence of a barrier(), rerun the jugfile. This makes barrier much
   easier to use.

@@ -1,4 +1,4 @@
-version 0.9+
+version 0.9.1 Mon Jun 11 2012 by luispedro
 	* Add --locks-only option to cleanup subcommand
 	* Make cache file (for `status` subcommand) configurable
 	* Add `webstatus` subcommand
