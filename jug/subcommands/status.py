@@ -60,7 +60,7 @@ def create_sqlite3(connection, ht, deps, rdeps):
 
 def retrieve_sqlite3(connection):
     ht = connection. \
-            execute('SELECT * FROM ht'). \
+            execute('SELECT * FROM ht ORDER BY id'). \
             fetchall()
     deps = defaultdict(list)
     rdeps = defaultdict(list)
