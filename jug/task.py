@@ -460,6 +460,7 @@ def TaskGenerator(f):
         return Task(f, *args, **kwargs)
     task_generator.__name__ = ('TaskGenerator(%s)' % task_generator.__name__)
     task_generator.f = f
+    task_generator._jug_is_task_generator = True
     return task_generator
 
 

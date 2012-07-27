@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License : MIT
 
@@ -18,6 +18,11 @@ __all__ = [
     'map',
     'reduce',
     ]
+
+def _get_function(f):
+    if getattr(f, '_jug_is_task_generator', False):
+        return f.f
+    return f
 
 def _jug_map_reduce(reducer, mapper, inputs):
     import __builtin__
@@ -71,6 +76,8 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     -------
     task : jug.Task object
     '''
+    reducer = _get_function(reducer)
+    mapper = _get_function(mapper)
     reducers = [Task(_jug_map_reduce, reducer, mapper, input_i) for input_i in _break_up(inputs, map_step)]
     while len(reducers) > 1:
         reducers = [Task(_jug_reduce, reducer, reduce_i) for reduce_i in _break_up(reducers, reduce_step)]
