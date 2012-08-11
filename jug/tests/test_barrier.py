@@ -38,3 +38,13 @@ def test_barrier_once():
     jug.jug.execute(options)
     assert 'four' in dir(sys.modules['wbarrier'])
 
+@task_reset
+def test_bvalue():
+    store, space = jug.jug.init('jug/tests/jugfiles/bvalue.py', 'dict_store')
+    assert 'four' not in space
+    simple_execute()
+    store, space = jug.jug.init('jug/tests/jugfiles/bvalue.py', store)
+    assert 'four' in space
+    assert space['four'] == 4
+
+

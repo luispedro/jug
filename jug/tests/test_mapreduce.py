@@ -2,8 +2,8 @@ import numpy as np
 
 import jug.mapreduce
 from jug.backends.dict_store import dict_store
-from jug.mapreduce import _break_up
-from jug import value
+from jug.mapreduce import _break_up, _get_function
+from jug import value, TaskGenerator
 from jug.tests.task_reset import task_reset
 
 def mapper(x):
@@ -14,6 +14,13 @@ def dfs_run(t):
     for dep in t.dependencies():
         dfs_run(dep)
     t.run()
+
+def test_get_function():
+    oid = id(reducer)
+    assert oid == id(_get_function(reducer))
+    task_reducer = TaskGenerator(reducer)
+    assert oid == id(_get_function(task_reducer))
+
 
 @task_reset
 def test_mapreduce():
