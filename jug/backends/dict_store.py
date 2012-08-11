@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2012, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -142,6 +142,17 @@ class dict_store(base_store):
             if k.startswith('result:'):
                 yield k[len('result:')]
 
+    def listlocks(self):
+        '''
+        for key in store.listlocks():
+            ...
+
+        Iterates over all the keys in the store
+        '''
+        for k in self.store.keys():
+            if k.startswith('lock:'):
+                yield k[len('lock:')]
+
 
     def getlock(self, name):
         return dict_lock(self.store, self.counts, name)
@@ -161,9 +172,12 @@ class dict_lock(object):
     Functions:
     ----------
 
-        * get(): acquire the lock
-        * release(): release the lock
-        * is_locked(): check lock state
+    get()
+        acquire the lock
+    release()
+        release the lock
+    is_locked()
+        check lock state
     '''
 
     def __init__(self, store, counts, name):

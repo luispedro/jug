@@ -133,6 +133,12 @@ class redis_store(base_store):
         for ex in existing:
             yield ex[len('result:'):]
 
+    def listlocks(self):
+        locks = self.redis.keys('lock:*')
+        for lk in locks:
+            yield lk[len('lock:')]
+
+
     def getlock(self, name):
         return redis_lock(self.redis, name)
 

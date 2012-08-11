@@ -13,12 +13,14 @@ def _remove_file_store():
 def test_stores():
     def load_get(store):
         try:
+            assert len(list(store.list())) == 0
             key = 'jugisbestthingever'
             assert not store.can_load(key)
             object = range(232)
             store.dump(object, key)
             assert store.can_load(key)
             assert store.load(key) == object
+            assert len(list(store.list())) == 1
             store.remove(key)
             assert not store.can_load(key)
             store.close()
@@ -28,6 +30,7 @@ def test_stores():
 
     def lock(store):
         try:
+            assert len(list(store.listlocks())) == 0
             key = 'jugisbestthingever'
             lock = store.getlock(key)
             assert not lock.is_locked()
@@ -35,13 +38,28 @@ def test_stores():
             assert not lock.get()
             lock2 = store.getlock(key)
             assert not lock2.get()
+            assert len(list(store.listlocks())) == 1
             lock.release()
             assert lock2.get()
             lock2.release()
             store.close()
         except redis.ConnectionError:
             raise SkipTest()
-    functions = (load_get, lock)
+    def lock_remove(store):
+        try:
+            assert len(list(store.listlocks())) == 0
+            key = 'jugisbestthingever'
+            lock = store.getlock(key)
+            assert not lock.is_locked()
+            assert lock.get()
+            assert not lock.get()
+            assert len(list(store.listlocks())) == 1
+            store.remove_locks()
+            assert len(list(store.listlocks())) == 0
+            store.close()
+        except redis.ConnectionError:
+            raise SkipTest()
+    functions = (load_get, lock, lock_remove)
     stores = (
             lambda: jug.redis_store.redis_store('redis:'),
             lambda: jug.backends.file_store.file_store('jugtests'),
