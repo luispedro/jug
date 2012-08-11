@@ -151,7 +151,8 @@ def usage():
     sys.exit(1)
 
 def _str_to_bool(s):
-    return s in ('', '0', 'False', 'off')
+    from string import lower
+    return lower(s) not in ('', '0', 'false', 'off')
 
 def read_configuration_file(fp=None):
     '''

@@ -50,3 +50,14 @@ def test_copy():
     copy = parsed.copy()
     assert parsed.pdb
     assert not parsed.aggressive_unload
+
+def test_bool():
+    from jug.options import _str_to_bool
+    assert not _str_to_bool("")
+    assert not _str_to_bool("0")
+    assert not _str_to_bool("false")
+    assert not _str_to_bool("FALSE")
+    assert not _str_to_bool("off")
+    assert _str_to_bool("on")
+    assert _str_to_bool("true")
+    assert _str_to_bool("1")
