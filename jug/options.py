@@ -140,13 +140,15 @@ Examples
 
 _usage_simple = 'jug SUBCOMMAND [JUGFILE] [OPTIONS...]'
 
-def usage():
+def usage(error=None):
     '''
-    usage()
+    usage(error=None)
 
     Print an usage string and exit.
     '''
     import sys
+    if error is not None:
+        print >>sys.stderr, error
     print _usage_string
     sys.exit(1)
 
@@ -236,13 +238,13 @@ def parse(cmdlist=None, optionsfile=None):
         cmdline.jugfile = args.pop(0)
 
     if cmdline.cmd not in _Commands:
-        usage()
+        usage(error='No sub-command given')
         return
     if options.invalid_name and cmdline.cmd != 'invalidate':
-        usage()
+        usage(error='invalid-name is only useful for invalidate subcommand')
         return
     if cmdline.cmd == 'invalidate' and not options.invalid_name:
-        usage()
+        usage(error='invalidate subcommand requires ``invalid-name`` option')
         return
 
     cmdline.argv = args
