@@ -35,7 +35,23 @@ def test_complex():
     store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', store)
     opts = Options(default_options)
     opts.invalid_name = space['t'].name
-    print space['t'].name
     h = space['t'].hash()
+    assert store.can_load(h)
     jug.jug.invalidate(store, opts)
     assert not store.can_load(h)
+
+@task_reset
+def test_cleanup():
+    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', 'dict_store')
+    h = space['t'].hash()
+    simple_execute()
+
+    opts = Options(default_options)
+    opts.cleanup_locks_only = True
+    assert store.can_load(h)
+    jug.jug.cleanup(store, opts)
+    assert store.can_load(h)
+    opts.cleanup_locks_only = False
+    jug.jug.cleanup(store, opts)
+    assert not store.can_load(h)
+

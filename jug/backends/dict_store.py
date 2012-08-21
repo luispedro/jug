@@ -111,7 +111,7 @@ class dict_store(base_store):
             except KeyError:
                 pass
         for superflous in existing:
-            del self.store[_resultname(superflous)]
+            del self.store[superflous]
 
     def remove_locks(self):
         '''
