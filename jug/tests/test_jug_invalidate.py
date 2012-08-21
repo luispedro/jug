@@ -4,6 +4,7 @@ import jug.task
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.options import Options, default_options
+from jug.tests.utils import simple_execute
 from jug.tests.task_reset import task_reset
 import random
 jug.jug.silent = True
@@ -25,3 +26,16 @@ def test_jug_invalidate():
     jug.jug.invalidate(store, opts)
     assert not store.store.keys(), store.store.keys()
     jug.task.Task.store = dict_store()
+
+@task_reset
+def test_complex():
+    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', 'dict_store')
+    simple_execute()
+
+    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', store)
+    opts = Options(default_options)
+    opts.invalid_name = space['t'].name
+    print space['t'].name
+    h = space['t'].hash()
+    jug.jug.invalidate(store, opts)
+    assert not store.can_load(h)
