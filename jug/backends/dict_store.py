@@ -140,7 +140,7 @@ class dict_store(base_store):
         '''
         for k in self.store.keys():
             if k.startswith('result:'):
-                yield k[len('result:')]
+                yield k[len('result:'):]
 
     def listlocks(self):
         '''
@@ -151,7 +151,7 @@ class dict_store(base_store):
         '''
         for k in self.store.keys():
             if k.startswith('lock:'):
-                yield k[len('lock:')]
+                yield k[len('lock:'):]
 
 
     def getlock(self, name):

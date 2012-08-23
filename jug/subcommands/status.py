@@ -177,6 +177,7 @@ def _status_cached(options):
             ht[i] = (i, name, hash, nstatus)
         with _open_connection(options) as connection:
             create_sqlite3(connection, ht, deps, rdeps)
+    return sum(tf.values())
 
 
 def _status_nocache(options):
@@ -199,6 +200,7 @@ def _status_nocache(options):
         else:
             tasks_waiting[t.name] += 1
     _print_status(options, tasks_waiting, tasks_ready, tasks_running, tasks_finished)
+    return sum(tasks_finished.itervalues())
 
 
 def status(options):
@@ -212,6 +214,6 @@ def status(options):
     options : jug options
     '''
     if options.status_mode == 'cached':
-        _status_cached(options)
+        return _status_cached(options)
     else:
-        _status_nocache(options)
+        return _status_nocache(options)
