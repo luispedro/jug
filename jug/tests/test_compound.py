@@ -21,7 +21,6 @@ def test_compound():
 
 @task_reset
 def test_w_barrier():
-    from jug.options import default_options
     store, space = jug.jug.init('jug/tests/jugfiles/compound_wbarrier.py', 'dict_store')
     simple_execute()
     store, space = jug.jug.init('jug/tests/jugfiles/compound_wbarrier.py', store)
@@ -32,7 +31,6 @@ def test_w_barrier():
 
 @task_reset
 def test_non_simple():
-    from jug.options import default_options
     store, space = jug.jug.init('jug/tests/jugfiles/compound_nonsimple.py', 'dict_store')
     simple_execute()
     store, space = jug.jug.init('jug/tests/jugfiles/compound_nonsimple.py', store)

@@ -1,6 +1,5 @@
 import jug.jug
 import jug.task
-from jug.options import Options, default_options
 from jug.task import Task
 from jug.tests.utils import simple_execute
 from jug.backends.dict_store import dict_store
