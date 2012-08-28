@@ -63,7 +63,7 @@ def test_empty_mapreduce():
 
 @task_reset
 def test_taskgenerator_mapreduce():
-    store, space = jug.jug.init('jug/tests/jugfiles/empty_mapreduce.py', 'dict_store')
+    store, space = jug.jug.init('jug/tests/jugfiles/mapreduce_generator.py', 'dict_store')
     space['two'].run()
     assert space['two'].result == []
 
