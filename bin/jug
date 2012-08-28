@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# Copyright (C) 2009-2012, Luis Pedro Coelho <luis@luispedro.org>
 
-import jug.jug
-jug.jug.main()
+from jug.jug import main
+main()
