@@ -10,6 +10,8 @@ mapreduce: Build tasks that follow a map-reduce pattern.
 from __future__ import division
 from jug import Task
 from .utils import identity
+from .hash import hash_one
+
 from itertools import chain
 import operator
 
@@ -21,14 +23,20 @@ __all__ = [
 
 def _get_function(f):
     if getattr(f, '_jug_is_task_generator', False):
-        return f.f
+        hvalue = hash_one(f)
+        f = f.f
+        f.__jug_hash__ = lambda: hvalue
+        return f
     return f
 
 def _jug_map_reduce(reducer, mapper, inputs):
     import __builtin__
+    reducer = _get_function(reducer)
+    mapper = _get_function(mapper)
     return __builtin__.reduce(reducer, __builtin__.map(mapper, inputs))
 def _jug_reduce(reducer, inputs):
     import __builtin__
+    reducer = _get_function(reducer)
     return __builtin__.reduce(reducer, chain(inputs))
 
 def _break_up(lst, step):
@@ -41,9 +49,14 @@ def _break_up(lst, step):
 
 class _jug_map(object):
     def __init__(self, mapper):
-        self.mapper = mapper
+        self.mapper = _get_function(mapper)
+
     def __call__(self, e):
         return [self.mapper(e)]
+
+    def __jug_hash__(self):
+        return hash_one(self.mapper)
+
 
 def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     '''
@@ -76,8 +89,6 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     -------
     task : jug.Task object
     '''
-    reducer = _get_function(reducer)
-    mapper = _get_function(mapper)
     reducers = [Task(_jug_map_reduce, reducer, mapper, input_i) for input_i in _break_up(inputs, map_step)]
     while len(reducers) > 1:
         reducers = [Task(_jug_reduce, reducer, reduce_i) for reduce_i in _break_up(reducers, reduce_step)]

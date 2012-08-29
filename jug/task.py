@@ -443,7 +443,7 @@ def CachedFunction(f,*args,**kwargs):
         t.run()
     return value(t)
 
-def TaskGenerator(f):
+class TaskGenerator(object):
     '''
     @TaskGenerator
     def f(arg0, arg1, ...)
@@ -454,14 +454,26 @@ def TaskGenerator(f):
     This means that calling ``f(arg0, arg1)`` results in:
     ``Task(f, arg0, arg1)``
     '''
-    from functools import wraps
-    @wraps(f)
-    def task_generator(*args, **kwargs):
-        return Task(f, *args, **kwargs)
-    task_generator.__name__ = ('TaskGenerator(%s)' % task_generator.__name__)
-    task_generator.f = f
-    task_generator._jug_is_task_generator = True
-    return task_generator
+    _jug_is_task_generator = True
+    def __init__(self, f):
+        self.f = f
+
+    def __getstate__(self):
+        from sys import modules
+        modname = getattr(self.f, '__module__', None)
+        fname = self.f.__name__
+        obj = getattr(modules[modname], fname, None)
+        if modname is None or (obj is not self and obj is not self.f):
+            raise RuntimeError('jug.TaskGenerator could not pickle function.\nA function must be defined at the top-module level')
+        return modname,fname
+
+    def __setstate__(self, state):
+        from sys import modules
+        modname,fname = state
+        self.f = getattr(modules[modname], fname)
+
+    def __call__(self, *args, **kwargs):
+        return Task(self.f, *args, **kwargs)
 
 
 # This is lower case to be used like a function

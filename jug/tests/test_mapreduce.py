@@ -2,6 +2,7 @@ import numpy as np
 
 import jug.mapreduce
 from jug.backends.dict_store import dict_store
+from jug.tests.utils import simple_execute
 from jug.mapreduce import _break_up, _get_function
 from jug import value, TaskGenerator
 from jug.tests.task_reset import task_reset
@@ -64,6 +65,12 @@ def test_empty_mapreduce():
 @task_reset
 def test_taskgenerator_mapreduce():
     store, space = jug.jug.init('jug/tests/jugfiles/mapreduce_generator.py', 'dict_store')
-    space['two'].run()
-    assert space['two'].result == []
+    simple_execute()
+    assert space['sumtwo'].result == 2*sum(range(10))
+
+@task_reset
+def test_taskgenerator_map():
+    store, space = jug.jug.init('jug/tests/jugfiles/mapgenerator.py', 'dict_store')
+    simple_execute()
+    assert len(space['v2s'].result) == 16
 

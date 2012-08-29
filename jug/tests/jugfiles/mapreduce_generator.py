@@ -4,7 +4,10 @@ import math
 
 @TaskGenerator
 def double(x):
-    val = math.sqrt(2.)*math.sqrt(2.)
-    return x*val
+    return x*2
 
-two = jug.mapreduce.map(double, range(10))
+@TaskGenerator
+def sum2(a,b):
+    return (a+b)
+
+sumtwo = jug.mapreduce.mapreduce(sum2, double, range(10))
