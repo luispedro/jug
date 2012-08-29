@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2011-2012, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -75,4 +75,23 @@ def new_hash_object():
     '''
     import hashlib
     return hashlib.sha1()
+
+def hash_one(obj):
+    '''
+    hvalue = hash_one(obj)
+
+    Compute a hash from a single object
+
+    Parameters
+    ----------
+    obj : object
+        Hashable object
+
+    Returns
+    -------
+    hvalue : str
+    '''
+    h = new_hash_object()
+    hash_update(h, [('hash1', obj)])
+    return h.hexdigest()
 
