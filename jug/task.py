@@ -396,10 +396,20 @@ def recursive_dependencies(t, max_level=-1):
 
 def value(elem):
     '''
-    value = value(task)
+    value = value(obj)
 
     Loads a task object recursively. This correcly handles lists,
     dictonaries and eny other type handled by the tasks themselves.
+
+    Parameters
+    ----------
+    obj : object
+        Anything that can be pickled or a Task
+
+    Returns
+    -------
+    value : object
+        The result of the task ``obj``
     '''
     if isinstance(elem, (Task, Tasklet)):
         return elem.value()
@@ -421,7 +431,7 @@ def CachedFunction(f,*args,**kwargs):
         task = Task(f, *args, **kwargs)
         if not task.can_load():
             task.run()
-        value = task.result
+        value = task.value()
 
     That is, it calls the function if the value is available,
     but caches the result for the future.
