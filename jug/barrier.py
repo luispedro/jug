@@ -31,7 +31,15 @@ def barrier():
     barrier()
     
     In a jug file, it assures that all tasks defined up to now have been
-    completed.
+    completed. If not, parsing will (temporarily) stop at that point.
+
+    This ensures that, after calling ``barrier()`` you are free to call
+    ``value()`` to get any needed results.
+
+    See Also
+    --------
+    bvalue : function
+        Restricted version of this function. Often faster
     ''' 
     # The reason to import here instead of at module level is that if some
     # other code does
@@ -53,6 +61,12 @@ def bvalue(t):
         value = value(t)
 
     except that it only checks that `t` is complete.
+
+    This can be much faster than a full ``barrier()`` call.
+    See Also
+    --------
+    barrier : function
+        Checks that **all** tasks have results available.
     '''
     from .task import value
     try:
