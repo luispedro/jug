@@ -1,1 +1,1 @@
-../../docs/text-example.rst
+../../docs/source/text-example.rst
