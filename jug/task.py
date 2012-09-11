@@ -139,6 +139,15 @@ tricky to support since the general code relies on the function name)''')
         assert self.can_load()
         self._result = self.store.load(self.hash())
 
+    def invalidate(self):
+        '''
+        t.invalidate()
+
+        Equivalent to ``t.store.remove(t.hash())``. Useful for interactive use
+        (i.e., in ``jug shell`` mode).
+        '''
+        self.store.remove(self.hash())
+
     def unload(self):
         '''
         t.unload()
