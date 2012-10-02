@@ -74,6 +74,7 @@ default_options.cleanup_locks_only = False
 
 default_options.execute_wait_cycle_time_secs = 12
 default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
+default_options.execute_keep_going = False
 
 default_options.status_cache_file = '.jugstatus.sqlite3'
 
@@ -122,6 +123,8 @@ execute OPTIONS
     memory errors.
 --pdb
     Call python debugger on errors
+--keep-going
+    Keep going after errors
 
 invalidate OPTIONS
 ------------------
@@ -200,6 +203,7 @@ def read_configuration_file(fp=None):
     attempt('execute', 'pbd', 'pdb', bool)
     attempt('execute', 'nr-wait-cycles', 'execute_nr_wait_cycles', int)
     attempt('execute', 'wait-cycle-time', 'execute_wait_cycle_time_secs', int)
+    attempt('execute', 'keep-going', 'execute_keep_going', _str_to_bool)
     return infile
 
 
@@ -227,6 +231,7 @@ def parse(cmdlist=None, optionsfile=None):
     parser.add_option('--locks-only', action='store_true', dest='cleanup_locks_only')
     parser.add_option('--pdb', action='store_true', dest='pdb')
     parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
+    parser.add_option('--keep-going', action='store_true', dest='execute_keep_going')
     parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
     options,args = parser.parse_args(cmdlist)
     if not args:
@@ -263,6 +268,7 @@ def parse(cmdlist=None, optionsfile=None):
     _maybe_set('pdb')
     _maybe_set('execute_nr_wait_cycles')
     _maybe_set('execute_wait_cycle_time_secs')
+    _maybe_set('execute_keep_going')
 
     cmdline.jugdir = cmdline.jugdir % {
                 'date': datetime.now().strftime('%Y-%m-%d'),

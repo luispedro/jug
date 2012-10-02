@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -166,7 +166,8 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                         for dep in other.dependencies():
                             if dep is t:
                                 logging.critical('Other tasks are dependent on this one! Parallel processors will be held waiting!')
-                raise
+                if not options.execute_keep_going:
+                    raise
             finally:
                 if locked: t.unlock()
 def execute(options):

@@ -2,6 +2,7 @@ version 0.9.1+
 	* More flexible mapreduce()/map() functions
 	* Make TaskGenerator pickle()able and hash()able
 	* Add invalidate() method to Task
+	* Add --keep-going option to execute
 
 version 0.9.1 Mon Jun 11 2012 by luispedro
 	* Add --locks-only option to cleanup subcommand
