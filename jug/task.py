@@ -454,6 +454,21 @@ def CachedFunction(f,*args,**kwargs):
     -------
     value : result
         Result of calling ``f(*args,**kwargs)``
+
+    See Also
+    --------
+    bvalue : function
+        An alternative way to achieve similar results to ``CachedFunction(f)``
+        using ``bvalue`` is::
+
+            ft = Task(f)
+            fvalue = bvalue(ft)
+
+        The alternative method is more flexible, but will only be execute
+        lazily. In particular, a ``jug status`` will not see past the
+        ``bvalue`` call until ``jug execute`` is called to execute ``f``, while
+        a ``CachedFunction`` object will always execute.
+
     '''
     t = Task(f,*args, **kwargs)
     if not t.can_load():
