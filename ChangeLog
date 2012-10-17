@@ -3,6 +3,7 @@ version 0.9.1+
 	* Make TaskGenerator pickle()able and hash()able
 	* Add invalidate() method to Task
 	* Add --keep-going option to execute
+	* Better help messsage
 
 version 0.9.1 Mon Jun 11 2012 by luispedro
 	* Add --locks-only option to cleanup subcommand

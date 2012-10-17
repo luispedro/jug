@@ -223,15 +223,31 @@ def parse(cmdlist=None, optionsfile=None):
     cmdline = Options(infile)
 
     parser = optparse.OptionParser(usage=_usage_simple, version=__version__)
-    parser.add_option('--aggressive-unload',action='store_true',dest='aggressive_unload')
+    parser.add_option(
+                    '--aggressive-unload',
+                    action='store_true',
+                    dest='aggressive_unload',
+                    help='Do not keep intermediate results in memory (for jobs which require a lot of memory)')
     parser.add_option('--invalid',action='store',dest='invalid_name')
-    parser.add_option('--jugdir',action='store',dest='jugdir')
-    parser.add_option('--verbose',action='store',dest='verbose')
-    parser.add_option('--cache', action='store_true', dest='cache')
+    parser.add_option('--jugdir',
+                    action='store',
+                    dest='jugdir',
+                    help='Where to save intermediate results')
+    parser.add_option('--verbose',
+                    action='store',
+                    dest='verbose',
+                    help='Verbosity level [use "info" to see details of processing]')
+    parser.add_option('--cache',
+                    action='store_true',
+                    dest='cache',
+                    help='Use a cache for faster status [does not update after jugfile changes, though]')
     parser.add_option('--locks-only', action='store_true', dest='cleanup_locks_only')
-    parser.add_option('--pdb', action='store_true', dest='pdb')
+    parser.add_option('--pdb',
+                    action='store_true',
+                    dest='pdb',
+                    help='Drop to a PDB (debug) console on error')
     parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
-    parser.add_option('--keep-going', action='store_true', dest='execute_keep_going')
+    parser.add_option('--keep-going', action='store_true', dest='execute_keep_going', help='For execute: continue after errors')
     parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
     options,args = parser.parse_args(cmdlist)
     if not args:
