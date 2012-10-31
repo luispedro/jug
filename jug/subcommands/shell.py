@@ -35,8 +35,8 @@ def load_all(jugspace, local_ns):
         if k.startswith('__') and k.endswith('__'): continue
         try:
             local_ns[k] = value(v)
-        except Exception, e:
-            print 'Error while loading %s: %s' % (k, e)
+        except Exception as e:
+            print('Error while loading %s: %s' % (k, e))
 
 _ipython_not_found_msg = '''\
 jug: Error: could not import IPython libraries

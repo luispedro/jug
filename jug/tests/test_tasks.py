@@ -29,7 +29,7 @@ def _assert_tsorted(tasks):
 
 @task_reset
 def test_topological_sort():
-    bases = [jug.task.Task(add1,i) for i in xrange(10)]
+    bases = [jug.task.Task(add1,i) for i in range(10)]
     derived = [jug.task.Task(add1,t) for t in bases]
     derived2 = [jug.task.Task(add1,t) for t in derived]
     derived3 = [jug.task.Task(add1,t) for t in derived]
@@ -72,8 +72,8 @@ def test_topological_sort_kwargs():
     def sumlst(lst,param):
         return sum(lst)
 
-    bases = [jug.task.Task(add2,x=i) for i in xrange(10)]
-    derived = [jug.task.Task(sumlst,lst=bases,param=p) for p in xrange(4)]
+    bases = [jug.task.Task(add2,x=i) for i in range(10)]
+    derived = [jug.task.Task(sumlst,lst=bases,param=p) for p in range(4)]
 
     alltasks = bases + derived
     jug.task.topological_sort(alltasks)
@@ -107,7 +107,7 @@ def reduce(r):
 def test_topological_sort_canrun():
     Task = jug.task.Task
     input = Task(data)
-    for f in xrange(80):
+    for f in range(80):
         Task(reduce, Task(mult,input,f))
 
     alltasks = jug.task.alltasks

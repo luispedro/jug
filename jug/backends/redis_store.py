@@ -56,7 +56,7 @@ class redis_store(base_store):
         '''
         '''
         if redis is None:
-            raise IOError, 'jug.redis_store: redis module is not found!'
+            raise IOError('jug.redis_store: redis module is not found!')
         redis_params = {}
         match = _redis_urlpat.match(url)
         if match:

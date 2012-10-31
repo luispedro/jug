@@ -15,8 +15,8 @@ def test_jug_invalidate():
     def setAi(i):
         A[i] = True
     N = 1024
-    A = [False for i in xrange(N)]
-    setall = [Task(setAi, i) for i in xrange(N)]
+    A = [False for i in range(N)]
+    setall = [Task(setAi, i) for i in range(N)]
     store = dict_store()
     jug.task.Task.store = store
     for t in setall: t.run()

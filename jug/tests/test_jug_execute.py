@@ -9,10 +9,10 @@ jug.jug.silent = True
 def test_jug_execute_simple():
     N = 1024
     random.seed(232)
-    A = [False for i in xrange(N)]
+    A = [False for i in range(N)]
     def setAi(i):
         A[i] = True
-    setall = [Task(setAi, i) for i in xrange(N)]
+    setall = [Task(setAi, i) for i in range(N)]
     store = dict_store()
     jug.task.Task.store = store
     simple_execute()
@@ -22,10 +22,10 @@ def test_jug_execute_simple():
 def test_jug_execute_deps():
     N = 256
     random.seed(234)
-    A = [False for i in xrange(N)]
+    A = [False for i in range(N)]
     def setAi(i, other):
         A[i] = True
-    idxs = range(N)
+    idxs = list(range(N))
     random.shuffle(idxs)
     prev = None
     for idx in idxs:

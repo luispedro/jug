@@ -47,7 +47,7 @@ def create_directories(dname):
     if head: create_directories(head)
     try:
         mkdir(dname)
-    except OSError, e:
+    except OSError as e:
         if e.errno != errno.EEXIST:
             raise
 

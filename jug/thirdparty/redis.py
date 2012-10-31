@@ -59,7 +59,7 @@ class Redis(object):
         if isinstance(s, unicode):
             try:
                 return s.encode(self.charset, self.errors)
-            except UnicodeEncodeError, e:
+            except UnicodeEncodeError as e:
                 raise InvalidData("Error encoding unicode value '%s': %s" % (value.encode(self.charset, 'replace'), e))
         return str(s)
     
@@ -78,7 +78,7 @@ class Redis(object):
         """
         try:
             self._sock.sendall(s)
-        except socket.error, e:
+        except socket.error as e:
             if e.args[0] == 32:
                 # broken pipe
                 self.disconnect()
@@ -87,7 +87,7 @@ class Redis(object):
     def _read(self):
         try:
             return self._fp.readline()
-        except socket.error, e:
+        except socket.error as e:
             if e.args and e.args[0] == errno.EAGAIN:
                 return
             self.disconnect()
@@ -1036,7 +1036,7 @@ class Redis(object):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.host, self.port))
-        except socket.error, e:
+        except socket.error as e:
             raise ConnectionError("Error %s connecting to %s:%s. %s." % (e.args[0], self.host, self.port, e.args[1]))
         else:
             self._sock = sock

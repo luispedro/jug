@@ -114,9 +114,9 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
     logging.info('Execute start (%s tasks)' % len(tasks))
     while tasks:
         upnext = [] # tasks that can be run
-        for i in xrange(options.execute_nr_wait_cycles):
+        for i in range(options.execute_nr_wait_cycles):
             max_cannot_run = min(len(tasks), 128)
-            for i in xrange(max_cannot_run):
+            for i in range(max_cannot_run):
                 # The argument for this is the following:
                 # if T' is dependent on the result of T, it is better if the
                 # processor that ran T, also runs T'. By having everyone else
@@ -154,7 +154,7 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                         t.unload_recursive()
                 else:
                     logging.info('Already in execution %s...' % t.name)
-            except Exception, e:
+            except Exception as e:
                 if options.pdb:
                     import pdb, sys
                     _,_, tb = sys.exc_info()
@@ -319,10 +319,10 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     jugspace = jugmodule.__dict__
     sys.modules[jugmodname] = jugmodule
     try:
-        execfile(jugfile, jugspace, jugspace)
+        exec(compile(open(jugfile).read(), jugfile, 'exec'), jugspace, jugspace)
     except BarrierError:
         jugspace['__jug__hasbarrier__'] = True
-    except Exception, e:
+    except Exception as e:
         logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
         if on_error == 'exit':
             sys.exit(1)
@@ -364,6 +364,6 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception, exc:
+    except Exception as exc:
         logging.critical('Unhandled Jug Error!')
         raise
