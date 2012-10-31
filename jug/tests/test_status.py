@@ -13,7 +13,6 @@ def test_nocache():
     options.jugdir = store
     options.jugfile = 'jug/tests/jugfiles/simple.py'
     options.verbose = 'quiet'
-    print store
     assert status.status(options) == 8 * 4
 
 @task_reset
