@@ -104,7 +104,7 @@ class dict_store(base_store):
 
         Implement 'cleanup' command
         '''
-        existing = self.store.keys()
+        existing = set(self.store.keys())
         for act in active:
             try:
                 existing.remove(_resultname(act))
