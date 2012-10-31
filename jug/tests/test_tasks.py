@@ -239,7 +239,8 @@ def test__str__repr__():
     assert repr(t).find('3') >= 0
 
 
-def add_tuple((a,b)):
+def add_tuple(a_b):
+    a,b = a_b
     return a + b
 
 @task_reset
