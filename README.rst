@@ -79,6 +79,13 @@ the `value` function::
 What's New
 ..........
 
+version **0.9.2** (Nov 4 2012):
+- More flexible mapreduce()/map() functions
+- Make TaskGenerator pickle()able and hash()able
+- Add invalidate() method to Task
+- Add --keep-going option to execute
+- Better help messsage
+
 version **0.9.1** (Jun 11 2012):
 - Add --locks-only option to cleanup subcommand
 - Make cache file (for ``status`` subcommand) configurable
@@ -98,43 +105,8 @@ version **0.9**:
 - Avoid creating directories in file backend unless it is necessary
 - Add jug.mapreduce.reduce (which mimicks the builtin reduce)
 
-version **0.8.1**:
-- Fix redis backend for new version of client module
-- Faster file store for large files
-- Fix ``invalidate`` with Tasklets
-- Install tests and have them be runnable
-- Changed hash computation method. This has a special case on numpy arrays
-  (for speed) and is more extensible through a ``__jug_hash__`` hook
-- Fix bug with ``Tasklet`` dependencies not being properly taken into account
-- Fix ``shell`` subcommand in newer versions of ipython
-- Add ``__file__`` attribute to fake jugmodule
 
-version **0.8**:
-- Tasklets
-- Fix bugs in sleep-until and cleanup
-- Fix bugs with CompoundTask (you needed to run jug execute twice before)
-
-version **0.7.4**:
-- Fix case where ~/.jug/configrc does not exist
-- Print host name to lock file on file_store
-- Refactored implementation of options
-- Fix unloading tasks that have not run
-- Fix mapreduce for empty input
-
-Version **0.7.3**:
-- Parse ~/.jug/configrc
-- Fix bug with waiting times
-- Special case saving of numpy arrays
-- Add more expressive jugdir syntax
-- Save dict_store backend to disk
-
-Version **0.7.2**:
-- included missing files in the distribution
-
-Version **0.7.1**:
-- ``sleep-until`` subcommand
-- bugfixes
-
+For older version see ``ChangeLog`` file.
 
 Roadmap
 .......
