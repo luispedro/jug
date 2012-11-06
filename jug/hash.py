@@ -47,9 +47,21 @@ def hash_update(M, elems):
         if hasattr(e, '__jug_hash__'):
             M.update(e.__jug_hash__())
         elif type(e) in (list, tuple):
+            M.update(repr(type(e)))
             hash_update(M, enumerate(e))
+        elif type(e) == set:
+            M.update('set')
+            items = list(e)
+            items.sort()
+            hash_update(M, enumerate(items))
         elif type(e) == dict:
-            hash_update(M, e.iteritems())
+            M.update('dict')
+            items = e.items()
+            # With randomized hashing, different runs of Python might result in
+            # different orders, so sort:
+            items.sort(key=(lambda k_v:k_v[0]))
+
+            hash_update(M, items)
         elif np is not None and type(e) == np.ndarray:
             M.update('np.ndarray')
             M.update(pickle.dumps(e.dtype))
