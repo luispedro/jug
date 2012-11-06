@@ -63,6 +63,12 @@ tricky to support since the general code relies on the function name)''')
         self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
         self.args = args
+        __jug_hash__ = kwargs.pop( '__jug_hash__', None )
+        
+        # Sometimes the best way of identifying a task might come from 
+        # the client himself.
+        if __jug_hash__ != None:
+            self.jug_hash_precursor =  __jug_hash__ 
         self.kwargs = kwargs
         alltasks.append(self)
 
@@ -226,8 +232,12 @@ tricky to support since the general code relies on the function name)''')
     def __jug_hash__(self):
         M = new_hash_object()
         M.update(self.name)
-        hash_update(M, enumerate(self.args))
-        hash_update(M, self.kwargs.iteritems())
+        if hasattr( self, 'jug_hash_tuple'):
+            hash_update( M, self.jug_hash_precursor )
+        else: 
+            # Take the default, but somehow hazardous path...
+            hash_update(M, enumerate(self.args))
+            hash_update(M, self.kwargs.iteritems())
         value = M.hexdigest()
         self.__jug_hash__ = lambda : value
         return value

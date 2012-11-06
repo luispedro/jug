@@ -48,7 +48,7 @@ def _lockname(name):
 
 _LOCKED = 1
 
-_redis_urlpat = re.compile('redis://(?P<host>[A-Za-z0-9\.]+)(?P<port>\:[0-9]+)?/')
+_redis_urlpat = re.compile(r'redis://(?P<host>[A-Za-z0-9\.]+)(\:(?P<port>[0-9]+))?/')
 
 
 class redis_store(base_store):
@@ -61,6 +61,10 @@ class redis_store(base_store):
         match = _redis_urlpat.match(url)
         if match:
             redis_params = match.groupdict()
+            if redis_params['port'] == None:
+                del redis_params['port']
+            else:
+                redis_params['port'] = int( redis_params['port'] )
         logging.info('connecting to %s' % redis_params)
 
         self.redis = redis.Redis(**redis_params)

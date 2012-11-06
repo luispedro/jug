@@ -20,6 +20,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+from __future__ import print_function
+import sys
+
 def hash_update(M, elems):
     '''
     M = hash_update(M, elems)
@@ -42,24 +45,43 @@ def hash_update(M, elems):
         import numpy as np
     except ImportError:
         np = None
-    for n,e in elems:
-        M.update(pickle.dumps(n))
-        if hasattr(e, '__jug_hash__'):
+    for e in elems:
+        if type(e) in (int,str,float):
+            M.update(str(e) )
+        elif type(e) == buffer:
+            M.update(e)
+        elif hasattr(e, '__jug_hash__'):
             M.update(e.__jug_hash__())
         elif type(e) in (list, tuple):
-            hash_update(M, enumerate(e))
+            M.update( repr( type(e) ) )
+            hash_update(M, e)
         elif type(e) == dict:
-            hash_update(M, e.iteritems())
+            # Will have to extract the items and assert that they are
+            # sorted....
+            items = e.items()
+            items.sort() # <-- Default sort
+            items.insert( 0, 'dict' )
+            hash_update(M,items)
+        elif type(e) == set:
+            items = list( e )
+            items.sort()
+            items.insert(0, 'set' )
+            hash_update(M, items)
         elif np is not None and type(e) == np.ndarray:
             M.update('np.ndarray')
-            M.update(pickle.dumps(e.dtype))
-            M.update(pickle.dumps(e.shape))
-            try:
-                buffer = e.data
-                M.update(buffer)
-            except:
-                M.update(e.copy().data)
+            if e.dtype == np.dtype('O'):
+                # It is not so flat, so get into it
+                hash_update(M, list( e.flatten() ) )
+            else:
+                M.update(pickle.dumps(e.dtype))
+                M.update(pickle.dumps(e.shape))
+                try:
+                    buffer_ = e.data
+                    M.update(buffer_)
+                except:
+                    M.update(e.copy().data)
         else:
+            print("WARNING: Trying to hash object of unknown composition:", repr(type(e)), file = sys.stderr )
             M.update(pickle.dumps(e))
     return M
 
