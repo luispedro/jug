@@ -35,3 +35,28 @@ between the throughput and latency. You might quibble with the default, but the
 principle is sound and it is only a default: the setting is there to give you
 more control.
 
+Identifying tasks
+-----------------
+
+In the module ``jug.hash``, jug attempts to construct a unique identifier, called 
+a hash, for each of your tasks. For doing that, the name of the function involved
+invoked in the task together with  the parameters that it receives are used. This
+makes jug easy to use but has some drawbacks: 
+
+- If your functions take long/big arguments, the hash process will potentially be 
+  costly. That's a common situation when you are processing arrays for example, or 
+  if you are using sets/dictionaries, in which case the default handling needs to get a sorted 
+  list from the elements of the set/dictionary.
+
+- Jug might now know how to handle the types of your arguments,
+
+- Arguments might be equivalent, and thus the tasks should be identified in the 
+  same way, without jug knowing. As a very contrived example, suppose that a task uses 
+  an argument which is an angle and for the purpose of your program all the values 
+  are equivalent modulo 2*pi.
+
+The solution for this is to provide a ``__jug_hash__`` keyword argument to the Task 
+constructor specifying an object that should be used to build the hash instead of 
+the function arguments. Or, alternatively, to provide a ``__jug_hash__`` method to
+the problematic arguments: this method should return a string to feed the hash function. 
+
