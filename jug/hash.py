@@ -51,14 +51,17 @@ def hash_update(M, elems):
             hash_update(M, enumerate(e))
         elif type(e) == set:
             M.update('set')
-            items = list(e)
+            # With randomized hashing, different runs of Python might result in
+            # different orders, so sort. We cannot trust that all the elements
+            # in the set will be comparable, so we convert them to their hashes
+            # beforehand.
+            items = map(hash_one, e)
             items.sort()
             hash_update(M, enumerate(items))
         elif type(e) == dict:
             M.update('dict')
             items = e.items()
-            # With randomized hashing, different runs of Python might result in
-            # different orders, so sort:
+            items = [(hash_one(k),v) for k,v in items]
             items.sort(key=(lambda k_v:k_v[0]))
 
             hash_update(M, items)
