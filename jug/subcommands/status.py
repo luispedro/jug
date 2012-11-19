@@ -154,6 +154,12 @@ def _print_status(options, waiting, ready, running, finished):
     options.print_out(format % ('Total:',sum(waiting.values()),sum(ready.values()),sum(finished.values()),sum(running.values())))
     options.print_out()
 
+def _clear_cache(options):
+    from os import unlink
+    try:
+        unlink(options.status_cache_file)
+    except:
+        pass
 
 def _status_cached(options):
     create, update = range(2)
@@ -214,6 +220,8 @@ def status(options):
     options : jug options
     '''
     if options.status_mode == 'cached':
+        if options.status_cache_clear:
+            return _clear_cache(options)
         return _status_cached(options)
     else:
         return _status_nocache(options)

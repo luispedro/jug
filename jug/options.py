@@ -67,6 +67,7 @@ default_options.invalid_name = None
 default_options.argv = None
 default_options.print_out = nprint
 default_options.status_mode = 'no-cached'
+default_options.status_cache_clear = False
 default_options.pdb = False
 default_options.verbose = 'quiet'
 
@@ -241,6 +242,10 @@ def parse(cmdlist=None, optionsfile=None):
                     action='store_true',
                     dest='cache',
                     help='Use a cache for faster status [does not update after jugfile changes, though]')
+    parser.add_option('--clear',
+                    action='store_true',
+                    dest='status_cache_clear',
+                    help='Use with status --cache. Removes the cache file')
     parser.add_option('--locks-only', action='store_true', dest='cleanup_locks_only')
     parser.add_option('--pdb',
                     action='store_true',
@@ -285,6 +290,7 @@ def parse(cmdlist=None, optionsfile=None):
     _maybe_set('execute_nr_wait_cycles')
     _maybe_set('execute_wait_cycle_time_secs')
     _maybe_set('execute_keep_going')
+    _maybe_set('status_cache_clear')
 
     cmdline.jugdir = cmdline.jugdir % {
                 'date': datetime.now().strftime('%Y-%m-%d'),
