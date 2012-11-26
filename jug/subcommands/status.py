@@ -36,7 +36,11 @@ __all__ = [
     'status'
     ]
 
-unknown,waiting,ready,running,finished = range(5)
+unknown = 'unknown'
+waiting = 'waiting'
+ready = 'ready'
+running = 'running'
+finished = 'finished'
 
 def create_sqlite3(connection, ht, deps, rdeps):
     connection.executescript('''
@@ -70,7 +74,7 @@ def retrieve_sqlite3(connection):
     return ht, dict(deps), dict(rdeps)
 
 def save_dirty3(connection, dirty):
-    connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', dirty)
+    connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', [(nstatus,id) for id,nstatus in dirty.items()])
 
 @contextmanager
 def _open_connection(options):
@@ -106,7 +110,7 @@ def update_status(store, ht, deps, rdeps):
     tasks_finished = defaultdict(int)
 
     store = memoize_store(store, list_base=True)
-    dirty = []
+    dirty = {}
     for i,name,hash,status in ht:
         nstatus = None
         if status == finished or store.can_load(hash):
@@ -133,7 +137,7 @@ def update_status(store, ht, deps, rdeps):
                 nstatus = waiting
         assert nstatus is not None, 'update_status: nstatus not assigned'
         if status != nstatus:
-            dirty.append((nstatus,i))
+            dirty[i] = nstatus
     return tasks_waiting, tasks_ready, tasks_running, tasks_finished, dirty
 
 
@@ -178,9 +182,9 @@ def _status_cached(options):
         with _open_connection(options) as connection:
             save_dirty3(connection, dirty)
     else:
-        for i,nstatus in dirty:
-            _,name,hash,_ = ht[i]
-            ht[i] = (i, name, hash, nstatus)
+        for k in dirty:
+            _,name,hash,_ = ht[k]
+            ht[k] = (k, name, hash, dirty[k])
         with _open_connection(options) as connection:
             create_sqlite3(connection, ht, deps, rdeps)
     return sum(tf.values())
