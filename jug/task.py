@@ -14,7 +14,7 @@ There are two main alternatives:
 '''
 
 from __future__ import division
-from .hash import new_hash_object, hash_update
+from .hash import new_hash_object, hash_update, hash_one
 
 __all__ = [
     'Task',
@@ -30,8 +30,14 @@ alltasks = []
 class _getitem(object):
     def __init__(self, slice):
         self.slice = slice
+
     def __call__(self, obj):
-        return obj[self.slice]
+        obj = value(obj)
+        slice = value(self.slice)
+        return obj[slice]
+
+    def __jug_hash__(self):
+        return hash_one(('jug.task._getitem', self.slice))
 
     def __repr__(self):
         return 'jug.task._getitem(%s)' % self.slice

@@ -25,3 +25,11 @@ def test_tasklet_dependencies():
     store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', 'dict_store')
     assert not space['t0_2'].can_run()
 
+
+@task_reset
+def test_tasklet_dependencies():
+    store, space = jug.jug.init('jug/tests/jugfiles/slice_task.py', 'dict_store')
+    simple_execute()
+    assert space['z2'].value() == 0
+
+
