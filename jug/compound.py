@@ -75,7 +75,7 @@ def CompoundTask(f, *args, **kwargs):
     del task
     inner = f(*args, **kwargs)
     compound = Task(compound_task_execute, inner, h)
-    compound._hash = h
+    compound.__jug_hash__ = lambda : h
     return compound
 
 def CompoundTaskGenerator(f):

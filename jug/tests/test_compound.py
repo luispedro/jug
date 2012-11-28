@@ -39,3 +39,14 @@ def test_non_simple():
     simple_execute()
     assert 'sixteen' in space
     assert space['sixteen'].result == 16
+
+@task_reset
+def test_non_simple():
+    store, space = jug.jug.init('jug/tests/jugfiles/compound.py', 'dict_store')
+    simple_execute()
+    assert 'sixteen' in space
+    assert space['sixteen'].result == 16
+    store, space = jug.jug.init('jug/tests/jugfiles/compound.py', store)
+    assert 'sixteen' in space
+    assert space['sixteen'].result == 16
+
