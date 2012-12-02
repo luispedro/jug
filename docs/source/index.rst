@@ -130,35 +130,48 @@ install jug` if you'd like.
 What's New
 ----------
 
-version **0.8**:
-- Tasklets
-- Fix bugs in sleep-until and cleanup
-- Fix bugs with CompoundTask (you needed to run jug execute twice before)
+version **0.9.3** (Dec 2 2012)
+- Fix parsing of ports on redis URL (patch by Alcides Viamontes)
+- Make hashing robust to different orders when using randomized hashing
+  (patch by Alcides Viamontes)
+- Allow regex in invalidate command (patch by Alcides Viamontes)
+- Add ``--cache --clear`` suboption to status
+- Allow builtin functions for tasks
+- Fix status --cache`` (a general bug which seems to be triggered mainly by
+  ``bvalue()`` usage).
+- Fix ``CompoundTask`` (broken by earlier ``__jug_hash__`` hook introduction)
+- Make ``Tasklets`` more flexible by allowing slicing with ``Tasks``
+  (previously, slicing with tasks was **not** allowed)
 
-version **0.7.4**:
-- Fix case where ~/.jug/configrc does not exist
-- Print host name to lock file on file_store
-- Refactored implementation of options
-- Fix unloading tasks that have not run
-- Fix mapreduce for empty input
 
-Version **0.7.3**:
-- Parse ~/.jug/configrc
-- Fix bug with waiting times
-- Special case saving of numpy arrays
-- Add more expressive jugdir syntax
-- Save dict_store backend to disk
+version **0.9.2** (Nov 4 2012):
+- More flexible mapreduce()/map() functions
+- Make TaskGenerator pickle()able and hash()able
+- Add invalidate() method to Task
+- Add --keep-going option to execute
+- Better help messsage
 
-Version **0.7.2**:
-- included missing files in the distribution
+version **0.9.1** (Jun 11 2012):
+- Add --locks-only option to cleanup subcommand
+- Make cache file (for ``status`` subcommand) configurable
+- Add ``webstatus`` subcommand
+- Add bvalue() function
+- Fix bug in ``shell`` subcommand (``value`` was not in global namespace)
+- Improve identity()
+- Fix bug in using Tasklets and --aggressive-unload
+- Fix bug with Tasklets and sleep-until/check
 
-Version **0.7.1**:
-- ``sleep-until`` subcommand
-- bugfixes
+version **0.9**:
+- In the presence of a barrier(), rerun the jugfile. This makes barrier much
+  easier to use.
+- Add set_jugdir to public API
+- Added CompoundTaskGenerator
+- Support subclassing of Task
+- Avoid creating directories in file backend unless it is necessary
+- Add jug.mapreduce.reduce (which mimicks the builtin reduce)
 
-Version **0.7 (starting with 0.6.9 in testing)**:
-- `barrier()`
-- better ``shell`` command
+
+See the file ``ChangeLog`` for the full history
 
 What do I need to run Jug?
 ---------------------------

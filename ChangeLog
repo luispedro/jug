@@ -1,4 +1,4 @@
-version 0.9.2+
+version 0.9.3 Sun Dec 2 2012 by luispedro
 	* Fix parsing of ports on redis URL (patch by Alcides Viamontes)
 	* Make hashing robust to different orders when using randomized hashing
 	(patch by Alcides Viamontes)

@@ -79,6 +79,20 @@ the `value` function::
 What's New
 ..........
 
+version **0.9.3** (Dec 2 2012)
+- Fix parsing of ports on redis URL (patch by Alcides Viamontes)
+- Make hashing robust to different orders when using randomized hashing
+  (patch by Alcides Viamontes)
+- Allow regex in invalidate command (patch by Alcides Viamontes)
+- Add ``--cache --clear`` suboption to status
+- Allow builtin functions for tasks
+- Fix status --cache`` (a general bug which seems to be triggered mainly by
+  ``bvalue()`` usage).
+- Fix ``CompoundTask`` (broken by earlier ``__jug_hash__`` hook introduction)
+- Make ``Tasklets`` more flexible by allowing slicing with ``Tasks``
+  (previously, slicing with tasks was **not** allowed)
+
+
 version **0.9.2** (Nov 4 2012):
 - More flexible mapreduce()/map() functions
 - Make TaskGenerator pickle()able and hash()able
