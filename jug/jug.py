@@ -140,7 +140,7 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                 upnext.append(tasks.pop(0))
             if upnext:
                 break
-            logging.info('waiting 12 secs for an open task...')
+            logging.info('waiting %s secs for an open task...' % options.execute_wait_cycle_time_secs)
             sleep(options.execute_wait_cycle_time_secs)
         if not upnext:
             logging.info('No tasks can be run!')
