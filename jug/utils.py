@@ -23,11 +23,12 @@
 from __future__ import division
 import os
 
-from .task import Task, Tasklet, TaskGenerator
+from .task import Task, Tasklet, TaskGenerator, value
 
 __all__ = [
     'timed_path',
     'identity',
+    'CustomHash',
     ]
 
 def _return_first(one, two):
@@ -86,3 +87,29 @@ def identity(x):
     t.name = 'identity'
     return t
 
+class CustomHash(object):
+    '''
+    value = CustomHash(obj, hash_function)
+
+    Set a custom hash function
+
+    This is an advanced feature and you can shoot yourself in the foot with it.
+    Make sure you know what you are doing. In particular, hash_function should
+    be a strong hash: ``hash_function(obj0) == hash_function(obj1)`` is taken
+    to imply that ``obj0 == obj1``
+
+    Parameters
+    ----------
+    obj : any object
+    hash_function : function
+        This should take your object and return a str
+    '''
+    def __init__(self, obj, hash_function):
+        self.obj = obj
+        self.hash_function = hash_function
+
+    def __jug_hash__(self):
+        return self.hash_function(self.obj)
+
+    def __jug_value__(self):
+        return value(self.obj)

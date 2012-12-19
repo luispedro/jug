@@ -434,6 +434,8 @@ def value(elem):
         return tuple([value(e) for e in elem])
     elif type(elem) == dict:
         return dict((x,value(y)) for x,y in elem.iteritems())
+    elif hasattr(elem, '__jug_value__'):
+        return elem.__jug_value__()
     else:
         return elem
 

@@ -55,8 +55,23 @@ makes jug easy to use but has some drawbacks:
   an argument which is an angle and for the purpose of your program all the values
   are equivalent modulo 2*pi.
 
-The solution for this is to provide a ``__jug_hash__`` keyword argument to the Task
-constructor specifying an object that should be used to build the hash instead of
-the function arguments. Or, alternatively, to provide a ``__jug_hash__`` method to
-the problematic arguments: this method should return a string to feed the hash function.
+If you control the types of your arguments, you can add a ``__jug_hash__``
+method to your type directly. This method should return a string::
+
+    class MySpecialThing(object):
+        def __jug_hash__(self):
+            return some_string
+
+Alternatively, you can use ``jug.utils.CustomHash`` in the case where you
+cannot (or rather not) change the types::
+
+    from jug.utils import CustomHash
+    def my_hash_function(x):
+        return some_string_based_on_x
+    
+    complex = ...
+    value = CustomHash(complex, my_hash_function) 
+
+Now, ``value`` behaves exactly like ``complex``, but it's hash is computed by
+calling ``my_hash_function``.
 
