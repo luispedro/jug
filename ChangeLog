@@ -1,6 +1,7 @@
 version 0.9.3+
 	* Add CustomHash wrapper to set __jug_hash__
 	* Print traceback on import error
+	* Exit when no progress is made even with barrier
 
 version 0.9.3 Sun Dec 2 2012 by luispedro
 	* Fix parsing of ports on redis URL (patch by Alcides Viamontes)

@@ -193,12 +193,23 @@ def execute(options):
     tasks_executed = defaultdict(int)
     tasks_loaded = defaultdict(int)
     store = None
-    done = False
-    while not done:
+    noprogress = 0
+    while noprogress < 32:
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
+        previous = sum(tasks_executed.values())
         execution_loop(tasks, options, tasks_executed, tasks_loaded)
+        after = sum(tasks_executed.values())
         done = not jugspace.get('__jug__hasbarrier__', False)
+        if done:
+            break
+        if after == previous:
+            from time import sleep
+            noprogress += 1
+            sleep(options.execute_wait_cycle_time_secs)
+    else:
+        logging.info('No tasks can be run!')
+
 
     options.print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
     options.print_out('-' * (52+12+12))
