@@ -194,7 +194,7 @@ def execute(options):
     tasks_loaded = defaultdict(int)
     store = None
     noprogress = 0
-    while noprogress < 32:
+    while noprogress < 2:
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
         previous = sum(tasks_executed.values())
