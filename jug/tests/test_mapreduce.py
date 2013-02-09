@@ -6,6 +6,7 @@ from jug.tests.utils import simple_execute
 from jug.mapreduce import _break_up, _get_function
 from jug import value, TaskGenerator
 from jug.tests.task_reset import task_reset
+import jug.utils
 
 def mapper(x):
     return x**2
@@ -37,9 +38,9 @@ def test_map():
     np.random.seed(33)
     jug.task.Task.store = dict_store()
     A = np.random.rand(10000)
-    t = jug.mapreduce.map(mapper, A)
-    dfs_run(t)
-    ts = value(t)
+    ts = jug.mapreduce.map(mapper, A)
+    simple_execute()
+    ts = value(ts)
     assert np.all(ts == np.array(map(mapper,A)))
 
 @task_reset
@@ -59,8 +60,8 @@ def test_break_up():
 @task_reset
 def test_empty_mapreduce():
     store, space = jug.jug.init('jug/tests/jugfiles/empty_mapreduce.py', 'dict_store')
-    space['two'].run()
-    assert space['two'].result == []
+    simple_execute()
+    assert value(space['two']) == []
 
 @task_reset
 def test_taskgenerator_mapreduce():
@@ -72,5 +73,5 @@ def test_taskgenerator_mapreduce():
 def test_taskgenerator_map():
     store, space = jug.jug.init('jug/tests/jugfiles/mapgenerator.py', 'dict_store')
     simple_execute()
-    assert len(space['v2s'].result) == 16
+    assert len(value(space['v2s'])) == 16
 

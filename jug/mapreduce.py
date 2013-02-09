@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License : MIT
 
@@ -47,15 +47,9 @@ def _break_up(lst, step):
         start = next
         next += step
 
-class _jug_map(object):
-    def __init__(self, mapper):
-        self.mapper = _get_function(mapper)
-
-    def __call__(self, e):
-        return [self.mapper(e)]
-
-    def __jug_hash__(self):
-        return hash_one(self.mapper)
+def _jug_map(mapper, es):
+    import __builtin__
+    return __builtin__.map(mapper, es)
 
 
 def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
@@ -127,7 +121,15 @@ def map(mapper, sequence, map_step=4):
     --------
     mapreduce
     '''
-    return mapreduce(operator.add, _jug_map(mapper), sequence, map_step=map_step, reduce_step=(len(sequence)//map_step+1))
+    if map_step == 1:
+        return [Task(mapper, s) for s in sequence]
+    result = []
+    for ss in _break_up(sequence, map_step):
+        t = Task(_jug_map, _get_function(mapper), ss)
+        for i,_ in enumerate(ss):
+            result.append(t[i])
+    return result
+
 
 def reduce(reducer, inputs, reduce_step=8):
     '''
