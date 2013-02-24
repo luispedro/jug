@@ -54,8 +54,8 @@ TH {
     <th>Task Name</th>
     <th>Waiting</th>
     <th>Ready</th>
-    <th>Completed</th>
     <th>Executing</th>
+    <th>Completed</th>
 </tr>
 %(table)s
 </table>
