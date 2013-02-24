@@ -123,7 +123,7 @@ execute OPTIONS
     information, but is necessary if keeping too much in memory is leading to
     memory errors.
 --pdb
-    Call python debugger on errors
+    Call interactive debugger on errors. Preferentially uses IPython debugger.
 --keep-going
     Keep going after errors
 
