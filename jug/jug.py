@@ -166,9 +166,31 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     logging.info('Already in execution %s...' % t.name)
             except Exception as e:
                 if options.pdb:
-                    import pdb, sys
+                    import sys
                     _,_, tb = sys.exc_info()
-                    pdb.post_mortem(tb)
+
+                    try:
+                        import IPython
+                        try:
+                            #Attempt to load IPython debugger
+                            import IPython.core.ipapi
+                            import IPython.core.debugger
+                            ip = IPython.core.ipapi.get()
+                            debugger = IPython.core.debugger.Pdb(ip.colors)
+                        except ImportError:
+                            #Fallback to older version of IPython API
+                            import IPython.ipapi
+                            import IPython.Debugger
+                            shell = IPython.Shell.IPShell(argv=[''])
+                            ip = IPython.ipapi.get()
+                            debugger=IPythong.Debugger.Pdb(ip.options.colors)
+                    except ImportError:
+                        #Fallback to standard debugger
+                        import pdb
+                        debugger = pdb.Pdb()
+
+                    debugger.reset()
+                    debugger.interaction(None, tb)
                 else:
                     import itertools
                     logging.critical('Exception while running %s: %s' % (t.name,e))
