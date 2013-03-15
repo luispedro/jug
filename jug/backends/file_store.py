@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -220,17 +220,15 @@ class file_store(base_store):
         nr_removed : integer
             number of removed files
         '''
-        files = set()
+        active = frozenset(self._getfname(t.hash()) for t in active)
+        removed = 0
         for dir,_,fs in os.walk(self.jugdir):
             for f in fs:
-                files.add(path.join(dir,f))
-        for t in active:
-            fname = self._getfname(t.hash())
-            if fname in files:
-                files.remove(fname)
-        for f in files:
-            os.unlink(f)
-        return len(files)
+                f = path.join(dir, f)
+                if f not in active:
+                    os.unlink(f)
+                    removed += 1
+        return removed
 
     def remove_locks(self):
         '''
