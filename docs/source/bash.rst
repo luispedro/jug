@@ -101,13 +101,28 @@ Then save the file and make it executable by typing `chmod a+x .waitonjug`.
 
 **Creating run_workers.sh**
 Create a new file called run_workers.sh and paste the following, 
-but *be sure to modify the variable!* This script assumes that
-all slave machines can run the same number of jug processes without 
-being overloaded. I would generally recommend setting the number of 
+but *be sure to modify the script!* There are a few things to 
+modify: the number of workers, the name of your jug python code, 
+and where to send the output. 
+
+Number of Workers: This script assumes that all slave machines can run 
+the same number of jug processes without being overloaded. I would 
+generally recommend setting the number of 
 jug processes to be slightly lower than the total number of hardware
 threads your slave machine can support. For example, each of my 
 slave machines has 12 hardware threads (6 cores, 2 threads each), 
-so I've set to run 10 jug processes per slave machine
+so I've set to run 10 jug processes per slave machine. 
+
+Name of script: Below, the name of my jug script is benchmark_jug.py. 
+Yours is likely different, so please update
+
+Output redirection: I'm outputing stdout and stderr /mnt/localhd . If 
+your jug tasks do not use stdout or stderr, then perhaps just do 
+`jug execute <my_jug>.py &> /dev/null &` to redirect everything to 
+/dev/null. If you actually want output, make sure that the directory 
+you're using for output (in my case /mnt/localhd) is NOT shared by NFS, 
+or your workers on different machines will be overwriting the same 
+file. Or be a boss and upgrade this script to read in the hostname ;-)
 
 ::
 
@@ -139,6 +154,8 @@ in the workers.iplist
 This uses the watch command to call 'jug status' every ten seconds
 
 **jugrun**
+*This will likely need to be modified minorly for your use. See
+'installation' section above.*
 This first posts log entry, then sets up what I call a 'watcher',
 which is a tiny executable that runs in the background on the host
 computer (actually, it runs inside of a detached screen session)
@@ -169,7 +186,7 @@ Outputs the contents of the log file from the run/halt/complete.
 Simple file, can be used with other options e.g. `tail -f ~/.juglog`
 
 **jugoutput**
-*This will likely need to be modified for your use*. In my setup, 
+*This will likely need to be modified for your use.* In my setup, 
 all files under /home/myuser/ are shared via NFS. This means that 
 any output files placed in my home directory can have problems as 
 multiple jug processes are writing to the same file and NFS is 
