@@ -110,16 +110,17 @@ slave machines has 12 hardware threads (6 cores, 2 threads each),
 so I've set to run 10 jug processes per slave machine
 
 ::
-  #!/bin/sh
 
-  JUG_PROCESSES_PER_WORKER=10
+    #!/bin/sh
 
-  rm /mnt/localhd/.jug*
-  for i in {1..${JUG_PROCESSES_PER_WORKER}}
-  do
-    jug execute benchmark_jug.py > /mnt/localhd/.jug$i.out 2> /mnt/localhd/.jug$i.err &
-  done
-  wait
+    JUG_PROCESSES_PER_WORKER=10
+
+    rm /mnt/localhd/.jug*
+    for i in {1..${JUG_PROCESSES_PER_WORKER}}
+    do
+        jug execute benchmark_jug.py > /mnt/localhd/.jug$i.out 2> /mnt/localhd/.jug$i.err &
+    done
+    wait
 
 After creating run_workers.sh, don't forget to make it 
 executable using `chmod a+x run_workers.sh`

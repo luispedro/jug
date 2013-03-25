@@ -36,6 +36,7 @@ Documentation Contents
     utilities.rst
     backends.rst
     configuration.rst
+    bash.rst
     faq.rst
     why.rst
     writeabackend.rst
