@@ -171,15 +171,14 @@ tricky to support since the general code relies on the function name)''')
 
             for tt in recursive_dependencies(t): tt.unload()
         '''
-        self._unload_recursive(set())
+        def checked_unload_recursive(t, visited):
+            if t.hash() not in visited:
+                visited.add(t.hash())
+                t.unload()
+                for dep in t.dependencies():
+                    checked_unload_recursive(dep, visited)
 
-    def _unload_recursive(self, visited):
-        if self.hash() not in visited:
-            visited.add(self.hash())
-            self.unload()
-            for dep in self.dependencies():
-                dep.unload_recursive()
-
+        checked_unload_recursive(self, set())
 
     def dependencies(self):
         '''
