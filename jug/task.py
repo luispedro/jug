@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -171,9 +171,14 @@ tricky to support since the general code relies on the function name)''')
 
             for tt in recursive_dependencies(t): tt.unload()
         '''
-        self.unload()
-        for dep in self.dependencies():
-            dep.unload_recursive()
+        self._unload_recursive(set())
+
+    def _unload_recursive(self, visited):
+        if self.hash() not in visited:
+            visited.add(self.hash())
+            self.unload()
+            for dep in self.dependencies():
+                dep.unload_recursive()
 
 
     def dependencies(self):
