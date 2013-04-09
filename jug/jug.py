@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -138,6 +138,12 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                 tasks.append(tasks.pop(0))
             while tasks and tasks[0].can_run():
                 upnext.append(tasks.pop(0))
+            if upnext:
+                break
+            for ti,t in enumerate(tasks):
+                if t.can_run():
+                    upnext.append(tasks.pop(ti))
+                    break
             if upnext:
                 break
             logging.info('waiting %s secs for an open task...' % options.execute_wait_cycle_time_secs)
