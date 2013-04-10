@@ -172,8 +172,8 @@ tricky to support since the general code relies on the function name)''')
             for tt in recursive_dependencies(t): tt.unload()
         '''
         def checked_unload_recursive(t, visited):
-            if t.hash() not in visited:
-                visited.add(t.hash())
+            if id(t) not in visited:
+                visited.add(id(t))
                 t.unload()
                 for dep in t.dependencies():
                     checked_unload_recursive(dep, visited)
