@@ -50,3 +50,7 @@ def test_aggressive_unload():
         execution_loop(alltasks, options, defaultdict(int), defaultdict(int))
     yield run_jugfile, 'jug/tests/jugfiles/tasklet_simple.py'
     yield run_jugfile, 'jug/tests/jugfiles/tasklets.py'
+    yield run_jugfile, 'jug/tests/jugfiles/barrier_mapreduce.py'
+    yield run_jugfile, 'jug/tests/jugfiles/compound_nonsimple.py'
+    yield run_jugfile, 'jug/tests/jugfiles/slice_task.py'
+
