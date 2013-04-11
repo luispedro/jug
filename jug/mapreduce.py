@@ -47,9 +47,13 @@ def _break_up(lst, step):
         start = next
         next += step
 
+
 def _jug_map(mapper, es):
     import __builtin__
     return __builtin__.map(mapper, es)
+
+def _jug_map_curry(mapper, es):
+    return [mapper(*e) for e in es]
 
 
 def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
@@ -106,7 +110,7 @@ def map(mapper, sequence, map_step=4):
     Parameters
     ----------
     mapper : function
-        functions from A -> B
+        function from A -> B
     sequence : list of A
     map_step : integer, optional
         nr of elements to process per task. This should be set so that each
@@ -120,6 +124,8 @@ def map(mapper, sequence, map_step=4):
     See Also
     --------
     mapreduce
+    currymap: function
+        Curried version of this function
     '''
     if map_step == 1:
         return [Task(mapper, s) for s in sequence]
@@ -129,6 +135,47 @@ def map(mapper, sequence, map_step=4):
         for i,_ in enumerate(ss):
             result.append(t[i])
     return result
+
+def currymap(mapper, sequence, map_step=4):
+    '''
+    sequence' = currymap(mapper, sequence, map_step=4)
+
+    Roughly equivalent to::
+
+        sequence' = [Task(mapper,*s) for s in sequence]
+
+    except that the tasks are grouped in groups of `map_step`
+
+    Parameters
+    ----------
+    mapper : function
+        function from A1 -> A2 ... -> An -> B
+    sequence : list of (A1,A2,...,An)
+    map_step : integer, optional
+        nr of elements to process per task. This should be set so that each
+        task takes the right amount of time.
+
+    Returns
+    -------
+    sequence' : list of B
+        sequence'[i] = mapper(*sequence[i])
+
+    See Also
+    --------
+    mapreduce: function
+    map: function
+        Uncurried version of this function
+    '''
+    if map_step == 1:
+        return [Task(mapper, *s) for s in sequence]
+    result = []
+    for ss in _break_up(sequence, map_step):
+        t = Task(_jug_map_curry, _get_function(mapper), ss)
+        for i,_ in enumerate(ss):
+            result.append(t[i])
+    return result
+
+
 
 
 def reduce(reducer, inputs, reduce_step=8):

@@ -5,6 +5,7 @@ version 0.9.3+
 	* Use Tasklets for better jug.mapreduce.map
 	* Use Ipython debugger if available (patch by Alex Ford)
 	* Faster --aggressive-unload
+	* Add currymap() function
 
 version 0.9.3 Sun Dec 2 2012 by luispedro
 	* Fix parsing of ports on redis URL (patch by Alcides Viamontes)

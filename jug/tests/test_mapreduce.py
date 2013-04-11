@@ -17,6 +17,9 @@ def dfs_run(t):
         dfs_run(dep)
     t.run()
 
+def mapper2(x,y):
+    return x+y
+
 def test_get_function():
     oid = id(reducer)
     assert oid == id(_get_function(reducer))
@@ -74,4 +77,13 @@ def test_taskgenerator_map():
     store, space = jug.jug.init('jug/tests/jugfiles/mapgenerator.py', 'dict_store')
     simple_execute()
     assert len(value(space['v2s'])) == 16
+
+@task_reset
+def test_currymap():
+    np.random.seed(33)
+    jug.task.Task.store = dict_store()
+    A = np.random.rand(100)
+    ts = jug.mapreduce.currymap(mapper2, zip(A,A))
+    simple_execute()
+    assert np.allclose(np.array(value(ts)) , A*2)
 
