@@ -34,6 +34,7 @@ Documentation Contents
     barrier.rst
     compound.rst
     utilities.rst
+    mapreduce.rst
     backends.rst
     configuration.rst
     bash.rst
