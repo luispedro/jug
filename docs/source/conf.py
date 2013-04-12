@@ -35,7 +35,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'Jug'
-copyright = '2008-2011, Luis Pedro Coelho'
+copyright = '2008-2013, Luis Pedro Coelho'
 
 # The short X.Y version.
 version = jug_version[:3]
