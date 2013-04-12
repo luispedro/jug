@@ -17,31 +17,6 @@ Jug also takes care of saving all the intermediate results to the backend in a
 way that allows them to be retrieved later.
 
 
-Documentation Contents
-----------------------
-
-.. toctree::
-    :maxdepth: 2
-
-    tutorial.rst
-    decrypt-example.rst
-    text-example.rst
-    subcommands.rst
-    types.rst
-    tasks.rst
-    tasklets.rst
-    idioms.rst
-    barrier.rst
-    compound.rst
-    utilities.rst
-    mapreduce.rst
-    backends.rst
-    configuration.rst
-    bash.rst
-    faq.rst
-    why.rst
-    writeabackend.rst
-    api.rst
 
 Examples
 --------
@@ -128,6 +103,31 @@ install jug` if you'd like.
 
 .. _PyPI: http://pypi.python.org/pypi/Jug
 
+Documentation Contents
+----------------------
+
+.. toctree::
+    :maxdepth: 2
+
+    tutorial.rst
+    decrypt-example.rst
+    text-example.rst
+    subcommands.rst
+    types.rst
+    tasks.rst
+    tasklets.rst
+    idioms.rst
+    barrier.rst
+    compound.rst
+    utilities.rst
+    mapreduce.rst
+    backends.rst
+    configuration.rst
+    bash.rst
+    faq.rst
+    why.rst
+    writeabackend.rst
+    api.rst
 
 What's New
 ----------
