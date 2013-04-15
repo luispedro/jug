@@ -132,6 +132,15 @@ Documentation Contents
 What's New
 ----------
 
+version **0.9.4** (Apr 15 2013)
+- Add CustomHash wrapper to set __jug_hash__
+- Print traceback on import error
+- Exit when no progress is made even with barrier
+- Use Tasklets for better jug.mapreduce.map
+- Use Ipython debugger if available (patch by Alex Ford)
+- Faster --aggressive-unload
+- Add currymap() function
+
 version **0.9.3** (Dec 2 2012)
 - Fix parsing of ports on redis URL (patch by Alcides Viamontes)
 - Make hashing robust to different orders when using randomized hashing
