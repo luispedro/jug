@@ -15,5 +15,6 @@ or
 From Source
 -----------
 
-Follow the typical
+Follow the typical::
+
     python setup.py install
