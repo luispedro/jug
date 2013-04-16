@@ -72,7 +72,7 @@ tricky to support since the general code relies on the function name)''')
         self.kwargs = kwargs
         alltasks.append(self)
 
-    def run(self, force=False, save=True):
+    def run(self, force=False, save=True, debug_mode=False):
         '''
         task.run(force=False, save=True)
 
@@ -87,11 +87,19 @@ tricky to support since the general code relies on the function name)''')
             if true, save the result to the store
             (default: True)
         '''
+        def check_hash(self):
+            if debug_mode:
+                if self.hash() != self._compute_set_hash():
+                    hash_error_msg = ('jug error: Hash value of task (name: %s) changed unexpectedly.\n' % self.name)
+                    hash_error_msg += 'Typical cause is that a Task function changed the value of an argument (which messes up downstream computations).'
+                    raise RuntimeError(hash_error_msg)
         assert self.can_run()
+        check_hash(self)
         self._result = self._execute()
         if save:
             name = self.hash()
             self.store.dump(self._result, name)
+        check_hash(self)
         return self._result
 
     def _execute(self):
@@ -233,7 +241,7 @@ tricky to support since the general code relies on the function name)''')
         '''
         return self.__jug_hash__()
 
-    def __jug_hash__(self):
+    def _compute_set_hash(self):
         M = new_hash_object()
         M.update(self.name)
         hash_update(M, enumerate(self.args))
@@ -241,6 +249,10 @@ tricky to support since the general code relies on the function name)''')
         value = M.hexdigest()
         self.__jug_hash__ = lambda : value
         return value
+
+
+    def __jug_hash__(self):
+        return _compute_set_hash()
 
 
     def __str__(self):

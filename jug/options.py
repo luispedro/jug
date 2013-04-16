@@ -70,6 +70,7 @@ default_options.status_mode = 'no-cached'
 default_options.status_cache_clear = False
 default_options.pdb = False
 default_options.verbose = 'quiet'
+default_options.debug = False
 
 default_options.cleanup_locks_only = False
 
@@ -124,6 +125,11 @@ execute OPTIONS
     memory errors.
 --pdb
     Call interactive debugger on errors. Preferentially uses IPython debugger.
+--debug
+    Debug mode. This adds a little more error checking, thus it can be slower.
+    However, it detects certain types of errors and prints an error message. If
+    --pdb is passed, --debug is automatically implied, but the opposite is not
+    true: you can use --debug mode without --pdb.
 --keep-going
     Keep going after errors
 
@@ -202,6 +208,7 @@ def read_configuration_file(fp=None):
 
     attempt('execute', 'aggressive-unload', 'aggressive_unload', _str_to_bool)
     attempt('execute', 'pbd', 'pdb', bool)
+    attempt('execute', 'debug', 'debug', bool)
     attempt('execute', 'nr-wait-cycles', 'execute_nr_wait_cycles', int)
     attempt('execute', 'wait-cycle-time', 'execute_wait_cycle_time_secs', int)
     attempt('execute', 'keep-going', 'execute_keep_going', _str_to_bool)
@@ -251,6 +258,10 @@ def parse(cmdlist=None, optionsfile=None):
                     action='store_true',
                     dest='pdb',
                     help='Drop to a PDB (debug) console on error')
+    parser.add_option('--debug',
+                    action='store_true',
+                    dest='debug',
+                    help='Turn on debug mode')
     parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
     parser.add_option('--keep-going', action='store_true', dest='execute_keep_going', help='For execute: continue after errors')
     parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
@@ -287,6 +298,7 @@ def parse(cmdlist=None, optionsfile=None):
     _maybe_set('aggressive_unload')
     _maybe_set('invalid_name')
     _maybe_set('pdb')
+    _maybe_set('debug')
     _maybe_set('execute_nr_wait_cycles')
     _maybe_set('execute_wait_cycle_time_secs')
     _maybe_set('execute_keep_going')

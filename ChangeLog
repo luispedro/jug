@@ -1,3 +1,6 @@
+version 0.9.4+
+	* Added debug mode
+
 version 0.9.4 Mon Apr 15 2013 by luispedro
 	* Add CustomHash wrapper to set __jug_hash__
 	* Print traceback on import error

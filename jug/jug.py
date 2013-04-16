@@ -164,7 +164,7 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     tasks_loaded[t.name] += 1
                 elif locked:
                     logging.info('Executing %s...' % t.name)
-                    t.run()
+                    t.run(debug_mode=options.debug)
                     tasks_executed[t.name] += 1
                     if options.aggressive_unload:
                         t.unload_recursive()
@@ -225,6 +225,11 @@ def execute(options):
     while noprogress < 2:
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
+        if options.debug:
+            for t in alltasks:
+                # Trigger hash computation:
+                t.hash()
+
         previous = sum(tasks_executed.values())
         execution_loop(tasks, options, tasks_executed, tasks_loaded)
         after = sum(tasks_executed.values())
