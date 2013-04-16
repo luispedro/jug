@@ -252,7 +252,7 @@ tricky to support since the general code relies on the function name)''')
 
 
     def __jug_hash__(self):
-        return _compute_set_hash()
+        return self._compute_set_hash()
 
 
     def __str__(self):

@@ -226,7 +226,7 @@ def execute(options):
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
         if options.debug:
-            for t in alltasks:
+            for t in tasks:
                 # Trigger hash computation:
                 t.hash()
 
