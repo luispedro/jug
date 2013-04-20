@@ -36,7 +36,7 @@ speeding things up. Consider the following case::
         results[p] = process(inputs, p)
 
 How is this processed? Every time ``process`` is called, a new ``jug.Task`` is
-generated. This task has as arguments, ``inputs`` and an integer. When the hash
+generated. This task has two arguments: ``inputs`` and an integer. When the hash
 of the task is computed, both its arguments are analysed. ``inputs`` is a large
 list of strings. Therefore, it is going to take a very long time to process all
 of the hashes.
