@@ -97,6 +97,84 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     else:
         assert False, 'This is a bug'
 
+class block_access_slice(object):
+    __slots__ = ('base', 'start', 'stop', 'stride', '_hvalue')
+    def __init__(self, access, orig):
+        self.base = access
+        self.start,self.stop,self.stride = orig
+        self._hvalue = None
+
+    def __getitem__(self, p):
+        if isinstance(p, slice):
+            start,stop,stride = p.indices(len(self))
+            return block_access_slice(self.base, (self.start + start, self.stop - (len(self)-stop), self.stride * stride))
+        elif isinstance(p, int):
+            p *= self.stride
+            p += self.start
+            if p >= self.stop:
+                raise IndexError
+            return self.base[p]
+        else:
+            raise TypeError
+
+    def __len__(self):
+        return self.stop - self.start
+
+    def __jug_hash__(self):
+        if self._hvalue is not None:
+            return self._hvalue
+        self._hvalue = hash_one({
+            'type': 'map-access-slice',
+            'base': self.base,
+            'start': self.start,
+            'stop': self.stop,
+            'stride': self.stride,
+        })
+        return self._hvalue
+
+    def __jug_value__(self):
+        from .task import value
+        return [value(self[i]) for i in xrange(len(self))]
+
+class block_access(object):
+    __slots__ = ('blocks','block_size', 'len','_hvalue')
+    def __init__(self, blocks, block_size, len):
+        self.blocks = blocks
+        self.block_size = block_size
+        self.len = len
+        self._hvalue = None
+
+    def __getitem__(self, p):
+        if isinstance(p, slice):
+            return block_access_slice(self, p.indices(self.len))
+        elif isinstance(p, int):
+            if not (0 <= p < self.len):
+                raise IndexError
+            b = p//self.block_size
+            bi = p % self.block_size
+            return self.blocks[b][bi]
+        else:
+            raise TypeError
+
+    def __len__(self):
+        return self.len
+
+    def __jug_hash__(self):
+        if self._hvalue is not None:
+            return self._hvalue
+        value = hash_one({
+            'type': 'map-access',
+            'len': self.len,
+            'blocks': self.blocks,
+            'block_size': self.block_size,
+        })
+        self._hvalue = value
+        return value
+
+    def __jug_value__(self):
+        from .task import value
+        return [value(self[i]) for i in xrange(len(self))]
+
 def map(mapper, sequence, map_step=4):
     '''
     sequence' = map(mapper, sequence, map_step=4)
@@ -129,12 +207,14 @@ def map(mapper, sequence, map_step=4):
     '''
     if map_step == 1:
         return [Task(mapper, s) for s in sequence]
-    result = []
+    blocks = []
+    n = 0
     for ss in _break_up(sequence, map_step):
-        t = Task(_jug_map, _get_function(mapper), ss)
-        for i,_ in enumerate(ss):
-            result.append(t[i])
-    return result
+        blocks.append(
+            Task(_jug_map, _get_function(mapper), ss)
+            )
+        n += len(ss)
+    return block_access(blocks, map_step, n)
 
 def currymap(mapper, sequence, map_step=4):
     '''
