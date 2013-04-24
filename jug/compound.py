@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -76,6 +76,7 @@ def CompoundTask(f, *args, **kwargs):
     inner = f(*args, **kwargs)
     compound = Task(compound_task_execute, inner, h)
     compound.__jug_hash__ = lambda : h
+    compound._check_hash = lambda : None
     return compound
 
 def CompoundTaskGenerator(f):
