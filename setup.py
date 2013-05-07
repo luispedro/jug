@@ -61,6 +61,7 @@ setuptools.setup(name = 'Jug',
       packages = setuptools.find_packages(),
       scripts = ['bin/jug'],
       test_suite = 'nose.collector',
+      install_requires=['six'],
       )
 
 
