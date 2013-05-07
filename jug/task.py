@@ -13,7 +13,7 @@ There are two main alternatives:
 - Rely on the ``TaskGenerator`` decorator as a shortcut for this.
 '''
 
-from __future__ import division
+
 from .hash import new_hash_object, hash_update, hash_one
 
 __all__ = [

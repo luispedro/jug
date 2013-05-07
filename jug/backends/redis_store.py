@@ -23,7 +23,7 @@
 '''
 redis_store: store based on a redis backend
 '''
-from __future__ import division
+
 
 import re
 import logging

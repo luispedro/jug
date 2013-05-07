@@ -19,9 +19,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from __future__ import division
 
-from __future__ import division
+
+
 
 from glob import glob
 template_start= file('../template.py').readlines()

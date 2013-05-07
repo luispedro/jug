@@ -23,7 +23,7 @@
 '''
 memoize_store: a wrapper that never repeats a lookup.
 '''
-from __future__ import division
+
 
 class memoize_store(object):
     def __init__(self, base, list_base=False):

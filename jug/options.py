@@ -32,7 +32,7 @@ Options
 - argv: Arguments not captured by jug (for script use)
 - print_out: Print function to be used for output (behaves like Python3's print)
 '''
-from __future__ import division
+
 import logging
 from datetime import datetime
 import string

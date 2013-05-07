@@ -23,7 +23,7 @@
 '''
 file_store : file-system based data store & locks.
 '''
-from __future__ import division
+
 
 import os
 from os import path, mkdir, fdopen

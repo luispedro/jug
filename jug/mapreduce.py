@@ -7,8 +7,8 @@
 mapreduce: Build tasks that follow a map-reduce pattern.
 '''
 
-from __future__ import division
-from jug import Task
+
+from .jug import Task
 from .utils import identity
 from .hash import hash_one
 
