@@ -36,9 +36,8 @@ Options
 import logging
 from datetime import datetime
 import string
+import six
 import sys
-
-from .p3 import nprint
 
 class Options(object):
     def __init__(self, next):
@@ -65,7 +64,7 @@ default_options.cmd = None
 default_options.aggressive_unload = False
 default_options.invalid_name = None
 default_options.argv = None
-default_options.print_out = nprint
+default_options.print_out = six.print_
 default_options.status_mode = 'no-cached'
 default_options.status_cache_clear = False
 default_options.pdb = False
