@@ -184,8 +184,8 @@ def read_configuration_file(fp=None):
             fp = open(fp)
         except IOError:
             return Options(None)
-    import ConfigParser
-    config = ConfigParser.RawConfigParser()
+    from six.moves import configparser
+    config = configparser.RawConfigParser()
     config.readfp(fp)
     infile = Options(None)
 
@@ -195,9 +195,9 @@ def read_configuration_file(fp=None):
             if conv is not None:
                 value = conv(value)
             setattr(infile, new_name, value)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             pass
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             pass
     attempt('main', 'jugdir', 'jugdir')
     attempt('main', 'jugfile', 'jugfile')
@@ -336,7 +336,7 @@ def set_jugdir(jugdir):
     store : a jug backend
     '''
     from .task import Task
-    import backends
+    from . import backends
     if jugdir is None:
         jugdir = 'jugdata'
     store = backends.select(jugdir)
