@@ -18,7 +18,7 @@ def test_chaining():
     assert second.one == 1
     assert second.two == 'two'
     assert third.three == 'three'
-    @raises(KeyError)
+    @raises(AttributeError)
     def not_present_key(obj, key):
         return obj.key
 

@@ -132,12 +132,13 @@ class decompress_stream(object):
             self.queue = self.lastread[skip:]
 
     def readline(self):
-        line = ''
+        import six
+        line = six.b('')
         while True:
             block = self.read(self.block)
             if not block:
                 return line
-            ln = block.find('\n')
+            ln = block.find(six.b('\n'))
             if ln == -1:
                 line += block
             else:

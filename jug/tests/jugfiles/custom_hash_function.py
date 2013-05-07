@@ -6,7 +6,7 @@ hash_called = 0
 def bad_hash(x):
     global hash_called
     hash_called += 1
-    return '%s' % x
+    return ('%s' % x).encode('utf-8')
 
 @TaskGenerator
 def double(x):

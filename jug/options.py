@@ -52,8 +52,8 @@ class Options(object):
             raise AttributeError
         if name in self.__dict__:
             return self.__dict__[name]
-        if self.__dict__['next'] is None:
-            raise KeyError('jug.options: Cannot find option value for `%s`' % name)
+        if self.__dict__.get('next') is None:
+            raise AttributeError
         return getattr(self.__dict__['next'], name)
 
 default_options = Options(None)

@@ -33,10 +33,10 @@ from .base import base_store
 import six
 
 def _resultname(name):
-    return 'result:{0}'.format(name)
+    return six.b('result:')+name
 
 def _lockname(name):
-    return 'lock:{0}'.format(name)
+    return six.b('lock:')+name
 
 
 class dict_store(base_store):
@@ -129,7 +129,7 @@ class dict_store(base_store):
                 # we need a copy of the keys because we change it inside
                 # iteration:
         for k in list(self.store.keys()):
-            if k.startswith('lock:'):
+            if k.startswith(six.b('lock:')):
                 del self.store[k]
                 removed += 1
         return removed
@@ -142,7 +142,7 @@ class dict_store(base_store):
         Iterates over all the keys in the store
         '''
         for k in self.store.keys():
-            if k.startswith('result:'):
+            if k.startswith(six.b('result:')):
                 yield k[len('result:'):]
 
     def listlocks(self):
@@ -153,7 +153,7 @@ class dict_store(base_store):
         Iterates over all the keys in the store
         '''
         for k in self.store.keys():
-            if k.startswith('lock:'):
+            if k.startswith(six.b('lock:')):
                 yield k[len('lock:'):]
 
 
@@ -193,7 +193,7 @@ class dict_lock(object):
         lock.get()
         '''
 
-        self.counts['lock:' + self.name] += 1
+        self.counts[six.b('lock:') + self.name] += 1
 
         previous = self.store.get(self.name, _NOT_LOCKED)
         self.store[self.name] = _LOCKED
@@ -206,14 +206,14 @@ class dict_lock(object):
 
         Removes lock
         '''
-        self.counts['unlock:' + self.name] += 1
+        self.counts[six.b('unlock:') + self.name] += 1
         del self.store[self.name]
 
     def is_locked(self):
         '''
         locked = lock.is_locked()
         '''
-        self.counts['islock:' + self.name] += 1
+        self.counts[six.b('islock:') + self.name] += 1
         return (self.store.get(self.name, _NOT_LOCKED) == _LOCKED)
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

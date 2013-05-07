@@ -41,10 +41,10 @@ except ImportError:
     redis_functional = False
 
 def _resultname(name):
-    return 'result:' + name
+    return 'result:{0}'.format(name).encode('utf-8')
 
 def _lockname(name):
-    return 'lock:' + name
+    return 'lock:{0}'.format(name).encode('utf-8')
 
 _LOCKED = 1
 
@@ -95,7 +95,6 @@ class redis_store(base_store):
         '''
         s = self.redis.get(_resultname(name))
         if s:
-            s = str(s)
             s = b64decode(s)
         return decode(s)
 

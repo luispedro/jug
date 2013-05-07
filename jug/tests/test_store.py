@@ -4,6 +4,7 @@ import jug.backends.dict_store
 from jug.backends.redis_store import redis
 from nose.tools import with_setup
 from nose import SkipTest
+import six
 
 _storedir = 'jugtests'
 def _remove_file_store():
@@ -14,7 +15,7 @@ def test_stores():
     def load_get(store):
         try:
             assert len(list(store.list())) == 0
-            key = 'jugisbestthingever'
+            key = six.b('jugisbestthingever')
             assert not store.can_load(key)
             object = list(range(232))
             store.dump(object, key)
@@ -31,7 +32,7 @@ def test_stores():
     def lock(store):
         try:
             assert len(list(store.listlocks())) == 0
-            key = 'jugisbestthingever'
+            key = six.b('jugisbestthingever')
             lock = store.getlock(key)
             assert not lock.is_locked()
             assert lock.get()
@@ -48,7 +49,7 @@ def test_stores():
     def lock_remove(store):
         try:
             assert len(list(store.listlocks())) == 0
-            key = 'jugisbestthingever'
+            key = six.b('jugisbestthingever')
             lock = store.getlock(key)
             assert not lock.is_locked()
             assert lock.get()
