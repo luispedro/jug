@@ -163,8 +163,7 @@ def usage(error=None):
     sys.exit(1)
 
 def _str_to_bool(s):
-    from string import lower
-    return lower(s) not in ('', '0', 'false', 'off')
+    return s.lower() not in ('', '0', 'false', 'off')
 
 def read_configuration_file(fp=None):
     '''
