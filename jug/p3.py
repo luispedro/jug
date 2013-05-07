@@ -31,3 +31,4 @@ def nprint(*args):
     for arg in args:
         print arg,
     print
+

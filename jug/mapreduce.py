@@ -30,14 +30,14 @@ def _get_function(f):
     return f
 
 def _jug_map_reduce(reducer, mapper, inputs):
-    import __builtin__
+    from six.moves import builtins
     reducer = _get_function(reducer)
     mapper = _get_function(mapper)
-    return __builtin__.reduce(reducer, __builtin__.map(mapper, inputs))
+    return builtins.reduce(reducer, builtins.map(mapper, inputs))
 def _jug_reduce(reducer, inputs):
-    import __builtin__
+    from six.moves import builtins
     reducer = _get_function(reducer)
-    return __builtin__.reduce(reducer, chain(inputs))
+    return builtins.reduce(reducer, chain(inputs))
 
 def _break_up(lst, step):
     start = 0
@@ -49,8 +49,8 @@ def _break_up(lst, step):
 
 
 def _jug_map(mapper, es):
-    import __builtin__
-    return __builtin__.map(mapper, es)
+    from six.moves import builtins
+    return builtins.map(mapper, es)
 
 def _jug_map_curry(mapper, es):
     return [mapper(*e) for e in es]
