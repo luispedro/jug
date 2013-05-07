@@ -49,8 +49,9 @@ def _break_up(lst, step):
 
 
 def _jug_map(mapper, es):
-    from six.moves import builtins
-    return builtins.map(mapper, es)
+    if mapper is None:
+        mapper = lambda x: x
+    return [mapper(e) for e in es]
 
 def _jug_map_curry(mapper, es):
     return [mapper(*e) for e in es]
