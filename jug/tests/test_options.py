@@ -1,6 +1,6 @@
 import jug.options
 
-from StringIO import StringIO
+from six import StringIO
 from nose.tools import raises
 
 def test_chaining():

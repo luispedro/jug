@@ -20,12 +20,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from __future__ import division
-from StringIO import StringIO
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+
+from six.moves import cPickle as pickle
+from six import BytesIO
 import zlib
 
 __all__ = ['encode', 'decode', 'encode_to', 'decode_from']
@@ -48,7 +45,7 @@ def encode(object):
     ---
       `decode`
     '''
-    output = StringIO()
+    output = BytesIO()
     encode_to(object, output)
     return output.getvalue()
 
@@ -163,7 +160,7 @@ def decode(s):
     -------
       object : the object
     '''
-    return decode_from(StringIO(s))
+    return decode_from(BytesIO(s))
 
 def decode_from(stream):
     '''
