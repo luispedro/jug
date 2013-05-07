@@ -32,13 +32,13 @@ from base64 import b64encode, b64decode
 from jug.backends.encode import encode, decode
 from .base import base_store, base_lock
 
+
 try:
     import redis
+    redis_functional = True
 except ImportError:
-    try:
-        from ..thirdparty import redis
-    except ImportError:
-        redis = None
+    redis = None
+    redis_functional = False
 
 def _resultname(name):
     return 'result:' + name

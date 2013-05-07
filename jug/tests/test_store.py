@@ -60,10 +60,13 @@ def test_stores():
         except redis.ConnectionError:
             raise SkipTest()
     functions = (load_get, lock, lock_remove)
-    stores = (
-            lambda: jug.redis_store.redis_store('redis:'),
+    stores = [
             lambda: jug.backends.file_store.file_store('jugtests'),
             jug.backends.dict_store.dict_store,
+            ]
+    if redis is not None:
+        stores.append(
+            lambda: jug.redis_store.redis_store('redis:')
             )
     teardowns = (None, _remove_file_store, None)
     for f in functions:

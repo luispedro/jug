@@ -8,5 +8,6 @@ python:
 install:
   - pip install numpy
   - pip install six
+  - pip install redis
   - pip install .
 script: nosetests
