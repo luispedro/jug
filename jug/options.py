@@ -312,7 +312,7 @@ def parse(cmdlist=None, optionsfile=None):
         nlevel = {
             'DEBUG' : logging.DEBUG,
             'INFO' : logging.INFO,
-        }[string.upper(cmdline.verbose)]
+        }[cmdline.verbose.upper()]
         root = logging.getLogger()
         root.level = nlevel
     except KeyError:

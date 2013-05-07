@@ -49,7 +49,7 @@ def hash_update(M, elems):
         if hasattr(e, '__jug_hash__'):
             M.update(e.__jug_hash__())
         elif type(e) in (list, tuple):
-            M.update(repr(type(e)))
+            M.update(repr(type(e)).encode('utf-8'))
             hash_update(M, enumerate(e))
         elif type(e) == set:
             M.update('set')
@@ -109,5 +109,5 @@ def hash_one(obj):
     '''
     h = new_hash_object()
     hash_update(h, [('hash1', obj)])
-    return h.hexdigest()
+    return h.hexdigest().encode('utf-8')
 

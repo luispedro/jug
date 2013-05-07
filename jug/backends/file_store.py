@@ -31,6 +31,7 @@ from os.path import dirname, exists
 import errno
 import tempfile
 import shutil
+import six
 
 from .base import base_store
 from jug.backends.encode import encode_to, decode_from
@@ -80,6 +81,8 @@ class file_store(base_store):
         return path.join(self.jugdir, 'tempfiles')
 
     def _getfname(self, name):
+        import six
+        name = six.text_type(name, 'utf-8')
         return path.join(self.jugdir, name[:2], name[2:])
 
 
@@ -89,7 +92,7 @@ class file_store(base_store):
 
         Performs the same as
 
-        pickle.dump(object, file(name,'w'))
+        pickle.dump(object, open(name,'w'))
 
         but does it in a way that is guaranteed to be atomic even over NFS.
         '''
@@ -97,7 +100,7 @@ class file_store(base_store):
         create_directories(dirname(name))
         self._maybe_create()
         fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
-        output = os.fdopen(fd, 'w')
+        output = os.fdopen(fd, 'wb')
         try:
             import numpy as np
             if type(object) == np.ndarray:
@@ -179,7 +182,7 @@ class file_store(base_store):
             The object that was saved under ``name``
         '''
         fname = self._getfname(name)
-        input = file(fname)
+        input = open(fname, 'rb')
         try:
             import numpy as np
             return np.lib.format.read_array(input)
@@ -301,7 +304,7 @@ class file_based_lock(object):
     '''
 
     def __init__(self, jugdir, name):
-        self.fullname = path.join(jugdir, 'locks', name + '.lock')
+        self.fullname = path.join(jugdir, 'locks', '{}.lock'.format(name))
 
     def get(self):
         '''

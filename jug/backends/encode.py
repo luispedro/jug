@@ -23,6 +23,7 @@
 
 from six.moves import cPickle as pickle
 from six import BytesIO
+import six
 import zlib
 
 __all__ = ['encode', 'decode', 'encode_to', 'decode_from']
@@ -62,12 +63,12 @@ def encode_to(object, stream):
     '''
     if object is None:
         return
-    prefix = 'P'
+    prefix = six.b('P')
     write = pickle.dump
     try:
         import numpy as np
         if isinstance(object, np.ndarray):
-            prefix = 'N'
+            prefix = six.b('N')
             write = (lambda f,a: np.save(a,f))
     except ImportError:
         pass
@@ -93,11 +94,11 @@ class decompress_stream(object):
         self.stream = stream
         self.D = zlib.decompressobj()
         self.block = block
-        self.lastread = ''
-        self.queue = ''
+        self.lastread = six.b('')
+        self.queue = six.b('')
 
     def read(self, nbytes):
-        res = ''
+        res = six.b('')
         if self.queue:
             if len(self.queue) >= nbytes:
                 res = self.queue[:nbytes]
@@ -180,9 +181,9 @@ def decode_from(stream):
     prefix = stream.read(1)
     if not prefix:
         return None
-    elif prefix == 'P':
+    elif prefix == six.b('P'):
         return pickle.load(stream)
-    elif prefix == 'N':
+    elif prefix == six.b('N'):
         import numpy as np
         return np.load(stream)
     else:
