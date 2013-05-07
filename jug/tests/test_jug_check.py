@@ -23,25 +23,23 @@ def test_jug_check():
     check2 = Task(first_two, setall[1], setall[2])
     store = dict_store()
     jug.task.Task.store = store
-    e = None
     try:
         jug.jug.check(store, default_options)
     except SystemExit as e:
-        pass
-    assert e is not None
-    assert e.code == 1
+        assert e.code == 1
+    else:
+        assert False
     savedtasks = jug.task.alltasks[:]
     simple_execute()
     jug.task.alltasks = savedtasks
 
-    e = None
     try:
         jug.jug.check(store, default_options)
         assert False
     except SystemExit as e:
-        pass
-    assert e is not None
-    assert e.code == 0
+        assert e.code == 0
+    else:
+        assert False
 
 
 @task_reset
