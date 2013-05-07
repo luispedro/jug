@@ -30,12 +30,13 @@ from collections import defaultdict
 
 from abc import ABCMeta, abstractmethod
 from .base import base_store
+import six
 
 def _resultname(name):
-    return 'result:' + name
+    return 'result:{0}'.format(name)
 
 def _lockname(name):
-    return 'lock:' + name
+    return 'lock:{0}'.format(name)
 
 
 class dict_store(base_store):
@@ -50,7 +51,7 @@ class dict_store(base_store):
         '''
         if backend is not None:
             try:
-                self.store = pickle.load(file(backend))
+                self.store = pickle.load(open(backend))
             except IOError:
                 self.store = {}
         else:
@@ -63,14 +64,14 @@ class dict_store(base_store):
         self.dump(object, name)
         '''
         self.store[_resultname(name)] = pickle.dumps(object)
-        self.counts['dump:' + name] += 1
+        self.counts['dump:{0}'.format(name)] += 1
 
 
     def can_load(self, name):
         '''
         can = can_load(name)
         '''
-        self.counts['exists:' + name] += 1
+        self.counts['exists:{0}'.format(name)] += 1
         return _resultname(name) in self.store
 
 
@@ -80,7 +81,7 @@ class dict_store(base_store):
 
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
-        self.counts['load:' + name] += 1
+        self.counts['load:{0}'.format(name)] += 1
         return pickle.loads(self.store[_resultname(name)])
 
 
@@ -92,9 +93,9 @@ class dict_store(base_store):
 
         Returns whether any entry was actually removed.
         '''
-        self.counts['del:' + name] += 1
+        self.counts['del:{0}'.format(name)] += 1
         if self.can_load(name):
-            self.counts['true-del:' + name] += 1
+            self.counts['true-del:{0}'.format(name)] += 1
             del self.store[_resultname(name)]
 
 
@@ -125,7 +126,9 @@ class dict_store(base_store):
             Number of locks removed
         '''
         removed = 0
-        for k in self.store.keys():
+                # we need a copy of the keys because we change it inside
+                # iteration:
+        for k in list(self.store.keys()):
             if k.startswith('lock:'):
                 del self.store[k]
                 removed += 1

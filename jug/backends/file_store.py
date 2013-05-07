@@ -82,7 +82,7 @@ class file_store(base_store):
 
     def _getfname(self, name):
         import six
-        name = six.text_type(name, 'utf-8')
+        name = six.text_type(name)
         return path.join(self.jugdir, name[:2], name[2:])
 
 

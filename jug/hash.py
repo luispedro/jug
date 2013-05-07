@@ -39,6 +39,7 @@ def hash_update(M, elems):
     '''
     from six.moves import cPickle as pickle
     from six.moves import map
+    import six
 
     try:
         import numpy as np
@@ -61,13 +62,13 @@ def hash_update(M, elems):
             items.sort()
             hash_update(M, enumerate(items))
         elif type(e) == dict:
-            M.update('dict')
+            M.update(six.b('dict'))
             items = [(hash_one(k),v) for k,v in e.items()]
             items.sort(key=(lambda k_v:k_v[0]))
 
             hash_update(M, items)
         elif np is not None and type(e) == np.ndarray:
-            M.update('np.ndarray')
+            M.update(six.b('np.ndarray'))
             M.update(pickle.dumps(e.dtype))
             M.update(pickle.dumps(e.shape))
             try:
