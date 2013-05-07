@@ -36,7 +36,7 @@ def test_jug_execute_deps():
     assert False not in A
     assert max(store.counts.values()) < 4
 
-from task_reset import task_reset
+from .task_reset import task_reset
 def test_aggressive_unload():
     from jug.jug import execution_loop
     from jug.task import alltasks

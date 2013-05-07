@@ -16,7 +16,7 @@ def test_stores():
             assert len(list(store.list())) == 0
             key = 'jugisbestthingever'
             assert not store.can_load(key)
-            object = range(232)
+            object = list(range(232))
             store.dump(object, key)
             assert store.can_load(key)
             assert store.load(key) == object

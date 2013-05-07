@@ -1,4 +1,4 @@
-from task_reset import task_reset
+from .task_reset import task_reset
 
 def simple_execute():
     from jug.jug import execution_loop

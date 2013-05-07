@@ -30,7 +30,7 @@ def load_all(jugspace, local_ns):
 
     Loads the result of all tasks.
     '''
-    for k,v in jugspace.iteritems():
+    for k,v in jugspace.items():
         # ignore objects name like __this__
         if k.startswith('__') and k.endswith('__'): continue
         try:

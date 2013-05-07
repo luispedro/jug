@@ -7,6 +7,7 @@ from jug.mapreduce import _break_up, _get_function
 from jug import value, TaskGenerator
 from jug.tests.task_reset import task_reset
 import jug.utils
+from functools import reduce
 
 def mapper(x):
     return x**2
@@ -44,7 +45,7 @@ def test_map():
     ts = jug.mapreduce.map(mapper, A)
     simple_execute()
     ts = value(ts)
-    assert np.all(ts == np.array(map(mapper,A)))
+    assert np.all(ts == np.array(list(map(mapper,A))))
 
 @task_reset
 def test_reduce():
@@ -57,8 +58,8 @@ def test_reduce():
     assert t.value() == reduce(reducer,A)
 
 def test_break_up():
-    for i in xrange(2,105):
-        assert reduce(lambda a,b: a+b, _break_up(range(100), i), []) == range(100)
+    for i in range(2,105):
+        assert reduce(lambda a,b: a+b, _break_up(list(range(100)), i), []) == list(range(100))
 
 @task_reset
 def test_empty_mapreduce():
@@ -83,7 +84,7 @@ def test_currymap():
     np.random.seed(33)
     jug.task.Task.store = dict_store()
     A = np.random.rand(100)
-    ts = jug.mapreduce.currymap(mapper2, zip(A,A))
+    ts = jug.mapreduce.currymap(mapper2, list(zip(A,A)))
     simple_execute()
     assert np.allclose(np.array(value(ts)) , A*2)
 

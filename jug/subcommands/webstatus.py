@@ -75,15 +75,15 @@ def _format_counts(tw, tre, tru, tf):
     r = ''
     names = set()
     for t in [tw,tre,tru,tf]:
-        names.update(t.keys())
+        names.update(list(t.keys()))
     for n in names:
         r += _row_template % (n, tw[n], tre[n], tru[n], tf[n])
     r += _row_template % ('', '', '', '', '')
     r += _row_template % ('Total',
-                                sum(tw.itervalues()),
-                                sum(tre.itervalues()),
-                                sum(tru.itervalues()),
-                                sum(tf.itervalues()))
+                                sum(tw.values()),
+                                sum(tre.values()),
+                                sum(tru.values()),
+                                sum(tf.values()))
     return r
 
 
@@ -97,7 +97,7 @@ def webstatus(options):
         import web
     except ImportError:
         from sys import stderr
-        print >>stderr, '''
+        stderr.write('''
 webstatus subcommand requires that web.py be installed (it could not be found).
 You can try one of the following commands to install it:
 
@@ -106,7 +106,7 @@ You can try one of the following commands to install it:
 or
 
     easy_install web.py
-'''
+''')
         return
     urls = (
         '/(.*)', 'status'

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2011-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,7 +37,9 @@ def hash_update(M, elems):
     M : hashlib object
         This is the same object as the argument
     '''
-    import cPickle as pickle
+    from six.moves import cPickle as pickle
+    from six.moves import map
+
     try:
         import numpy as np
     except ImportError:
@@ -55,13 +57,12 @@ def hash_update(M, elems):
             # different orders, so sort. We cannot trust that all the elements
             # in the set will be comparable, so we convert them to their hashes
             # beforehand.
-            items = map(hash_one, e)
+            items = list(map(hash_one, e))
             items.sort()
             hash_update(M, enumerate(items))
         elif type(e) == dict:
             M.update('dict')
-            items = e.items()
-            items = [(hash_one(k),v) for k,v in items]
+            items = [(hash_one(k),v) for k,v in e.items()]
             items.sort(key=(lambda k_v:k_v[0]))
 
             hash_update(M, items)

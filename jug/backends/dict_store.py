@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2013, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@ dict_store: an in-memory dictionary.
 
 Does not support multiple processes!
 '''
-from __future__ import division
-import cPickle as pickle
+
+from six.moves import cPickle as pickle
 from collections import defaultdict
 
 from abc import ABCMeta, abstractmethod

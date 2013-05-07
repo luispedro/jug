@@ -10,4 +10,4 @@ def double(x):
 def sum2(a,b):
     return (a+b)
 
-sumtwo = jug.mapreduce.mapreduce(sum2, double, range(10))
+sumtwo = jug.mapreduce.mapreduce(sum2, double, list(range(10)))

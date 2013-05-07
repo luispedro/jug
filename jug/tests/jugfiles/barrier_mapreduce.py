@@ -5,12 +5,13 @@
 from jug import barrier, Task, value
 import jug.mapreduce
 import math
+from functools import reduce
 
 def double(x):
     val = math.sqrt(2.)*math.sqrt(2.)
     return x*val
 
-two = jug.mapreduce.map(double, range(20))
+two = jug.mapreduce.map(double, list(range(20)))
 barrier()
 def product(vals):
     import operator

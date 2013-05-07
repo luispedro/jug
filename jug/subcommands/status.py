@@ -56,7 +56,7 @@ def create_sqlite3(connection, ht, deps, rdeps):
 
     connection.executemany('INSERT INTO ht VALUES(?,?,?,?)', ht)
 
-    for i,cdeps in deps.iteritems():
+    for i,cdeps in deps.items():
         if len(cdeps):
             connection.executemany('''
                INSERT INTO dep(source, target) VALUES(?,?)
@@ -97,7 +97,7 @@ def load_jugfile(options):
         h2idx[hash] = i
 
     rdeps = defaultdict(list)
-    for k,v in deps.iteritems():
+    for k,v in deps.items():
         for rv in v:
             rdeps[rv].append(k)
     return store, ht, deps, dict(rdeps)
@@ -143,9 +143,9 @@ def update_status(store, ht, deps, rdeps):
 
 def _print_status(options, waiting, ready, running, finished):
     names = set(waiting.keys())
-    names.update(ready.keys())
-    names.update(running.keys())
-    names.update(finished.keys())
+    names.update(list(ready.keys()))
+    names.update(list(running.keys()))
+    names.update(list(finished.keys()))
     format      = '%-40s%12s%12s%12s%12s'
     format_size =    40 +12 +12 +12 +12
     options.print_out(format % ('Task name','Waiting','Ready','Finished','Running'))
@@ -166,7 +166,7 @@ def _clear_cache(options):
         pass
 
 def _status_cached(options):
-    create, update = range(2)
+    create, update = list(range(2))
     try:
         with _open_connection(options) as connection:
             ht, deps, rdeps = retrieve_sqlite3(connection)
@@ -210,7 +210,7 @@ def _status_nocache(options):
         else:
             tasks_waiting[t.name] += 1
     _print_status(options, tasks_waiting, tasks_ready, tasks_running, tasks_finished)
-    return sum(tasks_finished.itervalues())
+    return sum(tasks_finished.values())
 
 
 def status(options):

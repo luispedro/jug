@@ -94,7 +94,7 @@ def invalidate(store, options):
         cache[h] = False
         return False
 
-    invalid = filter(isinvalid, tasks)
+    invalid = list(filter(isinvalid, tasks))
     if not invalid:
         options.print_out('No results invalidated.')
         return
@@ -246,8 +246,8 @@ def execute(options):
 
     options.print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
     options.print_out('-' * (52+12+12))
-    task_names = tasks_executed.keys()
-    task_names.extend(tasks_loaded.keys())
+    task_names = list(tasks_executed.keys())
+    task_names.extend(list(tasks_loaded.keys()))
     task_names = sorted(set(task_names))
     for t in task_names:
         name_cut = t[:52]

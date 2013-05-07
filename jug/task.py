@@ -98,7 +98,7 @@ tricky to support since the general code relies on the function name)''')
 
     def _execute(self):
         args = [value(dep) for dep in self.args]
-        kwargs = dict((key,value(dep)) for key,dep in self.kwargs.iteritems())
+        kwargs = dict((key,value(dep)) for key,dep in self.kwargs.items())
         return self.f(*args,**kwargs)
 
 
@@ -211,7 +211,7 @@ tricky to support since the general code relies on the function name)''')
                 elif isinstance(dep, (list, tuple)):
                     queue.append(dep)
                 elif isinstance(dep, dict):
-                    queue.append(dep.itervalues())
+                    queue.append(iter(dep.values()))
 
 
     def can_load(self, store=None):
@@ -239,7 +239,7 @@ tricky to support since the general code relies on the function name)''')
         M = new_hash_object()
         M.update(self.name)
         hash_update(M, enumerate(self.args))
-        hash_update(M, self.kwargs.iteritems())
+        hash_update(M, iter(self.kwargs.items()))
         value = M.hexdigest()
         self.__jug_hash__ = lambda : value
         return value
@@ -448,7 +448,7 @@ def value(elem):
     elif type(elem) == tuple:
         return tuple([value(e) for e in elem])
     elif type(elem) == dict:
-        return dict((x,value(y)) for x,y in elem.iteritems())
+        return dict((x,value(y)) for x,y in elem.items())
     elif hasattr(elem, '__jug_value__'):
         return elem.__jug_value__()
     else:

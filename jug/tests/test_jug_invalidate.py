@@ -24,7 +24,7 @@ def test_jug_invalidate():
     opts = Options(default_options)
     opts.invalid_name = setall[0].name
     jug.jug.invalidate(store, opts)
-    assert not store.store.keys(), store.store.keys()
+    assert not list(store.store.keys()), list(store.store.keys())
     jug.task.Task.store = dict_store()
 
 @task_reset

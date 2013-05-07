@@ -99,7 +99,7 @@ def test_topological_sort_kwargs():
     _assert_tsorted(alltasks)
 
 def data():
-    return range(20)
+    return list(range(20))
 def mult(r,f):
     return [f*rr for rr in r]
 def reduce(r):

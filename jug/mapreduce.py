@@ -134,7 +134,7 @@ class block_access_slice(object):
 
     def __jug_value__(self):
         from .task import value
-        return [value(self[i]) for i in xrange(len(self))]
+        return [value(self[i]) for i in range(len(self))]
 
 class block_access(object):
     __slots__ = ('blocks','block_size', 'len','_hvalue')
@@ -173,7 +173,7 @@ class block_access(object):
 
     def __jug_value__(self):
         from .task import value
-        return [value(self[i]) for i in xrange(len(self))]
+        return [value(self[i]) for i in range(len(self))]
 
 def map(mapper, sequence, map_step=4):
     '''

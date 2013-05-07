@@ -6,7 +6,7 @@ def zero():
 
 @TaskGenerator
 def range10():
-    return range(10)
+    return list(range(10))
 
 @TaskGenerator
 def double(x):

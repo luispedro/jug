@@ -2,6 +2,7 @@ import jug.jug
 from jug.tests.task_reset import task_reset
 from jug.tests.utils import simple_execute
 from jug.options import default_options
+from functools import reduce
 
 @task_reset
 def test_barrier():
@@ -26,7 +27,7 @@ def test_mapreduce_barrier():
     simple_execute()
     store, space = jug.jug.init('jug/tests/jugfiles/barrier_mapreduce.py', store)
     assert 'values' in space
-    assert space['values'] == product(range(20))
+    assert space['values'] == product(list(range(20)))
     simple_execute()
 
 @task_reset

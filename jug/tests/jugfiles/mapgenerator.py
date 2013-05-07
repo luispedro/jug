@@ -4,5 +4,5 @@ from jug import mapreduce, TaskGenerator
 def double(x):
     return 2*x
 
-vs = range(16)
+vs = list(range(16))
 v2s = mapreduce.map(double, vs)
