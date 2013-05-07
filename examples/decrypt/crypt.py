@@ -7,20 +7,20 @@ def decode(text, passwd):
 encode = decode
 
 def preprocess(ciphertext):
-    return np.array(map(ord,ciphertext), np.uint8)
+    return np.array(list(map(ord,ciphertext)), np.uint8)
 
 def isgood(text):
     return text.find('Luis Pedro Coelho') >= 0
 
-letters = map(ord, 'abcdefghijklmnopqrstuvwxyz')
+letters = list(map(ord, 'abcdefghijklmnopqrstuvwxyz'))
 
 
 if __name__ == '__main__':
     import sys
     text = sys.argv[1]
     passwd = sys.argv[2]
-    passwd = map(ord, passwd)
-    text = np.array(map(ord,text), np.uint8)
+    passwd = list(map(ord, passwd))
+    text = np.array(list(map(ord,text)), np.uint8)
     sys.stdout.write(encode(text, passwd))
 
 

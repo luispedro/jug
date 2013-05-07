@@ -1,4 +1,4 @@
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from jug import Task
 from collections import defaultdict
 from time import sleep
@@ -15,15 +15,15 @@ def getdata(title):
     # In a real example, we would *not* have a cache, of course.
     cache = 'text-data/' + title
     if exists(cache):
-        return unicode(file(cache).read(), 'utf-8')
+        return str(file(cache).read(), 'utf-8')
 
-    title = urllib2.quote(title)
+    title = urllib.parse.quote(title)
     url = 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=' + title
-    text = urllib2.urlopen(url).read()
+    text = urllib.request.urlopen(url).read()
     data = json.loads(text)
-    data = data['query']['pages'].values()[0]
+    data = list(data['query']['pages'].values())[0]
     text = data['revisions'][0]['*']
-    text = re.sub(ur'(?x) \[ [^]] *? \]\]', '', text)
+    text = re.sub(r'(?x) \[ [^]] *? \]\]', '', text)
     text = re.sub('(?x) {{ [^}]*? }}', '', text)
     text = text.strip()
 
@@ -46,7 +46,7 @@ def countwords(title, document):
     Takes a file name and returns a wordcount.
     '''
     sleep(4)
-    titlewords = map(lower, title.split())
+    titlewords = list(map(lower, title.split()))
     counts = defaultdict(int)
     for w in document.split():
         w = lower(w)
@@ -61,7 +61,7 @@ def addcounts(counts):
     sleep(24)
     allcounts = defaultdict(int)
     for c in counts:
-        for k,v in c.iteritems():
+        for k,v in c.items():
             allcounts[k] += v
     return dict(allcounts)
 
@@ -73,7 +73,7 @@ def divergence(global_counts, nr_documents, counts):
     '''
     sleep(8)
     specific = []
-    for w,n in counts.iteritems():
+    for w,n in counts.items():
         if n > global_counts[w]//100:
             specific.append(w)
     specific.sort(key=counts.get)
