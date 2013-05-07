@@ -380,7 +380,7 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
         logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
         if on_error == 'exit':
             import traceback
-            print(traceback.format_exc(e))
+            print(traceback.format_exc())
             sys.exit(1)
         else:
             raise
