@@ -75,7 +75,7 @@ def shell(store, options, jugspace):
             ipshell = InteractiveShellEmbed(display_banner=_ipython_banner)
         except ImportError:
             import sys
-            print >>sys.stderr, _ipython_not_found_msg
+            sys.stderr.write(_ipython_not_found_msg)
             sys.exit(1)
 
     def _load_all():

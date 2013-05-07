@@ -158,8 +158,9 @@ def usage(error=None):
     '''
     import sys
     if error is not None:
-        print >>sys.stderr, error
-    print _usage_string
+        error += '\n'
+        sys.stderr.write(error)
+    print(_usage_string)
     sys.exit(1)
 
 def _str_to_bool(s):

@@ -20,18 +20,19 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from __future__ import division
+
 from sys import exit
 try:
     import setuptools
 except:
-    print '''
+    from sys import stdout
+    stdout.write('''
 setuptools not found. Please install it.
 
-On linux, the package is often called python-setuptools'''
+On linux, the package is often called python-setuptools\n''')
     exit(1)
 
-execfile('jug/jug_version.py')
+exec(compile(open('jug/jug_version.py').read(), 'jug/jug_version.py', 'exec'))
 long_description = file('README.rst').read()
 
 classifiers = [

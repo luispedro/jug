@@ -7,4 +7,4 @@ import jugfile
 results = jug.task.value(jugfile.results)
 for mp,r in zip(file('MPs.txt'), results):
     mp = mp.strip()
-    print mp, ":    ", " ".join(r[:8])
+    print(mp, ":    ", " ".join(r[:8]))
