@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,7 +33,7 @@ On linux, the package is often called python-setuptools\n''')
     exit(1)
 
 exec(compile(open('jug/jug_version.py').read(), 'jug/jug_version.py', 'exec'))
-long_description = file('README.rst').read()
+long_description = open('README.rst').read()
 
 classifiers = [
 'Development Status :: 4 - Beta',
