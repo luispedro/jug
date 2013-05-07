@@ -367,8 +367,9 @@ class Tasklet(TaskletMixin):
         return self.base.hash()
 
     def __jug_hash__(self):
+        import six
         M = new_hash_object()
-        M.update('Tasklet')
+        M.update(six.b('Tasklet'))
         hash_update(M, [
                 ('base', self.base),
                 ('f', self.f),
