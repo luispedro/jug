@@ -75,6 +75,11 @@ the `value` function::
     In [2]: primes100[:10]
     Out[2]: [True, True, False, True, False, True, False, False, False, True]
 
+Travis Build Status
+~~~~~~~~~~~~~~~~~~~
+
+.. image:: https://travis-ci.org/luispedro/jug.png
+       :target: https://travis-ci.org/luispedro/jug
 
 What's New
 ..........
