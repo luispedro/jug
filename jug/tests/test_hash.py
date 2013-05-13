@@ -22,3 +22,8 @@ def test_dict_mixed():
     }
     v = hash_one(value)
     assert len(v)
+
+def test_hash_numpy_copy():
+    X = np.arange(10)
+    assert hash_one(X[::-1]) != hash_one(X)
+    assert hash_one(X.copy()) == hash_one(X)
