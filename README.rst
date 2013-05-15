@@ -14,7 +14,7 @@ Python 2.6/2.7 and Python 3.3 are supported.
 
 *Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
 
-*Documentation*: `http://packages.python.org/Jug <http://packages.python.org/Jug>`_
+*Documentation*: `https://jug.readthedocs.org/ <https://jug.readthedocs.org/>`__
 
 *Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
 <http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_
@@ -86,8 +86,8 @@ Travis Build Status
 What's New
 ..........
 
-
 version **0.9.4** (Apr 15 2013)
+
 - Add CustomHash wrapper to set __jug_hash__
 - Print traceback on import error
 - Exit when no progress is made even with barrier
@@ -97,6 +97,7 @@ version **0.9.4** (Apr 15 2013)
 - Add currymap() function
 
 version **0.9.3** (Dec 2 2012)
+
 - Fix parsing of ports on redis URL (patch by Alcides Viamontes)
 - Make hashing robust to different orders when using randomized hashing
   (patch by Alcides Viamontes)
@@ -111,6 +112,7 @@ version **0.9.3** (Dec 2 2012)
 
 
 version **0.9.2** (Nov 4 2012):
+
 - More flexible mapreduce()/map() functions
 - Make TaskGenerator pickle()able and hash()able
 - Add invalidate() method to Task
@@ -118,6 +120,7 @@ version **0.9.2** (Nov 4 2012):
 - Better help messsage
 
 version **0.9.1** (Jun 11 2012):
+
 - Add --locks-only option to cleanup subcommand
 - Make cache file (for ``status`` subcommand) configurable
 - Add ``webstatus`` subcommand
@@ -128,6 +131,7 @@ version **0.9.1** (Jun 11 2012):
 - Fix bug with Tasklets and sleep-until/check
 
 version **0.9**:
+
 - In the presence of a barrier(), rerun the jugfile. This makes barrier much
   easier to use.
 - Add set_jugdir to public API
@@ -143,14 +147,14 @@ Roadmap
 .......
 
 Version 1.0
-'''''''''''
+~~~~~~~~~~~
 
 Version 1.0 is just around the corner. After 0.8 is done, there really are not
 that many features left. More flexible configuration, a bit more caching, and
 we are done.
 
 After version 1.0
-'''''''''''''''''
+~~~~~~~~~~~~~~~~~
 
 I want to start adding bells&whistles through extensions. Things like timing,
 more active monitoring, &c.
