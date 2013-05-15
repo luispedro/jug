@@ -8,7 +8,10 @@ decade and characterise each by a couple of *meaningful* word from their
 wikipedia pages. Meaningful words are those that appear in the article for the
 the particular MP but not everywhere else.
 
-So the algorithm looks like this::
+(The complete code for this example and a list of MPs [valid in 2010] with the
+`jug source <https://github.com/luispedro/jug/tree/master/examples/text>`__)
+
+The algorithm looks like this::
 
     allcounts = []
     for mp in MPs:
@@ -26,8 +29,8 @@ So the algorithm looks like this::
         meaningful.reverse()
         print mp, meaningful[:8]
 
-Very simple. It's also *embarassingly parallel*, except for the line where
-``global_counts`` is computed, because it uses the results from everyone.
+Very simple. It's also *embarassingly parallel*, except for the line which
+computes ``global_counts``, because it uses the results from everyone.
 
 To use ``jug``, we write the above, including the functions, to a file (in this
 case, the file is ``jugfile.py``). Now, I can call ``jug status jugfile.py`` to
@@ -163,5 +166,8 @@ in the main ``jugfile.py``, with a final function writing to an output file.
    details.
 .. [#] There is a limit to how much the nodes will wait before giving up to
    avoid having one bad task keep every node in active-wait mode, which is very
-   unfriendly if you are sharing a cluster. Right now, the maximum wait time is
-   set to roughly half an hour. Eventually, this will be configurable.
+   unfriendly if you are sharing a cluster. By default, the maximum wait time
+   is set to roughly half an hour. You can set this with the
+   ``--nr-wait-cycles`` (how many times jug will check for tasks) and
+   ``--wait-cycle-time`` (the number of seconds to wait between each check).
+
