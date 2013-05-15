@@ -1,11 +1,14 @@
 Worked-Out Example 0
 ====================
-Processing text
-...............
+Decrypting a Password
+.....................
 
 Problem: crack an encrypted file by brute force. Assume that the password is a
 five-letter lower-case word and that you know that the plain text contains my
 name.
+
+(The complete code for this example and a secret message comes with the
+`jug source <https://github.com/luispedro/jug/tree/master/examples/decrypt>`__)
 
 This is the ultimate parallel problem: try very many keys (26**5 ~ 11M), but
 there is no interaction between the different tasks.
@@ -76,8 +79,8 @@ finished.
 
 Eventually, everyone will be finished and your results will be saved in
 directory ``jugdata`` in files with names such as
-``jugdata/5/4/a1266debc307df7c741cb7b997004f.pp.gz``. The name is simply a hash
-of the task description (function and its arguments).
+``jugdata/5/4/a1266debc307df7c741cb7b997004f`` The name is simply a hash of the
+task description (function and its arguments).
 
 In order to make sense of all of this, we write a final script, which loads the
 results and prints them on stdout::
