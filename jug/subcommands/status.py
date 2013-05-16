@@ -22,7 +22,6 @@
 #  THE SOFTWARE.
 
 from collections import defaultdict
-import sqlite3
 from contextlib import contextmanager
 
 import jug
@@ -78,6 +77,7 @@ def save_dirty3(connection, dirty):
 
 @contextmanager
 def _open_connection(options):
+    import sqlite3
     connection = sqlite3.connect(options.status_cache_file)
     yield connection
     connection.commit()
@@ -224,6 +224,13 @@ def status(options):
     options : jug options
     '''
     if options.status_mode == 'cached':
+        try:
+            import sqlite3
+        except ImportError:
+            from os import stderr
+            stderr.write('Cached status relies on sqlite3. Falling back to non-cached version')
+            options.status_mode = 'no-cache'
+            return status(options)
         if options.status_cache_clear:
             return _clear_cache(options)
         return _status_cached(options)
