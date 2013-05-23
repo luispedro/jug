@@ -65,14 +65,15 @@ def shell(store, options, jugspace):
     Currently depends on Ipython being installed.
     '''
     try:
-        from IPython.Shell import IPShellEmbed
-        ipshell = IPShellEmbed(banner=_ipython_banner)
+        from IPython.frontend.terminal.embed import InteractiveShellEmbed
+        from IPython.frontend.terminal.ipapp import load_default_config
+        config = load_default_config()
+        ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
     except ImportError:
         try:
-            # From ipython v0.11, the interface changed.
-            # So we try the new interface too
-            from IPython.frontend.terminal.embed import InteractiveShellEmbed
-            ipshell = InteractiveShellEmbed(display_banner=_ipython_banner)
+            # Fallback for older Python:
+            from IPython.Shell import IPShellEmbed
+            ipshell = IPShellEmbed(banner=_ipython_banner)
         except ImportError:
             import sys
             sys.stderr.write(_ipython_not_found_msg)

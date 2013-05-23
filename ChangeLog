@@ -3,6 +3,7 @@ version 0.9.4+
 	* Even better map.reduce.map using blocked access
 	* Python 3 support
 	* Make sqlite3 a soft dependency for ``status --cache``
+	* Load config when embedding ipython
 
 version 0.9.4 Mon Apr 15 2013 by luispedro
 	* Add CustomHash wrapper to set __jug_hash__
