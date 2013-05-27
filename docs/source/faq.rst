@@ -77,3 +77,10 @@ not pickled, but rather saved in their native format), but you could extend
 this. Ask on the `mailing list <http://groups.google.com/group/jug-users>`_ if
 you want to learn more.
 
+Is jug based on a background server?
+------------------------------------
+
+No. Jug processes do not need a server running. They need a shared *backend*.
+This may be the filesystem or a *redis* database. But **jug does not need any
+sort of jug server**.
+
