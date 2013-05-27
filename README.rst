@@ -1,5 +1,6 @@
+===========================================
 Jug: A Task-Based Parallelization Framework
--------------------------------------------
+===========================================
 
 Jug allows you to write code that is broken up into
 tasks and run different tasks on different processors.
@@ -12,18 +13,18 @@ Jug is a pure Python implementation and should work on any platform.
 
 Python 2.6/2.7 and Python 3.3 are supported.
 
-*Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`_
+*Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`__
 
 *Documentation*: `https://jug.readthedocs.org/ <https://jug.readthedocs.org/>`__
 
-*Video*: On `vimeo <http://vimeo.com/8972696>`_ or `showmedo
-<http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`_
+*Video*: On `vimeo <http://vimeo.com/8972696>`__ or `showmedo
+<http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`__
 
 *Mailing List*: `http://groups.google.com/group/jug-users
-<http://groups.google.com/group/jug-users>`_
+<http://groups.google.com/group/jug-users>`__
 
 Short Example
-.............
+-------------
 
 Here is a one minute example. Save the following to a file called ``primes.py``::
 
@@ -84,7 +85,7 @@ Travis Build Status
        :target: https://travis-ci.org/luispedro/jug
 
 What's New
-..........
+----------
 
 version **0.9.4** (Apr 15 2013)
 
@@ -144,7 +145,7 @@ version **0.9**:
 For older version see ``ChangeLog`` file.
 
 Roadmap
-.......
+-------
 
 Version 1.0
 ~~~~~~~~~~~
