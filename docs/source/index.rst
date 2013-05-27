@@ -133,6 +133,14 @@ Documentation Contents
 What's New
 ----------
 
+
+version **0.9.5** (May 27 2013)
+
+- Added debug mode
+- Even better map.reduce.map using blocked access
+- Python 3 support
+- Documentation improvements
+
 version **0.9.4** (Apr 15 2013)
 
 - Add CustomHash wrapper to set __jug_hash__
