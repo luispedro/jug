@@ -112,6 +112,7 @@ Documentation Contents
     tutorial.rst
     decrypt-example.rst
     text-example.rst
+    segmentation-example.rst
     subcommands.rst
     types.rst
     tasks.rst
