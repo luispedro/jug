@@ -97,13 +97,7 @@ process:
 
 ::
 
-    from jug.task import Task
-
-    def TaskGenerator(function):
-        def gen(*args,**kwargs):
-            return Task(function,*args,**kwargs)
-
-        return gen
+    from jug import TaskGenerator
 
     computefeatures = TaskGenerator(computefeatures)
     kmeans = TaskGenerator(kmeans)
@@ -128,12 +122,7 @@ except for the declarations at the top and the fact that *Nr_clusters* is now a
 function (actually a TaskGenerator, look at the use of a declarator).
 
 This file is called the jugfile (you should name it *jugfile.py* on the
-filesystem) and specifies your problem. Of course, *TaskManager* is already a
-part of jug and those first few lines could have read
-
-::
-
-    from jug.task import TaskGenerator
+filesystem) and specifies your problem.
 
 Jug
 ~~~
@@ -204,13 +193,15 @@ separate processors are merged correctly in my *ad hoc* scripts.
 Limitations
 -----------
 
-This is not an attempt to replace MPI in any way. For code that has more merge
-points, this won't do. It also won't do if the individual tasks are so small
-that the over-head of managing them swamps out the performance gains of
-parallelisation. In my code, most of the times, each task takes 20 seconds to a
-few minutes. Just enough to make the managing time irrelevant, but fast enough
-that the main job can be broken into thousands of tiny pieces. As a rule of
-thumb, tasks that last less than 5 seconds should probably be merged together.
+This is not an attempt to replace libraries such as MPI in any way. For code
+that has many more merge points (i.e., code locations which all threads must
+reach at the same time), this won't do. It also won't do if the individual
+tasks are so small that the over-head of managing them swamps out the
+performance gains of parallelisation. In my code, most of the times, each task
+takes 20 seconds to a few minutes. Just enough to make the managing time
+irrelevant, but fast enough that the main job can be broken into thousands of
+tiny pieces. As a rule of thumb, tasks that last less than 5 seconds should
+probably be merged together.
 
 The system makes it too easy to save all intermediate results and run out of
 disk space.
