@@ -1,5 +1,6 @@
 version 0.9.5+
 	* Faster decoding
+	* Add jug-execute script
 
 version 0.9.5 Mon May 27 2013 by luispedro
 	* Added debug mode

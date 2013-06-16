@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+# Copyright (C) 2013, Luis Pedro Coelho <luis@luispedro.org>
+# License: MIT
+
+from jug.jug import main
+from sys import argv
+argv.insert(1, 'execute')
+main(argv)

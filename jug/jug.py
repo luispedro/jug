@@ -387,9 +387,11 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     return store, jugspace
 
 
-def main():
+def main(argv=None):
     from .options import parse
-    options = parse()
+    if argv is None:
+        from sys import argv
+    options = parse(argv[1:])
     store = None
     if options.cmd not in ('status', 'execute', 'webstatus'):
         store,jugspace = init(options.jugfile, options.jugdir)
