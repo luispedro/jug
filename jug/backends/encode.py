@@ -90,7 +90,7 @@ class compress_stream(object):
         self.stream.flush()
 
 class decompress_stream(object):
-    def __init__(self, stream, block=128):
+    def __init__(self, stream, block=8192):
         self.stream = stream
         self.D = zlib.decompressobj()
         self.block = block
@@ -133,6 +133,12 @@ class decompress_stream(object):
 
     def readline(self):
         import six
+        qi = self.queue.find(six.b('\n'))
+        if qi >= 0:
+            qi += 1
+            res = self.queue[:qi]
+            self.queue = self.queue[qi:]
+            return res
         line = six.b('')
         while True:
             block = self.read(self.block)
