@@ -105,7 +105,7 @@ class decompress_stream(object):
                 self.queue = self.queue[nbytes:]
                 return res
             res = self.queue
-            self.queue = ''
+            self.queue = b''
 
         if self.D.unconsumed_tail:
             res += self.D.decompress(self.D.unconsumed_tail, nbytes - len(res))
