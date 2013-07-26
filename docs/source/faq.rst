@@ -65,6 +65,30 @@ And it will work fine. Given that jobs can join the computation at any time and
 all of the communication is through the backend (file system by default), jug
 especially suited for these environments.
 
+Why does jug not check for code changes?
+----------------------------------------
+
+1) It is very hard to get this right. You can easily check Python code (with
+dependencies), but checking into compiled C is harder. If the system runs any
+command line programmes you need to check for them (including libraries) as
+well as any configuration/datafiles they touch.
+
+You can do this by monitoring the programmes, but it is no longer portable (I
+could probably figure out how to do it on Linux, but not other operating
+systems) and it is a lot of work.
+
+It would also slow things down. Even if it checked only the Python code: it
+would need to check the function code & all dependencies + global variables at
+the time of task generation.
+
+2) I was also afraid that this would make people wary of refactoring their
+code. If improving your code even in ways which would not change the results
+(refactoring) makes jug recompute 2 hours of results, then you don't do it.
+
+3) Jug supports explicit invalidation with jug invalidate. This checks your
+dependencies. It is not automatic, but often you need a person to understand
+the code changes in any case.
+
 Can jug handle non-pickle() objects?
 ------------------------------------
 
