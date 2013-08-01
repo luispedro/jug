@@ -281,6 +281,36 @@ class file_store(base_store):
         '''
         pass
 
+    def metadata(self, t):
+        '''
+        meta = store.metadata(t)
+
+        Retrieves information on the state of the computation
+
+        Parameters
+        ----------
+        t : Task
+            A Task object
+
+        Returns
+        -------
+        meta : dict
+            Dictionary describing the state of the computation
+        '''
+        from os import stat, path
+        from time import ctime
+        fname = self._getfname(t.hash())
+        if path.exists(fname):
+            st = stat(fname)
+            return {
+                'computed': True,
+                'completed': ctime(st.st_mtime),
+            }
+        return {
+                'computed': False
+        }
+
+
     @staticmethod
     def remove_store(jugdir):
         '''
