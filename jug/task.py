@@ -567,3 +567,42 @@ class iteratetask(object):
     def __len__(self):
         return self.n
 
+
+def describe(t):
+    '''
+    description = describe(t)
+
+    Return a recursive description of the computation.
+
+    Parameters
+    ----------
+    t : object
+
+    Returns
+    -------
+    description : obj
+    '''
+    if isinstance(t, Task):
+        description = { 'name': t.name, }
+        if len(t.args):
+            description['args'] = [describe(a) for a in t.args]
+        if len(t.kwargs):
+            description['kwargs'] = {k:describe(v) for k,v in t.kwargs.iteritems()}
+        meta = t.store.metadata(t)
+        if meta is not None:
+            description['meta'] = meta
+        return description
+    elif isinstance(t, Tasklet):
+        return {
+                'name': 'tasklet',
+                'operation': repr(t.f),
+                'base': describe(t.base)
+        }
+    elif isinstance(t, list):
+        return [describe(ti) for ti in t]
+    elif isinstance(t, dict):
+        return {k:describe(v) for k,v in t.items()}
+    elif isinstance(t, tuple):
+        return tuple(list(t))
+    return t
+
