@@ -601,7 +601,7 @@ def describe(t):
     elif isinstance(t, list):
         return [describe(ti) for ti in t]
     elif isinstance(t, dict):
-        return {k:describe(v) for k,v in t.items()}
+        return dict([(k,describe(v)) for k,v in t.items()])
     elif isinstance(t, tuple):
         return tuple(list(t))
     return t
