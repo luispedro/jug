@@ -587,7 +587,7 @@ def describe(t):
         if len(t.args):
             description['args'] = [describe(a) for a in t.args]
         if len(t.kwargs):
-            description['kwargs'] = {k:describe(v) for k,v in t.kwargs.iteritems()}
+            description['kwargs'] = dict([(k,describe(v)) for k,v in t.kwargs.iteritems()])
         meta = t.store.metadata(t)
         if meta is not None:
             description['meta'] = meta
