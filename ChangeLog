@@ -2,6 +2,7 @@ version 0.9.5+
 	* Faster decoding
 	* Add jug-execute script
 	* Add describe() function
+	* Add write_task_out function()
 
 version 0.9.5 Mon May 27 2013 by luispedro
 	* Added debug mode
