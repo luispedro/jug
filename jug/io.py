@@ -43,7 +43,7 @@ def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadat
         pass
     if oname is not None:
         import pickle
-        pickle.dump(result_value, open(oname, 'w'))
+        pickle.dump(result_value, open(oname, 'wb'))
 
 def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     '''
