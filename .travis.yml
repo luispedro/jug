@@ -7,5 +7,6 @@ install:
   - pip install numpy
   - pip install six
   - pip install redis
+  - pip install pyyaml
   - pip install .
 script: nosetests
