@@ -81,6 +81,9 @@ It would also slow things down. Even if it checked only the Python code: it
 would need to check the function code & all dependencies + global variables at
 the time of task generation.
 
+I believe `sumatra <http://pythonhosted.org/Sumatra/>`__ accomplishes this.
+Consider using it if you desire all this functionality.
+
 2) I was also afraid that this would make people wary of refactoring their
 code. If improving your code even in ways which would not change the results
 (refactoring) makes jug recompute 2 hours of results, then you don't do it.
