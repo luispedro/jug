@@ -41,8 +41,9 @@ def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadat
             return
     except:
         pass
-    import pickle
-    pickle.dump(result_value, open(oname, 'w'))
+    if oname is not None:
+        import pickle
+        pickle.dump(result_value, open(oname, 'w'))
 
 def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     '''
@@ -65,4 +66,22 @@ def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     '''
 
     return _do_write_task_out(result, NoLoad(result), oname, metadata_fname, metadata_format)
+
+def write_metadata(result, metadata_fname, metadata_format='yaml'):
+    '''
+    write_metadata(result, metadata_fname, metadata_format='yaml')
+
+    Write out the metadata on a Task out.
+
+
+    Parameters
+    ----------
+    result: a Task object
+    metadata_fname : str
+        metadata will be written to this file.
+    metadata_format : str, optional
+        What format to write data in. Currently, 'yaml' & 'json' are supported.
+    '''
+
+    return _do_write_task_out(result, NoLoad(result), None, metadata_fname, metadata_format)
 
