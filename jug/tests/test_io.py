@@ -16,7 +16,7 @@ def remove_files(flist, dlist):
         from shutil import rmtree
         for dir in dlist:
             try:
-                shutil.rmtree(dir)
+                rmtree(dir)
             except:
                 pass
     return with_setup(None, teardown)
@@ -30,10 +30,15 @@ def test_describe():
     desc = describe(t)
     assert len(desc['args']) == len(t.args)
 
-@remove_files(['x.pkl', 'x.meta.yaml', 'x.meta.json'], ['testing.jugdata'])
+@remove_files(['x.pkl', 'x.meta.yaml', 'x.meta.json'], ['testing_TO_DELETE.jugdata'])
 @task_reset
 def test_describe():
     jugfile = 'jug/tests/jugfiles/write_with_meta.py'
     store, space = jug.jug.init(jugfile, 'testing_TO_DELETE.jugdata')
     simple_execute()
-
+    x = space['x']
+    desc = describe(x)
+    import json
+    assert desc == json.load(open('x.meta.json'))
+    import yaml
+    assert desc == yaml.load(open('x.meta.yaml'))
