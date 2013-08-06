@@ -133,6 +133,11 @@ Documentation Contents
 What's New
 ----------
 
+version **0.9.6** (Tue Aug 6 2013)
+- Faster decoding
+- Add jug-execute script
+- Add describe() function
+- Add write_task_out() function
 
 version **0.9.5** (May 27 2013)
 
