@@ -175,14 +175,23 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     import sys
                     _,_, tb = sys.exc_info()
 
+                    # The code below is a complex attempt to load IPython
+                    # debugger which works with multiple versions of IPython.
+                    #
+                    # Unfortunately, their API kept changing prior to the 1.0.
                     try:
                         import IPython
                         try:
-                            #Attempt to load IPython debugger
-                            import IPython.core.ipapi
                             import IPython.core.debugger
-                            ip = IPython.core.ipapi.get()
-                            debugger = IPython.core.debugger.Pdb(ip.colors)
+                            try:
+                                from IPython.terminal.ipapp import load_default_config
+                                config = load_default_config()
+                                colors = config.TerminalInteractiveShell.colors
+                            except:
+                                import IPython.core.ipapi
+                                ip = IPython.core.ipapi.get()
+                                colors = ip.colors
+                            debugger = IPython.core.debugger.Pdb(colors)
                         except ImportError:
                             #Fallback to older version of IPython API
                             import IPython.ipapi
