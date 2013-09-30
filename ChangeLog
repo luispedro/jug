@@ -3,6 +3,7 @@ version 0.9.6 Tue Aug 6 2013 by luispedro
 	* Add jug-execute script
 	* Add describe() function
 	* Add write_task_out() function
+	* Allow for set_jugdir() to be called inside jugfile
 
 version 0.9.5 Mon May 27 2013 by luispedro
 	* Added debug mode

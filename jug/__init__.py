@@ -50,6 +50,7 @@ barrier : function
 
 from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask
 from .barrier import barrier, bvalue
+from .options import set_jugdir
 
 from .jug import init
 from .backends import file_store, dict_store, redis_store
@@ -65,6 +66,8 @@ __all__ = [
     'CachedFunction',
     'barrier',
     'bvalue',
+
+    'set_jugdir',
 
     'init',
     'file_store',

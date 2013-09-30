@@ -394,6 +394,9 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
             sys.exit(1)
         else:
             raise
+
+    # The store may have been changed by the jugfile.
+    store = Task.store
     return store, jugspace
 
 
