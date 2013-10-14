@@ -227,7 +227,7 @@ def status(options):
         try:
             import sqlite3
         except ImportError:
-            from os import stderr
+            from sys import stderr
             stderr.write('Cached status relies on sqlite3. Falling back to non-cached version')
             options.status_mode = 'no-cache'
             return status(options)
