@@ -124,7 +124,7 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
     logging.info('Execute start (%s tasks)' % len(tasks))
     while tasks:
         upnext = [] # tasks that can be run
-        for i in range(options.execute_nr_wait_cycles):
+        for i in range(int(options.execute_nr_wait_cycles)):
             max_cannot_run = min(len(tasks), 128)
             for i in range(max_cannot_run):
                 # The argument for this is the following:
@@ -147,7 +147,7 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
             if upnext:
                 break
             logging.info('waiting %s secs for an open task...' % options.execute_wait_cycle_time_secs)
-            sleep(options.execute_wait_cycle_time_secs)
+            sleep(int(options.execute_wait_cycle_time_secs))
         if not upnext:
             logging.info('No tasks can be run!')
             break
@@ -248,7 +248,7 @@ def execute(options):
         if after == previous:
             from time import sleep
             noprogress += 1
-            sleep(options.execute_wait_cycle_time_secs)
+            sleep(int(options.execute_wait_cycle_time_secs))
     else:
         logging.info('No tasks can be run!')
 
