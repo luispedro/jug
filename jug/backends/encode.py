@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -67,7 +67,7 @@ def encode_to(object, stream):
     write = pickle.dump
     try:
         import numpy as np
-        if isinstance(object, np.ndarray):
+        if type(object) == np.ndarray:
             prefix = six.b('N')
             write = (lambda f,a: np.save(a,f))
     except ImportError:

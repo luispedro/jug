@@ -1,3 +1,6 @@
+version 0.9.6+
+	* Fix use of numpy subclasses
+
 version 0.9.6 Tue Aug 6 2013 by luispedro
 	* Faster decoding
 	* Add jug-execute script

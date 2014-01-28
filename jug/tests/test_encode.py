@@ -43,5 +43,14 @@ def test_decompress_stream_readline():
     assert dstream.readline() == six.b("3\n")
     assert dstream.readline() == six.b("4")
     assert dstream.readline() == six.b("")
-    
-     
+
+
+class Derived(np.ndarray):
+    def __new__(cls, value):
+        return np.ndarray.__new__(cls, value)
+    def __init__(self, value):
+        np.ndarray.__init__(self, value)
+
+def test_numpy_derived():
+    a = Derived([1,2,3])
+    assert type(decode(encode(a))) == type(a)
