@@ -30,6 +30,7 @@ from .. import task
 from .. import backends
 from ..task import Task
 from ..backends import memoize_store
+from ..io import print_task_summary_table
 
 __all__ = [
     'status'
@@ -142,21 +143,12 @@ def update_status(store, ht, deps, rdeps):
 
 
 def _print_status(options, waiting, ready, running, finished):
-    names = set(waiting.keys())
-    names.update(list(ready.keys()))
-    names.update(list(running.keys()))
-    names.update(list(finished.keys()))
-    format      = '%-40s%12s%12s%12s%12s'
-    format_size =    40 +12 +12 +12 +12
-    options.print_out(format % ('Task name','Waiting','Ready','Finished','Running'))
-    options.print_out('-' * format_size)
+    print_task_summary_table(options, [
+                                ("Waiting", waiting),
+                                ("Ready", ready),
+                                ("Finished", finished),
+                                ("Running", running)])
 
-    for n in sorted(names):
-        n_cut = n[:40]
-        options.print_out(format % (n_cut,waiting[n],ready[n],finished[n],running[n]))
-    options.print_out('.' * format_size)
-    options.print_out(format % ('Total:',sum(waiting.values()),sum(ready.values()),sum(finished.values()),sum(running.values())))
-    options.print_out()
 
 def _clear_cache(options):
     from os import unlink

@@ -31,6 +31,7 @@ import logging
 
 from . import task
 from .task import Task
+from .io import print_task_summary_table
 from .subcommands.status import status
 from .subcommands.webstatus import webstatus
 from .subcommands.shell import shell
@@ -50,8 +51,8 @@ def do_print(store, options):
     task_counts = defaultdict(int)
     for t in task.alltasks:
         task_counts[t.name] += 1
-    for tnc in task_counts.items():
-        options.print_out('Task %s: %s' % tnc)
+
+    print_task_summary_table(options, [("Count", task_counts)])
 
 def invalidate(store, options):
     '''
@@ -105,15 +106,7 @@ def invalidate(store, options):
     if sum(task_counts.values()) == 0:
         options.print_out('Tasks invalidated, but no results removed')
     else:
-        options.print_out('Tasks Invalidated')
-        options.print_out()
-        options.print_out('Task Name                                   Count')
-        options.print_out('-------------------------------------------------')
-        #                  0         1         2         3         4         5
-        #                  012345678901234567890123456789012345678901234567890123456789
-        for n_c in task_counts.items():
-            options.print_out('%-40s: %7s' % n_c)
-
+        print_task_summary_table(options, [("Invalidated", task_counts)])
 
 def _sigterm(_,__):
     sys.exit(1)
@@ -253,17 +246,8 @@ def execute(options):
         logging.info('No tasks can be run!')
 
 
-    options.print_out('%-52s%12s%12s' %('Task name','Executed','Loaded'))
-    options.print_out('-' * (52+12+12))
-    task_names = list(tasks_executed.keys())
-    task_names.extend(list(tasks_loaded.keys()))
-    task_names = sorted(set(task_names))
-    for t in task_names:
-        name_cut = t[:52]
-        options.print_out('%-52s%12s%12s' % (name_cut,tasks_executed[t],tasks_loaded[t]))
-    if not task_names:
-        options.print_out('<no tasks>')
 
+    print_task_summary_table(options, [("Executed", tasks_executed), ("Loaded", tasks_loaded)])
 
 def cleanup(store, options):
     '''
