@@ -48,8 +48,6 @@ def test_decompress_stream_readline():
 class Derived(np.ndarray):
     def __new__(cls, value):
         return np.ndarray.__new__(cls, value)
-    def __init__(self, value):
-        np.ndarray.__init__(self, value)
 
 def test_numpy_derived():
     a = Derived([1,2,3])
