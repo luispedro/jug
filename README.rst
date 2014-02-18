@@ -87,7 +87,16 @@ Travis Build Status
 What's New
 ----------
 
+version **0.9.7** (Tue Feb 18 2014)
+
+- Fix use of numpy subclasses
+- Fix redis URL parsing
+- Fix ``shell`` for newer versions of IPython
+- Correctly fall back on non-sqlite ``status``
+- Allow user to call set_jugdir() inside jugfile
+
 version **0.9.6** (Tue Aug 6 2013)
+
 - Faster decoding
 - Add jug-execute script
 - Add describe() function
@@ -123,37 +132,6 @@ version **0.9.3** (Dec 2 2012)
 - Fix ``CompoundTask`` (broken by earlier ``__jug_hash__`` hook introduction)
 - Make ``Tasklets`` more flexible by allowing slicing with ``Tasks``
   (previously, slicing with tasks was **not** allowed)
-
-
-version **0.9.2** (Nov 4 2012):
-
-- More flexible mapreduce()/map() functions
-- Make TaskGenerator pickle()able and hash()able
-- Add invalidate() method to Task
-- Add --keep-going option to execute
-- Better help messsage
-
-version **0.9.1** (Jun 11 2012):
-
-- Add --locks-only option to cleanup subcommand
-- Make cache file (for ``status`` subcommand) configurable
-- Add ``webstatus`` subcommand
-- Add bvalue() function
-- Fix bug in ``shell`` subcommand (``value`` was not in global namespace)
-- Improve identity()
-- Fix bug in using Tasklets and --aggressive-unload
-- Fix bug with Tasklets and sleep-until/check
-
-version **0.9**:
-
-- In the presence of a barrier(), rerun the jugfile. This makes barrier much
-  easier to use.
-- Add set_jugdir to public API
-- Added CompoundTaskGenerator
-- Support subclassing of Task
-- Avoid creating directories in file backend unless it is necessary
-- Add jug.mapreduce.reduce (which mimicks the builtin reduce)
-
 
 For older version see ``ChangeLog`` file.
 

@@ -1,5 +1,9 @@
-version 0.9.6+
+version 0.9.7 Tue Feb 18 2014 by luispedro
 	* Fix use of numpy subclasses
+	* Fix redis URL parsing
+	* Fix ``shell`` for newer versions of IPython
+	* Correctly fall back on non-sqlite ``status``
+	* Allow user to call set_jugdir() inside jugfile
 
 version 0.9.6 Tue Aug 6 2013 by luispedro
 	* Faster decoding
