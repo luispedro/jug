@@ -1,3 +1,6 @@
+version 0.9.7+
+	* Adapt status output to terminal width (by Alex Ford)
+
 version 0.9.7 Tue Feb 18 2014 by luispedro
 	* Fix use of numpy subclasses
 	* Fix redis URL parsing
