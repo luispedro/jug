@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -113,6 +113,7 @@ def _sigterm(_,__):
 
 def execution_loop(tasks, options, tasks_executed, tasks_loaded):
     from time import sleep
+    from .hooks import jug_hook
 
     logging.info('Execute start (%s tasks)' % len(tasks))
     while tasks:
@@ -159,10 +160,13 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     logging.info('Executing %s...' % t.name)
                     t.run(debug_mode=options.debug)
                     tasks_executed[t.name] += 1
+                    jug_hook('execute.task-executed1', (t,))
                     if options.aggressive_unload:
                         t.unload_recursive()
                 else:
                     logging.info('Already in execution %s...' % t.name)
+            except SystemExit:
+                raise
             except Exception as e:
                 if options.pdb:
                     import sys
