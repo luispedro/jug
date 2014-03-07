@@ -4,9 +4,9 @@
 
 _hooks = {}
 
-_known_hooks = {
+_known_hooks = set([
         'execute.task-executed1',
-        }
+        ])
 
 def jug_hook(name, args=(), kwargs={}):
     '''Call hook
