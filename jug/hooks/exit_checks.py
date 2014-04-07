@@ -1,9 +1,9 @@
 from sys import exit
 def exit_if_file_exists(fname):
-    '''After each task, exit if file exists. If so, exit.
+    '''Before each task execute, check if file exists. If so, exit.
 
-    Note that a check is only performed after each Task is completed. Thus, jug
-    will not exit immediately.
+    Note that a check is only performed before a Task is execute. Thus, jug
+    will not exit immediately if it is executing another long-running task.
 
     Parameters
     ----------
@@ -15,7 +15,7 @@ def exit_if_file_exists(fname):
         from os import path
         if path.exists(fname):
             exit(0)
-    hooks.register_hook('execute.task-executed1', check_file)
+    hooks.register_hook('execute.task-pre-execute', check_file)
 
 def exit_when_true(f, function_takes_Task=False):
     '''Generic exit check.

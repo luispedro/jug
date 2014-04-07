@@ -6,6 +6,7 @@ _hooks = {}
 
 _known_hooks = set([
         'execute.task-executed1',
+        'execute.task-pre-execute',
         ])
 
 def jug_hook(name, args=(), kwargs={}):

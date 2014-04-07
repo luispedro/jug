@@ -158,6 +158,8 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     tasks_loaded[t.name] += 1
                 elif locked:
                     logging.info('Executing %s...' % t.name)
+                    jug_hook('execute.task-pre-execute', (t,))
+
                     t.run(debug_mode=options.debug)
                     tasks_executed[t.name] += 1
                     jug_hook('execute.task-executed1', (t,))
