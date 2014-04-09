@@ -248,6 +248,10 @@ def parse(cmdlist=None, optionsfile=None):
                     action='store_true',
                     dest='cache',
                     help='Use a cache for faster status [does not update after jugfile changes, though]')
+    parser.add_option('--cache-file',
+                    action='store',
+                    dest='status_cache_file',
+                    help='Name of file to use for status cache. Use with status --cache.')
     parser.add_option('--clear',
                     action='store_true',
                     dest='status_cache_clear',
@@ -302,6 +306,7 @@ def parse(cmdlist=None, optionsfile=None):
     _maybe_set('execute_wait_cycle_time_secs')
     _maybe_set('execute_keep_going')
     _maybe_set('status_cache_clear')
+    _maybe_set('status_cache_file')
 
     cmdline.jugdir = cmdline.jugdir % {
                 'date': datetime.now().strftime('%Y-%m-%d'),
