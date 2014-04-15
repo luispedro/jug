@@ -13,13 +13,15 @@ name.
 This is the ultimate parallel problem: try very many keys (26**5 ~ 11M), but
 there is no interaction between the different tasks.
 
-The brute force version is very simple::
+The brute force version is very simple:
+
+.. code-block:: python
 
     for p in product(letters, repeat=5):
-    text = decode(ciphertext, p)
-    if isgood(text):
-        passwd = "".join(map(chr,p))
-        print '%s:%s' % (passwd, text)
+        text = decode(ciphertext, p)
+        if isgood(text):
+            passwd = "".join(map(chr,p))
+            print '%s:%s' % (passwd, text)
 
 However, if we have more than one processor, we'd like to be able to jug
 ``jug`` to use the multiple processors.
@@ -28,7 +30,9 @@ We cannot simply have each password be its own task: 11M tasks would be too
 much!
 
 So, we are going to iterate over the first letter and a task will consist of
-trying every possibility *starting* with that letter::
+trying every possibility *starting* with that letter:
+
+.. code-block:: python
 
     @TaskGenerator
     def decrypt(prefix, suffix_size):
@@ -50,17 +54,21 @@ Here, the ``decrypt`` function returns a list of all the good passwords it
 found. To simplify things, we call the ``join`` function which concatenates all
 the partial results into a single list for convenience.
 
-Now, run ``jug``::
+Now, run ``jug``:
 
-    jug execute jugfile.py &
-    jug execute jugfile.py &
-    jug execute jugfile.py &
-    jug execute jugfile.py &
+.. code-block:: bash
+
+    $ jug execute jugfile.py &
+    $ jug execute jugfile.py &
+    $ jug execute jugfile.py &
+    $ jug execute jugfile.py &
 
 You can run as many simultaneous processes as you have processors. To see what
-is happening, type::
+is happening, type:
 
-    jug status jugfile.py
+.. code-block:: bash
+
+    $ jug status jugfile.py
 
 And you will get an output such as::
 
@@ -83,7 +91,9 @@ directory ``jugdata`` in files with names such as
 task description (function and its arguments).
 
 In order to make sense of all of this, we write a final script, which loads the
-results and prints them on stdout::
+results and prints them on stdout:
+
+.. code-block:: python
 
     import jug
     jug.init('jugfile', 'jugdata')
