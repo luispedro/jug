@@ -87,6 +87,12 @@ Travis Build Status
 What's New
 ----------
 
+version **1.0rc0** (Mon Apr 21 2014)
+- Adapt status output to terminal width (by Alex Ford)
+- Add a newline at the end of lockfiles for file backend
+- Add --cache-file option to specify file for ``status --cache``
+
+
 version **0.9.7** (Tue Feb 18 2014)
 
 - Fix use of numpy subclasses
@@ -137,13 +143,6 @@ For older version see ``ChangeLog`` file.
 
 Roadmap
 -------
-
-Version 1.0
-~~~~~~~~~~~
-
-Version 1.0 is just around the corner. After 0.8 is done, there really are not
-that many features left. More flexible configuration, a bit more caching, and
-we are done.
 
 After version 1.0
 ~~~~~~~~~~~~~~~~~
