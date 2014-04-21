@@ -105,6 +105,8 @@ class file_store(base_store):
             import numpy as np
             if type(object) == np.ndarray:
                 np.lib.format.write_array(output, object)
+                output.flush()
+                os.fsync(output.fileno())
                 output.close()
                 os.rename(fname, name)
                 return
@@ -116,6 +118,8 @@ class file_store(base_store):
             pass
 
         encode_to(object, output)
+        output.flush()
+        os.fsync(output.fileno())
         output.close()
 
         # Rename is atomic even over NFS.
