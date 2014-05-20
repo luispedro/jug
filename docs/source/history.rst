@@ -1,7 +1,7 @@
 =======
 History
 =======
-version **1.0rc0** (Mon Apr 21 2014)
+version **1.0** (Tue May 20 2014)
 - Adapt status output to terminal width (by Alex Ford)
 - Add a newline at the end of lockfiles for file backend
 - Add --cache-file option to specify file for ``status --cache``
