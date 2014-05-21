@@ -35,7 +35,6 @@ Options
 
 import logging
 from datetime import datetime
-import string
 import six
 import sys
 

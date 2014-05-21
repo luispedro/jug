@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 import jug
-from ..task import recursive_dependencies
 from .. import task
 from .. import backends
 from ..task import Task
@@ -186,7 +185,6 @@ def _status_nocache(options):
     store,_ = jug.init(options.jugfile, options.jugdir)
     Task.store = memoize_store(store, list_base=True)
 
-    task_names = set(t.name for t in task.alltasks)
     tasks_waiting = defaultdict(int)
     tasks_ready = defaultdict(int)
     tasks_running = defaultdict(int)

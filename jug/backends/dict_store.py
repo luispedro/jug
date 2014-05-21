@@ -28,7 +28,6 @@ Does not support multiple processes!
 from six.moves import cPickle as pickle
 from collections import defaultdict
 
-from abc import ABCMeta, abstractmethod
 from .base import base_store
 import six
 

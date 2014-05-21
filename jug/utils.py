@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2014, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@
 
 import os
 
-from .task import Task, Tasklet, TaskGenerator, value
+from .task import Task, Tasklet, value
 
 __all__ = [
     'timed_path',

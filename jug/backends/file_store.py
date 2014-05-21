@@ -26,12 +26,11 @@ file_store : file-system based data store & locks.
 
 
 import os
-from os import path, mkdir, fdopen
+from os import path, mkdir
 from os.path import dirname, exists
 import errno
 import tempfile
 import shutil
-import six
 
 from .base import base_store
 from jug.backends.encode import encode_to, decode_from

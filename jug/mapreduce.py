@@ -13,7 +13,6 @@ from .utils import identity
 from .hash import hash_one
 
 from itertools import chain
-import operator
 
 __all__ = [
     'mapreduce',
@@ -30,7 +29,7 @@ def _get_function(f):
     return f
 
 def _jug_map_reduce(reducer, mapper, inputs):
-    from six.moves import reduce, builtins
+    from six.moves import reduce
     reducer = _get_function(reducer)
     mapper = _get_function(mapper)
     return reduce(reducer, _jug_map(mapper, inputs))
