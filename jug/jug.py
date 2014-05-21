@@ -197,7 +197,7 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                             import IPython.Debugger
                             shell = IPython.Shell.IPShell(argv=[''])
                             ip = IPython.ipapi.get()
-                            debugger=IPythong.Debugger.Pdb(ip.options.colors)
+                            debugger = IPython.Debugger.Pdb(ip.options.colors)
                     except ImportError:
                         #Fallback to standard debugger
                         import pdb
