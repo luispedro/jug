@@ -31,6 +31,7 @@ import logging
 
 from . import task
 from .task import Task
+from .hooks import jug_hook, register_hook
 from .io import print_task_summary_table
 from .subcommands.status import status
 from .subcommands.webstatus import webstatus
@@ -113,7 +114,6 @@ def _sigterm(_,__):
 
 def execution_loop(tasks, options, tasks_executed, tasks_loaded):
     from time import sleep
-    from .hooks import jug_hook
 
     logging.info('Execute start (%s tasks)' % len(tasks))
     while tasks:
@@ -163,8 +163,6 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     t.run(debug_mode=options.debug)
                     tasks_executed[t.name] += 1
                     jug_hook('execute.task-executed1', (t,))
-                    if options.aggressive_unload:
-                        t.unload_recursive()
                 else:
                     logging.info('Already in execution %s...' % t.name)
             except SystemExit:
@@ -230,6 +228,8 @@ def execute(options):
     tasks_loaded = defaultdict(int)
     store = None
     noprogress = 0
+    if options.aggressive_unload:
+        register_hook('execute.task-executed1', lambda t : t.unload_recursive())
     while noprogress < 2:
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
