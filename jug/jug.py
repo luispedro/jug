@@ -112,7 +112,7 @@ def invalidate(store, options):
 def _sigterm(_,__):
     sys.exit(1)
 
-def execution_loop(tasks, options, tasks_executed, tasks_loaded):
+def execution_loop(tasks, options):
     from time import sleep
 
     logging.info('Execute start (%s tasks)' % len(tasks))
@@ -148,20 +148,19 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
         for t in upnext:
             if t.can_load():
                 logging.info('Loadable %s...' % t.name)
-                tasks_loaded[t.name] += 1
+                jug_hook('execute.task-loadable', (t,))
                 continue
             locked = False
             try:
                 locked = t.lock()
                 if t.can_load(): # This can be true if the task ran between the check above and this one
                     logging.info('Loadable %s...' % t.name)
-                    tasks_loaded[t.name] += 1
+                    jug_hook('execute.task-loadable', (t,))
                 elif locked:
                     logging.info('Executing %s...' % t.name)
                     jug_hook('execute.task-pre-execute', (t,))
 
                     t.run(debug_mode=options.debug)
-                    tasks_executed[t.name] += 1
                     jug_hook('execute.task-executed1', (t,))
                 else:
                     logging.info('Already in execution %s...' % t.name)
@@ -214,6 +213,19 @@ def execution_loop(tasks, options, tasks_executed, tasks_loaded):
                     raise
             finally:
                 if locked: t.unlock()
+
+class TaskStats(object):
+    def __init__(self):
+        self.loaded = defaultdict(int)
+        self.executed = defaultdict(int)
+        register_hook('execute.task-loadable', self.loadable)
+        register_hook('execute.task-executed1', self.executed1)
+
+    def loadable(self, t):
+        self.loaded[t.name] += 1
+    def executed1(self, t):
+        self.executed[t.name] += 1
+
 def execute(options):
     '''
     execute(options)
@@ -224,12 +236,12 @@ def execute(options):
 
     signal(SIGTERM,_sigterm)
     tasks = task.alltasks
-    tasks_executed = defaultdict(int)
-    tasks_loaded = defaultdict(int)
+    tstats = TaskStats()
     store = None
     noprogress = 0
     if options.aggressive_unload:
         register_hook('execute.task-executed1', lambda t : t.unload_recursive())
+
     while noprogress < 2:
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
@@ -238,9 +250,9 @@ def execute(options):
                 # Trigger hash computation:
                 t.hash()
 
-        previous = sum(tasks_executed.values())
-        execution_loop(tasks, options, tasks_executed, tasks_loaded)
-        after = sum(tasks_executed.values())
+        previous = sum(tstats.executed.values())
+        execution_loop(tasks, options)
+        after = sum(tstats.executed.values())
         done = not jugspace.get('__jug__hasbarrier__', False)
         if done:
             break
@@ -253,7 +265,7 @@ def execute(options):
 
 
 
-    print_task_summary_table(options, [("Executed", tasks_executed), ("Loaded", tasks_loaded)])
+    print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
 
 def cleanup(store, options):
     '''

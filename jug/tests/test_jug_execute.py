@@ -41,13 +41,12 @@ def test_aggressive_unload():
     from jug.jug import execution_loop
     from jug.task import alltasks
     from jug.options import default_options
-    from collections import defaultdict
     options = default_options.copy()
     options.aggressive_unload = True
     @task_reset
     def run_jugfile(jugfile):
         store, space = jug.jug.init(jugfile, 'dict_store')
-        execution_loop(alltasks, options, defaultdict(int), defaultdict(int))
+        execution_loop(alltasks, options)
     yield run_jugfile, 'jug/tests/jugfiles/tasklet_simple.py'
     yield run_jugfile, 'jug/tests/jugfiles/tasklets.py'
     yield run_jugfile, 'jug/tests/jugfiles/barrier_mapreduce.py'
