@@ -82,7 +82,8 @@ class file_store(base_store):
 
     def _getfname(self, name):
         import six
-        name = six.text_type(name)
+        if type(name) != six.text_type:
+            name = six.text_type(name, 'utf-8')
         return path.join(self.jugdir, name[:2], name[2:])
 
 
@@ -137,8 +138,8 @@ class file_store(base_store):
         keys = []
         for d in os.listdir(self.jugdir):
             if len(d) == 2:
-                for f in os.listdir(self.jugdir + '/' + d):
-                    keys.append(d+f)
+                for f in os.listdir(path.join(self.jugdir, d)):
+                    keys.append((d+f).encode('ascii'))
         return keys
 
 
@@ -151,12 +152,12 @@ class file_store(base_store):
         This is an unsafe function as the results may be outdated by the time
         the function returns.
         '''
-        if not exists(self.jugdir + '/locks'):
+        if not exists(path.join(self.jugdir, 'locks')):
             return []
 
         keys = []
-        for k in os.listdir(self.jugdir + '/locks'):
-            keys.append(k[:-len('.lock')])
+        for k in os.listdir(path.join(self.jugdir, 'locks')):
+            keys.append(k[:-len('.lock')].encode('ascii'))
         return keys
 
 
