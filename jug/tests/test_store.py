@@ -11,6 +11,11 @@ def _remove_file_store():
     jug.backends.file_store.file_store.remove_store(_storedir)
 
 
+try:
+    redisConnectionError = redis.ConnectionError
+except:
+    redisConnectionError = SystemError
+
 def test_stores():
     def load_get(store):
         try:
@@ -21,11 +26,15 @@ def test_stores():
             store.dump(object, key)
             assert store.can_load(key)
             assert store.load(key) == object
-            assert len(list(store.list())) == 1
+
+            flist = list(store.list())
+            assert len(flist) == 1
+            assert flist[0] == key
+
             store.remove(key)
             assert not store.can_load(key)
             store.close()
-        except redis.ConnectionError:
+        except redisConnectionError:
             raise SkipTest()
 
 
@@ -44,7 +53,7 @@ def test_stores():
             assert lock2.get()
             lock2.release()
             store.close()
-        except redis.ConnectionError:
+        except redisConnectionError:
             raise SkipTest()
     def lock_remove(store):
         try:
@@ -58,7 +67,7 @@ def test_stores():
             store.remove_locks()
             assert len(list(store.listlocks())) == 0
             store.close()
-        except redis.ConnectionError:
+        except redisConnectionError:
             raise SkipTest()
     functions = (load_get, lock, lock_remove)
     stores = [
