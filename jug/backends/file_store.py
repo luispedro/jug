@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -61,6 +61,10 @@ class file_store(base_store):
         '''
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
+
+    def __repr__(self):
+        return 'file_store({})'.format(self.jugdir)
+    __str__ = __repr__
 
     def create(self):
         '''
