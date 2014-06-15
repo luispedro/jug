@@ -87,6 +87,9 @@ Travis Build Status
 What's New
 ----------
 
+version **1.0.1** (Sun Jun 15 2014)
+- Fix important bug with Python 3
+
 version **1.0** (Tue May 20 2014)
 - Adapt status output to terminal width (by Alex Ford)
 - Add a newline at the end of lockfiles for file backend
