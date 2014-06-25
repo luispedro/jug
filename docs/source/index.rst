@@ -200,16 +200,7 @@ Read the tutorial_.
 What's the status of the project?
 ---------------------------------
 
-Beta (or thereabouts).
-
-This is still in development and APIs are not fixed, but are in less flux than
-they were earlier in the project and it is very usable.
-
-It is usable, though. I have used it for my academic projects for the past two
-years and wouldn't now start any other project without using ``jug``. It's
-become a major part of the way I handle projects with a large number of
-computations and cluster usage.
-
+Since version 1.0, jug should be considered stable.
 
 Indices and tables
 ------------------
