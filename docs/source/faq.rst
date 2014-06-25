@@ -9,6 +9,55 @@ The cluster I was using when I first started developing jug was called
 "juggernaut". That is too long and there is a Unix tradition of 3-character
 programme names, so I abbreviated it to jug.
 
+How to work with multiple computers?
+------------------------------------
+
+The typical setting is that all the computers have access to a networked
+filesystem like NFS. This means that they all "see" the same files. In this
+case, the default file-based backend will work nicely.
+
+You need to start separate ``jug execute`` processes on each node.
+
+See also the answer to the next question as well as the `bash utilities page
+<bash.html>`__
+
+Will jug work on batch cluster systems (like SGE or PBS)?
+---------------------------------------------------------
+
+Yes, it was built for it.
+
+The simplest way to do it is to use a job array.
+
+On LFS, it would be run like this::
+
+  bsub -o output.txt -J "jug[1-100]" jug execute myscript.py
+
+
+For SGE, you often need to write a script. For example::
+
+  cat >>jug1.sh <<EOF
+  #!/bin/bash
+
+  jug execute myscript.py
+  EOF
+
+  chmod +x jug1.sh
+
+Now, you can run a job array::
+
+  qsub -t 1-100 ./jug1.sh
+
+In both cases, 100 jobs would start running, jug synchronizing their
+outputs. Given that jobs can join the computation at any time and
+all of the communication is through the backend (file system by
+default), jug is especially suited for these environments.
+
+You can also use jug in interactive mode, but in such case, and
+assuming several nodes have been allocated to you, you need to ssh
+into such allocated computation node before you launch jug, otherwise
+you may use more CPUs than were allocated to you on the initial node.
+
+
 It doesn't work with random input!
 ----------------------------------
 
@@ -50,43 +99,6 @@ Now, everything will work as expected.
 to be able to reproduce your results, it is a good idea, in general, if your
 computation dependends of pseudo-random numbers, to be explicit about the
 seeds. So, *this is a feature not a bug*.)
-
-Will jug work on batch cluster systems (like SGE or PBS)?
----------------------------------------------------------
-
-Yes, it was built for it.
-
-The simplest way to do it is to use a job array.
-
-On LFS, it would be run like this::
-
-  bsub -o output.txt -J "jug[1-100]" jug execute myscript.py
-
-
-For SGE, you often need to write a script. For example::
-
-  cat >>jug1.sh <<EOF
-  #!/bin/bash
-
-  jug execute myscript.py
-  EOF
-
-  chmod +x jug1.sh
-
-Now, you can run a job array::
-
-  qsub -t 1-100 ./jug1.sh
-
-In both cases, 100 jobs would start running, jug synchronizing their
-outputs. Given that jobs can join the computation at any time and
-all of the communication is through the backend (file system by
-default), jug is especially suited for these environments.
-
-You can also use jug in interactive mode, but in such case, and
-assuming several nodes have been allocated to you, you need to ssh
-into such allocated computation node before you launch jug, otherwise
-you may use more CPUs than were allocated to you on the initial node.
-
 
 Why does jug not check for code changes?
 ----------------------------------------
