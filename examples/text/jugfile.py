@@ -3,7 +3,6 @@ from jug import Task
 from collections import defaultdict
 from time import sleep
 import re
-from string import lower
 from os.path import exists
 import json
 from os import mkdir
@@ -46,10 +45,10 @@ def countwords(title, document):
     Takes a file name and returns a wordcount.
     '''
     sleep(4)
-    titlewords = list(map(lower, title.split()))
+    titlewords = [w.lower() for w in title.split()]
     counts = defaultdict(int)
     for w in document.split():
-        w = lower(w)
+        w = w.lower()
         if not isstopword(titlewords, w):
             counts[w] += 1
     return dict(counts)
@@ -81,7 +80,7 @@ def divergence(global_counts, nr_documents, counts):
     return specific
 
 counts = []
-for mp in file('MPs.txt'):
+for mp in open('MPs.txt'):
     mp = mp.strip()
     document = Task(getdata, mp)
     counts.append(Task(countwords, mp, document))
