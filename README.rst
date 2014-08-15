@@ -34,12 +34,12 @@ Here is a one minute example. Save the following to a file called ``primes.py``:
     @TaskGenerator
     def is_prime(n):
         sleep(1.)
-        for j in xrange(2,n-1):
+        for j in range(2,n-1):
             if (n % j) == 0:
                 return False
         return True
 
-    primes100 = map(is_prime, xrange(2,101))
+    primes100 = list(map(is_prime, range(2,101)))
 
 Of course, this is only for didactical purposes, normally you would use a
 better method. Similarly, the ``sleep`` function is so that it does not run too
