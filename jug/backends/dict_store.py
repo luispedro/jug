@@ -34,7 +34,7 @@ from .base import base_store
 def _gen_key(key, name):
     if type(name) != six.text_type:
         name = six.text_type(name, 'utf-8')
-    return '{}:{}'.format(key, name).encode('utf-8')
+    return '{0}:{1}'.format(key, name).encode('utf-8')
 
 def _resultname(name):
     return _gen_key('result', name)
@@ -69,14 +69,14 @@ class dict_store(base_store):
         self.dump(object, name)
         '''
         self.store[_resultname(name)] = pickle.dumps(object)
-        self.counts['dump:{0}'.format(name)] += 1
+        self.counts[_gen_key('dump:',name)] += 1
 
 
     def can_load(self, name):
         '''
         can = can_load(name)
         '''
-        self.counts['exists:{0}'.format(name)] += 1
+        self.counts[_gen_key('exists', name)] += 1
         return _resultname(name) in self.store
 
 
@@ -86,7 +86,7 @@ class dict_store(base_store):
 
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
-        self.counts['load:{0}'.format(name)] += 1
+        self.counts[_gen_key('load',name)] += 1
         return pickle.loads(self.store[_resultname(name)])
 
 
@@ -98,9 +98,9 @@ class dict_store(base_store):
 
         Returns whether any entry was actually removed.
         '''
-        self.counts['del:{0}'.format(name)] += 1
+        self.counts[_gen_key('del',name)] += 1
         if self.can_load(name):
-            self.counts['true-del:{0}'.format(name)] += 1
+            self.counts[_gen_key('true-del',name)] += 1
             del self.store[_resultname(name)]
 
 
