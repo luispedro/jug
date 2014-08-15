@@ -342,6 +342,9 @@ class file_based_lock(object):
     '''
 
     def __init__(self, jugdir, name):
+        import six
+        if type(name) != six.text_type:
+            name = six.text_type(name, 'utf-8')
         self.fullname = path.join(jugdir, 'locks', '{0}.lock'.format(name))
 
     def get(self):
