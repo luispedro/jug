@@ -1,4 +1,5 @@
 from jug.backends.file_store import file_store, file_based_lock
+from jug.backends.dict_store import dict_store
 from jug.tests.task_reset import task_reset
 from jug.backends import memoize_store
 from nose.tools import with_setup
@@ -46,3 +47,16 @@ def test_memoize_lock():
     assert t.is_locked()
     t2 = Task(double, 2)
     assert t2.is_locked()
+
+def test_lock_bytes():
+    store = file_store(_storedir)
+    lock = store.getlock('foo')
+    lock2 = store.getlock(b'foo')
+    assert lock.fullname == lock2.fullname
+
+def test_lock_bytes2():
+    store = dict_store()
+    lock = store.getlock('foo')
+    lock2 = store.getlock(b'foo')
+    lock.get()
+    assert lock2.is_locked()

@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2014, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,23 @@ dict_store: an in-memory dictionary.
 Does not support multiple processes!
 '''
 
+import six
 from six.moves import cPickle as pickle
 from collections import defaultdict
 
 from .base import base_store
-import six
+
+def _gen_key(key, name):
+    if type(name) != six.text_type:
+        name = six.text_type(name, 'utf-8')
+    return '{}:{}'.format(key, name).encode('utf-8')
 
 def _resultname(name):
-    return six.b('result:')+name
+    return _gen_key('result', name)
 
 def _lockname(name):
-    return six.b('lock:')+name
+    return _gen_key('lock', name)
+
 
 
 class dict_store(base_store):
@@ -192,7 +198,7 @@ class dict_lock(object):
         lock.get()
         '''
 
-        self.counts[six.b('lock:') + self.name] += 1
+        self.counts[_lockname(self.name)] += 1
 
         previous = self.store.get(self.name, _NOT_LOCKED)
         self.store[self.name] = _LOCKED
@@ -205,14 +211,14 @@ class dict_lock(object):
 
         Removes lock
         '''
-        self.counts[six.b('unlock:') + self.name] += 1
+        self.counts[_gen_key('unlock', self.name)] += 1
         del self.store[self.name]
 
     def is_locked(self):
         '''
         locked = lock.is_locked()
         '''
-        self.counts[six.b('islock:') + self.name] += 1
+        self.counts[_gen_key('islock', self.name)] += 1
         return (self.store.get(self.name, _NOT_LOCKED) == _LOCKED)
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
