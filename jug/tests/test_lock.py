@@ -1,5 +1,8 @@
 from jug.backends.file_store import file_store, file_based_lock
+from jug.tests.task_reset import task_reset
+from jug.backends import memoize_store
 from nose.tools import with_setup
+from jug import Task
 
 _storedir = 'jugtests'
 def _remove_file_store():
@@ -27,3 +30,19 @@ def test_twolocks():
     foo.release()
     bar.release()
 
+
+def double(x):
+    return x*2
+
+@task_reset
+@with_setup(teardown=_remove_file_store)
+def test_memoize_lock():
+    Task.store = file_store(_storedir)
+
+    t = Task(double, 2)
+    assert t.lock()
+
+    Task.store = memoize_store(Task.store, list_base=True)
+    assert t.is_locked()
+    t2 = Task(double, 2)
+    assert t2.is_locked()
