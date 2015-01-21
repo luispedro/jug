@@ -1,3 +1,6 @@
+version 1.0+git
+	* fsync(directory) in file backend
+
 version 1.0 Tue May 20 2014 by luispedro
 	* Renamed release candidate to final
 

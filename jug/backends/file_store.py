@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,6 +52,19 @@ def create_directories(dname):
             raise
 
 
+def _fsync_dir(fname):
+    import errno
+    parent = dirname(fname)
+    fd = os.open(parent, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    except OSError as err:
+        if err.errno != errno.EINVAL:
+            raise
+    finally:
+        os.close(fd)
+
+
 class file_store(base_store):
     def __init__(self, dname):
         '''
@@ -94,15 +107,16 @@ class file_store(base_store):
         '''
         store.dump(object, name)
 
-        Performs the same as
+        Performs roughly the same as
 
         pickle.dump(object, open(name,'w'))
 
-        but does it in a way that is guaranteed to be atomic even over NFS.
+        but does it in a way that is guaranteed to be atomic even over NFS and
+        using compression on the disk for faster access.
         '''
+        self._maybe_create()
         name = self._getfname(name)
         create_directories(dirname(name))
-        self._maybe_create()
         fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
         output = os.fdopen(fd, 'wb')
         try:
@@ -112,6 +126,7 @@ class file_store(base_store):
                 output.flush()
                 os.fsync(output.fileno())
                 output.close()
+                _fsync_dir(fname)
                 os.rename(fname, name)
                 return
         except ImportError:
@@ -127,6 +142,7 @@ class file_store(base_store):
         output.close()
 
         # Rename is atomic even over NFS.
+        _fsync_dir(fname)
         os.rename(fname, name)
 
     def list(self):
