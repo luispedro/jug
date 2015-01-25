@@ -99,7 +99,7 @@ Subcommands
    status:       Print status
    check:        Returns 0 if all tasks are finished. 1 otherwise.
    sleep-until:  Wait until all tasks are done, then exit.
-   counts:       Simply count tasks
+   count:        Simply count tasks
    cleanup:      Cleanup: remove result files that are not used.
    invalidate:   Invalidate the results of a task
    shell:        Run a shell after initialization
