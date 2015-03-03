@@ -1,6 +1,13 @@
 =======
 History
 =======
+
+version **1.1** (Tue Mar 3 2015)
+- Python 3 compatibility fixes
+- fsync(directory) in file backend
+- Jug hooks (still mostly undocumented, but already enabling internal code simplification)
+
+
 version **1.0** (Tue May 20 2014)
 - Adapt status output to terminal width (by Alex Ford)
 - Add a newline at the end of lockfiles for file backend
