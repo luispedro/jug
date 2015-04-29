@@ -64,7 +64,7 @@ def encode_to(object, stream):
     if object is None:
         return
     prefix = six.b('P')
-    write = pickle.dump
+    write = lambda f,a: pickle.dump(f, a, protocol=pickle.HIGHEST_PROTOCOL)
     try:
         import numpy as np
         if type(object) == np.ndarray:

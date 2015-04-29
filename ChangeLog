@@ -1,3 +1,6 @@
+version 1.1+
+	* Use HIGHEST_PROTOCOL when pickle()ing
+
 version 1.1 Tue Mar 03 2015 by luispedro
 	* Python 3 compatibility fixes
 	* fsync(directory) in file backend
