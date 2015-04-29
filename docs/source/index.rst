@@ -117,6 +117,7 @@ Documentation Contents
     types.rst
     tasks.rst
     tasklets.rst
+    invalidate.rst
     idioms.rst
     barrier.rst
     compound.rst
