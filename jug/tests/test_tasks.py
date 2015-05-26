@@ -1,8 +1,16 @@
+import inspect
+import os
+
 from nose.tools import with_setup
 import jug.task
 from jug.backends.dict_store import dict_store
 from jug.tests.task_reset import task_reset
 from jug.tests.utils import simple_execute
+
+
+_jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
+_jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
+
 
 Task = jug.task.Task
 jug.task.Task.store = dict_store()
@@ -264,7 +272,8 @@ def test_unload_recursive_tuple():
 @task_reset
 def test_builtin_function():
     import numpy as np
-    store, space = jug.jug.init('jug/tests/jugfiles/builtin_function.py', 'dict_store')
+    jugfile = os.path.join(_jugdir, 'builtin_function.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()
     a8 = jug.task.value(space['a8'])
     assert np.all(a8 == np.arange(8))

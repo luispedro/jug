@@ -1,3 +1,6 @@
+import inspect
+import os
+
 from nose.tools import with_setup
 import jug.jug
 import jug.task
@@ -8,6 +11,10 @@ from jug.tests.utils import simple_execute
 from jug.tests.task_reset import task_reset
 import random
 jug.jug.silent = True
+
+
+_jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
+_jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
 
 
 @task_reset
@@ -29,10 +36,11 @@ def test_jug_invalidate():
 
 @task_reset
 def test_complex():
-    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', 'dict_store')
+    jugfile = os.path.join(_jugdir, 'tasklets.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()
 
-    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', store)
+    store, space = jug.jug.init(jugfile, store)
     opts = Options(default_options)
     opts.invalid_name = space['t'].name
     h = space['t'].hash()
@@ -42,7 +50,8 @@ def test_complex():
 
 @task_reset
 def test_cleanup():
-    store, space = jug.jug.init('jug/tests/jugfiles/tasklets.py', 'dict_store')
+    jugfile = os.path.join(_jugdir, 'tasklets.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
     h = space['t'].hash()
     simple_execute()
 

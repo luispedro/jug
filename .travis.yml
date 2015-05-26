@@ -10,4 +10,7 @@ install:
   - pip install redis
   - pip install pyyaml
   - pip install .
-script: nosetests
+script:
+  - mkdir _test
+  - cd _test
+  - nosetests jug

@@ -1,3 +1,6 @@
+import inspect
+import os
+
 import jug.jug
 import jug.task
 from jug.task import Task
@@ -5,6 +8,11 @@ from jug.tests.utils import simple_execute
 from jug.backends.dict_store import dict_store
 import random
 jug.jug.silent = True
+
+
+_jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
+_jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
+
 
 def test_jug_execute_simple():
     N = 1024
@@ -47,9 +55,9 @@ def test_aggressive_unload():
     def run_jugfile(jugfile):
         store, space = jug.jug.init(jugfile, 'dict_store')
         execution_loop(alltasks, options)
-    yield run_jugfile, 'jug/tests/jugfiles/tasklet_simple.py'
-    yield run_jugfile, 'jug/tests/jugfiles/tasklets.py'
-    yield run_jugfile, 'jug/tests/jugfiles/barrier_mapreduce.py'
-    yield run_jugfile, 'jug/tests/jugfiles/compound_nonsimple.py'
-    yield run_jugfile, 'jug/tests/jugfiles/slice_task.py'
+    yield run_jugfile, os.path.join(_jugdir, 'tasklet_simple.py')
+    yield run_jugfile, os.path.join(_jugdir, 'tasklets.py')
+    yield run_jugfile, os.path.join(_jugdir, 'barrier_mapreduce.py')
+    yield run_jugfile, os.path.join(_jugdir, 'compound_nonsimple.py')
+    yield run_jugfile, os.path.join(_jugdir, 'slice_task.py')
 
