@@ -27,7 +27,7 @@ The algorithm looks like this::
             if c > global_counts[w]//100: meaningful.append(w)
         meaningful.sort(key=mp_count.get)
         meaningful.reverse()
-        print mp, meaningful[:8]
+        print(mp, meaningful[:8])
 
 Very simple. It's also *embarassingly parallel*, except for the line which
 computes ``global_counts``, because it uses the results from everyone.
@@ -130,7 +130,7 @@ inside ``jugdata``. To access it, we can write a little script::
     results = jug.task.value(jugfile.results)
     for mp,r in zip(file('MPs.txt'), results):
         mp = mp.strip()
-        print mp, ":    ", " ".join(r[:8])
+        print(mp, ":    ", " ".join(r[:8]))
 
 
 The ``jug.init()`` call takes the *jugfile* (which does not need to be called

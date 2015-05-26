@@ -69,7 +69,7 @@ In pure Python, we'd write something like::
             if cur > best_val:
                 best = p0,p1
                 best_val = cur
-    print 'Best parameter pair', best
+    print('Best parameter pair', best)
 
 This is, obviously, an **embarassingly parallel** problem and we want *jug* to
 handle it.
@@ -110,9 +110,9 @@ result dictionary to look at all the results.
 ::
     
     result = value(result)
-    print result[0, -2]
+    print(result[0, -2])
     # Look for the maximum score
-    print max(result.values())
+    print(max(result.values()))
     # Look at maximum score *and* the parameters that generated it:
-    print max((v,k) for k,v in result.iteritems())
+    print(max((v, k) for k, v in result.iteritems()))
 

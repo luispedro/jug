@@ -21,7 +21,7 @@ The brute force version is very simple:
         text = decode(ciphertext, p)
         if isgood(text):
             passwd = "".join(map(chr,p))
-            print '%s:%s' % (passwd, text)
+            print('%s:%s' % (passwd, text))
 
 However, if we have more than one processor, we'd like to be able to jug
 ``jug`` to use the multiple processors.
@@ -100,7 +100,7 @@ results and prints them on stdout:
     import jugfile
     results = jug.task.value(jugfile.fullresults)
     for p,t in results:
-        print "%s\n\n    Password was '%s'" % (t,p)
+        print("%s\n\n    Password was '%s'" % (t, p))
 
 ``jug.init`` takes the jugfile name (which happens to be ``jugfile.py``, the
 extension is optional if it is ``.py``) and the data directory name.
