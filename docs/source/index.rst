@@ -131,65 +131,12 @@ Documentation Contents
     writeabackend.rst
     api.rst
 
-What's New
-----------
-
-version **0.9.7** (Tue Feb 18 2014)
-
-- Fix use of numpy subclasses
-- Fix redis URL parsing
-- Fix ``shell`` for newer versions of IPython
-- Correctly fall back on non-sqlite ``status``
-- Allow user to call set_jugdir() inside jugfile
-
-
-version **0.9.6** (Tue Aug 6 2013)
-
-- Faster decoding
-- Add jug-execute script
-- Add describe() function
-- Add write_task_out() function
-
-version **0.9.5** (May 27 2013)
-
-- Added debug mode
-- Even better map.reduce.map using blocked access
-- Python 3 support
-- Documentation improvements
-
-version **0.9.4** (Apr 15 2013)
-
-- Add CustomHash wrapper to set __jug_hash__
-- Print traceback on import error
-- Exit when no progress is made even with barrier
-- Use Tasklets for better jug.mapreduce.map
-- Use Ipython debugger if available (patch by Alex Ford)
-- Faster --aggressive-unload
-- Add currymap() function
-
-version **0.9.3** (Dec 2 2012)
-
-- Fix parsing of ports on redis URL (patch by Alcides Viamontes)
-- Make hashing robust to different orders when using randomized hashing
-  (patch by Alcides Viamontes)
-- Allow regex in invalidate command (patch by Alcides Viamontes)
-- Add ``--cache --clear`` suboption to status
-- Allow builtin functions for tasks
-- Fix status --cache`` (a general bug which seems to be triggered mainly by
-  ``bvalue()`` usage).
-- Fix ``CompoundTask`` (broken by earlier ``__jug_hash__`` hook introduction)
-- Make ``Tasklets`` more flexible by allowing slicing with ``Tasks``
-  (previously, slicing with tasks was **not** allowed)
-
-See the file ``ChangeLog`` for the full history
-
 What do I need to run Jug?
 ---------------------------
 
-It is a Python only package. I have tested it with Python 2.5 and 2.6.
-I do not expect Python 2.4 or earlier to work (this is not a priority).
-Python 3.0 will not work either (this is expected to change in the 
-future---patches are welcome).
+It is a Python only package. Jug is `continuously tested
+<https://travis-ci.org/luispedro/jug>`__ with Python 2.6 and up (including
+Python 3.3 and up).
 
 How does it work?
 -----------------
