@@ -1,3 +1,6 @@
+import inspect
+import os
+
 import numpy as np
 
 import jug.mapreduce
@@ -8,6 +11,11 @@ from jug import value, TaskGenerator
 from jug.tests.task_reset import task_reset
 import jug.utils
 from functools import reduce
+
+
+_jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
+_jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
+
 
 def mapper(x):
     return x**2
@@ -63,19 +71,22 @@ def test_break_up():
 
 @task_reset
 def test_empty_mapreduce():
-    store, space = jug.jug.init('jug/tests/jugfiles/empty_mapreduce.py', 'dict_store')
+    jugfile = os.path.join(_jugdir, 'empty_mapreduce.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()
     assert value(space['two']) == []
 
 @task_reset
 def test_taskgenerator_mapreduce():
-    store, space = jug.jug.init('jug/tests/jugfiles/mapreduce_generator.py', 'dict_store')
+    jugfile = os.path.join(_jugdir, 'mapreduce_generator.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()
     assert space['sumtwo'].result == 2*sum(range(10))
 
 @task_reset
 def test_taskgenerator_map():
-    store, space = jug.jug.init('jug/tests/jugfiles/mapgenerator.py', 'dict_store')
+    jugfile = os.path.join(_jugdir, 'mapgenerator.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()
     assert len(value(space['v2s'])) == 16
 

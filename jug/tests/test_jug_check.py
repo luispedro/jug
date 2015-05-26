@@ -1,3 +1,6 @@
+import inspect
+import os
+
 import jug.jug
 import jug.task
 from jug.task import Task
@@ -8,6 +11,11 @@ from jug.options import Options, default_options
 
 import random
 jug.jug.silent = True
+
+
+_jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
+_jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
+
 
 def test_jug_check():
     N = 16
@@ -44,7 +52,7 @@ def test_jug_check():
 
 @task_reset
 def test_tasklet():
-    jugfile = 'jug/tests/jugfiles/sleep_until_tasklet.py'
+    jugfile = os.path.join(_jugdir, 'sleep_until_tasklet.py')
     store, space = jug.jug.init(jugfile, 'dict_store')
     assert 'four' not in space
     simple_execute()
