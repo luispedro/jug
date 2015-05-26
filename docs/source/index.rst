@@ -24,20 +24,9 @@ Examples
 Short Example
 ~~~~~~~~~~~~~
 
-Here is a one minute example. Save the following to a file called ``primes.py``::
+Here is a one minute example. Save the following to a file called ``primes.py``:
 
-    from jug import TaskGenerator
-    from time import sleep
-
-    @TaskGenerator
-    def is_prime(n):
-        sleep(1.)
-        for j in xrange(2,n-1):
-            if (n % j) == 0:
-                return False
-        return True
-
-    primes100 = map(is_prime, xrange(2,101))
+.. literalinclude:: ../../examples/primes/primes.py
 
 Of course, this is only for didactical purposes, normally you would use a
 better method. Similarly, the ``sleep`` function is so that it does not run too
