@@ -31,8 +31,8 @@ I could write the following simple code:
     features = [computefeatures(img,parameter=2) for img in imgs]
     clusters = []
     bics = []
-    for k in xrange(2,200):
-        for repeat in xrange(10):
+    for k in range(2, 200):
+        for repeat in range(10):
             clusters.append(kmeans(features,k=k,random_seed=repeat))
             bics.append(compute_bic(clusters[-1]))
     Nr_clusters = argmin(bics) // 10
@@ -82,8 +82,8 @@ following code declares the necessary tasks for our problem:
     feature_tasks = [Task(computefeatures,img,parameter=2) for img in imgs]
     cluster_tasks = []
     bic_tasks = []
-    for k in xrange(2,200):
-        for repeat in xrange(10):
+    for k in range(2, 200):
+        for repeat in range(10):
             cluster_tasks.append(Task(kmeans,feature_tasks,k=k,random_seed=repeat))
             bic_tasks.append(Task(compute_bic,cluster_tasks[-1]))
     Nr_clusters = Task(argmin,bic_tasks)
@@ -111,8 +111,8 @@ process:
     features = [computefeatures(img,parameter=2) for img in imgs]
     clusters = []
     bics = []
-    for k in xrange(2,200):
-        for repeat in xrange(10):
+    for k in range(2, 200):
+        for repeat in range(10):
             clusters.append(kmeans(features,k=k,random_seed=repeat))
             bics.append(compute_bic(clusters[-1]))
     Nr_clusters(bics)
