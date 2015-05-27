@@ -1,4 +1,4 @@
-import urllib.request, urllib.error, urllib.parse
+import requests
 from jug import Task
 from collections import defaultdict
 from time import sleep
@@ -17,10 +17,13 @@ def get_data(title):
         with open(cache, 'rb') as f:
             return f.read().decode('utf-8')
 
-    title = urllib.parse.quote(title)
-    url = 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=' + title
-    text = urllib.request.urlopen(url).read()
-    data = json.loads(text)
+    params = {'action': 'query',
+              'prop': 'revisions',
+              'rvprop': 'content',
+              'format': 'json',
+              'titles': title}
+    r = requests.get('http://en.wikipedia.org/w/api.php', params=params)
+    data = json.loads(r.text)
     data = list(data['query']['pages'].values())[0]
     text = data['revisions'][0]['*']
     text = re.sub(r'(?x) \[ [^]] *? \]\]', '', text)
