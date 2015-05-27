@@ -4,7 +4,7 @@ Idioms
 
 
 There are certain types of computation that show up again and again in parallel
-computation. This section shows up to perform them with jug.
+computation. This section shows how to perform them with jug.
 
 Map/Reduce
 ----------
@@ -63,13 +63,13 @@ In pure Python, we'd write something like::
 
     best = None
     best_val = float("-Inf")
-    for p0 in xrange(100):
-        for p1 in xrange(-20,20):
+    for p0 in range(100):
+        for p1 in range(-20, 20):
             cur = score(data, p0, p1)
             if cur > best_val:
                 best = p0,p1
                 best_val = cur
-    print 'Best parameter pair', best
+    print('Best parameter pair', best)
 
 This is, obviously, an **embarassingly parallel** problem and we want *jug* to
 handle it.
@@ -89,8 +89,8 @@ First note: we can, of course, perform this with a *map/reduce*::
                     reducer,
                     mapper,
                     [(p0, p1)
-                            for p0 in xrange(101)
-                            for p1 in xrange(-20, 21)])
+                            for p0 in range(101)
+                            for p1 in range(-20, 21)])
 
 However, if you want to look at the whole parameter space instead of just the
 best score, this will not work. Instead, you can do::
@@ -99,8 +99,8 @@ best score, this will not work. Instead, you can do::
 
     score = TaskGenerator(score)
     results = {}
-    for p0 in xrange(100):
-        for p1 in xrange(-20,20):
+    for p0 in range(100):
+        for p1 in range(-20, 20):
             result[p0,p1] = value(data, p0, p1)
 
 Now, *after you've run ``jug execute``*, you can use ``jug shell`` and load the
@@ -110,9 +110,9 @@ result dictionary to look at all the results.
 ::
     
     result = value(result)
-    print result[0, -2]
+    print(result[0, -2])
     # Look for the maximum score
-    print max(result.values())
+    print(max(result.values()))
     # Look at maximum score *and* the parameters that generated it:
-    print max((v,k) for k,v in result.iteritems())
+    print(max((v, k) for k, v in result.iteritems()))
 

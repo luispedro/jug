@@ -32,7 +32,7 @@ speeding things up. Consider the following case::
     # inputs is a large list
 
     results = {}
-    for p in xrange(1000):
+    for p in range(1000):
         results[p] = process(inputs, p)
 
 How is this processed? Every time ``process`` is called, a new ``jug.Task`` is
@@ -50,7 +50,7 @@ Consider the variation::
 
     inputs = identity(inputs)
     results = {}
-    for p in xrange(1000):
+    for p in range(1000):
         results[p] = process(inputs, p)
 
 Now, the long list is only hashed once! It is transformed into a ``Task`` (we

@@ -39,7 +39,7 @@ juglog
   Outputs a log of jug run/halt/stop commands
 jugoutput
   If your jug tasks print to stdout or stderr, this collects all 
-  of that content from each remote machine ane prints it out. 
+  of that content from each remote machine and prints it out.
   Note that this command will likely need to be configured for 
   your computer
 
@@ -55,7 +55,8 @@ pssh
 
 **Creating command aliases**
 
-::
+.. code-block:: bash
+
   local ~$ ssh myserver
   myserver ~$ nano .bash_profile
   # Nano opens a text editor and I paste the following at 
@@ -76,9 +77,8 @@ pssh
 
 **Creating workers.iplist**
 This is pretty simple, just create a file called workers.iplist and 
-insert something like this to identify all of your slave computers
+insert something like this to identify all of your slave computers::
 
-::
   10.0.2.2
   10.0.2.4
   10.0.2.5
@@ -89,7 +89,8 @@ insert something like this to identify all of your slave computers
 **Creating .waitonjug executable**
 Create a new file called .waitonjug and insert the following
 
-::
+.. code-block:: bash
+
  #!/bin/sh
 
  echo "Waiting..."
@@ -116,7 +117,7 @@ so I've set to run 10 jug processes per slave machine.
 Name of script: Below, the name of my jug script is benchmark_jug.py. 
 Yours is likely different, so please update
 
-Output redirection: I'm outputing stdout and stderr /mnt/localhd . If 
+Output redirection: I'm outputing stdout and stderr to /mnt/localhd. If
 your jug tasks do not use stdout or stderr, then perhaps just do 
 `jug execute <my_jug>.py &> /dev/null &` to redirect everything to 
 /dev/null. If you actually want output, make sure that the directory 
@@ -124,7 +125,7 @@ you're using for output (in my case /mnt/localhd) is NOT shared by NFS,
 or your workers on different machines will be overwriting the same 
 file. Or be a boss and upgrade this script to read in the hostname ;-)
 
-::
+.. code-block:: bash
 
     #!/bin/sh
 
@@ -154,7 +155,7 @@ in the workers.iplist
 This uses the watch command to call 'jug status' every ten seconds
 
 **jugrun**
-*This will likely need to be modified minorly for your use. See
+*This will likely need minor modifications for your use. See the
 'installation' section above.*
 This first posts log entry, then sets up what I call a 'watcher',
 which is a tiny executable that runs in the background on the host

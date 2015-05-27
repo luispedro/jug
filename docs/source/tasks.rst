@@ -48,7 +48,7 @@ makes jug easy to use but has some drawbacks:
   if you are using sets/dictionaries, in which case the default handling needs
   to get a sorted list from the elements of the set/dictionary.
 
-- Jug might now know how to handle the types of your arguments,
+- Jug might not know how to handle the types of your arguments,
 
 - Arguments might be equivalent, and thus the tasks should be identified in the
   same way, without jug knowing. As a very contrived example, suppose that a task uses
@@ -63,7 +63,7 @@ method to your type directly. This method should return a string::
             return some_string
 
 Alternatively, you can use ``jug.utils.CustomHash`` in the case where you
-cannot (or rather not) change the types::
+cannot (or rather, would not) change the types::
 
     from jug.utils import CustomHash
     def my_hash_function(x):
@@ -72,6 +72,6 @@ cannot (or rather not) change the types::
     complex = ...
     value = CustomHash(complex, my_hash_function) 
 
-Now, ``value`` behaves exactly like ``complex``, but it's hash is computed by
+Now, ``value`` behaves exactly like ``complex``, but its hash is computed by
 calling ``my_hash_function``.
 

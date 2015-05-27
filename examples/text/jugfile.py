@@ -7,7 +7,7 @@ from os.path import exists
 import json
 from os import mkdir
 
-def getdata(title):
+def get_data(title):
     sleep(8)
     # The reason for this cache is to avoid hitting Wikipedia too much in
     # case we are playing around with testing.
@@ -40,7 +40,7 @@ def isstopword(titlewords, w):
     if w in titlewords: return True
     return False
 
-def countwords(title, document):
+def count_words(title, document):
     '''
     Takes a file name and returns a wordcount.
     '''
@@ -53,7 +53,7 @@ def countwords(title, document):
             counts[w] += 1
     return dict(counts)
 
-def addcounts(counts):
+def add_counts(counts):
     '''
     Takes intermediate word counts and puts them together
     '''
@@ -82,9 +82,9 @@ def divergence(global_counts, nr_documents, counts):
 counts = []
 for mp in open('MPs.txt'):
     mp = mp.strip()
-    document = Task(getdata, mp)
-    counts.append(Task(countwords, mp, document))
-avgs = Task(addcounts, counts)
+    document = Task(get_data, mp)
+    counts.append(Task(count_words, mp, document))
+avgs = Task(add_counts, counts)
 results = []
 for c in counts:
     results.append(Task(divergence,avgs, len(counts), c))

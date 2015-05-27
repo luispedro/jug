@@ -21,10 +21,10 @@ The brute force version is very simple:
         text = decode(ciphertext, p)
         if isgood(text):
             passwd = "".join(map(chr,p))
-            print '%s:%s' % (passwd, text)
+            print('%s:%s' % (passwd, text))
 
-However, if we have more than one processor, we'd like to be able to jug
-``jug`` to use the multiple processors.
+However, if we have more than one processor, we'd like to be able to tell
+``jug`` to use multiple processors.
 
 We cannot simply have each password be its own task: 11M tasks would be too
 much!
@@ -85,7 +85,7 @@ to run, and 4 are currently running; and ``join`` which has a single instance,
 which is ``waiting``: it cannot run until all the ``decrypt`` tasks have
 finished.
 
-Eventually, everyone will be finished and your results will be saved in
+Eventually, everything will be finished and your results will be saved in
 directory ``jugdata`` in files with names such as
 ``jugdata/5/4/a1266debc307df7c741cb7b997004f`` The name is simply a hash of the
 task description (function and its arguments).
@@ -100,7 +100,7 @@ results and prints them on stdout:
     import jugfile
     results = jug.task.value(jugfile.fullresults)
     for p,t in results:
-        print "%s\n\n    Password was '%s'" % (t,p)
+        print("%s\n\n    Password was '%s'" % (t, p))
 
 ``jug.init`` takes the jugfile name (which happens to be ``jugfile.py``, the
 extension is optional if it is ``.py``) and the data directory name.
