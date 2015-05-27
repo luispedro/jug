@@ -1,7 +1,8 @@
 import itertools
 from crypt import decode, letters, isgood, preprocess
 
-ciphertext = file('secret.msg').read()
+with open('secret.msg') as f:
+    ciphertext = f.read()
 ciphertext = preprocess(ciphertext)
 
 for p in itertools.product(letters, repeat=5):
