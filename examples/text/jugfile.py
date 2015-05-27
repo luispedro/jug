@@ -14,7 +14,8 @@ def get_data(title):
     # In a real example, we would *not* have a cache, of course.
     cache = 'text-data/' + title
     if exists(cache):
-        return str(file(cache).read(), 'utf-8')
+        with open(cache, 'rb') as f:
+            return f.read().decode('utf-8')
 
     title = urllib.parse.quote(title)
     url = 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=' + title
@@ -30,9 +31,8 @@ def get_data(title):
         mkdir('text-data')
     except:
         pass
-    cache = file(cache, 'w')
-    cache.write(text.encode('utf-8'))
-    cache.close()
+    with open(cache, 'wb') as f:
+        f.write(text.encode('utf-8'))
     return text
 
 def isstopword(titlewords, w):
@@ -80,10 +80,11 @@ def divergence(global_counts, nr_documents, counts):
     return specific
 
 counts = []
-for mp in open('MPs.txt'):
-    mp = mp.strip()
-    document = Task(get_data, mp)
-    counts.append(Task(count_words, mp, document))
+with open('MPs.txt', 'rb') as f:
+    for mp in f:
+        mp = mp.decode('utf-8').strip()
+        document = Task(get_data, mp)
+        counts.append(Task(count_words, mp, document))
 avgs = Task(add_counts, counts)
 results = []
 for c in counts:
