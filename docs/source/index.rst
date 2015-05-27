@@ -119,6 +119,7 @@ Documentation Contents
     why.rst
     writeabackend.rst
     api.rst
+    history.rst
 
 What do I need to run Jug?
 ---------------------------
