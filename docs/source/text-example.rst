@@ -159,20 +159,20 @@ convenient format for organising computations:
     printing. This should run fast and not do much computation.
 
 The reason why it's good to have the second step as a separate process is that
-you often want fast iteration on the output or even interactive use (if tyou are
-outputing a graph, for example; you want to be able to fiddle with the colours
+you often want fast iteration on the output or even interactive use (if you are
+outputting a graph, for example; you want to be able to fiddle with the colours
 and axes and have immediate feedback).  Otherwise, you could have had everything
 in the main ``jugfile.py``, with a final function writing to an output file.
 
 .. [#] For this tutorial, all nodes are on the same machine. In real life, they
-   could be in different computers as long as they can communicate with each
+   could be on different computers as long as they can communicate with each
    other.
 .. [#] In order to make this a more realistic example, tasks all call the
    ``sleep()`` function to simulate long running processes. This example,
    without the ``sleep()`` calls, takes four seconds to run, so it wouldn't be
-   much worth the effort to run multiple processors. Check ``jugfile.py`` for
+   worth the effort to run multiple processors. Check ``jugfile.py`` for
    details.
-.. [#] There is a limit to how much the nodes will wait before giving up to
+.. [#] There is a limit to how long the nodes will wait before giving up to
    avoid having one bad task keep every node in active-wait mode, which is very
    unfriendly if you are sharing a cluster. By default, the maximum wait time
    is set to roughly half an hour. You can set this with the

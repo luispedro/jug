@@ -2,9 +2,9 @@
 Subcommands
 ===========
 
-Jug is organised as a series of subcommands. It is called as ``jug subcommand
-jugfile.py [OPTIONS]``. This is similar to applications such as version control
-systems.
+Jug is organised as a series of subcommands. They are called by ``jug
+subcommand jugfile.py [OPTIONS]``. This is similar to applications such as
+version control systems.
 
 
 Major Subcommands
@@ -48,8 +48,8 @@ Minor Subcommands
 check
 ~~~~~
 
-Check is simple: it returns 0 if all tasks have run, 1 otherwise. Useful for
-shell scripting.
+Check is simple: it exits with status 0 if all tasks have run, 1 otherwise.
+Useful for shell scripting.
 
 sleep-until
 ~~~~~~~~~~~

@@ -14,10 +14,10 @@ Jug was designed to solve two intertwined problems:
 
 Up until that point, I had been writing code that saved intermediate results to
 files with complex filenames (e.g., ``r3_d2_p0_p3_p22_v9.pp`` for the results
-of stage 3, dataset 2, with parameters (0,3,22), running version 3 of the
+of stage 3, dataset 2, with parameters (0,3,22), running version 9 of the
 code). This becomes taxing on the mind that needs to keep track of things and
 extremely brittle. You constantly run the risk of having results that you are
-not sure of how to reproduce again.
+not sure how to reproduce again.
 
 Therefore, I decided I was going to write a solution for this.
 
@@ -51,10 +51,10 @@ much work).
 
 jug was also meant to be used in an *exploratory development environment*.
 This is why we have features such as ``jug shell``, ``jug invalidate`` (a much
-better alternative to attempting to selectively "all of the affected files"
-after some code change), and, to a certain extent, ``barrier()``. Much of the
-optimisation work that has been put into jug has been to support interactive
-work better.
+better alternative than attempting to selectively update "all of the affected
+files" after some code change), and, to a certain extent, ``barrier()``. Much
+of the optimisation work that has been put into jug has been to support
+interactive work better.
 
 As for more down to earth goals, there should **never be any known bugs** in
 jug. Any bug report has a promise to fix it ASAP. Fixing bugs takes priority

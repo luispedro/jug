@@ -3,7 +3,7 @@ Invalidating Jug Task Results (invalidate subcommand)
 =====================================================
 
 When you invalidate results of a task, you are telling jug that everything that
-was computed using that function needs should no longer be used. Thus, any
+was computed using that function should no longer be used. Thus, any
 result which depended on that function needs to be recomputed.
 
 Invalidation is manual
@@ -15,14 +15,14 @@ detect that you fixed a bug in your code automatically.
 Invalidation is dependency aware
 --------------------------------
 
-When you do invalidate a task, all results that depend on the invalid results
+When you invalidate a task, all results that depend on the invalid results
 will also be invalidated. This is what makes the invalidate subcommand so
 powerful.
 
 Example
 -------
 
-Consider the MP example we useed elsewhere in this guide:
+Consider the MP example we used elsewhere in this guide:
 
 Its dependency graph looks like this::
 

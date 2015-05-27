@@ -39,7 +39,7 @@ juglog
   Outputs a log of jug run/halt/stop commands
 jugoutput
   If your jug tasks print to stdout or stderr, this collects all 
-  of that content from each remote machine ane prints it out. 
+  of that content from each remote machine and prints it out.
   Note that this command will likely need to be configured for 
   your computer
 
@@ -117,7 +117,7 @@ so I've set to run 10 jug processes per slave machine.
 Name of script: Below, the name of my jug script is benchmark_jug.py. 
 Yours is likely different, so please update
 
-Output redirection: I'm outputing stdout and stderr /mnt/localhd . If 
+Output redirection: I'm outputing stdout and stderr to /mnt/localhd. If
 your jug tasks do not use stdout or stderr, then perhaps just do 
 `jug execute <my_jug>.py &> /dev/null &` to redirect everything to 
 /dev/null. If you actually want output, make sure that the directory 
@@ -155,7 +155,7 @@ in the workers.iplist
 This uses the watch command to call 'jug status' every ten seconds
 
 **jugrun**
-*This will likely need to be modified minorly for your use. See
+*This will likely need minor modifications for your use. See the
 'installation' section above.*
 This first posts log entry, then sets up what I call a 'watcher',
 which is a tiny executable that runs in the background on the host

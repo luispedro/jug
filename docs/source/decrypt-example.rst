@@ -23,8 +23,8 @@ The brute force version is very simple:
             passwd = "".join(map(chr,p))
             print('%s:%s' % (passwd, text))
 
-However, if we have more than one processor, we'd like to be able to jug
-``jug`` to use the multiple processors.
+However, if we have more than one processor, we'd like to be able to tell
+``jug`` to use multiple processors.
 
 We cannot simply have each password be its own task: 11M tasks would be too
 much!
@@ -85,7 +85,7 @@ to run, and 4 are currently running; and ``join`` which has a single instance,
 which is ``waiting``: it cannot run until all the ``decrypt`` tasks have
 finished.
 
-Eventually, everyone will be finished and your results will be saved in
+Eventually, everything will be finished and your results will be saved in
 directory ``jugdata`` in files with names such as
 ``jugdata/5/4/a1266debc307df7c741cb7b997004f`` The name is simply a hash of the
 task description (function and its arguments).

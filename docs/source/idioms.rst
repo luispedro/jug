@@ -4,7 +4,7 @@ Idioms
 
 
 There are certain types of computation that show up again and again in parallel
-computation. This section shows up to perform them with jug.
+computation. This section shows how to perform them with jug.
 
 Map/Reduce
 ----------

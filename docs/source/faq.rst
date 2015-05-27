@@ -78,8 +78,8 @@ you check ``jug status`` again, there is still one task that needs to be run!
 While this may be surprising, it is actually correct. Everytime you run the
 script, you build a task that consists of calling ``f`` with a different number
 (because it's a randomly generated number). Given that tasks are defined as the
-a Python function and its arguments, every time you run jug, you build a
-different task (unless you, by chance, draw twice the same number).
+combination of a Python function and its arguments, every time you run jug, you
+build a different task (unless you, by chance, draw twice the same number).
 
 My solution is typically **to set the random seed at the start of the
 computation explicitly**::
@@ -96,8 +96,8 @@ computation explicitly**::
 Now, everything will work as expected.
 
 (As an aside: given that jug was developed in a context where it is important
-to be able to reproduce your results, it is a good idea, in general, if your
-computation dependends of pseudo-random numbers, to be explicit about the
+to be able to reproduce your results, it is generally a good idea that if your
+computation depends on pseudo-random numbers, you be explicit about the
 seeds. So, *this is a feature not a bug*.)
 
 Why does jug not check for code changes?
