@@ -3,7 +3,8 @@ import numpy as np
 from itertools import product, chain
 from crypt import decode, letters, isgood, preprocess
 
-ciphertext = file('secret.msg').read()
+with open('secret.msg') as f:
+    ciphertext = f.read()
 ciphertext = preprocess(ciphertext)
 
 @TaskGenerator
