@@ -26,7 +26,7 @@ Here, we test two thresholding-based segmentation method, called ``method1`` and
     @TaskGenerator
     def method1(image):
         # Read the image
-        image = mh.imread(image)[:,:,0]
+        image = mh.imread(image)[:, :, 0]
         image  = mh.gaussian_filter(image, 2)
         binimage = (image > image.mean())
         labeled, _ = mh.label(binimage)
@@ -34,7 +34,7 @@ Here, we test two thresholding-based segmentation method, called ``method1`` and
 
     @TaskGenerator
     def method2(image):
-        image = mh.imread(image)[:,:,0]
+        image = mh.imread(image)[:, :, 0]
         image  = mh.gaussian_filter(image, 4)
         image = mh.stretch(image)
         binimage = (image > mh.otsu(image))
@@ -57,7 +57,7 @@ Running over all the images **looks exactly like Python**::
     for im in glob('images/*.jpg'):
         m1 = method1(im)
         m2 = method2(im)
-        ref = im.replace('images','references').replace('jpg','png')
+        ref = im.replace('images', 'references').replace('jpg', 'png')
         v1 = compare(m1, ref)
         v2 = compare(m2, ref)
         results.append( (v1,v2) )
@@ -71,7 +71,8 @@ A simple solution is to write a function which writes to an output file::
         import numpy as np
         r1, r2 = np.mean(results, 0)
         with open('output.txt', 'w') as out:
-            out.write('Result method1: {}\nResult method2: {}\n'.format(r1,r2))
+            out.write('Result method1: {}\nResult method2: {}\n'.format(r1,
+                                                                        r2))
     print_results(results)
 
 §

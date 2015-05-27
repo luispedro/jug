@@ -1,11 +1,14 @@
-import requests
-from jug import Task
 from collections import defaultdict
-from time import sleep
-import re
-from os.path import exists
 import json
 from os import mkdir
+from os.path import exists
+import re
+from time import sleep
+
+import requests
+
+from jug import Task
+
 
 def get_data(title):
     sleep(8)
@@ -38,10 +41,14 @@ def get_data(title):
         f.write(text.encode('utf-8'))
     return text
 
+
 def isstopword(titlewords, w):
-    if not re.match('^\w+$', w): return True
-    if w in titlewords: return True
+    if not re.match('^\w+$', w):
+        return True
+    if w in titlewords:
+        return True
     return False
+
 
 def count_words(title, document):
     '''
@@ -56,6 +63,7 @@ def count_words(title, document):
             counts[w] += 1
     return dict(counts)
 
+
 def add_counts(counts):
     '''
     Takes intermediate word counts and puts them together
@@ -63,9 +71,10 @@ def add_counts(counts):
     sleep(24)
     allcounts = defaultdict(int)
     for c in counts:
-        for k,v in c.items():
+        for k, v in c.items():
             allcounts[k] += v
     return dict(allcounts)
+
 
 def divergence(global_counts, nr_documents, counts):
     '''
@@ -75,12 +84,13 @@ def divergence(global_counts, nr_documents, counts):
     '''
     sleep(8)
     specific = []
-    for w,n in counts.items():
-        if n > global_counts[w]//100:
+    for w, n in counts.items():
+        if n > global_counts[w] // 100:
             specific.append(w)
     specific.sort(key=counts.get)
     specific.reverse()
     return specific
+
 
 counts = []
 with open('MPs.txt', 'rb') as f:
@@ -91,4 +101,4 @@ with open('MPs.txt', 'rb') as f:
 avgs = Task(add_counts, counts)
 results = []
 for c in counts:
-    results.append(Task(divergence,avgs, len(counts), c))
+    results.append(Task(divergence, avgs, len(counts), c))
