@@ -20,7 +20,7 @@ The brute force version is very simple:
     for p in product(letters, repeat=5):
         text = decode(ciphertext, p)
         if isgood(text):
-            passwd = "".join(map(chr,p))
+            passwd = "".join(map(chr, p))
             print('%s:%s' % (passwd, text))
 
 However, if we have more than one processor, we'd like to be able to tell
@@ -40,7 +40,7 @@ trying every possibility *starting* with that letter:
         for p in product(letters, repeat=suffix_size):
             text = decode(ciphertext, np.concatenate([prefix, p]))
             if isgood(text):
-                passwd = "".join(map(chr,p))
+                passwd = "".join(map(chr, p))
                 res.append((passwd, text))
         return res
 
@@ -48,7 +48,7 @@ trying every possibility *starting* with that letter:
     def join(partials):
         return list(chain(*partials))
 
-    fullresults = join([decrypt( [let], 4) for let in letters])
+    fullresults = join([decrypt([let], 4) for let in letters])
 
 Here, the ``decrypt`` function returns a list of all the good passwords it
 found. To simplify things, we call the ``join`` function which concatenates all
@@ -98,8 +98,9 @@ results and prints them on stdout:
     import jug
     jug.init('jugfile', 'jugdata')
     import jugfile
+
     results = jug.task.value(jugfile.fullresults)
-    for p,t in results:
+    for p, t in results:
         print("%s\n\n    Password was '%s'" % (t, p))
 
 ``jug.init`` takes the jugfile name (which happens to be ``jugfile.py``, the

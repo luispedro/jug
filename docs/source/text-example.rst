@@ -23,10 +23,11 @@ The algorithm looks like this:
 
     global_counts = add_counts(allcounts) # Here all processes must sync
 
-    for mp,mp_count in zip(MPs,counts):
+    for mp, mp_count in zip(MPs, counts):
         meaningful = []
-        for w,c in mp_count:
-            if c > global_counts[w]//100: meaningful.append(w)
+        for w, c in mp_count:
+            if c > global_counts[w] // 100:
+                meaningful.append(w)
         meaningful.sort(key=mp_count.get)
         meaningful.reverse()
         print(mp, meaningful[:8])
@@ -136,7 +137,7 @@ inside ``jugdata``. To access it, we can write a little script:
     import jugfile
 
     results = jug.task.value(jugfile.results)
-    for mp,r in zip(file('MPs.txt'), results):
+    for mp, r in zip(file('MPs.txt'), results):
         mp = mp.strip()
         print(mp, ":    ", " ".join(r[:8]))
 
