@@ -55,7 +55,8 @@ pssh
 
 **Creating command aliases**
 
-::
+.. code-block:: bash
+
   local ~$ ssh myserver
   myserver ~$ nano .bash_profile
   # Nano opens a text editor and I paste the following at 
@@ -76,9 +77,8 @@ pssh
 
 **Creating workers.iplist**
 This is pretty simple, just create a file called workers.iplist and 
-insert something like this to identify all of your slave computers
+insert something like this to identify all of your slave computers::
 
-::
   10.0.2.2
   10.0.2.4
   10.0.2.5
@@ -89,7 +89,8 @@ insert something like this to identify all of your slave computers
 **Creating .waitonjug executable**
 Create a new file called .waitonjug and insert the following
 
-::
+.. code-block:: bash
+
  #!/bin/sh
 
  echo "Waiting..."
@@ -124,7 +125,7 @@ you're using for output (in my case /mnt/localhd) is NOT shared by NFS,
 or your workers on different machines will be overwriting the same 
 file. Or be a boss and upgrade this script to read in the hostname ;-)
 
-::
+.. code-block:: bash
 
     #!/bin/sh
 
