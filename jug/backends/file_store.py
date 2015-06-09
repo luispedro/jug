@@ -66,7 +66,7 @@ def _fsync_dir(fname):
 
 
 class file_store(base_store):
-    def __init__(self, dname):
+    def __init__(self, dname, compress_numpy=False):
         '''
         file_store(dname)
 
@@ -74,6 +74,7 @@ class file_store(base_store):
         '''
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
+        self.compress_numpy = compress_numpy
 
     def __repr__(self):
         return 'file_store({})'.format(self.jugdir)
@@ -121,7 +122,7 @@ class file_store(base_store):
         output = os.fdopen(fd, 'wb')
         try:
             import numpy as np
-            if type(object) == np.ndarray:
+            if not self.compress_numpy and type(object) == np.ndarray:
                 np.lib.format.write_array(output, object)
                 output.flush()
                 os.fsync(output.fileno())

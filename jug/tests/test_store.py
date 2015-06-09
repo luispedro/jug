@@ -99,3 +99,19 @@ def test_numpy_array():
     assert np.all(arr2 == arr)
     store.remove(key)
     store.close()
+
+@with_setup(teardown=_remove_file_store)
+def test_numpy_array_no_compress():
+    try:
+        import numpy as np
+    except ImportError:
+        raise SkipTest()
+    store = jug.backends.file_store.file_store(_storedir, compress_numpy=False)
+    arr = np.arange(100) % 17
+    arr = arr.reshape((10,10))
+    key = 'mykey'
+    store.dump(arr, key)
+    arr2 = store.load(key)
+    assert np.all(arr2 == arr)
+    store.remove(key)
+    store.close()
