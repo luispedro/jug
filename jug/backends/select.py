@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2010, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,9 +33,10 @@ def select(jugdir):
 
     Parameters
     ----------
-      jugdir : string
-            representation of jugdir.
-            Alternatively, if not a string, a data store
+    jugdir : str
+            representation of jugdir, as a pseudo-URI.
+            If something other than a string is passed, then the function just
+            returns its argument.
 
     Returns
     -------
