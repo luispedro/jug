@@ -385,7 +385,7 @@ class file_based_lock(object):
             import socket
             fd = os.open(self.fullname,os.O_RDWR|os.O_CREAT|os.O_EXCL)
             F = os.fdopen(fd,'w')
-            F.write('%s on %s\n' % (os.getpid(), socket.gethostname()))
+            F.write('PID {} on HOSTNAME {}\n'.format(os.getpid(), socket.gethostname()))
             F.close()
             return True
         except OSError:
