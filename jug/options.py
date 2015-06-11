@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -66,6 +66,7 @@ default_options.argv = None
 default_options.print_out = six.print_
 default_options.status_mode = 'no-cached'
 default_options.status_cache_clear = False
+default_options.short = False
 default_options.pdb = False
 default_options.verbose = 'quiet'
 default_options.debug = False
@@ -255,6 +256,10 @@ def parse(cmdlist=None, optionsfile=None):
                     action='store_true',
                     dest='status_cache_clear',
                     help='Use with status --cache. Removes the cache file')
+    parser.add_option('--short',
+                    action='store_true',
+                    dest='short',
+                    help='Short output')
     parser.add_option('--locks-only', action='store_true', dest='cleanup_locks_only')
     parser.add_option('--pdb',
                     action='store_true',
@@ -297,6 +302,7 @@ def parse(cmdlist=None, optionsfile=None):
     _maybe_set('jugdir')
 
     _maybe_set('verbose')
+    _maybe_set('short')
     _maybe_set('aggressive_unload')
     _maybe_set('invalid_name')
     _maybe_set('pdb')

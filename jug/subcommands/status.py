@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -142,7 +142,19 @@ def update_status(store, ht, deps, rdeps):
 
 
 def _print_status(options, waiting, ready, running, finished):
-    print_task_summary_table(options, [
+    if options.short:
+        n_ready = sum(ready.values())
+        n_running = sum(running.values())
+        n_waiting = sum(waiting.values())
+        n_finished = sum(finished.values())
+        if not n_waiting and not n_running and not n_ready:
+            options.print_out('All finished ({0} tasks).'.format(n_finished))
+        elif not n_running:
+            options.print_out('{0} tasks to be run, {1} finished, (none running).'.format(n_waiting + n_ready, n_finished))
+        else:
+            options.print_out('{0} tasks to be run, {1} finished, ({2} running).'.format(n_waiting + n_ready, n_finished, n_running))
+    else:
+        print_task_summary_table(options, [
                                 ("Waiting", waiting),
                                 ("Ready", ready),
                                 ("Finished", finished),
