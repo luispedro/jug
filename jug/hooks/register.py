@@ -1,10 +1,10 @@
-# Copyright (C) 2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2014-2015, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License: MIT
 
 _hooks = {}
 
-_known_hooks = set([
+_known_hooks = frozenset([
         'execute.task-loadable',
         'execute.task-executed1',
         'execute.task-pre-execute',
