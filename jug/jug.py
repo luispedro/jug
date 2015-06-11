@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,7 +31,7 @@ import logging
 
 from . import task
 from .task import Task
-from .hooks import jug_hook, register_hook
+from .hooks import jug_hook, register_hook, register_hook_once
 from .io import print_task_summary_table
 from .subcommands.status import status
 from .subcommands.webstatus import webstatus
@@ -116,6 +116,16 @@ def execution_loop(tasks, options):
     from time import sleep
 
     logging.info('Execute start (%s tasks)' % len(tasks))
+
+    # For the special (but common) case where most (if not all) of the tasks
+    # can be loaded directly, just skip them as fast as possible:
+    first_unloadable = 0
+    while (first_unloadable < len(tasks)) and tasks[first_unloadable].can_load():
+        t = tasks[first_unloadable]
+        jug_hook('execute.task-loadable', (tasks[first_unloadable],))
+        first_unloadable += 1
+    del tasks[:first_unloadable]
+
     while tasks:
         upnext = [] # tasks that can be run
         for i in range(int(options.execute_nr_wait_cycles)):
@@ -147,14 +157,12 @@ def execution_loop(tasks, options):
             break
         for t in upnext:
             if t.can_load():
-                logging.info('Loadable %s...' % t.name)
                 jug_hook('execute.task-loadable', (t,))
                 continue
             locked = False
             try:
                 locked = t.lock()
                 if t.can_load(): # This can be true if the task ran between the check above and this one
-                    logging.info('Loadable %s...' % t.name)
                     jug_hook('execute.task-loadable', (t,))
                 elif locked:
                     logging.info('Executing %s...' % t.name)
@@ -226,6 +234,9 @@ class TaskStats(object):
     def executed1(self, t):
         self.executed[t.name] += 1
 
+def _log_loadable(t):
+    logging.info('Loadable {}...'.format(t.name))
+
 def execute(options):
     '''
     execute(options)
@@ -239,6 +250,7 @@ def execute(options):
     tstats = TaskStats()
     store = None
     noprogress = 0
+    register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
     if options.aggressive_unload:
         register_hook('execute.task-executed1', lambda t : t.unload_recursive())
 

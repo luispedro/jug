@@ -6,6 +6,8 @@ import jug.task
 from jug.task import Task
 from jug.tests.utils import simple_execute
 from jug.backends.dict_store import dict_store
+from .task_reset import task_reset
+
 import random
 jug.jug.silent = True
 
@@ -14,6 +16,7 @@ _jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
 _jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
 
 
+@task_reset
 def test_jug_execute_simple():
     N = 1024
     random.seed(232)
@@ -27,6 +30,7 @@ def test_jug_execute_simple():
     assert False not in A
     assert max(store.counts.values()) < 4
 
+@task_reset
 def test_jug_execute_deps():
     N = 256
     random.seed(234)
@@ -42,9 +46,8 @@ def test_jug_execute_deps():
     jug.task.Task.store = store
     simple_execute()
     assert False not in A
-    assert max(store.counts.values()) < 4
+    assert max(store.counts.values()) < 5
 
-from .task_reset import task_reset
 def test_aggressive_unload():
     from jug.jug import execution_loop
     from jug.task import alltasks
