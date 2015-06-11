@@ -8,7 +8,7 @@ def inc_A():
 
 def teardown():
     reset_all_hooks()
-    A.clear()
+    del A[:] # A.clear() is not available in Python 2.x
 
 @with_setup(teardown=teardown)
 def test_basic():

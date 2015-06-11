@@ -235,7 +235,7 @@ class TaskStats(object):
         self.executed[t.name] += 1
 
 def _log_loadable(t):
-    logging.info('Loadable {}...'.format(t.name))
+    logging.info('Loadable {0}...'.format(t.name))
 
 def execute(options):
     '''
