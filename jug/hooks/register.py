@@ -29,6 +29,32 @@ def jug_hook(name, args=(), kwargs={}):
     '''
     return [f(*args, **kwargs) for f in _hooks.get(name, [])]
 
+_registered = set([])
+def register_hook_once(name, code, f):
+    '''Register a hook only once
+
+    Parameters
+    ----------
+    name : str
+        Name of hook
+    code : str
+        An identifier for this registration. The second time this function is
+        called with the same (name, code) pair, no action will be taken.
+    f : function
+        Function to call
+        Note that this must be a function, you cannot use it as a decorator
+
+    See Also
+    --------
+    register_hook
+    '''
+    if (name,code) not in _registered:
+        _registered.add( (name, code) )
+        return register_hook(name, f=f)
+    elif f is None:
+        raise NotImplementedError("jug.register_hook_once: function argument must be used")
+
+
 def register_hook(name, f=None):
     '''Register a hook
 
@@ -52,3 +78,10 @@ def register_hook(name, f=None):
         from functools import partial
         return partial(register_hook, name)
     _hooks.setdefault(name, []).append(f)
+
+def reset_all_hooks():
+    '''Reset all hooks
+
+    This is a destructive actions, which cannot be undone'''
+    _registered.clear()
+    _hooks.clear()
