@@ -8,7 +8,7 @@ Jug.IO module
 - write_task_out: write out results, possibly with metadata.
 '''
 
-from .task import TaskGenerator, Task
+from .task import TaskGenerator
 
 class NoLoad(object):
     def __init__(self, t):
@@ -87,13 +87,20 @@ def write_metadata(result, metadata_fname, metadata_format='yaml'):
 
 # Console status table output
 
-import textwrap
 
 def print_task_summary_table(options, groups):
     """Print task summary table given tasks groups.
 
     groups - [(group_title, {(task_name, count)})] grouped summary of tasks.
     """
+    if options.short:
+        for name,gv in groups:
+            options.print_out("{0}:  {1} tasks".format(name, sum(gv.values())))
+        n = sum([sum(gv.values()) for _,gv in groups])
+        options.print_out("** Total: {0} tasks.".format(n))
+        return
+
+    import textwrap
     num_groups = len(groups)
 
     names = list()

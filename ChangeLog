@@ -3,7 +3,7 @@ version 1.1+
 	* Add compress_numpy option to file_store
 	* Add register_hook_once function
 	* Optimize case when most (or all) tasks are already run
-	* Add --short option to 'jug status'
+	* Add --short option to 'jug status' and 'jug execute'
 
 version 1.1 Tue Mar 03 2015 by luispedro
 	* Python 3 compatibility fixes
