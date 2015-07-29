@@ -55,6 +55,8 @@ from .options import set_jugdir
 from .jug import init
 from .backends import file_store, dict_store, redis_store
 
+from .grid import grid_jug
+
 from .jug_version import __version__
 
 __all__ = [
@@ -73,5 +75,6 @@ __all__ = [
     'file_store',
     'dict_store',
     'redis_store',
-    ]
 
+    'grid_jug',
+    ]
