@@ -21,7 +21,7 @@
 #  THE SOFTWARE.
 
 
-from sys import exit
+from sys import exit, version_info
 try:
     import setuptools
 except:
@@ -48,6 +48,10 @@ classifiers = [
 'Intended Audience :: Science/Research',
 ]
 
+install_requires = ['six', 'redis']
+if version_info < (2, 7):
+    install_requires.append('ordereddict')
+
 setuptools.setup(name = 'Jug',
       version = __version__,
       description = 'A Task Based Parallelization Framework',
@@ -61,7 +65,7 @@ setuptools.setup(name = 'Jug',
       packages = setuptools.find_packages(),
       scripts = ['bin/jug', 'bin/jug-execute'],
       test_suite = 'nose.collector',
-      install_requires=['six', 'redis'],
+      install_requires=install_requires,
       )
 
 

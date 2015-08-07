@@ -13,6 +13,10 @@ There are two main alternatives:
 - Rely on the ``TaskGenerator`` decorator as a shortcut for this.
 '''
 
+try:
+    from collections import OrderedDict
+except ImportError:  # Python < 2.7
+    from ordereddict import OrderedDict
 
 from .hash import new_hash_object, hash_update, hash_one
 
@@ -69,7 +73,12 @@ tricky to support since the general code relies on the function name)''')
         self.name = '%s.%s' % (f.__module__, f.__name__)
         self.f = f
         self.args = args
-        self.kwargs = kwargs
+        # The order of keyword arguments is undefined, so store them in an
+        # OrderedDict. Hash the keys before sorting as they might not be
+        # comparable.
+        self.kwargs = OrderedDict()
+        for key in sorted(kwargs, key=hash_one):
+            self.kwargs[key] = kwargs[key]
         alltasks.append(self)
 
     def run(self, force=False, save=True, debug_mode=False):
