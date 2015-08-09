@@ -195,7 +195,10 @@ def execution_loop(tasks, options):
                                 import IPython.core.ipapi
                                 ip = IPython.core.ipapi.get()
                                 colors = ip.colors
-                            debugger = IPython.core.debugger.Pdb(colors)
+                            try:
+                                debugger = IPython.core.debugger.Pdb(colors.get_value(initial='Linux'))
+                            except AttributeError:
+                                debugger = IPython.core.debugger.Pdb(colors)
                         except ImportError:
                             #Fallback to older version of IPython API
                             import IPython.ipapi
