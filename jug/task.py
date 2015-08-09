@@ -237,9 +237,11 @@ tricky to support since the general code relies on the function name)''')
 
     def _compute_set_hash(self):
         M = new_hash_object()
-        M.update(self.name.encode('utf-8'))
-        hash_update(M, enumerate(self.args))
-        hash_update(M, iter(self.kwargs.items()))
+        hash_update(M,
+                    [('name', self.name.encode('utf-8'))
+                    ,('args', self.args)
+                    ,('kwargs', self.kwargs)
+                    ])
         value = M.hexdigest().encode('utf-8')
         self.__jug_hash__ = lambda : value
         return value
