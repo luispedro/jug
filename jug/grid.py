@@ -5,12 +5,48 @@ from .jug import main as jug_main
 
 def grid_jug(jug_args, jug_nworkers=4, name='gridjug', **kwargs):
     """
-    A light-weight wrapper to run jug with gridmap on a Grid Engine cluster
+    A light-weight wrapper to run Jug with GridMap on a Grid Engine cluster
+
+    From their own description, GridMap is a package that allows to easily
+    create jobs on a Grid Engine powered cluster directly from Python.
+    This wrapper lets GridMap simply spawn several jug-execute workers on a
+    Grid Engine cluster.
+    Thus we have the benefit of programmatic (reproducible) execution of Jug
+    processes.
+    Furthermore, GridMap adds a convenient monitoring and reporting layer.
+    Under the hood, of course, Jug keeps doing the actual work.
+
+    Parameters
+    ----------
+
+    jug_args : list
+        Jug command-line arguments.
+        Note that ``'execute'`` is already included.
+        The command line is roughly equivalent to:
+
+            'jug execute ' + ' '.join(jug_args)
+
+    jug_nworkers : int, optional
+        number of Grid Engine tasks to start
+        (i.e. number of times 'jug execute' is run)
+
+    name : str, optional
+        base name of the Grid Engine task
+
+    **kwargs : keyword-dict, optional
+        additional options passed through to gridmap.grid_map
+
+    See Also
+    --------
+
+    `GridMap <https://github.com/pygridtools/gridmap>`_
+
+    `gridmap.grid_map <http://gridmap.readthedocs.org/en/latest/gridmap.html#gridmap.job.grid_map>`_
     """
 
     from gridmap.job import grid_map
 
-    jug_argv = ['dummy_script_name_not_parsed_by_jug', 'execute']
+    jug_argv = ['jug', 'execute']
     jug_argv.extend(jug_args)
 
     # function arguments for grid_map
