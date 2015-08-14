@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import jug.jug
+from .jug import main as jug_main
 
 
 def grid_jug(jug_args, jug_nworkers=4, name='gridjug', **kwargs):
@@ -9,7 +9,7 @@ def grid_jug(jug_args, jug_nworkers=4, name='gridjug', **kwargs):
     """
 
     from gridmap.job import grid_map
-    
+
     jug_argv = ['dummy_script_name_not_parsed_by_jug', 'execute']
     jug_argv.extend(jug_args)
 
@@ -46,4 +46,4 @@ def _jug_main(*args, **kwargs):
     """
     wrapper function for pickle
     """
-    return jug.jug.main(*args, **kwargs)
+    return jug_main(*args, **kwargs)
