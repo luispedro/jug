@@ -87,7 +87,6 @@ def write_metadata(result, metadata_fname, metadata_format='yaml'):
 
 # Console status table output
 
-
 def print_task_summary_table(options, groups):
     """Print task summary table given tasks groups.
 
@@ -103,9 +102,9 @@ def print_task_summary_table(options, groups):
     import textwrap
     num_groups = len(groups)
 
-    names = list()
+    names = set()
     for _, group_data in groups:
-        names.extend(n for n in group_data.keys() if not n in names) 
+        names.update(group_data.keys())
 
     termsize, termheight = get_terminal_size()
     name_width = termsize - (num_groups * 12) - 2
@@ -116,7 +115,7 @@ def print_task_summary_table(options, groups):
     options.print_out(line_format % tuple([g for g, _ in groups] + ["Task name"]))
     options.print_out('-' * format_size)
 
-    for n in names:
+    for n in sorted(names):
         name_lines = textwrap.wrap(n, width=name_width - 4)
         options.print_out(line_format % tuple([g[n] for _, g in groups] + name_lines[:1]))
 
@@ -134,8 +133,7 @@ import shlex
 import struct
 import platform
 import subprocess
- 
- 
+
 def get_terminal_size():
     """ get_terminal_size()
      - get width and height of console
