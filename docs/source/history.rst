@@ -2,6 +2,16 @@
 History
 =======
 
+version **1.2** (Thu Aug 20 2015)
+- Use HIGHEST_PROTOCOL when pickle()ing
+- Add compress_numpy option to file_store
+- Add register_hook_once function
+- Optimize case when most (or all) tasks are already run
+- Add --short option to 'jug status' and 'jug execute'
+- Fix bug with dictionary order in kwargs (fix by Andreas Sorge)
+- Fix ipython colors (fix by Andreas Sorge)
+- Sort tasks in 'jug status'
+
 version **1.1** (Tue Mar 3 2015)
 - Python 3 compatibility fixes
 - fsync(directory) in file backend
