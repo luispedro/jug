@@ -133,7 +133,7 @@ inside ``jugdata``. To access it, we can write a little script:
     import jug
     import jug.task
 
-    jug.init('jugfile', 'jugdata')
+    jug.init('jugfile.py', 'jugdata')
     import jugfile
 
     results = jug.task.value(jugfile.results)

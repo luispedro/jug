@@ -96,15 +96,15 @@ results and prints them on stdout:
 .. code-block:: python
 
     import jug
-    jug.init('jugfile', 'jugdata')
+    jug.init('jugfile.py', 'jugdata')
     import jugfile
 
     results = jug.task.value(jugfile.fullresults)
     for p, t in results:
         print("%s\n\n    Password was '%s'" % (t, p))
 
-``jug.init`` takes the jugfile name (which happens to be ``jugfile.py``, the
-extension is optional if it is ``.py``) and the data directory name.
+``jug.init`` takes the jugfile name (which happens to be ``jugfile.py``) and
+the data directory name.
 
 ``jug.task.value`` takes a ``jug.Task`` and loads its result. It handles more
 complex cases too, such as a list of tasks (and returns a list of their
