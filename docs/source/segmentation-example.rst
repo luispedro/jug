@@ -9,7 +9,10 @@ You can get the `slides online <http://luisepdro.org/talks/2013/jug-meetup>`__.
 Let us imagine you are trying to compare two image segmentation algorithms
 based on human-segmented images. This is a completely real-world example as it
 `was one of the projects where I first used jug
-<https://github.com/luispedro/segmentation>`__ [#]_.
+<https://github.com/luispedro/Coelho2009_ISBI_NuclearSegmentation>`__ [#]_.
+
+It depends on `mahotas <http://mahotas.readthedocs.org/>`__ for image
+processing.
 
 We are going to build this up piece by piece.
 
