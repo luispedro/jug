@@ -1,7 +1,7 @@
 import jug
 import jug.task
 
-jug.init('jugfile', 'jugdata')
+jug.init('jugfile.py', 'jugfile.jugdata')
 import jugfile
 
 

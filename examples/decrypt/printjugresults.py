@@ -1,5 +1,5 @@
 import jug
-jug.init('jugfile', 'jugdata')
+jug.init('jugfile.py', 'jugfile.jugdata')
 import jugfile
 
 
