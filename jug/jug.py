@@ -128,8 +128,12 @@ def execution_loop(tasks, options):
 
     while tasks:
         upnext = [] # tasks that can be run
-        for i in range(int(options.execute_nr_wait_cycles)):
+        nr_wait_cycles = int(options.execute_nr_wait_cycles)
+        for i in range(nr_wait_cycles):
             max_cannot_run = min(len(tasks), 128)
+            if i == nr_wait_cycles - 1:
+                # in the last loop iteration, check all tasks to ensure we don't miss any
+                max_cannot_run = len(tasks)
             for i in range(max_cannot_run):
                 # The argument for this is the following:
                 # if T' is dependent on the result of T, it is better if the
