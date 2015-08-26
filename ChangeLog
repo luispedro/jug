@@ -1,6 +1,7 @@
 version 1.2+
 	* Changed execution loop to ensure that all tasks are checked (issue #33
 	on github)
+	* Fixed bug that made 'check' or 'sleep-until' slower than necessary
 
 version 1.2 Wed Aug 19 2015 by luispedro
 	* Use HIGHEST_PROTOCOL when pickle()ing

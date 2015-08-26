@@ -342,12 +342,11 @@ def _check_or_sleep_until(store, sleep_until):
                 sleep(12)
             else:
                 return 1
-        else:
-            for dep in recursive_dependencies(t):
-                try:
-                    active.remove(dep)
-                except KeyError:
-                    pass
+        for dep in recursive_dependencies(t):
+            try:
+                active.remove(dep)
+            except KeyError:
+                pass
     return 0
 
 
