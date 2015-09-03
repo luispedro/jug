@@ -155,3 +155,8 @@ version **0.9.3** (Dec 2 2012)
 
 For older version see ``ChangeLog`` file.
 
+
+
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/luispedro/jug
+   :target: https://gitter.im/luispedro/jug?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
