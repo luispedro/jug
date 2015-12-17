@@ -230,6 +230,7 @@ def parse(cmdlist=None, optionsfile=None):
     cmdline = Options(infile)
 
     parser = optparse.OptionParser(usage=_usage_simple, version=__version__)
+    parser.disable_interspersed_args()
     parser.add_option(
                     '--aggressive-unload',
                     action='store_true',
