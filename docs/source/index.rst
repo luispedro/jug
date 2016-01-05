@@ -103,6 +103,7 @@ Documentation Contents
     text-example.rst
     segmentation-example.rst
     subcommands.rst
+    status.rst
     types.rst
     tasks.rst
     tasklets.rst
