@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,35 +30,6 @@ __all__ = [
     'identity',
     'CustomHash',
     ]
-
-def _return_first(one, two):
-    '''
-    one = _return_first(one, two)
-
-    Used internally to implement jug.util.timed_path
-    '''
-    return one
-
-def timed_path(path):
-    '''
-    opath = timed_path(ipath)
-
-    Returns a Task object that simply returns `path` with the exception that it uses the
-    paths mtime (modification time) in the hash. Thus, if the file contents change, this triggers
-    an invalidation of the results (which propagates).
-
-    Parameters
-    ----------
-    ipath : str
-        A filesystem path
-
-    Returns
-    -------
-    opath : str
-        A task equivalent to ``(lambda: ipath)``.
-    '''
-    mtime = os.stat_result(os.stat(path)).st_mtime
-    return Task(_return_first, path, mtime)
 
 def _identity(x):
     return x
@@ -98,6 +69,24 @@ class CustomHash(object):
     be a strong hash: ``hash_function(obj0) == hash_function(obj1)`` is taken
     to imply that ``obj0 == obj1``
 
+
+    You can use the helpers in the ``jug.hash`` module (in particular
+    ``hash_one``) to help you. The implementation of ``timed_path`` is a good
+    example of how to use a CustomHash::
+
+        def hash_with_mtime_size(path):
+            from .hash import hash_one
+            st = os.stat_result(os.stat(path))
+            mtime = st.st_mtime
+            size = st.st_size
+            return hash_one((path, mtime, size))
+
+        def timed_path(path):
+            return CustomHash(path, hash_with_mtime_size)
+
+    The ``path`` object (a string or bytes) is wrapped with a hashing function
+    which checks the file value.
+
     Parameters
     ----------
     obj : any object
@@ -113,3 +102,45 @@ class CustomHash(object):
 
     def __jug_value__(self):
         return value(self.obj)
+
+def hash_with_mtime_size(path):
+    '''hvalue = hash_with_mtime_size(path)
+
+    Computes a hash that depends on the mtime and size of the file ``path``.
+
+    Parameters
+    ----------
+    path : filepath
+
+    Returns
+    -------
+    hvalue : bytes
+        A hashed version
+    '''
+    from .hash import hash_one
+    st = os.stat_result(os.stat(path))
+    mtime = st.st_mtime
+    size = st.st_size
+    return hash_one((path, mtime, size))
+
+
+def timed_path(path):
+    '''path = timed_path(path)
+
+    Returns a Task object that simply returns `path` with the exception that it
+    uses the paths mtime (modification time) and the file size in the hash.
+    Thus, if the file is touched or changes size, this triggers an invalidation
+    of the results (which propagates to all dependent tasks).
+
+    Parameters
+    ----------
+    ipath : str
+        A filesystem path
+
+    Returns
+    -------
+    opath : str
+        A task equivalent to ``(lambda: ipath)``.
+    '''
+    return CustomHash(path, hash_with_mtime_size)
+
