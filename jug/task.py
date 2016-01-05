@@ -28,6 +28,7 @@ __all__ = [
 alltasks = []
 
 class _getitem(object):
+    __slots__ = ('slice',)
     def __init__(self, slice):
         self.slice = slice
 
@@ -45,6 +46,7 @@ class _getitem(object):
         return 'jug.task._getitem(%s)' % self.slice
 
 class TaskletMixin(object):
+    __slots__ = ()
     def __getitem__(self, slice):
         return Tasklet(self, _getitem(slice))
 
@@ -343,6 +345,8 @@ class Tasklet(TaskletMixin):
     --------
     Task
     '''
+
+    __slots__ = ('base', 'f')
     def __init__(self, base, f):
         '''
         Tasklet equivalent to::
@@ -351,8 +355,12 @@ class Tasklet(TaskletMixin):
         '''
         self.base = base
         self.f = f
-        self.unload = self.base.unload
-        self.unload_recursive = self.base.unload_recursive
+
+    def unload(self):
+        self.base.unload()
+
+    def unload_recursive(self):
+        self.base.unload_recursive()
 
     def dependencies(self):
         yield self.base
