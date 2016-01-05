@@ -119,6 +119,7 @@ Documentation Contents
     faq.rst
     why.rst
     writeabackend.rst
+    magic.rst
     api.rst
     history.rst
 
