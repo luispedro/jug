@@ -55,7 +55,15 @@ def create_directories(dname):
 def _fsync_dir(fname):
     import errno
     parent = dirname(fname)
-    fd = os.open(parent, os.O_RDONLY)
+    try:
+        fd = os.open(parent, os.O_RDONLY)
+    except:
+        # It seems that, on Windows, you cannot open a directory
+        import sys
+        if sys.platform.startswith('sys'):
+            return
+        else:
+            raise
     try:
         os.fsync(fd)
     except OSError as err:
