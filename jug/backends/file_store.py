@@ -58,11 +58,13 @@ def _fsync_dir(fname):
     try:
         fd = os.open(parent, os.O_RDONLY)
     except:
-        # It seems that, on Windows, you cannot open a directory
+        # It seems that, on Windows and related platforms (cygwin...), you
+        # cannot open a directory to get a file descriptor, so the call above
+        # raises an error.
         import sys
-        if sys.platform.startswith('sys'):
+        if not sys.platform.startswith('linux'):
             return
-        else:
+        else: # On Linux, we still want to check what's wrong
             raise
     try:
         os.fsync(fd)
