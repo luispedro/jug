@@ -65,7 +65,10 @@ def shell(store, options, jugspace):
     Currently depends on Ipython being installed.
     '''
     try:
-        from IPython.frontend.terminal.embed import InteractiveShellEmbed
+        if IPython.version_info[0]>=1:
+            from IPython.terminal.embed import InteractiveShellEmbed
+        else:
+            from IPython.frontend.terminal.embed import InteractiveShellEmbed
         from IPython.frontend.terminal.ipapp import load_default_config
         config = load_default_config()
         ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
@@ -101,4 +104,3 @@ def shell(store, options, jugspace):
     jugspace.update(local_ns)
     local_ns['__name__'] = '__jugfile__'
     ipshell(global_ns=jugspace, local_ns=local_ns)
-
