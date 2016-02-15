@@ -48,6 +48,7 @@ def test_memoize_lock():
     t2 = Task(double, 2)
     assert t2.is_locked()
 
+@with_setup(teardown=_remove_file_store)
 def test_lock_bytes():
     store = file_store(_storedir)
     lock = store.getlock('foo')
