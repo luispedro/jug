@@ -1,7 +1,9 @@
-version 1.2+
+version 1.2.1
 	* Changed execution loop to ensure that all tasks are checked (issue #33
 	on github)
 	* Fixed bug that made 'check' or 'sleep-until' slower than necessary
+	* Fixed jug on Windows (which does not support fsync on directories)
+	* Made Tasklets use slightly less memory
 
 version 1.2 Wed Aug 19 2015 by luispedro
 	* Use HIGHEST_PROTOCOL when pickle()ing

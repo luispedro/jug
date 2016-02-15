@@ -87,6 +87,14 @@ Travis Build Status
 What's New
 ----------
 
+version **1.2.1** (Mon Feb 15 2016)
+- Changed execution loop to ensure that all tasks are checked (issue #33 on
+  github)
+- Fixed bug that made 'check' or 'sleep-until' slower than necessary
+- Fixed jug on Windows (which does not support fsync on directories)
+- Made Tasklets use slightly less memory
+
+
 version **1.2** (Thu Aug 20 2015)
 - Use HIGHEST_PROTOCOL when pickle()ing
 - Add compress_numpy option to file_store
