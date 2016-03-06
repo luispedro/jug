@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -98,14 +98,13 @@ class decompress_stream(object):
         self.queue = six.b('')
 
     def read(self, nbytes):
-        res = six.b('')
-        if self.queue:
-            if len(self.queue) >= nbytes:
-                res = self.queue[:nbytes]
-                self.queue = self.queue[nbytes:]
-                return res
-            res = self.queue
-            self.queue = b''
+        if len(self.queue) >= nbytes:
+            res = self.queue[:nbytes]
+            self.queue = self.queue[nbytes:]
+            self.lastread = res
+            return res
+        res = self.queue
+        self.queue = six.b('')
 
         if self.D.unconsumed_tail:
             res += self.D.decompress(self.D.unconsumed_tail, nbytes - len(res))
