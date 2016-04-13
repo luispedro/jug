@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,11 +65,13 @@ def shell(store, options, jugspace):
     Currently depends on Ipython being installed.
     '''
     try:
+        import IPython
         if IPython.version_info[0]>=1:
             from IPython.terminal.embed import InteractiveShellEmbed
+            from IPython.terminal.ipapp import load_default_config
         else:
             from IPython.frontend.terminal.embed import InteractiveShellEmbed
-        from IPython.frontend.terminal.ipapp import load_default_config
+            from IPython.frontend.terminal.ipapp import load_default_config
         config = load_default_config()
         ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
     except ImportError:
