@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2011, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,9 +26,9 @@ redis_store: store based on a redis backend
 
 
 import re
+import six
 import logging
 from base64 import b64encode, b64decode
-
 from jug.backends.encode import encode, decode
 from .base import base_store, base_lock
 
@@ -41,10 +41,14 @@ except ImportError:
     redis_functional = False
 
 def _resultname(name):
-    return 'result:{0}'.format(name).encode('utf-8')
+    if type(name) == type(six.u('')):
+        name = name.encode('utf-8')
+    return six.b('result:') + name
 
 def _lockname(name):
-    return 'lock:{0}'.format(name).encode('utf-8')
+    if type(name) == type(six.u('')):
+        name = name.encode('utf-8')
+    return six.b('lock:') + name
 
 _LOCKED = 1
 
