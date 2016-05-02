@@ -1,22 +1,25 @@
 #!/usr/bin/env nix-shell
 
 with import <nixpkgs> {};
+{ python ? python27, pythonPackages ? pkgs.python27Packages }:
 
 let
   version = "1.2.1";
 in
 
-buildPythonPackage {
+pythonPackages.buildPythonPackage {
   name = "jug-${version}";
-  buildInputs = with pkgs.python27Packages; [
-    python27Full
-    python27Packages.virtualenv
-    python27Packages.setuptools
-    python27Packages.pyyaml
-    python27Packages.numpy
-    python27Packages.nose
-    python27Packages.redis
-    python27Packages.six
+  buildInputs = [
+    pythonPackages.nose
+  ];
+  propagatedBuildInputs = [
+    python
+    pythonPackages.virtualenv
+    pythonPackages.setuptools
+    pythonPackages.pyyaml
+    pythonPackages.numpy
+    pythonPackages.redis
+    pythonPackages.six
 
     zlib
   ];
