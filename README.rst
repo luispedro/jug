@@ -87,6 +87,11 @@ Travis Build Status
 What's New
 ----------
 
+version **1.2.2** (Sat Jun 25 2016)
+- Fix bugs in shell subcommand and a few corner cases in encoding/decoding
+  results
+
+
 version **1.2.1** (Mon Feb 15 2016)
 - Changed execution loop to ensure that all tasks are checked (issue #33 on
   github)
