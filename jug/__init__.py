@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -30,22 +30,7 @@ The main use of jug is from the command line::
     jug status jugfile.py
     jug execute jugfile.py
 
-You import jug to help you write your jugfiles.
-
-Main Contents
--------------
-
-Task : Task class
-    Task(function, arg0, arg1, arg2,...)
-
-TaskGenerator : functional decorator
-
-CachedFunction : load a function result from disk, running it if needed
-
-barrier : function
-    if you place this anywhere in a jugfile, it assures that all tasks up to
-    this point have completed before proceeding.
-
+Where ``jugfile.py`` is a Python script using the ``jug`` library.
 '''
 
 from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask

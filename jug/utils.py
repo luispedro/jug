@@ -39,10 +39,20 @@ def identity(x):
     x = identity(x)
 
     `identity` implements the identity function as a Task
-    (i.e., value(identity(x)) == x)
+    (i.e., ``value(identity(x)) == x``)
 
-    This seems pointless, but if x is, for example, a very large list, then
-    using the output of this function might be much faster than using x directly.
+    This seems pointless, but if ``x`` is, for example, a very large list, then
+    using this function might speed up some computations. Consider::
+
+        large = list(range(100000))
+        large = jug.utils.identity(large)
+        for i in range(100):
+            Task(process, large, i)
+
+    This way the list ``large`` is going to get hashed just once. Without the
+    call to ``jug.utils.identity``, it would get hashed at each loop iteration.
+
+    https://jug.readthedocs.io/en/latest/utilities.html#identity
 
     Parameters
     ----------

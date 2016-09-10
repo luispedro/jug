@@ -18,11 +18,11 @@ case, the default file-based backend will work nicely.
 
 You need to start separate ``jug execute`` processes on each node.
 
-See also the answer to the next question as well as the `bash utilities page
-<bash.html>`__
+See also the answer to the next question if you are using a batch system or the
+`bash utilities page <bash.html>`__ if you are not.
 
-Will jug work on batch cluster systems (like SGE or PBS)?
----------------------------------------------------------
+Will jug work on batch cluster systems (like SGE/LFS/PBS)?
+----------------------------------------------------------
 
 Yes, it was built for it.
 
@@ -31,7 +31,6 @@ The simplest way to do it is to use a job array.
 On LFS, it would be run like this::
 
   bsub -o output.txt -J "jug[1-100]" jug execute myscript.py
-
 
 For SGE, you often need to write a script. For example::
 
@@ -47,16 +46,17 @@ Now, you can run a job array::
 
   qsub -t 1-100 ./jug1.sh
 
-In both cases, 100 jobs would start running, jug synchronizing their
-outputs. Given that jobs can join the computation at any time and
-all of the communication is through the backend (file system by
-default), jug is especially suited for these environments.
 
-You can also use jug in interactive mode, but in such case, and
-assuming several nodes have been allocated to you, you need to ssh
-into such allocated computation node before you launch jug, otherwise
-you may use more CPUs than were allocated to you on the initial node.
+Alternatively, depending on your set up, you can pass in the script on STDIN::
 
+
+    echo jug execute myscript.py | qsub -t 1-100
+
+In any case, 100 jobs would start running with jug synchronizing their outputs.
+
+Given that jobs can join the computation at any time and all of the
+communication is through the backend (file system by default), jug is
+especially suited for these environments.
 
 It doesn't work with random input!
 ----------------------------------

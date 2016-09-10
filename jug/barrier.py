@@ -20,6 +20,12 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+'''
+See more complete documentation at
+
+https://jug.readthedocs.io/en/latest/barrier.html
+'''
+
 class BarrierError(Exception):
     '''
     Used to represent a barrier() violation
@@ -29,7 +35,7 @@ class BarrierError(Exception):
 def barrier():
     '''
     barrier()
-    
+
     In a jug file, it assures that all tasks defined up to now have been
     completed. If not, parsing will (temporarily) stop at that point.
 
@@ -40,7 +46,7 @@ def barrier():
     --------
     bvalue : function
         Restricted version of this function. Often faster
-    ''' 
+    '''
     # The reason to import here instead of at module level is that if some
     # other code does
     # jug.task.alltasks = []
@@ -55,18 +61,17 @@ def bvalue(t):
     '''
     value = bvalue(t)
 
-    Works similarly to::
+    Named after ``barrier``+``value``, this function Works similarly to::
 
         barrier()
         value = value(t)
 
-    except that it only checks that `t` is complete.
+    except that it only checks that `t` is complete (and not all tasks) and
+    thus can be much faster than a full ``barrier()`` call.
 
-    This can be much faster than a full ``barrier()`` call.
     See Also
     --------
-    barrier : function
-        Checks that **all** tasks have results available.
+    barrier : Checks that **all** tasks have results available.
     '''
     from .task import value
     try:

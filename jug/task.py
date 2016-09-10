@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -54,10 +54,14 @@ class Task(TaskletMixin):
     '''
     T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
-    Defines a task, which is roughly equivalent to::
+    Defines a task, which will call::
 
         f(dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
+    See Also
+    --------
+
+    TaskGenerator : function
     '''
     store = None
     # __slots__ = ('name', 'f', 'args', 'kwargs', '_hash','_lock')
@@ -479,6 +483,16 @@ def CachedFunction(f,*args,**kwargs):
     That is, it calls the function if the value is available,
     but caches the result for the future.
 
+    You can often use ``bvalue`` to achieve similar results::
+
+        task = Task(f, *args, **kwargs)
+        value = bvalues(task)
+
+    This alternative method is more flexible, but will only be execute lazily.
+    In particular, a ``jug status`` will not see past the ``bvalue`` call until
+    ``jug execute`` is called to execute ``f``, while a ``CachedFunction``
+    object will always execute.
+
     Parameters
     ----------
     f : function
@@ -493,15 +507,8 @@ def CachedFunction(f,*args,**kwargs):
     --------
     bvalue : function
         An alternative way to achieve similar results to ``CachedFunction(f)``
-        using ``bvalue`` is::
+        is using ``bvalue``.
 
-            ft = Task(f)
-            fvalue = bvalue(ft)
-
-        The alternative method is more flexible, but will only be execute
-        lazily. In particular, a ``jug status`` will not see past the
-        ``bvalue`` call until ``jug execute`` is called to execute ``f``, while
-        a ``CachedFunction`` object will always execute.
 
     '''
     t = Task(f,*args, **kwargs)
@@ -520,7 +527,36 @@ class TaskGenerator(object):
     Turns f from a function into a task generator.
 
     This means that calling ``f(arg0, arg1)`` results in:
-    ``Task(f, arg0, arg1)``
+    ``Task(f, arg0, arg1)``. This can make your jug-based code feel very
+    similar to what you do with traditional Python.
+
+
+    Example
+    -------
+
+    Add the following to ``jugfile.py``::
+
+        from jug import TaskGenerator
+
+        @TaskGenerator
+        def get1():
+            return 1
+
+        @TaskGenerator
+        def add(a, b):
+            return a + b
+
+
+        x = get1()
+        y = add(x, 2)
+        y = add(y, y)
+
+    Now, you have 3 tasks:
+
+    1. call ``get1``
+    2. call ``add`` with the result of that and the value 2
+    2. call ``add`` again with the result of the previous call
+
     '''
     _jug_is_task_generator = True
     def __init__(self, f):

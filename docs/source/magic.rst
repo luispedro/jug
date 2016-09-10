@@ -2,6 +2,10 @@
 Magic Jug Methods
 =================
 
+This is an advanced use of jug and you can shoot yourself in the foot doing
+this. If you cannot figure out why this functionality could be useful, then you
+probably should not be using it.
+
 Custom hash functions
 ---------------------
 
@@ -83,7 +87,7 @@ jug used internally to load objects.
 
 Again, ``value(x)`` works in the following way:
 
-1. Does the ``x.__jug_value__()`` exists? If so, call it.
+1. Does the ``x.__jug_value__`` member exist? If so, call it.
 2. Is ``x`` one of the composite types it knows about (dict, list,...). If so, use
    special code to recursively get all the sub objects. For a list
    ``value([x,y]) == [value(x), value(y)]``.

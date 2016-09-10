@@ -45,7 +45,7 @@ Which Backend Should I Use?
 ---------------------------
 
 If all your nodes share a filesystem and you don't want to set anything up,
-just you the default filesystem backend. If your computations are non-trivial
+just use the default filesystem backend. If your computations are non-trivial
 (in general, you should avoid breaking up your algorithm so much that each
 tasks takes less than a second), then this will be fast enough and very robust.
 
@@ -56,7 +56,7 @@ redis. For some cases (if you have many outputs of computations that do not
 take very long), it is also faster and, if your results are small, takes up
 significantly less space.
 
-So the tradeoffs are speed and space vs. convenience. 
+The tradeoffs are speed and space vs. convenience.
 
 .. _redis: http://code.google.com/p/redis
 

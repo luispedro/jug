@@ -35,7 +35,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'Jug'
-copyright = '2008-2013, Luis Pedro Coelho'
+copyright = '2008-2016, Luis Pedro Coelho'
 
 # The short X.Y version.
 version = jug_version[:3]
@@ -80,7 +80,7 @@ pygments_style = 'sphinx'
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
 #html_style = 'default.css'
-html_theme = 'nature'
+# html_theme = 'nature'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
