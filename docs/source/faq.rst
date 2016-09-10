@@ -58,6 +58,10 @@ Given that jobs can join the computation at any time and all of the
 communication is through the backend (file system by default), jug is
 especially suited for these environments.
 
+The project `gridjug <http://gridjug.readthedocs.io/>`__ integrates jug with
+`gridmap <https://github.com/pygridtools/gridmap>`__ to help run jug on SGE
+clusters (this is an external project).
+
 How do I clean up locks if jug processes are killed?
 ----------------------------------------------------
 
