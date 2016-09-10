@@ -37,7 +37,7 @@ For SGE, you often need to write a script. For example::
   cat >>jug1.sh <<EOF
   #!/bin/bash
 
-  jug execute myscript.py
+  exec jug execute myscript.py
   EOF
 
   chmod +x jug1.sh
@@ -57,6 +57,36 @@ In any case, 100 jobs would start running with jug synchronizing their outputs.
 Given that jobs can join the computation at any time and all of the
 communication is through the backend (file system by default), jug is
 especially suited for these environments.
+
+How do I clean up locks if jug processes are killed?
+----------------------------------------------------
+
+Jug will attempt to clean up when exiting, including if it receives a SIGTERM
+signal on Unix. However, there is nothing it can do if it receives a SIGKILL (or
+if the computer crashes).
+
+The solution is to run ``jug cleanup`` to remove all the locks.
+
+In some cases, you can avoid the problem in the first place by making sure that
+SIGTERM is being properly delivered to the jug process.
+
+For example, if you executing a script that only runs jug (like in the previous
+question), then use ``exec`` to replace the script by the jug process.
+
+Alternatively, in bash you can set a ``trap`` to catch and propagate the
+``SIGTERM``::
+
+    #!/bin/bash
+    N_JOBS=10
+
+    pids=""
+    for i in $(seq $N_JOBS); do
+        jug execute &
+        pids="$! $pids"
+    done
+    trap "kill -TERM $pids; exit 1" TERM
+    wait
+
 
 It doesn't work with random input!
 ----------------------------------
