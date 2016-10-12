@@ -3,31 +3,13 @@ import os
 
 import jug.jug
 from jug.tests.utils import simple_execute
-from jug.backends.dict_store import dict_store
-from .task_reset import task_reset
 from jug.task import describe
-from nose.tools import with_setup
-
+from .task_reset import task_reset
+from .utils import remove_files
 
 _jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
 _jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
 
-
-def remove_files(flist, dlist):
-    def teardown():
-        from os import unlink
-        for f in flist:
-            try:
-                unlink(f)
-            except:
-                pass
-        from shutil import rmtree
-        for dir in dlist:
-            try:
-                rmtree(dir)
-            except:
-                pass
-    return with_setup(None, teardown)
 
 @task_reset
 def test_describe():
@@ -40,7 +22,7 @@ def test_describe():
 
 @remove_files(['x.pkl', 'x.meta.yaml', 'x.meta.json'], ['testing_TO_DELETE.jugdata'])
 @task_reset
-def test_describe():
+def test_describe_load():
     jugfile = os.path.join(_jugdir, 'write_with_meta.py')
     store, space = jug.jug.init(jugfile, 'testing_TO_DELETE.jugdata')
     simple_execute()

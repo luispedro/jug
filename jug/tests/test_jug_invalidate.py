@@ -1,7 +1,6 @@
 import inspect
 import os
 
-from nose.tools import with_setup
 import jug.jug
 import jug.task
 from jug.task import Task
@@ -9,7 +8,6 @@ from jug.backends.dict_store import dict_store
 from jug.options import Options, default_options
 from jug.tests.utils import simple_execute
 from jug.tests.task_reset import task_reset
-import random
 jug.jug.silent = True
 
 
