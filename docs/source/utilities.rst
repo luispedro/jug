@@ -20,7 +20,7 @@ speeding things up. Consider the following case::
     from glob import glob
 
     def load(fname):
-       return open(fname).readlines() 
+       return open(fname).readlines()
 
     @TaskGenerator
     def process(inputs, parameter):
@@ -44,7 +44,7 @@ of the hashes.
 Consider the variation::
 
     from jug.utils import identity
-    
+
     # ...
     # same as above
 
@@ -56,6 +56,17 @@ Consider the variation::
 Now, the long list is only hashed once! It is transformed into a ``Task`` (we
 reuse the name ``inputs`` to keep things clear) and each ``process`` call can
 now compute its hash very fast.
+
+jug_execute
+-----------
+
+This is a simple wrapper around ``subprocess.call()``. It adds two important
+pieces of functionality:
+
+1. it checks the exit code and raises an exception if not zero (this can be
+   disabled by passing ``check_exit=False``).
+2. It takes an argument called ``run_after`` which is ignored but can be used
+   to declare dependencies between tasks.
 
 .. automodule:: jug.utils
     :members:

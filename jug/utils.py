@@ -23,7 +23,7 @@
 
 import os
 
-from .task import Task, Tasklet, value
+from .task import Task, TaskGenerator, Tasklet, value
 
 __all__ = [
     'timed_path',
@@ -154,3 +154,30 @@ def timed_path(path):
     '''
     return CustomHash(path, hash_with_mtime_size)
 
+@TaskGenerator
+def jug_execute(args, check_exit=True, run_after=None):
+    '''jug_execute(args, check_exit=True, run_after=None)
+
+    Wrapper around ``subprocess.call()``
+
+    Examples
+    --------
+
+    ::
+
+        create_input_tmp = jug_execute(['cp', 'input', 'input.tmp'])
+        jug_execute(['wc', '-l', 'input.tmp'], run_after=create_input_tmp)
+
+    Parameters
+    ----------
+    args : list of str
+    check_exit : boolean, optional
+        If true (default), then a non-zero exit results in an exception
+    run_after : any, optional
+        This is unused by the function, but can be used to order different
+        calls to jug_execute
+    '''
+    import subprocess
+    ret = subprocess.call(args)
+    if check_exit and ret != 0:
+        raise SystemError("Error in system")
