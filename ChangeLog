@@ -1,3 +1,7 @@
+version 1.2.2+
+	* Add `jug_execute` function
+	* Add timing functionality
+
 version 1.2.2 Sat Jun 25 2016 by luispedro
 	* Fix bugs in shell subcommand and a few corner cases in encoding/decoding
 	results

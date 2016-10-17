@@ -8,6 +8,8 @@ _known_hooks = frozenset([
         'execute.task-loadable',
         'execute.task-executed1',
         'execute.task-pre-execute',
+        'execute.finished_pre_status',
+        'execute.finished_post_status',
         ])
 
 def jug_hook(name, args=(), kwargs={}):

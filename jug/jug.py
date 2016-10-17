@@ -283,8 +283,9 @@ def execute(options):
         logging.info('No tasks can be run!')
 
 
-
+    jug_hook('execute.finished_pre_status')
     print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
+    jug_hook('execute.finished_post_status')
 
 def cleanup(store, options):
     '''
