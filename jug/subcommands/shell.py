@@ -105,4 +105,13 @@ def shell(store, options, jugspace):
 
     jugspace.update(local_ns)
     local_ns['__name__'] = '__jugfile__'
-    ipshell(global_ns=jugspace, local_ns=local_ns)
+    if IPython.version_info[0] >= 5:
+        from sys import modules
+        for mod in modules.values():
+            if getattr(mod, '__dict__', None) is jugspace:
+                break
+        else:
+            raise KeyError("Could not find jug module")
+        ipshell(module=mod, local_ns=local_ns)
+    else:
+        ipshell(global_ns=jugspace, local_ns=local_ns)
