@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2012-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,6 +45,11 @@ H1 .jugfile {
 TH {
     color: #6d2243;
 }
+
+TH.task-name {
+    text-align: left;
+    padding-right: 2em;
+}
 </style>
 </head>
 <body>
@@ -63,7 +68,7 @@ TH {
 '''
 _row_template = '''
 <tr>
-    <th>%s</th>
+    <th class="task-name">%s</th>
     <td>%s</td>
     <td>%s</td>
     <td>%s</td>
@@ -94,31 +99,29 @@ def webstatus(options):
     st.create_sqlite3(connection, ht, deps, rdeps)
 
     try:
-        import web
+        import bottle
     except ImportError:
         from sys import stderr
         stderr.write('''
 webstatus subcommand requires that web.py be installed (it could not be found).
 You can try one of the following commands to install it:
 
-    pip install web.py
+    pip install bottle
 
 or
 
-    easy_install web.py
+    easy_install bottle
 ''')
         return
-    urls = (
-        '/(.*)', 'status'
-    )
-    class Status(object):
-        def GET(self, name):
-            ht, deps, rdeps = st.retrieve_sqlite3(connection)
-            tw,tre,tru,tf,dirty = st.update_status(store, ht, deps, rdeps)
-            st.save_dirty3(connection, dirty)
-            return template % {
-                    'jugfile' : options.jugfile,
-                    'table' : _format_counts(tw, tre, tru, tf),
-            }
-    app = web.application(urls, {'status': Status})
-    app.run()
+
+    app = bottle.Bottle()
+    @app.route('/')
+    def status():
+        ht, deps, rdeps = st.retrieve_sqlite3(connection)
+        tw,tre,tru,tf,dirty = st.update_status(store, ht, deps, rdeps)
+        st.save_dirty3(connection, dirty)
+        return template % {
+                'jugfile' : options.jugfile,
+                'table' : _format_counts(tw, tre, tru, tf),
+        }
+    bottle.run(app)
