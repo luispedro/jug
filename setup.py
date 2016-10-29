@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,12 +36,19 @@ exec(compile(open('jug/jug_version.py').read(), 'jug/jug_version.py', 'exec'))
 long_description = open('README.rst').read()
 
 classifiers = [
-'Development Status :: 4 - Beta',
+'Development Status :: 5 - Production/Stable',
 'Environment :: Console',
 'License :: OSI Approved :: MIT License',
 'Operating System :: POSIX',
 'Operating System :: OS Independent',
 'Programming Language :: Python',
+'Programming Language :: Python :: 2',
+'Programming Language :: Python :: 2.7',
+'Programming Language :: Python :: 3',
+'Programming Language :: Python :: 3.3',
+'Programming Language :: Python :: 3.4',
+'Programming Language :: Python :: 3.5',
+'Programming Language :: Python :: 3.6',
 'Topic :: Scientific/Engineering',
 'Topic :: Software Development',
 'Topic :: System :: Distributed Computing',
@@ -57,9 +64,14 @@ setuptools.setup(name = 'Jug',
       license = 'MIT',
       platforms = ['Any'],
       classifiers = classifiers,
-      url = 'http://luispedro.org/software/jug',
+      url = 'https://jug.readthedocs.io',
       packages = setuptools.find_packages(),
-      scripts = ['bin/jug', 'bin/jug-execute'],
+      entry_points={
+          'console_scripts': [
+              'jug = jug.jug:main',
+          ],
+      },
+      scripts = ['bin/jug-execute'],
       test_suite = 'nose.collector',
       install_requires=['six', 'redis'],
       )
