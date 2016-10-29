@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -305,7 +305,6 @@ class file_store(base_store):
         lock : Lock object
             This is a file_lock object
         '''
-        self._maybe_create()
         return file_based_lock(self.jugdir, name)
 
     def close(self):
@@ -353,7 +352,8 @@ class file_store(base_store):
 
         Removes from disk all the files associated with this jugdir.
         '''
-        shutil.rmtree(jugdir)
+        if path.exists(jugdir):
+            shutil.rmtree(jugdir)
 
 
 class file_based_lock(object):
