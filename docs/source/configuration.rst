@@ -5,7 +5,13 @@ Configuration
 Configuration file
 ------------------
 
-On startup, ``jug`` reads the file ``~/.jug/configrc`` (if it exists). It
+.. versionadded:: 1.3
+    In previous versions, the configuration file was called
+    ``~/.jug/configrc``. Since version 1.3, the path ``~/.config/jugrc`` is
+    used (for compatibility, ``~/.jug/configrc`` is used if ``~/.config/jugrc``
+    is missing).
+
+On startup, ``jug`` reads the file ``~/.config/jugrc`` (if it exists). It
 expects an *.ini* format file. It can have the following fields::
 
     [main]

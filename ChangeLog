@@ -1,4 +1,6 @@
 version 1.2.2+
+	* Use ~/.config/jugrc as configuration file
+	* Cleanup usage string
 	* Use `bottle` instead of `web.py` for webstatus subcommand
 	* Add `jug_execute` function
 	* Add timing functionality

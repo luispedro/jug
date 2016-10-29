@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -91,63 +91,26 @@ _Commands = (
     'stats',
     'webstatus',
     )
-_usage_string = \
-'''jug SUBCOMMAND JUGFILE OPTIONS...
+
+_usage = '''\
+jug SUBCOMMAND [JUGFILE] [OPTIONS...]
+
+Docs: https://jug.readthedocs.io/
+Copyright: 2008-2016, Luis Pedro Coelho
 
 Subcommands
 -----------
    execute:      Execute tasks
    status:       Print status
+   webstatus:    Start a web interface which displays the status
+   shell:        Run a shell after initialization
    check:        Returns 0 if all tasks are finished. 1 otherwise.
    sleep-until:  Wait until all tasks are done, then exit.
    count:        Simply count tasks
    cleanup:      Cleanup: remove result files that are not used.
    invalidate:   Invalidate the results of a task
-   shell:        Run a shell after initialization
 
-General Options
----------------
---jugdir=JUGDIR
-    Directory in which to save intermediate files
-    You can use Python format syntax, the following variables are available:
-        - date
-        - jugfile (without extension)
-    By default, the value of `jugdir` is "%(jugfile)s.jugdata"
---verbose=LEVEL
-    Verbosity level ('DEBUG', 'INFO', 'QUIET')
-
-execute OPTIONS
----------------
---aggressive-unload
-    Aggressively unload data from memory. This causes many more reloading of
-    information, but is necessary if keeping too much in memory is leading to
-    memory errors.
---pdb
-    Call interactive debugger on errors. Preferentially uses IPython debugger.
---debug
-    Debug mode. This adds a little more error checking, thus it can be slower.
-    However, it detects certain types of errors and prints an error message. If
-    --pdb is passed, --debug is automatically implied, but the opposite is not
-    true: you can use --debug mode without --pdb.
---keep-going
-    Keep going after errors
-
-invalidate OPTIONS
-------------------
---invalid=TASK-NAME
-    Task name to invalidate
-
-
-Examples
---------
-
-  jug status script.py
-  jug execute script.py &
-  jug execute script.py &
-  jug status script.py
 '''
-
-_usage_simple = 'jug SUBCOMMAND [JUGFILE] [OPTIONS...]'
 
 def usage(error=None):
     '''
@@ -155,11 +118,10 @@ def usage(error=None):
 
     Print an usage string and exit.
     '''
-    import sys
     if error is not None:
         error += '\n'
         sys.stderr.write(error)
-    print(_usage_string)
+    print(_usage)
     sys.exit(1)
 
 def _str_to_bool(s):
@@ -167,7 +129,7 @@ def _str_to_bool(s):
 
 def read_configuration_file(fp=None):
     '''
-    options = read_configuration_file(fp='~/.jug/configrc')
+    options = read_configuration_file(fp='~/.config/jugrc')
 
     Parse configuration file.
 
@@ -178,10 +140,14 @@ def read_configuration_file(fp=None):
     '''
     if fp is None:
         from os import path
-        fp = path.expanduser('~/.jug/configrc')
-        try:
-            fp = open(fp)
-        except IOError:
+        for fp in ['~/.config/jugrc', '~/.jug/configrc']:
+            if path.exists(fp):
+                try:
+                    fp = open(fp)
+                except IOError:
+                    return Options(None)
+                break
+        else:
             return Options(None)
     from six.moves import configparser
     config = configparser.RawConfigParser()
@@ -229,17 +195,28 @@ def parse(cmdlist=None, optionsfile=None):
     infile.next = default_options
     cmdline = Options(infile)
 
-    parser = optparse.OptionParser(usage=_usage_simple, version=__version__)
+    parser = optparse.OptionParser(usage=_usage, version=__version__)
     parser.add_option(
                     '--aggressive-unload',
                     action='store_true',
                     dest='aggressive_unload',
-                    help='Do not keep intermediate results in memory (for jobs which require a lot of memory)')
-    parser.add_option('--invalid',action='store',dest='invalid_name')
+                    help='''\
+Aggressively unload data from memory. This causes many more reloading of
+information, but is necessary if keeping too much in memory is leading to
+memory errors.''')
+    parser.add_option('--invalid',
+                    action='store',
+                    dest='invalid_name',
+                    help='Task name to invalidate')
     parser.add_option('--jugdir',
                     action='store',
                     dest='jugdir',
-                    help='Where to save intermediate results')
+                    help='''\
+Directory in which to save intermediate files
+You can use Python format syntax, the following variables are available:
+    - date
+    - jugfile (without extension)
+By default, the value of `jugdir` is "%(jugfile)s.jugdata"''')
     parser.add_option('--verbose',
                     action='store',
                     dest='verbose',
@@ -268,14 +245,17 @@ def parse(cmdlist=None, optionsfile=None):
     parser.add_option('--debug',
                     action='store_true',
                     dest='debug',
-                    help='Turn on debug mode')
+                    help='''\
+Debug mode. This adds a little more error checking, thus it can be slower.
+However, it detects certain types of errors and prints an error message. If
+--pdb is passed, --debug is automatically implied, but the opposite is not
+true: you can use --debug mode without --pdb.''')
     parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
     parser.add_option('--keep-going', action='store_true', dest='execute_keep_going', help='For execute: continue after errors')
     parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
     options,args = parser.parse_args(cmdlist)
     if not args:
         usage()
-        return
 
     cmdline.cmd = args.pop(0)
     if args:
@@ -283,13 +263,10 @@ def parse(cmdlist=None, optionsfile=None):
 
     if cmdline.cmd not in _Commands:
         usage(error='No sub-command given')
-        return
     if options.invalid_name and cmdline.cmd != 'invalidate':
         usage(error='invalid-name is only useful for invalidate subcommand')
-        return
     if cmdline.cmd == 'invalidate' and not options.invalid_name:
         usage(error='invalidate subcommand requires ``invalid-name`` option')
-        return
 
     cmdline.argv = args
     sys.argv = [cmdline.jugfile] + args
