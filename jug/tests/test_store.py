@@ -1,3 +1,4 @@
+import os
 import jug.backends.redis_store
 import jug.backends.file_store
 import jug.backends.dict_store
@@ -10,6 +11,8 @@ _storedir = 'jugtests'
 def _remove_file_store():
     jug.backends.file_store.file_store.remove_store(_storedir)
 
+if not os.getenv('TEST_REDIS'):
+    redis = None
 
 try:
     redisConnectionError = redis.ConnectionError
