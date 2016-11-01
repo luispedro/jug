@@ -87,6 +87,14 @@ Travis Build Status
 What's New
 ----------
 
+version **1.3.0** (Tue Nov 1 2016)
+- Update `shell` subcommand to IPython 5
+- Use ~/.config/jugrc as configuration file
+- Cleanup usage string
+- Use `bottle` instead of `web.py` for webstatus subcommand
+- Add `jug_execute` function
+- Add timing functionality
+
 version **1.2.2** (Sat Jun 25 2016)
 - Fix bugs in shell subcommand and a few corner cases in encoding/decoding
   results
