@@ -23,9 +23,7 @@ Assume that I want to do the following to a collection of images:
    clusters, I try several values and pick the best result. For each value of
    k, because of the random initialisation, I run the clustering 10 times.
 
-I could write the following simple code:
-
-::
+I could write the following simple code::
 
     imgs = glob('*.png')
     features = [computefeatures(img,parameter=2) for img in imgs]
@@ -74,9 +72,7 @@ You create a Task by giving it a function which performs the work and its
 arguments. The arguments can be either literal values or other tasks (in which
 case, the function will be called with the *result* of those tasks!). Jug also
 understands lists of tasks and dictionaries with tasks. For example, the
-following code declares the necessary tasks for our problem:
-
-::
+following code declares the necessary tasks for our problem::
 
     imgs = glob('*.png')
     feature_tasks = [Task(computefeatures,img,parameter=2) for img in imgs]
@@ -93,9 +89,7 @@ Task Generators
 
 In the code above, there is a lot of code of the form *Task(function,args)*, so
 maybe it should read *function(args)*.  A simple helper function aids this
-process:
-
-::
+process::
 
     from jug import TaskGenerator
 
@@ -118,8 +112,8 @@ process:
     Nr_clusters(bics)
 
 You can see that this code is almost identical to our original sequential code,
-except for the declarations at the top and the fact that *Nr_clusters* is now a
-function (actually a TaskGenerator, look at the use of a declarator).
+except for the decorators at the top and the fact that *Nr_clusters* is now a
+function (actually a TaskGenerator, look at the use of a decorators).
 
 This file is called the jugfile (you should name it *jugfile.py* on the
 filesystem) and specifies your problem.
