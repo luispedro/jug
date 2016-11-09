@@ -264,8 +264,8 @@ true: you can use --debug mode without --pdb.''')
     if cmdline.cmd not in _Commands:
         usage(error='No sub-command given')
     if options.invalid_name and cmdline.cmd != 'invalidate':
-        usage(error='invalid-name is only useful for invalidate subcommand')
-    if cmdline.cmd == 'invalidate' and not options.invalid_name:
+        usage(error='invalid is only useful for invalidate subcommand')
+    if cmdline.cmd == 'invalidate' and not options.invalid:
         usage(error='invalidate subcommand requires ``invalid-name`` option')
 
     cmdline.argv = args
