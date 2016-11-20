@@ -34,6 +34,7 @@ Where ``jugfile.py`` is a Python script using the ``jug`` library.
 '''
 
 from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask
+from .compound import CompoundTaskGenerator, CompoundTask
 from .barrier import barrier, bvalue
 from .options import set_jugdir
 
