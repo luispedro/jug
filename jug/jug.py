@@ -28,6 +28,7 @@ import os
 import os.path
 import re
 import logging
+import itertools
 
 from . import task
 from .task import Task
@@ -126,6 +127,7 @@ def execution_loop(tasks, options):
         first_unloadable += 1
     del tasks[:first_unloadable]
 
+    prevtask = None
     while tasks:
         upnext = [] # tasks that can be run
         nr_wait_cycles = int(options.execute_nr_wait_cycles)
@@ -172,6 +174,13 @@ def execution_loop(tasks, options):
                     logging.info('Executing %s...' % t.name)
                     jug_hook('execute.task-pre-execute', (t,))
 
+                    if options.aggressive_unload:
+                        if prevtask is not None:
+                            active = set([id(d) for d in t.dependencies()])
+                            for d in itertools.chain(prevtask.dependencies(), [prevtask]):
+                                if id(d) not in active:
+                                    d.unload()
+                        prevtask = t
                     t.run(debug_mode=options.debug)
                     jug_hook('execute.task-executed1', (t,))
                 else:
@@ -218,7 +227,6 @@ def execution_loop(tasks, options):
                     debugger.reset()
                     debugger.interaction(None, tb)
                 else:
-                    import itertools
                     logging.critical('Exception while running %s: %s' % (t.name,e))
                     for other in itertools.chain(upnext, tasks):
                         for dep in other.dependencies():
@@ -228,6 +236,8 @@ def execution_loop(tasks, options):
                     raise
             finally:
                 if locked: t.unlock()
+            if options.aggressive_unload and prevtask is not None:
+                prevtask.unload()
 
 class TaskStats(object):
     def __init__(self):
@@ -258,8 +268,6 @@ def execute(options):
     store = None
     noprogress = 0
     register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
-    if options.aggressive_unload:
-        register_hook('execute.task-executed1', lambda t : t.unload_recursive())
 
     while noprogress < 2:
         del tasks[:]
