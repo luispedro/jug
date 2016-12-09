@@ -108,6 +108,8 @@ def print_task_summary_table(options, groups):
 
     termsize, termheight = get_terminal_size()
     name_width = termsize - (num_groups * 12) - 2
+    if name_width <= 8: # too short. Output will look ugly in any case
+        name_width = 12
 
     line_format = ("%12s" * num_groups) + '  ' + '%-' + str(name_width) + 's'
     format_size = (12 * num_groups) + 2 + name_width
