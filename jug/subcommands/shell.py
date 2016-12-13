@@ -107,7 +107,18 @@ def shell(store, options, jugspace):
     local_ns['__name__'] = '__jugfile__'
     if IPython.version_info[0] >= 5:
         from sys import modules
-        for mod in modules.values():
+
+        # This is tricky, but the following WOULD NOT work:
+        #  for mod in modules.values():
+        #     ..
+        # Some modules use https://pypi.python.org/pypi/apipkg which triggers
+        # name loading when __dict__ is accessed. This may itself import other
+        # modules, thus raising an error: "RuntimeError: dictionary changed
+        # size during iteration" Whether this happens depends on exactly which
+        # modules the user uses/has loaded
+
+        modules = list(modules.values())
+        for mod in modules:
             if getattr(mod, '__dict__', None) is jugspace:
                 break
         else:
