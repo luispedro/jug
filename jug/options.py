@@ -90,6 +90,7 @@ _Commands = (
     'status',
     'stats',
     'webstatus',
+    'test-jug',
     )
 
 _usage = '''\
@@ -109,6 +110,7 @@ Subcommands
    count:        Simply count tasks
    cleanup:      Cleanup: remove result files that are not used.
    invalidate:   Invalidate the results of a task
+   test-jug:     Run jug test suite (internal validation)
 
 '''
 
@@ -262,7 +264,7 @@ true: you can use --debug mode without --pdb.''')
         cmdline.jugfile = args.pop(0)
 
     if cmdline.cmd not in _Commands:
-        usage(error='No sub-command given')
+        usage(error='No valid sub-command given')
     if options.invalid_name and cmdline.cmd != 'invalidate':
         usage(error='invalid is only useful for invalidate subcommand')
     if cmdline.cmd == 'invalidate' and not options.invalid_name:

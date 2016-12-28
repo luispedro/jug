@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -435,7 +435,7 @@ def main(argv=None):
         from sys import argv
     options = parse(argv[1:])
     store = None
-    if options.cmd not in ('status', 'execute', 'webstatus'):
+    if options.cmd not in ('status', 'execute', 'webstatus', 'test-jug'):
         store,jugspace = init(options.jugfile, options.jugdir)
 
     if options.cmd == 'execute':
@@ -456,6 +456,18 @@ def main(argv=None):
         shell(store, options, jugspace)
     elif options.cmd == 'webstatus':
         webstatus(options)
+    elif options.cmd == 'test-jug':
+        try:
+            import nose
+        except ImportError:
+            logging.critical('jug test requires nose library')
+            return
+        from os import path
+        currentdir = path.dirname(__file__)
+        updir = path.join(currentdir, '..')
+        argv = ['', '--exe', '-w', updir]
+        argv.append('--verbose')
+        return nose.run('jug', argv=argv)
     else:
         logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
     if store is not None:
