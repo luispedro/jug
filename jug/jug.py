@@ -266,10 +266,11 @@ def execute(options):
     tasks = task.alltasks
     tstats = TaskStats()
     store = None
-    noprogress = 0
     register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
 
-    while noprogress < 2:
+    nr_wait_cycles = int(options.execute_nr_wait_cycles)
+    noprogress = 0
+    while noprogress < nr_wait_cycles:
         del tasks[:]
         store,jugspace = init(options.jugfile, options.jugdir, store=store)
         if options.debug:
@@ -287,6 +288,8 @@ def execute(options):
             from time import sleep
             noprogress += 1
             sleep(int(options.execute_wait_cycle_time_secs))
+        else:
+            noprogress = 0
     else:
         logging.info('No tasks can be run!')
 
