@@ -156,7 +156,6 @@ class decompress_stream(object):
                 line += block[:ln]
                 self.seek(ln-len(block), 1)
                 return line
-        return line
 
 def decode(s):
     '''
