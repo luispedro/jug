@@ -1,4 +1,4 @@
-from jug.hash import new_hash_object, hash_update, hash_one
+from jug.hash import hash_one
 import numpy as np
 
 
@@ -27,3 +27,8 @@ def test_hash_numpy_copy():
     X = np.arange(10)
     assert hash_one(X[::-1]) != hash_one(X)
     assert hash_one(X.copy()) == hash_one(X)
+    assert hash_one(X[::-1].copy()) == hash_one(X[::-1])
+
+def test_hash_set():
+    assert hash_one(set([1,2,3])) != hash_one([1,2,3])
+
