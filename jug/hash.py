@@ -53,7 +53,7 @@ def hash_update(M, elems):
             M.update(repr(type(e)).encode('utf-8'))
             hash_update(M, enumerate(e))
         elif type(e) == set:
-            M.update('set')
+            M.update(six.b('set'))
             # With randomized hashing, different runs of Python might result in
             # different orders, so sort. We cannot trust that all the elements
             # in the set will be comparable, so we convert them to their hashes
