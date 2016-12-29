@@ -7,9 +7,8 @@ from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.tests.task_reset import task_reset
 from jug.tests.utils import simple_execute
-from jug.options import Options, default_options
+from jug.options import default_options
 
-import random
 jug.jug.silent = True
 
 
@@ -59,5 +58,3 @@ def test_tasklet():
     store, space = jug.jug.init(jugfile, store)
     assert jug.jug._check_or_sleep_until(store, False) == 0
     assert jug.jug._check_or_sleep_until(store, True) == 0
-    
-    

@@ -3,7 +3,6 @@ import os
 
 from jug.tests.task_reset import task_reset
 from jug.tests.utils import simple_execute
-from jug import task
 import jug.jug
 
 
@@ -38,7 +37,7 @@ def test_tasklet_dependencies():
 
 
 @task_reset
-def test_tasklet_dependencies():
+def test_tasklet_slice_dependencies():
     jugfile = os.path.join(_jugdir, 'slice_task.py')
     store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()

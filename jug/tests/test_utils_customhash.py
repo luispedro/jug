@@ -1,7 +1,6 @@
 import inspect
 import os
 
-from jug.backends.dict_store import dict_store
 from jug.tests.utils import simple_execute
 from jug.tests.task_reset import task_reset
 import jug.jug

@@ -211,7 +211,7 @@ def test_dict_sort_run():
     assert tasks[-1].result == { 'one' : 2, 'two' : 2, 'three' : {1 : 4, 0: 2}}
 
 @task_reset
-def test_unload_recursive():
+def test_unload_recursive_result_property():
     two = double(1)
     four = double(two)
     two.run()
