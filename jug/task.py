@@ -618,6 +618,44 @@ class iteratetask(object):
     def __len__(self):
         return self.n
 
+def _get_check(r, i, n):
+    if len(r) != n:
+        raise ValueError("Expected a tuple of size {} got {}".format(n, len(r)))
+    return r[i]
+
+def return_tuple(n):
+    '''
+    Wraps a TaskGenerator which returns a tuple of size `n`. Now, the
+    TaskGenerator will also return a tuple, allowing for more natural code.
+
+    Examples
+    --------
+
+    ::
+
+        @return_tuple(2)
+        @TaskGenerator
+        def plus1(x):
+            return x, 1+x
+
+        x,x1 = plus1(0)
+
+
+
+
+
+    Parameters
+    ----------
+    n : int
+        Expected size of tuple (this is checked at runtime)
+    '''
+    from functools import partial
+    def wrapper(f):
+        def wrapped(*args, **kwargs):
+            r = f(*args, **kwargs)
+            return tuple([Tasklet(r, partial(_get_check, i=i, n=n)) for i in range(n)])
+        return wrapped
+    return wrapper
 
 def describe(t):
     '''

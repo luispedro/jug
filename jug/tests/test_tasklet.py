@@ -42,5 +42,7 @@ def test_tasklet_slice_dependencies():
     store, space = jug.jug.init(jugfile, 'dict_store')
     simple_execute()
     assert space['z2'].value() == 0
+    assert space['z2_2'].value() == 0
+    assert space['z3'].value() == 1
 
 
