@@ -87,6 +87,14 @@ Travis Build Status
 What's New
 ----------
 
+version **1.4.0** (Tue Jan 3 2017)
+- Fix bug with writing very large objects to disk
+- Smarter handling of --aggressive-unload (do not unload what will be
+  immediately necessary)
+- Work around corner case in `jug shell` command
+- Add test-jug subcommand
+- Add return_tuple decorator
+
 version **1.3.0** (Tue Nov 1 2016)
 - Update `shell` subcommand to IPython 5
 - Use ~/.config/jugrc as configuration file
