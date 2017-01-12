@@ -38,7 +38,7 @@ from .compound import CompoundTaskGenerator, CompoundTask
 from .barrier import barrier, bvalue
 from .options import set_jugdir
 
-from .jug import init
+from .jug import init, is_jug_running
 from .backends import file_store, dict_store, redis_store
 
 from .jug_version import __version__
@@ -50,12 +50,15 @@ __all__ = [
     'iteratetask',
     'value',
     'CachedFunction',
+    'CompoundTask',
+    'CompoundTaskGenerator',
     'barrier',
     'bvalue',
 
     'set_jugdir',
 
     'init',
+    'is_jug_running',
     'file_store',
     'dict_store',
     'redis_store',

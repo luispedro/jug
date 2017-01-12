@@ -432,7 +432,17 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     return store, jugspace
 
 
+_is_jug_running = False
+def is_jug_running():
+    '''
+    Returns True if this script is being executed by jug instead of regular
+    Python
+    '''
+    return _is_jug_running
+
 def main(argv=None):
+    global _is_jug_running
+    _is_jug_running = True
     from .options import parse
     if argv is None:
         from sys import argv

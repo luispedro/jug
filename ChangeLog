@@ -1,3 +1,6 @@
+version 1.4.0+git
+	* Add is_jug_running() function
+
 version 1.4.0 Tue Jan 3 2017 by luispedro
 	* Fix bug with writing very large objects to disk
 	* Smarter handling of --aggressive-unload (do not unload what will be
