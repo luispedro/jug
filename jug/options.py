@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -143,6 +143,7 @@ def read_configuration_file(fp=None):
     if fp is None:
         from os import path
         for fp in ['~/.config/jugrc', '~/.jug/configrc']:
+            fp = path.expanduser(fp)
             if path.exists(fp):
                 try:
                     fp = open(fp)
@@ -151,6 +152,7 @@ def read_configuration_file(fp=None):
                 break
         else:
             return Options(None)
+
     from six.moves import configparser
     config = configparser.RawConfigParser()
     config.readfp(fp)
