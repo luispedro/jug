@@ -8,6 +8,11 @@ long computation::
 
     from jug import Task
     inputs = load_data()
+
+    def keep(datum):
+        # A long running computation which decides whether datum should be kept
+        ...
+
     keeps = [Task(keep, i) for i in inputs]
 
     # Now I want to throw out data
@@ -16,13 +21,16 @@ long computation::
     results = [Task(long_computation, i) for i in inputs]
 
 This will not work: the ``keeps`` list is a list of ``Tasks`` not its results.
-You can work around this in a couple of ways, but none of which is completely
-satisfactory.
 
-The solution is a ``barrier()``::
+The solution is to use a ``barrier()``::
 
     from jug import Task, barrier, value
     inputs = load_data()
+    
+    def keep(datum):
+        # A long running computation which decides whether datum should be kept
+        ...
+    
     keeps = [Task(keep, i) for i in inputs]
     
     barrier() # <-------- this will divide the jugfile in two!
@@ -41,25 +49,22 @@ bvalue
    bvalue() was added in version 0.10. Before this version, you needed to call
    barrier() & value() separately.
 
-``bvalue`` is a more targeted version of ``barrier``::
+``bvalue`` is a more targeted version of ``barrier``, which combines the effect
+of ``value()`` as well. The above example could also be written as::
 
-    step1 = f(input)
-    step2 = g(step1)
-    other = h(step1)
+    from jug import Task, bvalue
+    inputs = load_data()
+    
+    def keep(datum):
+        # A long running computation which decides whether datum should be kept
+        ...
+    
+    keeps = [Task(keep, i) for i in inputs]
+    
+    inputs = [i for i,k in zip(inputs, bvalue(keeps)) if k]
+    results = [Task(long_computation, i) for i in inputs]
 
-    step2 = bvalue(step2)
-    ...
 
-This is roughly equivalent to::
-
-    step1 = f(input)
-    step2 = g(step1)
-    other = h(step1)
-
-    barrier()
-    step2 = value(step2)
-    ...
-
-except that using ``bvalue``, the status of ``other`` is not checked! It might
-not have run yet and the ``bvalue(step2)`` will still return the result.
+Note, however, that if there are additional tasks which are not loaded by the
+``bvalue()`` call, the processing can continue processing them.
 
