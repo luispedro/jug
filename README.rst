@@ -2,6 +2,10 @@
 Jug: A Task-Based Parallelization Framework
 ===========================================
 
+.. image:: https://travis-ci.org/luispedro/jug.png
+       :target: https://travis-ci.org/luispedro/jug
+
+
 Jug allows you to write code that is broken up into
 tasks and run different tasks on different processors.
 
@@ -78,11 +82,11 @@ the `value` function::
     In [2]: primes100[:10]
     Out[2]: [True, True, False, True, False, True, False, False, False, True]
 
-Travis Build Status
-~~~~~~~~~~~~~~~~~~~
+Testimonials
+------------
 
-.. image:: https://travis-ci.org/luispedro/jug.png
-       :target: https://travis-ci.org/luispedro/jug
+"I've been using jug with great success to distribute the running of a
+reasonably large set of parameter combinations" - Andreas Longva
 
 What's New
 ----------

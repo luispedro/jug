@@ -83,14 +83,25 @@ Links
 How do I get Jug?
 -----------------
 
+The simplest is using pip::
+
+pip install jug
+
+
 You can either get the git repository at
 
 `http://github.com/luispedro/jug <http://github.com/luispedro/jug>`__
 
-Or download the package from PyPI_. You can use `easy_instal jug` or `pip
-install jug` if you'd like.
+Or download the package from `PyPI <http://pypi.python.org/pypi/Jug>`__
 
-.. _PyPI: http://pypi.python.org/pypi/Jug
+
+Testimonials
+------------
+
+"I've been using jug with great success to distribute the running of a
+reasonably large set of parameter combinations" - Andreas Longva
+
+
 
 Documentation Contents
 ----------------------
