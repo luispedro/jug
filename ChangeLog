@@ -1,6 +1,7 @@
 version 1.4.0+git
 	* Add is_jug_running() function
 	* Fix bug in finding config files
+	* Improved --debug mode: check for unsupported recursive task creation
 
 version 1.4.0 Tue Jan 3 2017 by luispedro
 	* Fix bug with writing very large objects to disk

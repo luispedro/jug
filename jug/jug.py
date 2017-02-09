@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -127,6 +127,8 @@ def execution_loop(tasks, options):
         first_unloadable += 1
     del tasks[:first_unloadable]
 
+    if options.debug:
+        start_task_set = set([id(t) for t in task.alltasks])
     prevtask = None
     while tasks:
         upnext = [] # tasks that can be run
@@ -183,6 +185,11 @@ def execution_loop(tasks, options):
                         prevtask = t
                     t.run(debug_mode=options.debug)
                     jug_hook('execute.task-executed1', (t,))
+                    if options.debug:
+                        for nt in task.alltasks:
+                            if id(nt) not in start_task_set:
+                                raise RuntimeError('Creating tasks while executing another task is not supported.\n'
+                                            'Error detected while running task `{0}`'.format(t.name))
                 else:
                     logging.info('Already in execution %s...' % t.name)
             except SystemExit:
