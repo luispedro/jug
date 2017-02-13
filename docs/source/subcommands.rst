@@ -39,7 +39,9 @@ Shell drops you into an ipython shell where your jugfile has been loaded. You
 can look at the results of any Tasks that have already run. It works even if
 other tasks are running in the background.
 
-IPython needs to be installed for `shell` to work.
+IPython needs to be installed for ``shell`` to work.
+
+`More information about jug shell <shell.html>`__
 
 
 Minor Subcommands

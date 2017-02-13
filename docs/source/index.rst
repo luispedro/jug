@@ -115,6 +115,7 @@ Documentation Contents
     segmentation-example.rst
     subcommands.rst
     status.rst
+    shell.rst
     types.rst
     tasks.rst
     tasklets.rst
