@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -393,9 +393,11 @@ class file_based_lock(object):
         create_directories(path.dirname(self.fullname))
         try:
             import socket
-            fd = os.open(self.fullname,os.O_RDWR|os.O_CREAT|os.O_EXCL)
-            F = os.fdopen(fd,'w')
+            from datetime import datetime
+            fd = os.open(self.fullname, os.O_RDWR|os.O_CREAT|os.O_EXCL)
+            F = os.fdopen(fd, 'w')
             F.write('PID {0} on HOSTNAME {1}\n'.format(os.getpid(), socket.gethostname()))
+            F.write('Lock created on {0}\n'.format(datetime.now().strftime('%Y-%m-%d (%Hh%M.%S)')))
             F.close()
             return True
         except OSError:
