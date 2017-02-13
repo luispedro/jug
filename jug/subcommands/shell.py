@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,6 +56,23 @@ Available jug functions:
 Enjoy...
 '''
 
+def invalidate(tasklist, reverse, task):
+    if not reverse:
+        print("Building task DAG... (only performed once)")
+        for t in tasklist:
+            for d in t.dependencies():
+                reverse.setdefault(id(d), []).append(t)
+    seen = set([id(task)])
+    task.invalidate()
+    queue = reverse[id(task)]
+    while queue:
+        d = queue.pop()
+        if id(d) in seen:
+            continue
+        seen.add(id(d))
+        d.invalidate()
+        queue.extend([t for t in reverse.get(id(d), []) if id(t) not in seen])
+
 def shell(store, options, jugspace):
     '''
     shell(store, options, jugspace)
@@ -91,10 +108,28 @@ def shell(store, options, jugspace):
         Loads all task results.
         '''
         load_all(jugspace, local_ns)
+    reverse_cache= {}
+    def _invalidate(t):
+        '''Recursively invalidates its argument, i.e. removes from the store
+        results of any task which may (even indirectly) depend on its argument.
+    
+        This is analogous to the ``jug status`` subcommand.
+
+        Parameters
+        ----------
+        t : a Task
+
+        Returns
+        -------
+        None
+        '''
+        from ..task import alltasks
+        return invalidate(alltasks, reverse_cache, t)
 
     local_ns = {
         'load_all' : _load_all,
         'value' : value,
+        'invalidate': _invalidate,
     }
     # This is necessary for some versions of Ipython. See:
     # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
