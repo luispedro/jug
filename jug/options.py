@@ -76,6 +76,7 @@ default_options.cleanup_locks_only = False
 default_options.execute_wait_cycle_time_secs = 12
 default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
 default_options.execute_keep_going = False
+default_options.execute_target = None
 
 default_options.status_cache_file = '.jugstatus.sqlite3'
 
@@ -257,6 +258,8 @@ true: you can use --debug mode without --pdb.''')
     parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
     parser.add_option('--keep-going', action='store_true', dest='execute_keep_going', help='For execute: continue after errors')
     parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
+    parser.add_option('--target', action='store', dest='execute_target',
+                      help="Restrict tasks to execute based on their name")
     options,args = parser.parse_args(cmdlist)
     if not args:
         usage()
@@ -291,6 +294,7 @@ true: you can use --debug mode without --pdb.''')
     _maybe_set('execute_nr_wait_cycles')
     _maybe_set('execute_wait_cycle_time_secs')
     _maybe_set('execute_keep_going')
+    _maybe_set('execute_target')
     _maybe_set('status_cache_clear')
     _maybe_set('status_cache_file')
 

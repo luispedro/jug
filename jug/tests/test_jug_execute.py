@@ -6,6 +6,7 @@ import jug.task
 from jug.task import Task
 from jug.tests.utils import simple_execute
 from jug.backends.dict_store import dict_store
+from jug.options import default_options
 from .task_reset import task_reset
 
 import random
@@ -64,3 +65,32 @@ def test_aggressive_unload():
     yield run_jugfile, os.path.join(_jugdir, 'compound_nonsimple.py')
     yield run_jugfile, os.path.join(_jugdir, 'slice_task.py')
 
+@task_reset
+def test_target_exact():
+    from jug.jug import execution_loop
+    from jug.task import alltasks
+    options = default_options.copy()
+    options.jugfile = os.path.join(_jugdir, 'simple.py')
+    # Test if restricting to this target we skip the other tasks
+    options.execute_target = "simple.double"
+
+    store, space = jug.jug.init(options.jugfile, 'dict_store')
+    execution_loop(alltasks, options)
+
+    assert len(store.store) < len(alltasks)
+    assert len(store.store) == 8
+
+@task_reset
+def test_target_wild():
+    from jug.jug import execution_loop
+    from jug.task import alltasks
+    options = default_options.copy()
+    options.jugfile = os.path.join(_jugdir, 'simple_multiple.py')
+    # Test if restricting to this target we skip the other tasks
+    options.execute_target = "simple_multiple.sum_"
+
+    store, space = jug.jug.init(options.jugfile, 'dict_store')
+    execution_loop(alltasks, options)
+
+    assert len(store.store) < len(alltasks)
+    assert len(store.store) == 16

@@ -129,6 +129,12 @@ def execution_loop(tasks, options):
 
     if options.debug:
         start_task_set = set([id(t) for t in task.alltasks])
+
+    # If we are running with a target, exclude non-matching tasks
+    if options.execute_target:
+        tasks = [t for t in tasks if t.name.startswith(options.execute_target)]
+        logging.info('Non-matching tasks discarded. Remaining (%s tasks)' % len(tasks))
+
     prevtask = None
     while tasks:
         upnext = [] # tasks that can be run
