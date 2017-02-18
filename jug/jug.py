@@ -126,7 +126,8 @@ def execution_loop(tasks, options):
 
     # If we are running with a target, exclude non-matching tasks
     if options.execute_target:
-        tasks = [t for t in tasks if t.name.startswith(options.execute_target)]
+        task_matcher = prepare_task_matcher(options.execute_target)
+        tasks = [t for t in tasks if task_matcher(t.name)]
         logging.info('Non-matching tasks discarded. Remaining (%s tasks)' % len(tasks))
 
     prevtask = None
