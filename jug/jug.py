@@ -26,11 +26,11 @@ from collections import defaultdict
 import sys
 import os
 import os.path
-import re
 import logging
 import itertools
 
 from . import task
+from .utils import prepare_task_matcher
 from .task import Task
 from .hooks import jug_hook, register_hook, register_hook_once
 from .io import print_task_summary_table
@@ -72,22 +72,16 @@ def invalidate(store, options):
     invalid_name = options.invalid_name
     tasks = task.alltasks
     cache = {}
-    if re.match( r'/.*?/', invalid_name):
-        # Looks like a regular expression
-        invalidate_re = re.compile( invalid_name.strip('/') )
-    elif '.' in invalid_name:
-        # Looks like a full task name
-        invalidate_re = invalid_name.replace('.','\\.' )
-    else:
-        # A bare function name perhaps?
-        invalidate_re = re.compile(r'\.' + invalid_name )
+
+    task_matcher = prepare_task_matcher(invalid_name)
+
     def isinvalid(t):
         if isinstance(t, task.Tasklet):
             return isinvalid(t.base)
         h = t.hash()
         if h in cache:
             return cache[h]
-        if re.search( invalidate_re, t.name ):
+        if task_matcher(t.name):
             cache[h] = True
             return True
         for dep in t.dependencies():

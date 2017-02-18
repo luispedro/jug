@@ -22,6 +22,8 @@
 
 
 import os
+import re
+from functools import partial
 
 from .task import Task, TaskGenerator, Tasklet, value
 
@@ -153,6 +155,23 @@ def timed_path(path):
         A task equivalent to ``(lambda: ipath)``.
     '''
     return CustomHash(path, hash_with_mtime_size)
+
+
+def prepare_task_matcher(pattern):
+    if re.match(r'/.*/', pattern):
+        # Looks like a regular expression
+        regex = re.compile(pattern.strip('/'))
+
+    elif '.' in pattern:
+        # Looks like a full task name
+        regex = pattern.replace('.', '\\.')
+
+    else:
+        # A bare function name perhaps?
+        regex = re.compile(r'\.' + pattern)
+
+    return partial(re.search, regex)
+
 
 @TaskGenerator
 def jug_execute(args, check_exit=True, run_after=None):
