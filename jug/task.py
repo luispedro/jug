@@ -50,6 +50,14 @@ class TaskletMixin(object):
     def __getitem__(self, slice):
         return Tasklet(self, _getitem(slice))
 
+    def __iter__(self):
+        raise NotImplementedError("""\
+You cannot iterate over Task results.
+
+If the Task returns an iterator of a fixed size, `iteratetask` may fit your usage:
+
+http://jug.readthedocs.io/en/latest/api.html?highlight=iteratetask#jug.iteratetask""")
+
 class Task(TaskletMixin):
     '''
     T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
