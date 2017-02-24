@@ -22,8 +22,8 @@ Your backend should support a similar scheme.
 How to write a backend
 ----------------------
 
-You can start with the file ``jug/backends/generic.py`` which provides a
+You can start with the file ``jug/backends/base.py`` which provides a
 template with documentation. Implement the functions in there.
 
-.. automodule:: jug.backends.generic
-    :members: generic_backend, generic_lock
+.. automodule:: jug.backends.base
+    :members: base_store, base_lock
