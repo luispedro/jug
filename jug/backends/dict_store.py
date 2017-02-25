@@ -167,7 +167,7 @@ class dict_store(base_store):
 
     def close(self):
         if self.backend is not None:
-            pickle.dump(self.store, file(self.backend, 'w'))
+            pickle.dump(self.store, open(self.backend, 'w'))
             self.backend = None
     __del__ = close
 
