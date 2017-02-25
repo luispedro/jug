@@ -3,6 +3,8 @@ import os
 
 import jug.jug
 import jug.task
+import jug.subcommands.invalidate
+import jug.subcommands.cleanup
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.options import Options, default_options
@@ -28,7 +30,7 @@ def test_jug_invalidate():
 
     opts = Options(default_options)
     opts.invalid_name = setall[0].name
-    jug.jug.invalidate(store, opts)
+    jug.subcommands.invalidate.invalidate(store, opts)
     assert not list(store.store.keys()), list(store.store.keys())
     jug.task.Task.store = dict_store()
 
@@ -43,7 +45,7 @@ def test_complex():
     opts.invalid_name = space['t'].name
     h = space['t'].hash()
     assert store.can_load(h)
-    jug.jug.invalidate(store, opts)
+    jug.subcommands.invalidate.invalidate(store, opts)
     assert not store.can_load(h)
 
 @task_reset
@@ -56,9 +58,9 @@ def test_cleanup():
     opts = Options(default_options)
     opts.cleanup_locks_only = True
     assert store.can_load(h)
-    jug.jug.cleanup(store, opts)
+    jug.subcommands.cleanup.cleanup(store, opts)
     assert store.can_load(h)
     opts.cleanup_locks_only = False
-    jug.jug.cleanup(store, opts)
+    jug.subcommands.cleanup.cleanup(store, opts)
     assert not store.can_load(h)
 

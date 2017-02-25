@@ -3,6 +3,7 @@ import os
 
 import jug.jug
 import jug.task
+import jug.subcommands.check
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.tests.task_reset import task_reset
@@ -31,7 +32,7 @@ def test_jug_check():
     store = dict_store()
     jug.task.Task.store = store
     try:
-        jug.jug.check(store, default_options)
+        jug.subcommands.check.check(store, default_options)
     except SystemExit as e:
         assert e.code == 1
     else:
@@ -41,7 +42,7 @@ def test_jug_check():
     jug.task.alltasks = savedtasks
 
     try:
-        jug.jug.check(store, default_options)
+        jug.subcommands.check.check(store, default_options)
         assert False
     except SystemExit as e:
         assert e.code == 0
@@ -56,5 +57,5 @@ def test_tasklet():
     assert 'four' not in space
     simple_execute()
     store, space = jug.jug.init(jugfile, store)
-    assert jug.jug._check_or_sleep_until(store, False) == 0
-    assert jug.jug._check_or_sleep_until(store, True) == 0
+    assert jug.subcommands.check._check_or_sleep_until(store, False) == 0
+    assert jug.subcommands.check._check_or_sleep_until(store, True) == 0

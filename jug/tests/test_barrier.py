@@ -2,6 +2,7 @@ import inspect
 import os
 
 import jug.jug
+import jug.subcommands.execute
 from jug.tests.task_reset import task_reset
 from jug.tests.utils import simple_execute
 from jug.options import default_options
@@ -46,7 +47,7 @@ def test_barrier_once():
     options = default_options.copy()
     options.jugdir = 'dict_store'
     options.jugfile = os.path.join(_jugdir, 'wbarrier.py')
-    jug.jug.execute(options)
+    jug.subcommands.execute.execute(options)
     assert 'four' in dir(sys.modules['wbarrier'])
 
 @task_reset
