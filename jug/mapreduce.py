@@ -8,7 +8,7 @@ mapreduce: Build tasks that follow a map-reduce pattern.
 '''
 
 
-from .jug import Task
+from .task import Task
 from .utils import identity
 from .hash import hash_one
 

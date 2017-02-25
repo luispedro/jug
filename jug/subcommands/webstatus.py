@@ -22,6 +22,8 @@
 #  THE SOFTWARE.
 
 from . import status as st
+from . import subcommand
+
 
 template = '''
 <html>
@@ -79,20 +81,22 @@ _row_template = '''
 def _format_counts(tw, tre, tru, tf):
     r = ''
     names = set()
-    for t in [tw,tre,tru,tf]:
+    for t in [tw, tre, tru, tf]:
         names.update(list(t.keys()))
     for n in names:
         r += _row_template % (n, tw[n], tre[n], tru[n], tf[n])
     r += _row_template % ('', '', '', '', '')
     r += _row_template % ('Total',
-                                sum(tw.values()),
-                                sum(tre.values()),
-                                sum(tru.values()),
-                                sum(tf.values()))
+                          sum(tw.values()),
+                          sum(tre.values()),
+                          sum(tru.values()),
+                          sum(tf.values()))
     return r
 
 
-def webstatus(options):
+def webstatus(options, *args, **kwargs):
+    '''Start a web interface which displays the status
+    '''
     import sqlite3
     connection = sqlite3.connect(':memory:', check_same_thread=False)
     store, ht, deps, rdeps = st.load_jugfile(options)
@@ -115,13 +119,17 @@ or
         return
 
     app = bottle.Bottle()
+
     @app.route('/')
     def status():
         ht, deps, rdeps = st.retrieve_sqlite3(connection)
-        tw,tre,tru,tf,dirty = st.update_status(store, ht, deps, rdeps)
+        tw, tre, tru, tf, dirty = st.update_status(store, ht, deps, rdeps)
         st.save_dirty3(connection, dirty)
         return template % {
-                'jugfile' : options.jugfile,
-                'table' : _format_counts(tw, tre, tru, tf),
+            'jugfile': options.jugfile,
+            'table': _format_counts(tw, tre, tru, tf),
         }
     bottle.run(app)
+
+
+subcommand.register("webstatus", webstatus)

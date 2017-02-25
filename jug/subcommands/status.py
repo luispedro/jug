@@ -30,16 +30,19 @@ from .. import backends
 from ..task import Task
 from ..backends import memoize_store
 from ..io import print_task_summary_table
+from . import subcommand
 
 __all__ = [
     'status'
-    ]
+]
+
 
 unknown = 'unknown'
 waiting = 'waiting'
 ready = 'ready'
 running = 'running'
 finished = 'finished'
+
 
 def create_sqlite3(connection, ht, deps, rdeps):
     connection.executescript('''
@@ -55,11 +58,12 @@ def create_sqlite3(connection, ht, deps, rdeps):
 
     connection.executemany('INSERT INTO ht VALUES(?,?,?,?)', ht)
 
-    for i,cdeps in deps.items():
+    for i, cdeps in deps.items():
         if len(cdeps):
             connection.executemany('''
                INSERT INTO dep(source, target) VALUES(?,?)
-                ''', [(i,cd) for cd in cdeps])
+                ''', [(i, cd) for cd in cdeps])
+
 
 def retrieve_sqlite3(connection):
     ht = connection. \
@@ -67,13 +71,15 @@ def retrieve_sqlite3(connection):
             fetchall()
     deps = defaultdict(list)
     rdeps = defaultdict(list)
-    for d0,d1 in connection.execute('SELECT * FROM dep'):
+    for d0, d1 in connection.execute('SELECT * FROM dep'):
         deps[d0].append(d1)
         rdeps[d1].append(d0)
     return ht, dict(deps), dict(rdeps)
 
+
 def save_dirty3(connection, dirty):
-    connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', [(nstatus,id) for id,nstatus in dirty.items()])
+    connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', [(nstatus, id) for id, nstatus in dirty.items()])
+
 
 @contextmanager
 def _open_connection(options):
@@ -85,19 +91,19 @@ def _open_connection(options):
 
 
 def load_jugfile(options):
-    store,_ = jug.init(options.jugfile, options.jugdir)
+    store, _ = jug.init(options.jugfile, options.jugdir)
     h2idx = {}
     ht = []
     deps = {}
-    for i,t in enumerate(task.alltasks):
-        deps[i] = [h2idx[d.hash() if isinstance(d,Task) else d._base_hash()]
-                        for d in t.dependencies()]
+    for i, t in enumerate(task.alltasks):
+        deps[i] = [h2idx[d.hash() if isinstance(d, Task) else d._base_hash()]
+                   for d in t.dependencies()]
         hash = t.hash()
-        ht.append( (i, t.name, hash, unknown) )
+        ht.append((i, t.name, hash, unknown))
         h2idx[hash] = i
 
     rdeps = defaultdict(list)
-    for k,v in deps.items():
+    for k, v in deps.items():
         for rv in v:
             rdeps[rv].append(k)
     return store, ht, deps, dict(rdeps)
@@ -111,7 +117,7 @@ def update_status(store, ht, deps, rdeps):
 
     store = memoize_store(store, list_base=True)
     dirty = {}
-    for i,name,hash,status in ht:
+    for i, name, hash, status in ht:
         nstatus = None
         if status == finished or store.can_load(hash):
             tasks_finished[name] += 1
@@ -120,7 +126,7 @@ def update_status(store, ht, deps, rdeps):
             can_run = True
             if status != ready:
                 for dep in deps.get(i, []):
-                    _,_,dhash,dstatus = ht[dep]
+                    _, _, dhash, dstatus = ht[dep]
                     if dstatus != finished and not store.can_load(dhash):
                         can_run = False
                         break
@@ -168,6 +174,7 @@ def _clear_cache(options):
     except:
         pass
 
+
 def _status_cached(options):
     create, update = list(range(2))
     try:
@@ -179,14 +186,14 @@ def _status_cached(options):
         store, ht, deps, rdeps = load_jugfile(options)
         mode = create
 
-    tw,tre,tru,tf,dirty = update_status(store, ht, deps, rdeps)
+    tw, tre, tru, tf, dirty = update_status(store, ht, deps, rdeps)
     _print_status(options, tw, tre, tru, tf)
     if mode == update:
         with _open_connection(options) as connection:
             save_dirty3(connection, dirty)
     else:
         for k in dirty:
-            _,name,hash,_ = ht[k]
+            _, name, hash, _ = ht[k]
             ht[k] = (k, name, hash, dirty[k])
         with _open_connection(options) as connection:
             create_sqlite3(connection, ht, deps, rdeps)
@@ -194,7 +201,7 @@ def _status_cached(options):
 
 
 def _status_nocache(options):
-    store,_ = jug.init(options.jugfile, options.jugdir)
+    store, _ = jug.init(options.jugfile, options.jugdir)
     Task.store = memoize_store(store, list_base=True)
 
     tasks_waiting = defaultdict(int)
@@ -215,8 +222,9 @@ def _status_nocache(options):
     return sum(tasks_finished.values())
 
 
-def status(options):
-    '''
+def status(options, *args, **kwargs):
+    '''Print status
+
     status(options)
 
     Implements the status command.
@@ -238,3 +246,6 @@ def status(options):
         return _status_cached(options)
     else:
         return _status_nocache(options)
+
+
+subcommand.register("status", status)

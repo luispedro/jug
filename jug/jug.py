@@ -22,90 +22,96 @@
 #  THE SOFTWARE.
 
 
-from collections import defaultdict
-import sys
-import os
-import os.path
-import logging
 import itertools
+import logging
+import os
+import sys
+
 
 from . import task
-from .utils import prepare_task_matcher
-from .task import Task
-from .hooks import jug_hook, register_hook, register_hook_once
-from .io import print_task_summary_table
-from .subcommands.status import status
-from .subcommands.webstatus import webstatus
-from .subcommands.shell import shell
 from .barrier import BarrierError
+from .utils import prepare_task_matcher
+from .hooks import jug_hook
 
-def do_print(store, options):
+
+_is_jug_running = False
+def is_jug_running():
     '''
-    do_print(store, options)
+    Returns True if this script is being executed by jug instead of regular
+    Python
+    '''
+    return _is_jug_running
 
-    Print a count of task names.
+
+def init(jugfile=None, jugdir=None, on_error='exit', store=None):
+    '''
+    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit', store=None)
+
+    Initializes jug (create backend connection, ...).
+    Imports jugfile
 
     Parameters
     ----------
-    store : jug backend
-    options : jug options
+    jugfile : str, optional
+        jugfile to import (default: 'jugfile')
+    jugdir : str, optional
+        jugdir to use (could be a path)
+    on_error : str, optional
+        What to do if import fails (default: exit)
+    store : storage object, optional
+        If used, this is returned as ``store`` again.
+
+    Returns
+    -------
+    store : storage object
+    jugspace : dictionary
     '''
-    task_counts = defaultdict(int)
-    for t in task.alltasks:
-        task_counts[t.name] += 1
+    import imp
+    from .options import set_jugdir
+    assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
 
-    print_task_summary_table(options, [("Count", task_counts)])
+    if jugfile is None:
+        jugfile = 'jugfile'
+    if store is None:
+        store = set_jugdir(jugdir)
+    sys.path.insert(0, os.path.abspath('.'))
 
-def invalidate(store, options):
-    '''
-    invalidate(store, options)
+    # The reason for this implementation is that it is the only that seems to
+    # work with both barrier and pickle()ing of functions inside the jugfile
+    #
+    # Just doing __import__() will not work because if there is a BarrierError
+    # thrown, then functions defined inside the jugfile end up in a confusing
+    # state.
+    #
+    # Alternatively, just execfile()ing will make any functions defined in the
+    # jugfile unpickle()able which makes mapreduce not work
+    #
+    # Therefore, we simulate (partially) __import__ and set sys.modules *even*
+    # if BarrierError is raised.
+    #
+    jugmodname = os.path.basename(jugfile[:-len('.py')])
+    jugmodule = imp.new_module(jugmodname)
+    jugmodule.__file__ = os.path.abspath(jugfile)
+    jugspace = jugmodule.__dict__
+    sys.modules[jugmodname] = jugmodule
+    jugfile_contents = open(jugfile).read()
+    try:
+        exec(compile(jugfile_contents, jugfile, 'exec'), jugspace, jugspace)
+    except BarrierError:
+        jugspace['__jug__hasbarrier__'] = True
+    except Exception as e:
+        logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
+        if on_error == 'exit':
+            import traceback
+            print(traceback.format_exc())
+            sys.exit(1)
+        else:
+            raise
 
-    Implements 'invalidate' command
+    # The store may have been changed by the jugfile.
+    store = task.Task.store
+    return store, jugspace
 
-    Parameters
-    ----------
-    store : jug.backend
-    options : options object
-        Most relevant option is `invalid_name`, a string  with the exact (i.e.,
-        module qualified) name of function to invalidate
-    '''
-    invalid_name = options.invalid_name
-    tasks = task.alltasks
-    cache = {}
-
-    task_matcher = prepare_task_matcher(invalid_name)
-
-    def isinvalid(t):
-        if isinstance(t, task.Tasklet):
-            return isinvalid(t.base)
-        h = t.hash()
-        if h in cache:
-            return cache[h]
-        if task_matcher(t.name):
-            cache[h] = True
-            return True
-        for dep in t.dependencies():
-            if isinvalid(dep):
-                cache[h] = True
-                return True
-        cache[h] = False
-        return False
-
-    invalid = list(filter(isinvalid, tasks))
-    if not invalid:
-        options.print_out('No results invalidated.')
-        return
-    task_counts = defaultdict(int)
-    for t in invalid:
-        if store.remove(t.hash()):
-            task_counts[t.name] += 1
-    if sum(task_counts.values()) == 0:
-        options.print_out('Tasks invalidated, but no results removed')
-    else:
-        print_task_summary_table(options, [("Invalidated", task_counts)])
-
-def _sigterm(_,__):
-    sys.exit(1)
 
 def execution_loop(tasks, options):
     from time import sleep
@@ -243,210 +249,11 @@ def execution_loop(tasks, options):
                 if not options.execute_keep_going:
                     raise
             finally:
-                if locked: t.unlock()
+                if locked:
+                    t.unlock()
             if options.aggressive_unload and prevtask is not None:
                 prevtask.unload()
 
-class TaskStats(object):
-    def __init__(self):
-        self.loaded = defaultdict(int)
-        self.executed = defaultdict(int)
-        register_hook('execute.task-loadable', self.loadable)
-        register_hook('execute.task-executed1', self.executed1)
-
-    def loadable(self, t):
-        self.loaded[t.name] += 1
-    def executed1(self, t):
-        self.executed[t.name] += 1
-
-def _log_loadable(t):
-    logging.info('Loadable {0}...'.format(t.name))
-
-def execute(options):
-    '''
-    execute(options)
-
-    Implement 'execute' command
-    '''
-    from signal import signal, SIGTERM
-
-    signal(SIGTERM,_sigterm)
-    tasks = task.alltasks
-    tstats = TaskStats()
-    store = None
-    register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
-
-    nr_wait_cycles = int(options.execute_nr_wait_cycles)
-    noprogress = 0
-    while noprogress < nr_wait_cycles:
-        del tasks[:]
-        store,jugspace = init(options.jugfile, options.jugdir, store=store)
-        if options.debug:
-            for t in tasks:
-                # Trigger hash computation:
-                t.hash()
-
-        previous = sum(tstats.executed.values())
-        execution_loop(tasks, options)
-        after = sum(tstats.executed.values())
-        done = not jugspace.get('__jug__hasbarrier__', False)
-        if done:
-            break
-        if after == previous:
-            from time import sleep
-            noprogress += 1
-            sleep(int(options.execute_wait_cycle_time_secs))
-        else:
-            noprogress = 0
-    else:
-        logging.info('No tasks can be run!')
-
-
-    jug_hook('execute.finished_pre_status')
-    print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
-    jug_hook('execute.finished_post_status')
-
-def cleanup(store, options):
-    '''
-    cleanup(store, options)
-
-    Implement 'cleanup' command
-    '''
-    if options.cleanup_locks_only:
-        removed = store.remove_locks()
-    else:
-        tasks = task.alltasks
-        removed = store.cleanup(tasks)
-    options.print_out('Removed %s files' % removed)
-
-
-def check(store, options):
-    '''
-    check(store, options)
-
-    Executes check subcommand
-
-    Parameters
-    ----------
-    store : jug.backend
-            backend to use
-    options : jug options
-    '''
-    sys.exit(_check_or_sleep_until(store, False))
-
-def sleep_until(store, options):
-    '''
-    sleep_until(store, options)
-
-    Execute sleep-until subcommand
-
-    Parameters
-    ----------
-    store : jug.backend
-            backend to use
-    options : jug options
-        ignored
-    '''
-    sys.exit(_check_or_sleep_until(store, True))
-
-def _check_or_sleep_until(store, sleep_until):
-    from .task import recursive_dependencies
-    tasks = task.alltasks
-    active = set(tasks)
-    for t in reversed(tasks):
-        if t not in active:
-            continue
-        while not t.can_load(store):
-            if sleep_until:
-                from time import sleep
-                sleep(12)
-            else:
-                return 1
-        for dep in recursive_dependencies(t):
-            try:
-                active.remove(dep)
-            except KeyError:
-                pass
-    return 0
-
-
-def init(jugfile=None, jugdir=None, on_error='exit', store=None):
-    '''
-    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit', store=None)
-
-    Initializes jug (create backend connection, ...).
-    Imports jugfile
-
-    Parameters
-    ----------
-    jugfile : str, optional
-        jugfile to import (default: 'jugfile')
-    jugdir : str, optional
-        jugdir to use (could be a path)
-    on_error : str, optional
-        What to do if import fails (default: exit)
-    store : storage object, optional
-        If used, this is returned as ``store`` again.
-
-    Returns
-    -------
-    store : storage object
-    jugspace : dictionary
-    '''
-    import imp
-    from .options import set_jugdir
-    assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
-
-    if jugfile is None:
-        jugfile = 'jugfile'
-    if store is None:
-        store = set_jugdir(jugdir)
-    sys.path.insert(0, os.path.abspath('.'))
-
-    # The reason for this implementation is that it is the only that seems to
-    # work with both barrier and pickle()ing of functions inside the jugfile
-    #
-    # Just doing __import__() will not work because if there is a BarrierError
-    # thrown, then functions defined inside the jugfile end up in a confusing
-    # state.
-    #
-    # Alternatively, just execfile()ing will make any functions defined in the
-    # jugfile unpickle()able which makes mapreduce not work
-    #
-    # Therefore, we simulate (partially) __import__ and set sys.modules *even*
-    # if BarrierError is raised.
-    #
-    jugmodname = os.path.basename(jugfile[:-len('.py')])
-    jugmodule = imp.new_module(jugmodname)
-    jugmodule.__file__ = os.path.abspath(jugfile)
-    jugspace = jugmodule.__dict__
-    sys.modules[jugmodname] = jugmodule
-    jugfile_contents = open(jugfile).read()
-    try:
-        exec(compile(jugfile_contents, jugfile, 'exec'), jugspace, jugspace)
-    except BarrierError:
-        jugspace['__jug__hasbarrier__'] = True
-    except Exception as e:
-        logging.critical("Could not import file '%s' (error: %s)", jugfile, e)
-        if on_error == 'exit':
-            import traceback
-            print(traceback.format_exc())
-            sys.exit(1)
-        else:
-            raise
-
-    # The store may have been changed by the jugfile.
-    store = Task.store
-    return store, jugspace
-
-
-_is_jug_running = False
-def is_jug_running():
-    '''
-    Returns True if this script is being executed by jug instead of regular
-    Python
-    '''
-    return _is_jug_running
 
 def main(argv=None):
     global _is_jug_running
@@ -455,44 +262,18 @@ def main(argv=None):
     if argv is None:
         from sys import argv
     options = parse(argv[1:])
+    jugspace = None
     store = None
-    if options.cmd not in ('status', 'execute', 'webstatus', 'test-jug'):
-        store,jugspace = init(options.jugfile, options.jugdir)
 
-    if options.cmd == 'execute':
-        execute(options)
-    elif options.cmd == 'count':
-        do_print(store, options)
-    elif options.cmd == 'check':
-        check(store, options)
-    elif options.cmd == 'sleep-until':
-        sleep_until(store, options)
-    elif options.cmd == 'status':
-        status(options)
-    elif options.cmd == 'invalidate':
-        invalidate(store, options)
-    elif options.cmd == 'cleanup':
-        cleanup(store, options)
-    elif options.cmd == 'shell':
-        shell(store, options, jugspace)
-    elif options.cmd == 'webstatus':
-        webstatus(options)
-    elif options.cmd == 'test-jug':
-        try:
-            import nose
-        except ImportError:
-            logging.critical('jug test requires nose library')
-            return
-        from os import path
-        currentdir = path.dirname(__file__)
-        updir = path.join(currentdir, '..')
-        argv = ['', '--exe', '-w', updir]
-        argv.append('--verbose')
-        return nose.run('jug', argv=argv)
-    else:
-        logging.critical('Jug: unknown command: \'%s\'' % options.cmd)
+    if options.cmd not in ('status', 'execute', 'webstatus', 'test-jug'):
+        store, jugspace = init(options.jugfile, options.jugdir)
+
+    from .subcommands import subcommand
+    subcommand.run(options.cmd, options=options, store=store, jugspace=jugspace)
+
     if store is not None:
         store.close()
+
 
 if __name__ == '__main__':
     try:
