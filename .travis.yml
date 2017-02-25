@@ -8,6 +8,7 @@ python:
   - "3.6"
 sudo: false
 install:
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.6* ]]; then pip install importlib; fi
   - pip install numpy
   - pip install six
   - pip install redis
