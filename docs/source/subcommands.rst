@@ -73,3 +73,11 @@ cleanup
 
 Removes all elements in the store that are not used by your jugfile.
 
+
+Extending Subcommands
+---------------------
+
+.. note::
+    This feature is still experimental
+
+.. automodule:: jug.subcommands
