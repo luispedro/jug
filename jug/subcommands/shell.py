@@ -23,6 +23,8 @@
 
 
 from ..task import value
+from . import subcommand
+
 
 def load_all(jugspace, local_ns):
     '''
@@ -30,13 +32,15 @@ def load_all(jugspace, local_ns):
 
     Loads the result of all tasks.
     '''
-    for k,v in jugspace.items():
+    for k, v in jugspace.items():
         # ignore objects name like __this__
-        if k.startswith('__') and k.endswith('__'): continue
+        if k.startswith('__') and k.endswith('__'):
+            continue
         try:
             local_ns[k] = value(v)
         except Exception as e:
             print('Error while loading %s: %s' % (k, e))
+
 
 _ipython_not_found_msg = '''\
 jug: Error: could not import IPython libraries
@@ -56,6 +60,7 @@ Available jug functions:
 Enjoy...
 '''
 
+
 def invalidate(tasklist, reverse, task):
     if not reverse:
         print("Building task DAG... (only performed once)")
@@ -73,8 +78,10 @@ def invalidate(tasklist, reverse, task):
         d.invalidate()
         queue.extend([t for t in reverse.get(id(d), []) if id(t) not in seen])
 
-def shell(store, options, jugspace):
-    '''
+
+def shell(store, options, jugspace, *args, **kwargs):
+    '''Run a shell after initialization
+
     shell(store, options, jugspace)
 
     Implement 'shell' command.
@@ -83,7 +90,7 @@ def shell(store, options, jugspace):
     '''
     try:
         import IPython
-        if IPython.version_info[0]>=1:
+        if IPython.version_info[0] >= 1:
             from IPython.terminal.embed import InteractiveShellEmbed
             from IPython.terminal.ipapp import load_default_config
         else:
@@ -108,11 +115,12 @@ def shell(store, options, jugspace):
         Loads all task results.
         '''
         load_all(jugspace, local_ns)
-    reverse_cache= {}
+
+    reverse_cache = {}
     def _invalidate(t):
         '''Recursively invalidates its argument, i.e. removes from the store
         results of any task which may (even indirectly) depend on its argument.
-    
+
         This is analogous to the ``jug status`` subcommand.
 
         Parameters
@@ -127,8 +135,8 @@ def shell(store, options, jugspace):
         return invalidate(alltasks, reverse_cache, t)
 
     local_ns = {
-        'load_all' : _load_all,
-        'value' : value,
+        'load_all': _load_all,
+        'value': value,
         'invalidate': _invalidate,
     }
     # This is necessary for some versions of Ipython. See:
@@ -161,3 +169,6 @@ def shell(store, options, jugspace):
         ipshell(module=mod, local_ns=local_ns)
     else:
         ipshell(global_ns=jugspace, local_ns=local_ns)
+
+
+subcommand.register("shell", shell)

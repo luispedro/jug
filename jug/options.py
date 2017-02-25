@@ -80,52 +80,6 @@ default_options.execute_target = None
 
 default_options.status_cache_file = '.jugstatus.sqlite3'
 
-_Commands = (
-    'check',
-    'cleanup',
-    'count',
-    'execute',
-    'invalidate',
-    'shell',
-    'sleep-until',
-    'status',
-    'stats',
-    'webstatus',
-    'test-jug',
-    )
-
-_usage = '''\
-jug SUBCOMMAND [JUGFILE] [OPTIONS...]
-
-Docs: https://jug.readthedocs.io/
-Copyright: 2008-2016, Luis Pedro Coelho
-
-Subcommands
------------
-   execute:      Execute tasks
-   status:       Print status
-   webstatus:    Start a web interface which displays the status
-   shell:        Run a shell after initialization
-   check:        Returns 0 if all tasks are finished. 1 otherwise.
-   sleep-until:  Wait until all tasks are done, then exit.
-   count:        Simply count tasks
-   cleanup:      Cleanup: remove result files that are not used.
-   invalidate:   Invalidate the results of a task
-   test-jug:     Run jug test suite (internal validation)
-
-'''
-
-def usage(error=None):
-    '''
-    usage(error=None)
-
-    Print an usage string and exit.
-    '''
-    if error is not None:
-        error += '\n'
-        sys.stderr.write(error)
-    print(_usage)
-    sys.exit(1)
 
 def _str_to_bool(s):
     return s.lower() not in ('', '0', 'false', 'off')
@@ -143,7 +97,7 @@ def read_configuration_file(fp=None):
     '''
     if fp is None:
         from os import path
-        for fp in ['~/.config/jugrc', '~/.jug/configrc']:
+        for fp in ['~/.config/jug/jugrc', '~/.config/jugrc', '~/.jug/configrc']:
             fp = path.expanduser(fp)
             if path.exists(fp):
                 try:
@@ -193,6 +147,7 @@ def parse(cmdlist=None, optionsfile=None):
     '''
     import optparse
     from .jug_version import __version__
+    from .subcommands import subcommand
 
     if cmdlist is None:
         cmdlist = sys.argv[1:]
@@ -200,7 +155,7 @@ def parse(cmdlist=None, optionsfile=None):
     infile.next = default_options
     cmdline = Options(infile)
 
-    parser = optparse.OptionParser(usage=_usage, version=__version__)
+    parser = optparse.OptionParser(usage=subcommand.usage(_print=False, exit=False), version=__version__)
     parser.add_option(
                     '--aggressive-unload',
                     action='store_true',
@@ -262,18 +217,16 @@ true: you can use --debug mode without --pdb.''')
                       help="Restrict tasks to execute based on their name")
     options,args = parser.parse_args(cmdlist)
     if not args:
-        usage()
+        subcommand.usage()
 
     cmdline.cmd = args.pop(0)
     if args:
         cmdline.jugfile = args.pop(0)
 
-    if cmdline.cmd not in _Commands:
-        usage(error='No valid sub-command given')
     if options.invalid_name and cmdline.cmd != 'invalidate':
-        usage(error='invalid is only useful for invalidate subcommand')
+        subcommand.usage(error='invalid is only useful for invalidate subcommand')
     if cmdline.cmd == 'invalidate' and not options.invalid_name:
-        usage(error='invalidate subcommand requires ``invalid`` option')
+        subcommand.usage(error='invalidate subcommand requires ``invalid`` option')
 
     cmdline.argv = args
     sys.argv = [cmdline.jugfile] + args
@@ -311,6 +264,7 @@ true: you can use --debug mode without --pdb.''')
         root.level = nlevel
     except KeyError:
         pass
+
     return cmdline
 
 
