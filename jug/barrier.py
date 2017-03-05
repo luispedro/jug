@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2010-2012, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2010-2017, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -61,13 +61,58 @@ def bvalue(t):
     '''
     value = bvalue(t)
 
-    Named after ``barrier``+``value``, this function Works similarly to::
+    Named after ``barrier``+``value``, ``value = bvalue(t)`` is similar to::
 
         barrier()
         value = value(t)
 
     except that it only checks that `t` is complete (and not all tasks) and
     thus can be much faster than a full ``barrier()`` call.
+
+    Thus, ``bvalue`` stops interpreting the Jugfile if its argument has not run
+    yet. When it has run, then it returns its value.
+
+    Example
+    -------
+
+    A typical use case is the following:
+
+    1. split an input file into blocks of 1,000 lines
+    2. process each of these blocks independently.
+
+    You can use the following function to split the input::
+
+        @TaskGenerator
+        def split_input_file(ifile):
+            splits = []
+            output = None
+            with open(ifile) as ifile:
+                index = 0
+                for i,line in enumerate(ifile):
+                    if i % 1000 == 0:
+                        if output is not None:
+                            output.close()
+                        ofile = 'splits.{}.txt'.format(index)
+                        output = open(ofile, 'wt')
+                        index += 1
+                        splits.append(ofile)
+                    output.write(line)
+            if output is not None:
+                output.close()
+            return splits
+
+        blocks = split_input_file('input.txt')
+
+    And now, use ``bvalue`` to continue processing:
+
+
+        for b in bvalue(blocks):
+            process(b)
+
+    The use of a barrier-type construct (such as ``bvalue``) is necessary for
+    this case because you only know how many blocks you have **after running
+    part of the pipeline**.
+
 
     See Also
     --------

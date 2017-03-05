@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -56,7 +56,12 @@ You cannot iterate over Task results.
 
 If the Task returns an iterator of a fixed size, `iteratetask` may fit your usage:
 
-http://jug.readthedocs.io/en/latest/api.html?highlight=iteratetask#jug.iteratetask""")
+http://jug.readthedocs.io/en/latest/api.html?highlight=iteratetask#jug.iteratetask
+
+Otherwise, you may wish to consider `bvalue`:
+
+http://jug.readthedocs.io/en/latest/api.html?highlight=bvalue#jug.bvalue
+""")
 
 class Task(TaskletMixin):
     '''
