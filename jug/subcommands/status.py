@@ -248,4 +248,19 @@ def status(options, *args, **kwargs):
         return _status_nocache(options)
 
 
-subcommand.register("status", status)
+def status_options(parser):
+    parser.add_argument('--cache',
+                        action='store_true',
+                        dest='status_mode',
+                        help='Use a cache for faster status [does not update after jugfile changes, though]')
+    parser.add_argument('--cache-file',
+                        action='store', metavar="CACHE_FILE",
+                        dest='status_cache_file',
+                        help='Name of file to use for status cache. Use with status --cache.')
+    parser.add_argument('--clear',
+                        action='store_true',
+                        dest='status_cache_clear',
+                        help='Use with status --cache. Removes the cache file')
+
+
+subcommand.register("status", status, status_options)

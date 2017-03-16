@@ -261,15 +261,15 @@ def main(argv=None):
     from .options import parse
     if argv is None:
         from sys import argv
-    options = parse(argv[1:])
+    options = parse()
     jugspace = None
     store = None
 
-    if options.cmd not in ('status', 'execute', 'webstatus', 'test-jug'):
+    if options.subcommand not in ('status', 'execute', 'webstatus', 'test-jug'):
         store, jugspace = init(options.jugfile, options.jugdir)
 
     from .subcommands import subcommand
-    subcommand.run(options.cmd, options=options, store=store, jugspace=jugspace)
+    subcommand.run(options.subcommand, options=options, store=store, jugspace=jugspace)
 
     if store is not None:
         store.close()

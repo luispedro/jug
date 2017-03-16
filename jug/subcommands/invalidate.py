@@ -83,4 +83,10 @@ def invalidate(store, options, *args, **kwargs):
         print_task_summary_table(options, [("Invalidated", task_counts)])
 
 
-subcommand.register("invalidate", invalidate)
+def invalidate_options(parser):
+    parser.add_argument('--invalid', required=True, action='store',
+                        dest='invalid_name',
+                        help='Task name to invalidate')
+
+
+subcommand.register("invalidate", invalidate, invalidate_options)
