@@ -56,6 +56,24 @@ Finally you should know that your function will receive the following objects:
 additional objects may be introduced in the future so make sure your function
 uses ``*args, **kwargs`` to maintain compatibility.
 
+
+If your subcommand has configurable options you can expose them via command-line
+by defining arguments to be available in the command-line by using::
+
+    def fancyreport_options(parser):
+        parser.add_argument('--tofile', action='store',
+                            dest='report_tofile',
+                            help='Name of file to use for report')
+
+and instead of the above, register your subcommand with::
+
+    #                    <command-name>   <function to call> <cmd-line options>
+    subcommand.register("my-fancy-report", fancyreport_func, fancyreport_options)
+
+If a user sets these options they will be available through the ``options`` object
+mentioned above. Jug uses ``argparse`` for command-line parsing.
+For more information refer to ``argparse``'s documentation.
+
 """
 
 __all__ = [
@@ -101,20 +119,66 @@ Original error was:
 """ % (module, e))
 
 
+class SubCommandDict(dict):
+    def __getitem__(self, command):
+        if command not in self:
+            self.load_commands(command)
+
+        return super(SubCommandDict, self).__getitem__(command)
+
+    def load_commands(self, stop_on_command=None):
+        """Load all modules in jug's subcommands and user's jug folder
+
+        If stop_on_command is given the function will return True as soon as
+        a matching command is found
+        """
+        for _, name, _ in pkgutil.iter_modules(__path__):
+            module = __name__ + '.' + name
+
+            self._try_import(module)
+
+            if stop_on_command in self:
+                return True
+
+        self._load_user_commands()
+
+    def _try_import(self, module):
+        try:
+            importlib.import_module(module)
+        except Exception as e:
+            logging.warning("Couldn't load subcommand '%s' with error '%s'", module, e)
+
+    def _load_user_commands(self, user_path="~/.config/jug/"):
+        user_path = os.path.expanduser(user_path)
+        logging.debug("Loading user commands from '%s'", user_path)
+        if os.path.isdir(user_path):
+            if user_path not in sys.path:
+                logging.debug("Adding path '%s' to PYTHONPATH", user_path)
+                sys.path.insert(0, user_path)
+
+            user_commands = os.path.join(user_path, "jug_user_commands.py")
+            if os.path.isfile(user_commands):
+                self._try_import("jug_user_commands")
+
+
 class SubCommandManager:
     def __init__(self):
-        self._commands = {}
+        self._commands = SubCommandDict()
 
-    def register(self, name, callback):
-        if name in self._commands and self._commands[name] != callback:
-            logging.warning("Jug: command: '%s' will be overriden with code from '%s'" % (name, callback.__name__))
+    def register(self, name, cmd_callback, opt_callback=None):
+        callbacks = (cmd_callback, opt_callback)
 
-        self._commands[name] = callback
+        if name in self._commands and self._commands[name] != callbacks:
+            if opt_callback is None:
+                logging.warning("Jug: command: '%s' will be overriden with code from '%s'",
+                                name, cmd_callback.__name__)
+            else:
+                logging.warning("Jug: command: '%s' will be overriden with code from '%s' and '%s'",
+                                name, cmd_callback.__name__, opt_callback.__name__)
+
+        self._commands[name] = callbacks
 
     def get(self, command):
-        if command not in self._commands:
-            self._load_commands(command)
-
         try:
             return self._commands[command]
         except KeyError:
@@ -124,7 +188,7 @@ class SubCommandManager:
         """Execute subcommand
         """
         try:
-            cmd = subcommand.get(command)
+            cmd, opt = subcommand.get(command)
         except NoSuchCommandError as e:
             subcommand.usage(error=e)
 
@@ -150,16 +214,17 @@ Copyright: 2008-2017, Luis Pedro Coelho
 Subcommands
 -----------
 ''']
-        self._load_commands()
+        self._commands.load_commands()
 
         for name, command in sorted(self._commands.items()):
-            usage_text.append("   %-15s %s" % (name + ":", _get_helptext(command)))
+            cmd, opt = command
+            usage_text.append("   %-15s %s" % (name + ":", _get_helptext(cmd)))
 
         if error:
             usage_text.append("")
             usage_text.append(str(error))
 
-        message = "\n".join(usage_text) + "\n\n"
+        message = "\n".join(usage_text) + "\n "
 
         if _print:
             sys.stdout.write(message)
@@ -169,35 +234,25 @@ Subcommands
 
         return message
 
-    def _try_import(self, module):
-        try:
-            importlib.import_module(module)
-        except Exception as e:
-            logging.warning("Couldn't load subcommand '%s' with error '%s'", module, e)
+    def get_options(self, subparsers):
+        self._commands.load_commands()
 
-    def _load_commands(self, stop_on_command=None):
-        """Load all modules in jug's subcommands and user's jug folder
+        parsers = []
 
-        If stop_on_command is given the function will return True as soon as
-        a matching command is found
-        """
-        for _, name, _ in pkgutil.iter_modules(__path__):
-            module = __name__ + '.' + name
+        for name, command in sorted(self._commands.items()):
+            cmd, opt = command
+            parser = subparsers.add_parser(
+                name,
+                # This is necessary to have all the same output on all subparsers
+                usage=subcommand.usage(_print=False, exit=False),
+            )
+            parsers.append(parser)
 
-            self._try_import(module)
+            if opt is not None:
+                group = parser.add_argument_group(name)
+                opt(group)
 
-            if stop_on_command in self._commands:
-                return True
-
-        self._load_user_commands()
-
-    def _load_user_commands(self, user_path="~/.config/jug/"):
-        user_path = os.path.expanduser(user_path)
-        if os.path.isdir(user_path):
-            if user_path not in sys.path:
-                sys.path.insert(0, user_path)
-
-            self._try_import("jug_user_commands")
+        return parsers
 
 
 subcommand = SubCommandManager()

@@ -105,4 +105,20 @@ def execute(options, *args, **kwargs):
     jug_hook('execute.finished_post_status')
 
 
-subcommand.register("execute", execute)
+def execute_options(parser):
+    wait_cycle_time = 12
+
+    parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs',
+                        metavar='WAIT_CYCLE_TIME_SECS', default=wait_cycle_time,
+                        help="How long to wait in each cycle (in seconds)")
+    parser.add_argument('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles',
+                        metavar='NR_WAIT_CYCLES', default=(30 * 60) // wait_cycle_time,
+                        help="How many wait cycles to do")
+    parser.add_argument('--target', action='store', dest='execute_target',
+                        metavar='TARGET', default=None,
+                        help="Restrict tasks to execute based on their name")
+    parser.add_argument('--keep-going', action='store_true', dest='execute_keep_going',
+                        help='Continue after errors')
+
+
+subcommand.register("execute", execute, execute_options)

@@ -35,8 +35,10 @@ Options
 
 import logging
 from datetime import datetime
+from .jug_version import __version__
 import six
 import sys
+
 
 class Options(object):
     def __init__(self, next):
@@ -55,11 +57,12 @@ class Options(object):
             raise AttributeError
         return getattr(self.__dict__['next'], name)
 
+
 default_options = Options(None)
 
 default_options.jugdir = '%(jugfile)s.jugdata'
 default_options.jugfile = 'jugfile.py'
-default_options.cmd = None
+default_options.subcommand = None
 default_options.aggressive_unload = False
 default_options.invalid_name = None
 default_options.argv = None
@@ -74,7 +77,7 @@ default_options.debug = False
 default_options.cleanup_locks_only = False
 
 default_options.execute_wait_cycle_time_secs = 12
-default_options.execute_nr_wait_cycles = (30*60) // default_options.execute_wait_cycle_time_secs
+default_options.execute_nr_wait_cycles = (30 * 60) // default_options.execute_wait_cycle_time_secs
 default_options.execute_keep_going = False
 default_options.execute_target = None
 
@@ -83,6 +86,7 @@ default_options.status_cache_file = '.jugstatus.sqlite3'
 
 def _str_to_bool(s):
     return s.lower() not in ('', '0', 'false', 'off')
+
 
 def read_configuration_file(fp=None):
     '''
@@ -139,126 +143,129 @@ def read_configuration_file(fp=None):
     return infile
 
 
-def parse(cmdlist=None, optionsfile=None):
+def define_options(parser):
+    group = parser.add_argument_group("positional arguments")
+    group.add_argument('jugfile', action='store', nargs='?', default='jugfile.py',
+                       help="Python script to use. (Default: %(default)s)")
+
+    group = parser.add_argument_group("common")
+    group.add_argument('--version', action="version", version=__version__)
+    group.add_argument('--aggressive-unload',
+                       action='store_true',
+                       dest='aggressive_unload',
+                       help='''\
+Aggressively unload data from memory. This causes many more reloading of
+information, but is necessary if keeping too much in memory is leading to
+memory errors.''')
+    group.add_argument('--jugdir',
+                       action='store',
+                       dest='jugdir',
+                       help='''\
+Directory in which to save intermediate files
+You can use Python format syntax, the following variables are available:
+    - date
+    - jugfile (without extension)''')
+    # FIXME We used to show the default jugfile jugdata dir but ${jugfile} is not available in this context
+    # By default, the value of `jugdir` is "%(jugfile)s.jugdata"''')
+    group.add_argument('--verbose',
+                       action='store',
+                       dest='verbose',
+                       help='Verbosity level [use "info" to see details of processing]')
+    group.add_argument('--short',
+                       action='store_true',
+                       dest='short',
+                       help='Short output')
+    group.add_argument('--locks-only', action='store_true', dest='cleanup_locks_only')
+    group.add_argument('--pdb',
+                       action='store_true',
+                       dest='pdb',
+                       help='Drop to a PDB (debug) console on error')
+    group.add_argument('--debug',
+                       action='store_true',
+                       dest='debug',
+                       help='''\
+Debug mode. This adds a little more error checking, thus it can be slower.
+However, it detects certain types of errors and prints an error message. If
+--pdb is passed, --debug is automatically implied, but the opposite is not
+true: you can use --debug mode without --pdb.''')
+
+
+def parse(args=None, optionsfile=None):
     '''
     options.parse(cmdlist={sys.argv[1:]}, optionsfile=None)
 
     Parse the command line options and set the option variables.
     '''
-    import optparse
-    from .jug_version import __version__
+    import argparse
     from .subcommands import subcommand
 
-    if cmdlist is None:
-        cmdlist = sys.argv[1:]
+    if len(sys.argv) == 1:
+        subcommand.usage()
+
     infile = read_configuration_file(optionsfile)
     infile.next = default_options
     cmdline = Options(infile)
 
-    parser = optparse.OptionParser(usage=subcommand.usage(_print=False, exit=False), version=__version__)
-    parser.add_option(
-                    '--aggressive-unload',
-                    action='store_true',
-                    dest='aggressive_unload',
-                    help='''\
-Aggressively unload data from memory. This causes many more reloading of
-information, but is necessary if keeping too much in memory is leading to
-memory errors.''')
-    parser.add_option('--invalid',
-                    action='store',
-                    dest='invalid_name',
-                    help='Task name to invalidate')
-    parser.add_option('--jugdir',
-                    action='store',
-                    dest='jugdir',
-                    help='''\
-Directory in which to save intermediate files
-You can use Python format syntax, the following variables are available:
-    - date
-    - jugfile (without extension)
-By default, the value of `jugdir` is "%(jugfile)s.jugdata"''')
-    parser.add_option('--verbose',
-                    action='store',
-                    dest='verbose',
-                    help='Verbosity level [use "info" to see details of processing]')
-    parser.add_option('--cache',
-                    action='store_true',
-                    dest='cache',
-                    help='Use a cache for faster status [does not update after jugfile changes, though]')
-    parser.add_option('--cache-file',
-                    action='store',
-                    dest='status_cache_file',
-                    help='Name of file to use for status cache. Use with status --cache.')
-    parser.add_option('--clear',
-                    action='store_true',
-                    dest='status_cache_clear',
-                    help='Use with status --cache. Removes the cache file')
-    parser.add_option('--short',
-                    action='store_true',
-                    dest='short',
-                    help='Short output')
-    parser.add_option('--locks-only', action='store_true', dest='cleanup_locks_only')
-    parser.add_option('--pdb',
-                    action='store_true',
-                    dest='pdb',
-                    help='Drop to a PDB (debug) console on error')
-    parser.add_option('--debug',
-                    action='store_true',
-                    dest='debug',
-                    help='''\
-Debug mode. This adds a little more error checking, thus it can be slower.
-However, it detects certain types of errors and prints an error message. If
---pdb is passed, --debug is automatically implied, but the opposite is not
-true: you can use --debug mode without --pdb.''')
-    parser.add_option('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles')
-    parser.add_option('--keep-going', action='store_true', dest='execute_keep_going', help='For execute: continue after errors')
-    parser.add_option('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs')
-    parser.add_option('--target', action='store', dest='execute_target',
-                      help="Restrict tasks to execute based on their name")
-    options,args = parser.parse_args(cmdlist)
-    if not args:
-        subcommand.usage()
+    parser = argparse.ArgumentParser(
+        description=subcommand.usage(_print=False, exit=False),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    define_options(parser)
 
-    cmdline.cmd = args.pop(0)
-    if args:
-        cmdline.jugfile = args.pop(0)
+    sub = parser.add_subparsers(dest="subcommand", help=argparse.SUPPRESS)
+    sub.required = True
+    subparsers = subcommand.get_options(sub)
 
-    if options.invalid_name and cmdline.cmd != 'invalidate':
-        subcommand.usage(error='invalid is only useful for invalidate subcommand')
-    if cmdline.cmd == 'invalidate' and not options.invalid_name:
-        subcommand.usage(error='invalidate subcommand requires ``invalid`` option')
+    # NOTE The parents=[parent] feature of argparse is severely broken
+    # causing dependency loops in required arguments.
+    # To workaround we re-define all global options in all subparsers
+    for sub in subparsers:
+        define_options(sub)
 
-    cmdline.argv = args
-    sys.argv = [cmdline.jugfile] + args
-    if options.cache is not None:
-        cmdline.status_mode = ('cached' if options.cache else 'no-cached')
+    # FIXME with commands that require additional arguments (such as invalidate)
+    # writing "jug invalidate" shows the usage message twice and the last few empty
+    # lines are truncated causing the error message to be fused with the description
+    # of the last argument. Still not sure how to fix this.
+    options = parser.parse_args(args)
+
+    # FIXME This shouldn't be necessary. Use add_argument(dest="status_mode"
+    #   with 'choices=["cached", "no-cached"])' or simply refactor to options.cached (bool)
+    cmdline.status_mode = 'cached' if vars(options).get("status_mode", None) else 'no-cached'
+
+    # FIXME This entire updating mechanism needs to be replaced by something
+    # that preserves options set in argparse's parsers, otherwise subcommands
+    # cannot make use of command-line arguments
     def _maybe_set(name):
-        if getattr(options, name) is not None:
+        if getattr(options, name, None) is not None:
             setattr(cmdline, name, getattr(options, name))
 
     _maybe_set('jugdir')
+    _maybe_set('subcommand')
 
     _maybe_set('verbose')
     _maybe_set('short')
     _maybe_set('aggressive_unload')
-    _maybe_set('invalid_name')
     _maybe_set('pdb')
     _maybe_set('debug')
+    # NOTE This is now set in subcommands/invalidate.py
+    _maybe_set('invalid_name')
+    # NOTE These are now set in subcommands/execute.py
     _maybe_set('execute_nr_wait_cycles')
     _maybe_set('execute_wait_cycle_time_secs')
     _maybe_set('execute_keep_going')
     _maybe_set('execute_target')
+    # NOTE These are now set in subcommands/status.py
     _maybe_set('status_cache_clear')
     _maybe_set('status_cache_file')
 
     cmdline.jugdir = cmdline.jugdir % {
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'jugfile': cmdline.jugfile[:-3],
-                }
+        'date': datetime.now().strftime('%Y-%m-%d'),
+        'jugfile': cmdline.jugfile[:-3],
+    }
     try:
         nlevel = {
-            'DEBUG' : logging.DEBUG,
-            'INFO' : logging.INFO,
+            'DEBUG': logging.DEBUG,
+            'INFO': logging.INFO,
         }[cmdline.verbose.upper()]
         root = logging.getLogger()
         root.level = nlevel
@@ -290,4 +297,3 @@ def set_jugdir(jugdir):
     store = backends.select(jugdir)
     Task.store = store
     return store
-
