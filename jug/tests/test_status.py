@@ -33,7 +33,7 @@ def test_cache():
     options.jugdir = store
     options.jugfile = jugfile
     options.verbose = 'quiet'
-    options.status_mode = 'cached'
+    options.status_cache = True
     options.status_cache_file = ':memory:'
 
     assert status.status(options) == 0
@@ -49,7 +49,7 @@ def test_cache_bvalue():
     options.jugdir = store
     options.jugfile = jugfile
     options.verbose = 'quiet'
-    options.status_mode = 'cached'
+    options.status_cache = True
     options.status_cache_file = ':memory:'
 
     assert status.status(options) == 0

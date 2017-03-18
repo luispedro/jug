@@ -233,13 +233,13 @@ def status(options, *args, **kwargs):
     ----------
     options : jug options
     '''
-    if options.status_mode == 'cached':
+    if options.status_cache:
         try:
             import sqlite3
         except ImportError:
             from sys import stderr
             stderr.write('Cached status relies on sqlite3. Falling back to non-cached version')
-            options.status_mode = 'no-cache'
+            options.status_cache = False
             return status(options)
         if options.status_cache_clear:
             return _clear_cache(options)
@@ -251,7 +251,7 @@ def status(options, *args, **kwargs):
 def status_options(parser):
     parser.add_argument('--cache',
                         action='store_true',
-                        dest='status_mode',
+                        dest='status_cache',
                         help='Use a cache for faster status [does not update after jugfile changes, though]')
     parser.add_argument('--cache-file',
                         action='store', metavar="CACHE_FILE",
