@@ -67,7 +67,7 @@ default_options.aggressive_unload = False
 default_options.invalid_name = None
 default_options.argv = None
 default_options.print_out = six.print_
-default_options.status_mode = 'no-cached'
+default_options.status_cache = False
 default_options.status_cache_clear = False
 default_options.short = False
 default_options.pdb = False
@@ -130,7 +130,7 @@ def read_configuration_file(fp=None):
     attempt('main', 'jugdir', 'jugdir')
     attempt('main', 'jugfile', 'jugfile')
 
-    attempt('status', 'cache', 'status_mode')
+    attempt('status', 'cache', 'status_cache')
 
     attempt('cleanup', 'locks-only', 'cleanup_locks_only', bool)
 
@@ -228,9 +228,7 @@ def parse(args=None, optionsfile=None):
     # of the last argument. Still not sure how to fix this.
     options = parser.parse_args(args)
 
-    # FIXME This shouldn't be necessary. Use add_argument(dest="status_mode"
-    #   with 'choices=["cached", "no-cached"])' or simply refactor to options.cached (bool)
-    cmdline.status_mode = 'cached' if vars(options).get("status_mode", None) else 'no-cached'
+    cmdline.status_cache = True if vars(options).get("status_cache", None) else False
 
     # FIXME This entire updating mechanism needs to be replaced by something
     # that preserves options set in argparse's parsers, otherwise subcommands
