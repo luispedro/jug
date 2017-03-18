@@ -3,6 +3,7 @@
 import os
 import tempfile
 import shutil
+from six import StringIO
 from jug.subcommands import subcommand
 from jug.options import parse
 
@@ -23,6 +24,7 @@ def hello_command_opts(options, *args, **kwargs):
 
 def hello_options(parser):
     parser.add_argument("--value", dest="hello_value", action="store", default="option ated")
+    parser.add_argument("--other-value", dest="hello_other_value", action="store", default="undefined")
 
 
 def clear_cmds():
@@ -73,6 +75,22 @@ def test_options():
     output = subcommand.run(CMD, options=options)
 
     assert output == MSG_OPTIONS, "Expected: '%s' , got: '%s'" % (MSG_OPTIONS, output)
+
+
+_options_file = '''
+[hello]
+other_value='someone'
+'''
+
+
+def test_options_config():
+    clear_cmds()
+
+    subcommand.register(CMD, hello_command_opts, hello_options)
+    options = parse([CMD], StringIO(_options_file))
+
+    assert options.hello_other_value == "someone"
+    assert options.hello_value == "option ated"
 
 
 def test_usage():
