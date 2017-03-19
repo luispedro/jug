@@ -23,7 +23,7 @@
 
 
 from ..task import value
-from . import subcommand
+from . import SubCommand
 
 
 def load_all(jugspace, local_ns):
@@ -79,7 +79,7 @@ def invalidate(tasklist, reverse, task):
         queue.extend([t for t in reverse.get(id(d), []) if id(t) not in seen])
 
 
-def shell(store, options, jugspace, *args, **kwargs):
+class ShellCommand(SubCommand):
     '''Run a shell after initialization
 
     shell(store, options, jugspace)
@@ -88,87 +88,90 @@ def shell(store, options, jugspace, *args, **kwargs):
 
     Currently depends on Ipython being installed.
     '''
-    try:
-        import IPython
-        if IPython.version_info[0] >= 1:
-            from IPython.terminal.embed import InteractiveShellEmbed
-            from IPython.terminal.ipapp import load_default_config
-        else:
-            from IPython.frontend.terminal.embed import InteractiveShellEmbed
-            from IPython.frontend.terminal.ipapp import load_default_config
-        config = load_default_config()
-        ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
-    except ImportError:
+    name = "shell"
+
+    def run(self, store, options, jugspace, *args, **kwargs):
         try:
-            # Fallback for older Python:
-            from IPython.Shell import IPShellEmbed
-            ipshell = IPShellEmbed(banner=_ipython_banner)
+            import IPython
+            if IPython.version_info[0] >= 1:
+                from IPython.terminal.embed import InteractiveShellEmbed
+                from IPython.terminal.ipapp import load_default_config
+            else:
+                from IPython.frontend.terminal.embed import InteractiveShellEmbed
+                from IPython.frontend.terminal.ipapp import load_default_config
+            config = load_default_config()
+            ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
         except ImportError:
-            import sys
-            sys.stderr.write(_ipython_not_found_msg)
-            sys.exit(1)
+            try:
+                # Fallback for older Python:
+                from IPython.Shell import IPShellEmbed
+                ipshell = IPShellEmbed(banner=_ipython_banner)
+            except ImportError:
+                import sys
+                sys.stderr.write(_ipython_not_found_msg)
+                sys.exit(1)
 
-    def _load_all():
-        '''
-        load_all()
+        def _load_all():
+            '''
+            load_all()
 
-        Loads all task results.
-        '''
-        load_all(jugspace, local_ns)
+            Loads all task results.
+            '''
+            load_all(jugspace, local_ns)
 
-    reverse_cache = {}
-    def _invalidate(t):
-        '''Recursively invalidates its argument, i.e. removes from the store
-        results of any task which may (even indirectly) depend on its argument.
+        reverse_cache = {}
+        def _invalidate(t):
+            '''Recursively invalidates its argument, i.e. removes from the store
+            results of any task which may (even indirectly) depend on its argument.
 
-        This is analogous to the ``jug status`` subcommand.
+            This is analogous to the ``jug status`` subcommand.
 
-        Parameters
-        ----------
-        t : a Task
+            Parameters
+            ----------
+            t : a Task
 
-        Returns
-        -------
-        None
-        '''
-        from ..task import alltasks
-        return invalidate(alltasks, reverse_cache, t)
+            Returns
+            -------
+            None
+            '''
+            from ..task import alltasks
+            return invalidate(alltasks, reverse_cache, t)
 
-    local_ns = {
-        'load_all': _load_all,
-        'value': value,
-        'invalidate': _invalidate,
-    }
-    # This is necessary for some versions of Ipython. See:
-    # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
-    try:
-        del jugspace['__builtins__']
-    except KeyError:
-        pass
+        local_ns = {
+            'load_all': _load_all,
+            'value': value,
+            'invalidate': _invalidate,
+        }
+        # This is necessary for some versions of Ipython. See:
+        # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
+        try:
+            del jugspace['__builtins__']
+        except KeyError:
+            pass
 
-    jugspace.update(local_ns)
-    local_ns['__name__'] = '__jugfile__'
-    if IPython.version_info[0] >= 5:
-        from sys import modules
+        jugspace.update(local_ns)
+        local_ns['__name__'] = '__jugfile__'
+        if IPython.version_info[0] >= 5:
+            from sys import modules
 
-        # This is tricky, but the following WOULD NOT work:
-        #  for mod in modules.values():
-        #     ..
-        # Some modules use https://pypi.python.org/pypi/apipkg which triggers
-        # name loading when __dict__ is accessed. This may itself import other
-        # modules, thus raising an error: "RuntimeError: dictionary changed
-        # size during iteration" Whether this happens depends on exactly which
-        # modules the user uses/has loaded
+            # This is tricky, but the following WOULD NOT work:
+            #  for mod in modules.values():
+            #     ..
+            # Some modules use https://pypi.python.org/pypi/apipkg which triggers
+            # name loading when __dict__ is accessed. This may itself import other
+            # modules, thus raising an error: "RuntimeError: dictionary changed
+            # size during iteration" Whether this happens depends on exactly which
+            # modules the user uses/has loaded
 
-        modules = list(modules.values())
-        for mod in modules:
-            if getattr(mod, '__dict__', None) is jugspace:
-                break
+            modules = list(modules.values())
+            for mod in modules:
+                if getattr(mod, '__dict__', None) is jugspace:
+                    break
+            else:
+                raise KeyError("Could not find jug module")
+            ipshell(module=mod, local_ns=local_ns)
         else:
-            raise KeyError("Could not find jug module")
-        ipshell(module=mod, local_ns=local_ns)
-    else:
-        ipshell(global_ns=jugspace, local_ns=local_ns)
+            ipshell(global_ns=jugspace, local_ns=local_ns)
 
 
-subcommand.register("shell", shell)
+shell = ShellCommand()

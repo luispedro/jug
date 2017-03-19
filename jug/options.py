@@ -88,7 +88,7 @@ def key_to_option(s):
 def read_configuration_file(fp=None, default_options=None):
     '''
     options = read_configuration_file(fp='~/.config/jugrc',
-                                      default_options={"execute_keep_going": True})
+                                      default_options={'':'', ...})
 
     Parse configuration file.
 
@@ -96,6 +96,9 @@ def read_configuration_file(fp=None, default_options=None):
     ----------
     fp : inputfile, optional
         File to read. If not given, use
+    default_options: dictionary, optional
+        Dictionary with the default values for all command-line arguments.
+        Used to convert settings in the config file to the correct object type.
     '''
     inifile = Options(default_options)
 
@@ -123,7 +126,7 @@ def read_configuration_file(fp=None, default_options=None):
             else:
                 new_name = "{0}_{1}".format(key_to_option(section), key_to_option(key))
 
-            # Get type of default value if a default value exists
+            # Get the type of the default value if a default value exists
             if default_options is not None:
                 old_value = getattr(default_options, new_name, None)
                 if old_value is not None:
@@ -187,20 +190,19 @@ def parse(args=None, optionsfile=None):
     Parse the command line options and set the option variables.
     '''
     import argparse
-    from .subcommands import subcommand
+    from .subcommands import cmdapi
 
     if len(sys.argv) == 1:
-        subcommand.usage()
+        cmdapi.usage()
 
     parser = argparse.ArgumentParser(
-        description=subcommand.usage(_print=False, exit=False),
+        description=cmdapi.usage(_print=False, exit=False),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    define_options(parser)
 
     sub = parser.add_subparsers(dest="subcommand", help=argparse.SUPPRESS)
     sub.required = True
-    subparsers = subcommand.get_subcommand_parsers(sub)
+    subparsers = cmdapi.get_subcommand_parsers(sub)
 
     # NOTE The parents=[parent] feature of argparse is severely broken
     # causing dependency loops in required arguments.
@@ -210,7 +212,6 @@ def parse(args=None, optionsfile=None):
 
     argopts = parser.parse_args(args)
 
-    default_options.update(subcommand.default_options)
     inifile = read_configuration_file(optionsfile, default_options=default_options)
     # Priority is: user-supplied command line, config file, default options
     cmdline = Options(inifile)

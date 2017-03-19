@@ -23,7 +23,7 @@
 
 from os import path
 import logging
-from . import subcommand
+from . import SubCommand
 
 __all__ = [
     'internal_validation',
@@ -35,19 +35,23 @@ __all__ = [
 #
 # For this reason this module was renamed to internal_validation
 
-def internal_validation(*args, **kwargs):
+
+class InternalValidationCommand(SubCommand):
     '''Run jug test suite (internal validation)
     '''
-    try:
-        import nose
-    except ImportError:
-        logging.critical('jug test requires nose library')
-        return
-    currentdir = path.dirname(__file__)
-    updir = path.join(currentdir, '..')
-    argv = ['', '--exe', '-w', updir]
-    argv.append('--verbose')
-    return nose.run('jug', argv=argv)
+    name = "test-jug"
+
+    def run(self, *args, **kwargs):
+        try:
+            import nose
+        except ImportError:
+            logging.critical('jug test requires nose library')
+            return
+        currentdir = path.dirname(__file__)
+        updir = path.join(currentdir, '..')
+        argv = ['', '--exe', '-w', updir]
+        argv.append('--verbose')
+        return nose.run('jug', argv=argv)
 
 
-subcommand.register("test-jug", internal_validation)
+internal_validation = InternalValidationCommand()

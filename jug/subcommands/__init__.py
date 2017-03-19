@@ -31,23 +31,28 @@ Lets assume you wanted to create a custom report and have it available as::
 
     $ jug my-fancy-report
 
-First you will need to implement a function with the following signature::
+One way to achieve this is to add the following code to ``~/.config/jug/jug_user_commands.py``::
 
-    def fancyreport_func(*args, **kwargs):
+    from jug.subcommands import SubCommand
+
+    class FancyReport(SubCommand):
         "Produces a fancy report of my results"
-        ...
 
-The first line of the docstring is important as it will be shown as part of the
-jug usage help page.
+        name = "my-fancy-report"
 
-Then add your fancyreport extra commands to ``~/.config/jug/jug_user_commands.py``
-registering your commands via::
+        def run(self, *args, **kwargs):
+            ...
 
-    from jug.subcommands import subcommand
-    #                  <command-name>  <function to call>
-    subcommand.register("my-fancy-report", fancyreport_func)
+    fancy_report = FancyReport()
 
-Finally you should know that your function will receive the following objects:
+The first line of the class docstring is important as it will be shown in jug's
+usage help page. The name attribute is also required and should be the name of
+your subcommand on the command-line.
+
+The body of the method ``run()`` defines what should happen when you
+call the subcommand ``jug my-fancy-report``.
+
+The ``run`` function will receive the following objects::
 
 * ``options``  - object representing command-line and user options
 * ``store``    - backend object reponsible for handling jobs
@@ -56,33 +61,49 @@ Finally you should know that your function will receive the following objects:
 additional objects may be introduced in the future so make sure your function
 uses ``*args, **kwargs`` to maintain compatibility.
 
+Finally, in order to register the subcommand, you must instanciate the subcommand.
 
-If your subcommand has configurable options you can expose them via command-line
-by defining arguments to be available in the command-line by using::
 
-    def fancyreport_options(parser):
-        parser.add_argument('--tofile', action='store',
-                            dest='report_tofile',
-                            help='Name of file to use for report')
+If your subcommand needs configurable options you can expose them via command-line
+by defining two additional methods::
 
-and instead of the above, register your subcommand with::
+    class FancyReport(SubCommand):
+        ...
 
-    #                    <command-name>   <function to call> <cmd-line options>
-    subcommand.register("my-fancy-report", fancyreport_func, fancyreport_options)
+        def parse(self, parser):
+            parser.add_argument('--tofile', action='store',
+                                dest='report_tofile',
+                                help='Name of file to use for report')
 
-If a user sets these options they will be available through the ``options`` object
-mentioned above. Jug uses ``argparse`` for command-line parsing.
-For more information refer to ``argparse``'s documentation.
+        def parse_defaults(self):
+            return {
+                "report_tofile": "report.txt",
+            }
 
-NOTE: A word of caution, don't use ``action=`` with ``store_true`` or ``store_false``
+    fancy_report = FancyReport()
+
+The first method configures argparse arguments that will be available as
+``jug my-fancy-report --tofile myreport.txt``. These will also be avaiable to
+the ``run()`` method as part of the ``options`` object.
+
+The second defines default values in case of omission. The ``key`` should match
+the ``dest=`` attribute of ``add_argument()`` and the ``value`` should be any object
+to be used by your ``run()`` method. Note that the value received in the command-line
+will be automatically converted to the same type as this default (i.e. if your default
+is ``True`` any ``--tofile john`` would result in ``bool("john") -> True``).
+
+For more information on parser configuration refer to ``argparse``'s documentation.
+
+NOTE: A few words of caution, we cannot rely on ``argparse``'s ``default=`` option since
+it doesn't allow distinguishing between user supplied and built-in (default) values.
+For the same reason, don't use ``action=`` with ``store_true`` or ``store_false``
 instead use ``store_const`` and ``const=`` with ``True`` or ``False``.
 Failing to do so will cause any matching setting on ``jugrc`` to not have any effect.
-
 """
 
 __all__ = [
+    'cmdapi',
     'SubCommand',
-    'SubCommandManager',
     'SubCommandError',
     'NoSuchCommandError',
 ]
@@ -93,6 +114,8 @@ import os
 import pkgutil
 import sys
 import traceback
+from ..options import Options
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 
 class SubCommandError(Exception):
@@ -121,6 +144,51 @@ Please make sure that the subcommand(s) '%s' conform(s) to the API.
 Original error was:
 %s
 """ % (module, e))
+
+
+class SubCommand:
+    """Define a subcommand and its command-line options
+    """
+    __metaclass__ = ABCMeta
+
+    def __init__(self):
+        cmdapi._register(self.name, self)
+        cmdapi.update_defaults(self.name)
+
+    def __call__(self, *args, **kwargs):
+        return self.run(*args, **kwargs)
+
+    @abstractproperty
+    def name(self):
+        pass
+
+    def parse(self, parser):
+        """Define command line options using parser.add_argument()
+
+        The parser object is an argparser subparser group.
+        Anything returned by this method is ignored
+        """
+        pass
+
+    def parse_defaults(self):
+        """Define default values for parser options
+
+        Should return a dictionary mapping ``dest=`` targets to their default.
+        """
+        pass
+
+    @abstractmethod
+    def run(self, *args, **kwargs):
+        """Re-define to specify what your subcommand is supposed to do
+
+        This code will receive the following arguments:
+        * ``options``  - object representing command-line and user options
+        * ``store``    - backend object reponsible for handling jobs
+        * ``jugspace`` - a namespace of jug internal variables (better not touch)
+
+        Anything returned by this method is ignored
+        """
+        pass
 
 
 class SubCommandDict(dict):
@@ -168,20 +236,20 @@ class SubCommandDict(dict):
 class SubCommandManager:
     def __init__(self):
         self._commands = SubCommandDict()
-        self.default_options = {}
+        self.default_options = Options(None)
 
-    def register(self, name, cmd_callback, opt_callback=None):
-        callbacks = (cmd_callback, opt_callback)
+    def _register(self, name, cmd_instance):
+        if name in self._commands and self._commands[name] != cmd_instance:
+            logging.warning("Jug: command: '%s' will be overriden with code from '%s'",
+                            name, cmd_instance.__class__.__name__)
 
-        if name in self._commands and self._commands[name] != callbacks:
-            if opt_callback is None:
-                logging.warning("Jug: command: '%s' will be overriden with code from '%s'",
-                                name, cmd_callback.__name__)
-            else:
-                logging.warning("Jug: command: '%s' will be overriden with code from '%s' and '%s'",
-                                name, cmd_callback.__name__, opt_callback.__name__)
+        self._commands[name] = cmd_instance
 
-        self._commands[name] = callbacks
+    def update_defaults(self, name):
+        cmd = self.get(name)
+        opts = cmd.parse_defaults()
+        if opts is not None:
+            self.default_options.update(opts)
 
     def get(self, command):
         try:
@@ -193,9 +261,9 @@ class SubCommandManager:
         """Execute subcommand
         """
         try:
-            cmd, opt = subcommand.get(command)
+            cmd = self.get(command)
         except NoSuchCommandError as e:
-            subcommand.usage(error=e)
+            self.usage(error=e)
 
         try:
             return cmd(*args, **kwargs)
@@ -205,7 +273,7 @@ class SubCommandManager:
 
             traceback.print_exc(file=sys.stderr)
 
-            subcommand.usage(error=e)
+            self.usage(error=e)
 
     def usage(self, error='', exit=True, _print=True, *args, **kwargs):
         "Shows help/usage information"
@@ -221,8 +289,7 @@ Subcommands
 ''']
         self._commands.load_commands()
 
-        for name, command in sorted(self._commands.items()):
-            cmd, opt = command
+        for name, cmd in sorted(self._commands.items()):
             usage_text.append("   %-15s %s" % (name + ":", _get_helptext(cmd)))
 
         usage_text.append("\nhelp:")
@@ -247,23 +314,18 @@ Subcommands
 
         parsers = []
 
-        for name, command in sorted(self._commands.items()):
-            cmd, opt = command
+        for name, cmd in sorted(self._commands.items()):
             parser = subparsers.add_parser(
                 name,
                 # This is necessary to have all the same output on all subparsers
-                usage=subcommand.usage(_print=False, exit=False),
+                usage=self.usage(_print=False, exit=False),
             )
             parsers.append(parser)
 
-            if opt is not None:
-                group = parser.add_argument_group(name)
-                defaults = opt(group)
-
-                if defaults is not None:
-                    self.default_options.update(defaults)
+            group = parser.add_argument_group(name)
+            cmd.parse(group)
 
         return parsers
 
 
-subcommand = SubCommandManager()
+cmdapi = SubCommandManager()

@@ -22,38 +22,40 @@
 #  THE SOFTWARE.
 
 from .. import task
-from . import subcommand
+from . import SubCommand
 
 __all__ = [
     'cleanup'
 ]
 
 
-def cleanup(store, options, *args, **kwargs):
+class CleanupCommand(SubCommand):
     '''Cleanup: remove result files that are not used
 
     cleanup(store, options)
 
     Implement 'cleanup' command
     '''
-    if options.cleanup_locks_only:
-        removed = store.remove_locks()
-    else:
-        tasks = task.alltasks
-        removed = store.cleanup(tasks)
-    options.print_out('Removed %s files' % removed)
+    name = "cleanup"
+
+    def run(self, store, options, *args, **kwargs):
+
+        if options.cleanup_locks_only:
+            removed = store.remove_locks()
+        else:
+            tasks = task.alltasks
+            removed = store.cleanup(tasks)
+        options.print_out('Removed %s files' % removed)
+
+    def parse(self, parser):
+        parser.add_argument('--locks-only',
+                            action='store_const', const=True,
+                            dest='cleanup_locks_only')
+
+    def parse_defaults(self):
+        return {
+            "cleanup_locks_only": False,
+        }
 
 
-def cleanup_options(parser):
-    parser.add_argument('--locks-only',
-                        action='store_const', const=True,
-                        dest='cleanup_locks_only')
-
-    default_values = {
-        "cleanup_locks_only": False,
-    }
-
-    return default_values
-
-
-subcommand.register("cleanup", cleanup, cleanup_options)
+cleanup = CleanupCommand()

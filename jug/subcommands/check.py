@@ -24,7 +24,7 @@
 import sys
 
 from .. import task
-from . import subcommand
+from . import SubCommand
 
 __all__ = [
     'check',
@@ -32,7 +32,7 @@ __all__ = [
 ]
 
 
-def check(store, options, *args, **kwargs):
+class CheckCommand(SubCommand):
     '''Returns 0 if all tasks are finished. 1 otherwise.
 
     check(store, options)
@@ -45,10 +45,13 @@ def check(store, options, *args, **kwargs):
             backend to use
     options : jug options
     '''
-    sys.exit(_check_or_sleep_until(store, False))
+    name = "check"
+
+    def run(self, store, options, *args, **kwargs):
+        sys.exit(_check_or_sleep_until(store, False))
 
 
-def sleep_until(store, options, *args, **kwargs):
+class SleepUntilCommand(SubCommand):
     '''Wait until all tasks are done, then exit.
 
     sleep_until(store, options)
@@ -62,7 +65,10 @@ def sleep_until(store, options, *args, **kwargs):
     options : jug options
         ignored
     '''
-    sys.exit(_check_or_sleep_until(store, True))
+    name = "sleep-until"
+
+    def run(self, store, options, *args, **kwargs):
+        sys.exit(_check_or_sleep_until(store, True))
 
 
 def _check_or_sleep_until(store, sleep_until):
@@ -85,5 +91,5 @@ def _check_or_sleep_until(store, sleep_until):
     return 0
 
 
-subcommand.register("check", check)
-subcommand.register("sleep-until", sleep_until)
+check = CheckCommand()
+sleep_until = SleepUntilCommand()

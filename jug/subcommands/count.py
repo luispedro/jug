@@ -25,14 +25,14 @@ from collections import defaultdict
 
 from .. import task
 from ..io import print_task_summary_table
-from . import subcommand
+from . import SubCommand
 
 __all__ = [
     'count',
 ]
 
 
-def count(store, options, *args, **kwargs):
+class CountCommand(SubCommand):
     '''Simply count tasks
 
     count(store, options)
@@ -44,11 +44,14 @@ def count(store, options, *args, **kwargs):
     store : jug backend
     options : jug options
     '''
-    task_counts = defaultdict(int)
-    for t in task.alltasks:
-        task_counts[t.name] += 1
+    name = "count"
 
-    print_task_summary_table(options, [("Count", task_counts)])
+    def run(self, store, options, *args, **kwargs):
+        task_counts = defaultdict(int)
+        for t in task.alltasks:
+            task_counts[t.name] += 1
+
+        print_task_summary_table(options, [("Count", task_counts)])
 
 
-subcommand.register("count", count)
+count = CountCommand()

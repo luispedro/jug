@@ -4,47 +4,62 @@ import os
 import tempfile
 import shutil
 from six import StringIO
-from jug.subcommands import subcommand
+from jug.subcommands import cmdapi, SubCommand
 from jug.options import parse
 
 CMD = "hello-cmd"
 MSG = "Hello world"
-MSG_OPTIONS = "Hello world - option ated"
 
 
-def hello_command(*args, **kwargs):
+class HelloCommand(SubCommand):
     "This should be visible"
-    return MSG
 
+    name = "hello-cmd"
 
-def hello_command_opts(options, *args, **kwargs):
-    "This should be visible"
-    return MSG + " - " + options.hello_value
+    def run(self, *args, **kwargs):
+        return MSG
 
+    def parse(self, parser):
+        parser.add_argument("--value", dest="hello_value", action="store")
+        parser.add_argument("--other-value", dest="hello_other_value", action="store")
 
-def hello_options(parser):
-    parser.add_argument("--value", dest="hello_value", action="store")
-    parser.add_argument("--other-value", dest="hello_other_value", action="store")
-
-    default_values = {
-        "hello_value": "option ated",
-        "hello_other_value": "undefined",
-    }
-
-    return default_values
+    def parse_defaults(self):
+        return {
+            "hello_value": "option",
+            "hello_other_value": "undefined",
+        }
 
 
 def clear_cmds():
-    subcommand._commands.clear()
-    assert CMD not in subcommand._commands
+    # Remove all registered commands
+    cmdapi._commands.clear()
+
+    assert CMD not in cmdapi._commands
+
+
+def clear_default(default):
+    try:
+        delattr(cmdapi.default_options, default)
+    except AttributeError:
+        pass
+
+
+class HelloNoSelfRegister(HelloCommand):
+    "No self register"
+    def __init__(self):
+        pass
 
 
 def test_register():
     clear_cmds()
 
-    subcommand.register(CMD, hello_command)
-    output = subcommand.run(CMD)
+    hello_command = HelloNoSelfRegister()
+    assert "hello-cmd" not in cmdapi._commands
 
+    cmdapi._register(CMD, hello_command)
+    assert "hello-cmd" in cmdapi._commands
+
+    output = cmdapi.run(CMD)
     assert output == MSG, "Expected: '%s' , got: '%s'" % (MSG, output)
 
 
@@ -52,60 +67,80 @@ def test_user_commands():
     clear_cmds()
 
     payload = """
-from jug.subcommands import subcommand
+from jug.subcommands import SubCommand
 
-def hello_command(*args, **kwargs):
+class HelloCommandPayload(SubCommand):
     "This should be visible"
-    return "This TEST"
 
-subcommand.register("hello-cmd", hello_command)
+    name = "hello-payload"
+
+    def run(self, *args, **kwargs):
+        return "This TEST"
+
+hello_command = HelloCommandPayload()
 """
     userfile = "jug_user_commands.py"
     tmpdir = tempfile.mkdtemp(prefix="jug")
     with open(os.path.join(tmpdir, userfile), 'w') as fh:
         fh.write(payload)
 
-    subcommand._commands._load_user_commands(user_path=tmpdir)
-    assert CMD in subcommand._commands, "Expected: '%s' to be in '%s'" % (CMD, subcommand._commands)
+    cmdapi._commands._load_user_commands(user_path=tmpdir)
+    CMD = "hello-payload"
+    assert CMD in cmdapi._commands, "Expected: '%s' to be in '%s'" % (CMD, cmdapi._commands)
 
-    output = subcommand.run(CMD)
+    output = cmdapi.run(CMD)
     assert output == "This TEST"
 
     shutil.rmtree(tmpdir)
 
 
-def test_options():
+def test_usage():
     clear_cmds()
 
-    subcommand.register(CMD, hello_command_opts, hello_options)
-    options = parse([CMD])
-    output = subcommand.run(CMD, options=options)
+    HelloCommand()
+    output = cmdapi.usage(_print=False, exit=False)
 
-    assert output == MSG_OPTIONS, "Expected: '%s' , got: '%s'" % (MSG_OPTIONS, output)
+    assert "This should be visible" in output
 
 
-_options_file = '''
+def test_options_cmdline():
+    clear_cmds()
+
+    clear_default("hello_other_value")
+    clear_default("hello_value")
+
+    assert CMD not in cmdapi._commands
+
+    HelloCommand()
+
+    options = parse([CMD, "--value", "FooBar"])
+    assert options.hello_value == "FooBar"
+    assert options.hello_other_value == "undefined"
+
+    output = cmdapi.run(CMD, options=options)
+    assert output == "Hello world", "Got '{0}'".format(output)
+
+
+def test_options_config():
+    "Test if settings read from config file work even for custom subcommands"
+    clear_cmds()
+
+    _options_file = '''
 [hello]
 other-value=someone
 '''
 
+    clear_default("hello_other_value")
+    clear_default("hello_value")
 
-def test_options_config():
-    clear_cmds()
+    cmd = HelloCommand()
+    defaults = cmd.parse_defaults()
+    assert defaults["hello_other_value"] == "undefined"
+    assert defaults["hello_value"] == "option"
 
-    subcommand.register(CMD, hello_command_opts, hello_options)
     options = parse([CMD], StringIO(_options_file))
 
     assert options.hello_other_value == "someone"
-    assert options.hello_value == "option ated"
-
-
-def test_usage():
-    clear_cmds()
-
-    subcommand.register(CMD, hello_command)
-    output = subcommand.usage(_print=False, exit=False)
-
-    assert "This should be visible" in output
+    assert options.hello_value == "option"
 
 # vim: ai sts=4 et sw=4
