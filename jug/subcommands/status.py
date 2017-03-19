@@ -251,6 +251,8 @@ class StatusCommand(SubCommand):
             return _status_nocache(options)
 
     def parse(self, parser):
+        defaults = self.parse_defaults()
+
         parser.add_argument('--cache',
                             action='store_const', const=True,
                             dest='status_cache',
@@ -259,7 +261,8 @@ class StatusCommand(SubCommand):
         parser.add_argument('--cache-file',
                             action='store', metavar="CACHE_FILE",
                             dest='status_cache_file',
-                            help='Name of file to use for status cache. Use with status --cache.')
+                            help=('Name of file to use for status cache. Use with status --cache. '
+                                  '(Default: {status_cache_file}'.format(**defaults)))
         parser.add_argument('--clear',
                             action='store_const', const=True,
                             dest='status_cache_clear',
