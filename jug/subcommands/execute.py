@@ -108,13 +108,17 @@ class ExecuteCommand(SubCommand):
         jug_hook('execute.finished_post_status')
 
     def parse(self, parser):
+        defaults = self.parse_defaults()
+
         parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time',
                             metavar='WAIT_CYCLE_TIME', type=int,
-                            help="How long to wait in each cycle (in seconds)")
+                            help=("How long to wait in each cycle (in seconds) "
+                                  "(Default: {execute_wait_cycle_time})".format(**defaults)))
         parser.add_argument('--nr-wait-cycles', action='store',
                             dest='execute_nr_wait_cycles',
                             metavar='NR_WAIT_CYCLES', type=int,
-                            help="How many wait cycles to do")
+                            help=("How many wait cycles to do "
+                                  "(Default: {execute_nr_wait_cycles})".format(**defaults)))
         parser.add_argument('--target', action='store', dest='execute_target',
                             metavar='TARGET',
                             help="Restrict tasks to execute based on their name")
