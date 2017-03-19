@@ -29,7 +29,7 @@ from .. import task
 from ..hooks import jug_hook, register_hook, register_hook_once
 from ..io import print_task_summary_table
 from ..jug import init
-from . import subcommand
+from . import SubCommand
 
 
 __all__ = [
@@ -59,78 +59,81 @@ class TaskStats(object):
         self.executed[t.name] += 1
 
 
-def execute(options, *args, **kwargs):
+class ExecuteCommand(SubCommand):
     '''Execute tasks
 
     execute(options)
 
     Implement 'execute' command
     '''
-    from signal import signal, SIGTERM
-    from ..jug import execution_loop
+    name = "execute"
 
-    signal(SIGTERM, _sigterm)
-    tasks = task.alltasks
-    tstats = TaskStats()
-    store = None
-    register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
+    def run(self, options, *args, **kwargs):
+        from signal import signal, SIGTERM
+        from ..jug import execution_loop
 
-    nr_wait_cycles = int(options.execute_nr_wait_cycles)
-    noprogress = 0
-    while noprogress < nr_wait_cycles:
-        del tasks[:]
-        store, jugspace = init(options.jugfile, options.jugdir, store=store)
-        if options.debug:
-            for t in tasks:
-                # Trigger hash computation:
-                t.hash()
+        signal(SIGTERM, _sigterm)
+        tasks = task.alltasks
+        tstats = TaskStats()
+        store = None
+        register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
 
-        previous = sum(tstats.executed.values())
-        execution_loop(tasks, options)
-        after = sum(tstats.executed.values())
-        done = not jugspace.get('__jug__hasbarrier__', False)
-        if done:
-            break
-        if after == previous:
-            from time import sleep
-            noprogress += 1
-            sleep(int(options.execute_wait_cycle_time))
+        nr_wait_cycles = int(options.execute_nr_wait_cycles)
+        noprogress = 0
+        while noprogress < nr_wait_cycles:
+            del tasks[:]
+            store, jugspace = init(options.jugfile, options.jugdir, store=store)
+            if options.debug:
+                for t in tasks:
+                    # Trigger hash computation:
+                    t.hash()
+
+            previous = sum(tstats.executed.values())
+            execution_loop(tasks, options)
+            after = sum(tstats.executed.values())
+            done = not jugspace.get('__jug__hasbarrier__', False)
+            if done:
+                break
+            if after == previous:
+                from time import sleep
+                noprogress += 1
+                sleep(int(options.execute_wait_cycle_time))
+            else:
+                noprogress = 0
         else:
-            noprogress = 0
-    else:
-        logging.info('No tasks can be run!')
+            logging.info('No tasks can be run!')
 
-    jug_hook('execute.finished_pre_status')
-    print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
-    jug_hook('execute.finished_post_status')
+        jug_hook('execute.finished_pre_status')
+        print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
+        jug_hook('execute.finished_post_status')
 
+    def parse(self, parser):
+        parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time',
+                            metavar='WAIT_CYCLE_TIME', type=int,
+                            help="How long to wait in each cycle (in seconds)")
+        parser.add_argument('--nr-wait-cycles', action='store',
+                            dest='execute_nr_wait_cycles',
+                            metavar='NR_WAIT_CYCLES', type=int,
+                            help="How many wait cycles to do")
+        parser.add_argument('--target', action='store', dest='execute_target',
+                            metavar='TARGET',
+                            help="Restrict tasks to execute based on their name")
+        parser.add_argument('--keep-going',
+                            action='store_const', const=True,
+                            dest='execute_keep_going',
+                            help='Continue after errors')
 
-def execute_options(parser):
-    parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time',
-                        metavar='WAIT_CYCLE_TIME', type=int,
-                        help="How long to wait in each cycle (in seconds)")
-    parser.add_argument('--nr-wait-cycles', action='store',
-                        dest='execute_nr_wait_cycles',
-                        metavar='NR_WAIT_CYCLES', type=int,
-                        help="How many wait cycles to do")
-    parser.add_argument('--target', action='store', dest='execute_target',
-                        metavar='TARGET',
-                        help="Restrict tasks to execute based on their name")
-    parser.add_argument('--keep-going',
-                        action='store_const', const=True,
-                        dest='execute_keep_going',
-                        help='Continue after errors')
+    def parse_defaults(self):
+        wait_cycle_time = 12
 
-    wait_cycle_time = 12
+        default_values = {
+            "execute_keep_going": False,
+            "execute_target": None,
+            "execute_wait_cycle_time": wait_cycle_time,
+            "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
+        }
 
-    default_values = {
-        "execute_keep_going": False,
-        "execute_target": None,
-        "execute_wait_cycle_time": wait_cycle_time,
-        "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
-    }
-
-    return default_values
+        return default_values
 
 
-subcommand.register("execute", execute, execute_options)
+execute = ExecuteCommand()

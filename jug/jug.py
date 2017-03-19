@@ -268,8 +268,8 @@ def main(argv=None):
     if options.subcommand not in ('status', 'execute', 'webstatus', 'test-jug'):
         store, jugspace = init(options.jugfile, options.jugdir)
 
-    from .subcommands import subcommand
-    subcommand.run(options.subcommand, options=options, store=store, jugspace=jugspace)
+    from .subcommands import cmdapi
+    cmdapi.run(options.subcommand, options=options, store=store, jugspace=jugspace)
 
     if store is not None:
         store.close()

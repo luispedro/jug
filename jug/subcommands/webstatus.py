@@ -22,7 +22,7 @@
 #  THE SOFTWARE.
 
 from . import status as st
-from . import subcommand
+from . import SubCommand
 
 
 template = '''
@@ -94,42 +94,45 @@ def _format_counts(tw, tre, tru, tf):
     return r
 
 
-def webstatus(options, *args, **kwargs):
+class WebStatusCommand(SubCommand):
     '''Start a web interface which displays the status
     '''
-    import sqlite3
-    connection = sqlite3.connect(':memory:', check_same_thread=False)
-    store, ht, deps, rdeps = st.load_jugfile(options)
-    st.create_sqlite3(connection, ht, deps, rdeps)
+    name = "webstatus"
 
-    try:
-        import bottle
-    except ImportError:
-        from sys import stderr
-        stderr.write('''
-webstatus subcommand requires that web.py be installed (it could not be found).
-You can try one of the following commands to install it:
+    def run(self, options, *args, **kwargs):
+        import sqlite3
+        connection = sqlite3.connect(':memory:', check_same_thread=False)
+        store, ht, deps, rdeps = st.load_jugfile(options)
+        st.create_sqlite3(connection, ht, deps, rdeps)
 
-    pip install bottle
+        try:
+            import bottle
+        except ImportError:
+            from sys import stderr
+            stderr.write('''
+    webstatus subcommand requires that web.py be installed (it could not be found).
+    You can try one of the following commands to install it:
 
-or
+        pip install bottle
 
-    easy_install bottle
-''')
-        return
+    or
 
-    app = bottle.Bottle()
+        easy_install bottle
+    ''')
+            return
 
-    @app.route('/')
-    def status():
-        ht, deps, rdeps = st.retrieve_sqlite3(connection)
-        tw, tre, tru, tf, dirty = st.update_status(store, ht, deps, rdeps)
-        st.save_dirty3(connection, dirty)
-        return template % {
-            'jugfile': options.jugfile,
-            'table': _format_counts(tw, tre, tru, tf),
-        }
-    bottle.run(app)
+        app = bottle.Bottle()
+
+        @app.route('/')
+        def status():
+            ht, deps, rdeps = st.retrieve_sqlite3(connection)
+            tw, tre, tru, tf, dirty = st.update_status(store, ht, deps, rdeps)
+            st.save_dirty3(connection, dirty)
+            return template % {
+                'jugfile': options.jugfile,
+                'table': _format_counts(tw, tre, tru, tf),
+            }
+        bottle.run(app)
 
 
-subcommand.register("webstatus", webstatus)
+webstatus = WebStatusCommand()

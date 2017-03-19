@@ -26,14 +26,14 @@ from collections import defaultdict
 from ..utils import prepare_task_matcher
 from .. import task
 from ..io import print_task_summary_table
-from . import subcommand
+from . import SubCommand
 
 __all__ = [
     'invalidate'
 ]
 
 
-def invalidate(store, options, *args, **kwargs):
+class InvalidateCommand(SubCommand):
     '''Invalidate the results of a task
 
     invalidate(store, options)
@@ -47,46 +47,48 @@ def invalidate(store, options, *args, **kwargs):
         Most relevant option is `invalid_name`, a string  with the exact (i.e.,
         module qualified) name of function to invalidate
     '''
-    invalid_name = options.invalid_name
-    tasks = task.alltasks
-    cache = {}
+    name = "invalidate"
 
-    task_matcher = prepare_task_matcher(invalid_name)
+    def run(self, store, options, *args, **kwargs):
+        invalid_name = options.invalid_name
+        tasks = task.alltasks
+        cache = {}
 
-    def isinvalid(t):
-        if isinstance(t, task.Tasklet):
-            return isinvalid(t.base)
-        h = t.hash()
-        if h in cache:
-            return cache[h]
-        if task_matcher(t.name):
-            cache[h] = True
-            return True
-        for dep in t.dependencies():
-            if isinvalid(dep):
+        task_matcher = prepare_task_matcher(invalid_name)
+
+        def isinvalid(t):
+            if isinstance(t, task.Tasklet):
+                return isinvalid(t.base)
+            h = t.hash()
+            if h in cache:
+                return cache[h]
+            if task_matcher(t.name):
                 cache[h] = True
                 return True
-        cache[h] = False
-        return False
+            for dep in t.dependencies():
+                if isinvalid(dep):
+                    cache[h] = True
+                    return True
+            cache[h] = False
+            return False
 
-    invalid = list(filter(isinvalid, tasks))
-    if not invalid:
-        options.print_out('No results invalidated.')
-        return
-    task_counts = defaultdict(int)
-    for t in invalid:
-        if store.remove(t.hash()):
-            task_counts[t.name] += 1
-    if sum(task_counts.values()) == 0:
-        options.print_out('Tasks invalidated, but no results removed')
-    else:
-        print_task_summary_table(options, [("Invalidated", task_counts)])
+        invalid = list(filter(isinvalid, tasks))
+        if not invalid:
+            options.print_out('No results invalidated.')
+            return
+        task_counts = defaultdict(int)
+        for t in invalid:
+            if store.remove(t.hash()):
+                task_counts[t.name] += 1
+        if sum(task_counts.values()) == 0:
+            options.print_out('Tasks invalidated, but no results removed')
+        else:
+            print_task_summary_table(options, [("Invalidated", task_counts)])
+
+    def parse(self, parser):
+        parser.add_argument('--invalid', required=True, action='store',
+                            dest='invalid_name',
+                            help='Task name to invalidate')
 
 
-def invalidate_options(parser):
-    parser.add_argument('--invalid', required=True, action='store',
-                        dest='invalid_name',
-                        help='Task name to invalidate')
-
-
-subcommand.register("invalidate", invalidate, invalidate_options)
+invalidate = InvalidateCommand()
