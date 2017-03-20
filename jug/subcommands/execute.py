@@ -94,7 +94,7 @@ def execute(options, *args, **kwargs):
         if after == previous:
             from time import sleep
             noprogress += 1
-            sleep(int(options.execute_wait_cycle_time_secs))
+            sleep(int(options.execute_wait_cycle_time))
         else:
             noprogress = 0
     else:
@@ -106,8 +106,8 @@ def execute(options, *args, **kwargs):
 
 
 def execute_options(parser):
-    parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs',
-                        metavar='WAIT_CYCLE_TIME_SECS', type=int,
+    parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time',
+                        metavar='WAIT_CYCLE_TIME', type=int,
                         help="How long to wait in each cycle (in seconds)")
     parser.add_argument('--nr-wait-cycles', action='store',
                         dest='execute_nr_wait_cycles',
@@ -126,7 +126,7 @@ def execute_options(parser):
     default_values = {
         "execute_keep_going": False,
         "execute_target": None,
-        "execute_wait_cycle_time_secs": wait_cycle_time,
+        "execute_wait_cycle_time": wait_cycle_time,
         "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
     }
 

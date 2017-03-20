@@ -6,6 +6,7 @@ version 1.4.0+git
 	* Use ~/.config/jug/jugrc as configuration file
 	* Add experimental support for extensible commands, use
 	~/.config/jug/jug_user_commands.py
+	* jugrc: execute_wait_cycle_time_secs is now execute_wait_cycle_time
 
 version 1.4.0 Tue Jan 3 2017 by luispedro
 	* Fix bug with writing very large objects to disk
