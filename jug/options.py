@@ -41,8 +41,9 @@ import sys
 
 
 class Options(object):
-    def __init__(self, next):
+    def __init__(self, next, autoinit=False):
         self.next = next
+        self._autoinit = autoinit
 
     def update(self, dict):
         for k, v in dict.items():
@@ -53,28 +54,44 @@ class Options(object):
         return deepcopy(self)
 
     def __getattr__(self, name):
-        if name == '__deepcopy__':
+        if name in ('__deepcopy__', '_autoinit'):
             raise AttributeError
+
+        if self._autoinit:
+            # Used to automatically load default values from subcommands when
+            # first accessed and no match exists
+            self._autoinit(self)
+            self._autoinit = False
+
         if name in self.__dict__:
             return self.__dict__[name]
+
         if self.__dict__.get('next') is None:
             raise AttributeError
         return getattr(self.__dict__['next'], name)
 
 
-default_options = Options(None)
+def load_default_options(opt):
+    opt.jugdir = '%(jugfile)s.jugdata'
+    opt.jugfile = 'jugfile.py'
+    opt.subcommand = None
+    opt.aggressive_unload = False
+    opt.invalid_name = None
+    opt.argv = None
+    opt.print_out = six.print_
+    opt.short = False
+    opt.pdb = False
+    opt.verbose = 'quiet'
+    opt.debug = False
 
-default_options.jugdir = '%(jugfile)s.jugdata'
-default_options.jugfile = 'jugfile.py'
-default_options.subcommand = None
-default_options.aggressive_unload = False
-default_options.invalid_name = None
-default_options.argv = None
-default_options.print_out = six.print_
-default_options.short = False
-default_options.pdb = False
-default_options.verbose = 'quiet'
-default_options.debug = False
+    # Current hierarchy of options is the following:
+    #   default_options
+    #     .next => subcommands.default_options
+    from .subcommands import cmdapi
+    opt.next = cmdapi.default_options
+
+
+default_options = Options(None, autoinit=load_default_options)
 
 
 def _str_to_bool(s):
