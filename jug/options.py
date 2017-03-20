@@ -44,6 +44,10 @@ class Options(object):
     def __init__(self, next):
         self.next = next
 
+    def update(self, dict):
+        for k, v in dict.items():
+            setattr(self, k, v)
+
     def copy(self):
         from copy import deepcopy
         return deepcopy(self)
@@ -67,30 +71,24 @@ default_options.aggressive_unload = False
 default_options.invalid_name = None
 default_options.argv = None
 default_options.print_out = six.print_
-default_options.status_cache = False
-default_options.status_cache_clear = False
 default_options.short = False
 default_options.pdb = False
 default_options.verbose = 'quiet'
 default_options.debug = False
-
-default_options.cleanup_locks_only = False
-
-default_options.execute_wait_cycle_time_secs = 12
-default_options.execute_nr_wait_cycles = (30 * 60) // default_options.execute_wait_cycle_time_secs
-default_options.execute_keep_going = False
-default_options.execute_target = None
-
-default_options.status_cache_file = '.jugstatus.sqlite3'
 
 
 def _str_to_bool(s):
     return s.lower() not in ('', '0', 'false', 'off')
 
 
-def read_configuration_file(fp=None):
+def key_to_option(s):
+    return s.replace('-', '_')
+
+
+def read_configuration_file(fp=None, default_options=None):
     '''
-    options = read_configuration_file(fp='~/.config/jugrc')
+    options = read_configuration_file(fp='~/.config/jugrc',
+                                      default_options={"execute_keep_going": True})
 
     Parse configuration file.
 
@@ -99,6 +97,8 @@ def read_configuration_file(fp=None):
     fp : inputfile, optional
         File to read. If not given, use
     '''
+    inifile = Options(default_options)
+
     if fp is None:
         from os import path
         for fp in ['~/.config/jug/jugrc', '~/.config/jugrc', '~/.jug/configrc']:
@@ -107,48 +107,39 @@ def read_configuration_file(fp=None):
                 try:
                     fp = open(fp)
                 except IOError:
-                    return Options(None)
+                    return inifile
                 break
         else:
-            return Options(None)
+            return inifile
 
     from six.moves import configparser
     config = configparser.RawConfigParser()
     config.readfp(fp)
-    infile = Options(None)
 
-    def attempt(section, entry, new_name, conv=None):
-        try:
-            value = config.get(section, entry)
-            if conv is not None:
-                value = conv(value)
-            setattr(infile, new_name, value)
-        except configparser.NoOptionError:
-            pass
-        except configparser.NoSectionError:
-            pass
-    attempt('main', 'jugdir', 'jugdir')
-    attempt('main', 'jugfile', 'jugfile')
+    for section in config.sections():
+        for key, value in config.items(section):
+            if section == "main":
+                new_name = key_to_option(key)
+            else:
+                new_name = "{0}_{1}".format(key_to_option(section), key_to_option(key))
 
-    attempt('status', 'cache', 'status_cache')
+            # Get type of default value if a default value exists
+            if default_options is not None:
+                old_value = getattr(default_options, new_name, None)
+                if old_value is not None:
+                    # Cast the config object to the same type as the default
+                    value = type(old_value)(value)
 
-    attempt('cleanup', 'locks-only', 'cleanup_locks_only', bool)
+            logging.debug("Setting %s to %s", new_name, value)
+            setattr(inifile, new_name, value)
 
-    attempt('execute', 'aggressive-unload', 'aggressive_unload', _str_to_bool)
-    attempt('execute', 'pbd', 'pdb', bool)
-    attempt('execute', 'debug', 'debug', bool)
-    attempt('execute', 'nr-wait-cycles', 'execute_nr_wait_cycles', int)
-    attempt('execute', 'wait-cycle-time', 'execute_wait_cycle_time_secs', int)
-    attempt('execute', 'keep-going', 'execute_keep_going', _str_to_bool)
-    return infile
+    return inifile
 
 
 def define_options(parser):
-    group = parser.add_argument_group("positional arguments")
-    group.add_argument('jugfile', action='store', nargs='?', default='jugfile.py',
-                       help="Python script to use. (Default: %(default)s)")
-
     group = parser.add_argument_group("common")
+    group.add_argument('jugfile', action='store', nargs='?',
+                       help="Python script to use. (Default: %(default)s)" % {"default": default_options.jugfile})
     group.add_argument('--version', action="version", version=__version__)
     group.add_argument('--aggressive-unload',
                        action='store_true',
@@ -164,9 +155,9 @@ memory errors.''')
 Directory in which to save intermediate files
 You can use Python format syntax, the following variables are available:
     - date
-    - jugfile (without extension)''')
-    # FIXME We used to show the default jugfile jugdata dir but ${jugfile} is not available in this context
-    # By default, the value of `jugdir` is "%(jugfile)s.jugdata"''')
+    - jugfile (without extension)
+
+    By default, the value of `jugdir` is "%(jugfile)s.jugdata"''' % {"jugfile": default_options.jugfile})
     group.add_argument('--verbose',
                        action='store',
                        dest='verbose',
@@ -175,7 +166,6 @@ You can use Python format syntax, the following variables are available:
                        action='store_true',
                        dest='short',
                        help='Short output')
-    group.add_argument('--locks-only', action='store_true', dest='cleanup_locks_only')
     group.add_argument('--pdb',
                        action='store_true',
                        dest='pdb',
@@ -202,10 +192,6 @@ def parse(args=None, optionsfile=None):
     if len(sys.argv) == 1:
         subcommand.usage()
 
-    infile = read_configuration_file(optionsfile)
-    infile.next = default_options
-    cmdline = Options(infile)
-
     parser = argparse.ArgumentParser(
         description=subcommand.usage(_print=False, exit=False),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -214,7 +200,7 @@ def parse(args=None, optionsfile=None):
 
     sub = parser.add_subparsers(dest="subcommand", help=argparse.SUPPRESS)
     sub.required = True
-    subparsers = subcommand.get_options(sub)
+    subparsers = subcommand.get_subcommand_parsers(sub)
 
     # NOTE The parents=[parent] feature of argparse is severely broken
     # causing dependency loops in required arguments.
@@ -222,44 +208,18 @@ def parse(args=None, optionsfile=None):
     for sub in subparsers:
         define_options(sub)
 
-    # FIXME with commands that require additional arguments (such as invalidate)
-    # writing "jug invalidate" shows the usage message twice and the last few empty
-    # lines are truncated causing the error message to be fused with the description
-    # of the last argument. Still not sure how to fix this.
-    options = parser.parse_args(args)
+    argopts = parser.parse_args(args)
 
-    cmdline.status_cache = True if vars(options).get("status_cache", None) else False
+    default_options.update(subcommand.default_options)
+    inifile = read_configuration_file(optionsfile, default_options=default_options)
+    # Priority is: user-supplied command line, config file, default options
+    cmdline = Options(inifile)
 
-    # FIXME This entire updating mechanism needs to be replaced by something
-    # that preserves options set in argparse's parsers, otherwise subcommands
-    # cannot make use of command-line arguments
-    def _maybe_set(name):
-        if getattr(options, name, None) is not None:
-            setattr(cmdline, name, getattr(options, name))
+    # Set cmdline options only if they aren't None
+    for key, val in vars(argopts).items():
+        if val is not None:
+            setattr(cmdline, key, val)
 
-    _maybe_set('jugdir')
-    _maybe_set('subcommand')
-
-    _maybe_set('verbose')
-    _maybe_set('short')
-    _maybe_set('aggressive_unload')
-    _maybe_set('pdb')
-    _maybe_set('debug')
-    # NOTE This is now set in subcommands/invalidate.py
-    _maybe_set('invalid_name')
-    # NOTE These are now set in subcommands/execute.py
-    _maybe_set('execute_nr_wait_cycles')
-    _maybe_set('execute_wait_cycle_time_secs')
-    _maybe_set('execute_keep_going')
-    _maybe_set('execute_target')
-    # NOTE These are now set in subcommands/status.py
-    _maybe_set('status_cache_clear')
-    _maybe_set('status_cache_file')
-
-    cmdline.jugdir = cmdline.jugdir % {
-        'date': datetime.now().strftime('%Y-%m-%d'),
-        'jugfile': cmdline.jugfile[:-3],
-    }
     try:
         nlevel = {
             'DEBUG': logging.DEBUG,
@@ -269,6 +229,17 @@ def parse(args=None, optionsfile=None):
         root.level = nlevel
     except KeyError:
         pass
+
+    cmdline.jugdir = cmdline.jugdir % {
+        'date': datetime.now().strftime('%Y-%m-%d'),
+        'jugfile': cmdline.jugfile[:-3],
+    }
+
+    logging.debug("command-line args: %s", argopts)
+    logging.debug("jugrc args: %s", inifile.__dict__)
+    logging.debug("default args: %s", default_options.__dict__)
+    logging.debug("default subcommand args: %s", default_options.next.__dict__)
+    logging.debug("continuing with: %s", cmdline.__dict__)
 
     return cmdline
 

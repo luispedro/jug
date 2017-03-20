@@ -250,17 +250,26 @@ def status(options, *args, **kwargs):
 
 def status_options(parser):
     parser.add_argument('--cache',
-                        action='store_true',
+                        action='store_const', const=True,
                         dest='status_cache',
                         help='Use a cache for faster status [does not update after jugfile changes, though]')
+
     parser.add_argument('--cache-file',
                         action='store', metavar="CACHE_FILE",
                         dest='status_cache_file',
                         help='Name of file to use for status cache. Use with status --cache.')
     parser.add_argument('--clear',
-                        action='store_true',
+                        action='store_const', const=True,
                         dest='status_cache_clear',
                         help='Use with status --cache. Removes the cache file')
+
+    default_values = {
+        "status_cache": False,
+        "status_cache_clear": False,
+        "status_cache_file": ".jugstatus.sqlite3",
+    }
+
+    return default_values
 
 
 subcommand.register("status", status, status_options)

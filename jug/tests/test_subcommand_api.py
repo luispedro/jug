@@ -23,8 +23,15 @@ def hello_command_opts(options, *args, **kwargs):
 
 
 def hello_options(parser):
-    parser.add_argument("--value", dest="hello_value", action="store", default="option ated")
-    parser.add_argument("--other-value", dest="hello_other_value", action="store", default="undefined")
+    parser.add_argument("--value", dest="hello_value", action="store")
+    parser.add_argument("--other-value", dest="hello_other_value", action="store")
+
+    default_values = {
+        "hello_value": "option ated",
+        "hello_other_value": "undefined",
+    }
+
+    return default_values
 
 
 def clear_cmds():
@@ -79,7 +86,7 @@ def test_options():
 
 _options_file = '''
 [hello]
-other_value='someone'
+other-value=someone
 '''
 
 

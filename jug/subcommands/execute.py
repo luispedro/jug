@@ -106,19 +106,31 @@ def execute(options, *args, **kwargs):
 
 
 def execute_options(parser):
-    wait_cycle_time = 12
-
     parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time_secs',
-                        metavar='WAIT_CYCLE_TIME_SECS', default=wait_cycle_time,
+                        metavar='WAIT_CYCLE_TIME_SECS', type=int,
                         help="How long to wait in each cycle (in seconds)")
-    parser.add_argument('--nr-wait-cycles', action='store', dest='execute_nr_wait_cycles',
-                        metavar='NR_WAIT_CYCLES', default=(30 * 60) // wait_cycle_time,
+    parser.add_argument('--nr-wait-cycles', action='store',
+                        dest='execute_nr_wait_cycles',
+                        metavar='NR_WAIT_CYCLES', type=int,
                         help="How many wait cycles to do")
     parser.add_argument('--target', action='store', dest='execute_target',
-                        metavar='TARGET', default=None,
+                        metavar='TARGET',
                         help="Restrict tasks to execute based on their name")
-    parser.add_argument('--keep-going', action='store_true', dest='execute_keep_going',
+    parser.add_argument('--keep-going',
+                        action='store_const', const=True,
+                        dest='execute_keep_going',
                         help='Continue after errors')
+
+    wait_cycle_time = 12
+
+    default_values = {
+        "execute_keep_going": False,
+        "execute_target": None,
+        "execute_wait_cycle_time_secs": wait_cycle_time,
+        "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
+    }
+
+    return default_values
 
 
 subcommand.register("execute", execute, execute_options)

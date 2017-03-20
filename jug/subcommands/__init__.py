@@ -74,6 +74,10 @@ If a user sets these options they will be available through the ``options`` obje
 mentioned above. Jug uses ``argparse`` for command-line parsing.
 For more information refer to ``argparse``'s documentation.
 
+NOTE: A word of caution, don't use ``action=`` with ``store_true`` or ``store_false``
+instead use ``store_const`` and ``const=`` with ``True`` or ``False``.
+Failing to do so will cause any matching setting on ``jugrc`` to not have any effect.
+
 """
 
 __all__ = [
@@ -164,6 +168,7 @@ class SubCommandDict(dict):
 class SubCommandManager:
     def __init__(self):
         self._commands = SubCommandDict()
+        self.default_options = {}
 
     def register(self, name, cmd_callback, opt_callback=None):
         callbacks = (cmd_callback, opt_callback)
@@ -220,6 +225,9 @@ Subcommands
             cmd, opt = command
             usage_text.append("   %-15s %s" % (name + ":", _get_helptext(cmd)))
 
+        usage_text.append("\nhelp:")
+        usage_text.append("  Use 'jug <subcommand> --help' for subcommand specific options")
+
         if error:
             usage_text.append("")
             usage_text.append(str(error))
@@ -234,7 +242,7 @@ Subcommands
 
         return message
 
-    def get_options(self, subparsers):
+    def get_subcommand_parsers(self, subparsers):
         self._commands.load_commands()
 
         parsers = []
@@ -250,7 +258,10 @@ Subcommands
 
             if opt is not None:
                 group = parser.add_argument_group(name)
-                opt(group)
+                defaults = opt(group)
+
+                if defaults is not None:
+                    self.default_options.update(defaults)
 
         return parsers
 
