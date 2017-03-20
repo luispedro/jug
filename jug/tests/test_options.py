@@ -40,7 +40,7 @@ def test_parse():
 
     assert parsed.jugfile == 'myjugfile.py'
     assert parsed.pdb
-    assert parsed.execute_wait_cycle_time_secs == 23
+    assert parsed.execute_wait_cycle_time == 23
     assert not parsed.aggressive_unload
 
 def test_copy():
