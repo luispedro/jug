@@ -44,4 +44,16 @@ def cleanup(store, options, *args, **kwargs):
     options.print_out('Removed %s files' % removed)
 
 
-subcommand.register("cleanup", cleanup)
+def cleanup_options(parser):
+    parser.add_argument('--locks-only',
+                        action='store_const', const=True,
+                        dest='cleanup_locks_only')
+
+    default_values = {
+        "cleanup_locks_only": False,
+    }
+
+    return default_values
+
+
+subcommand.register("cleanup", cleanup, cleanup_options)
