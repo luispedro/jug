@@ -8,6 +8,10 @@ Jugfile. It can be used for debugging and exploration of the task structure.
 Inside the environment, you can use the ``value(task)`` function to load
 results (if available; otherwise, an exception is thrown).
 
+.. versionadded:: 1.5
+    ``invalidate(task)`` was only added to the shell in version 1.5. Before
+    that, only ``task.invalidate()`` (non-recursive) was available.
+
 The ``invalidate(task)`` function invalidates the results of its argument and
 all dependents, **recursively**, much like the ``jug invalidate`` subcommand.
 
