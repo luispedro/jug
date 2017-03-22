@@ -299,7 +299,7 @@ Subcommands
             usage_text.append("")
             usage_text.append(str(error))
 
-        message = "\n".join(usage_text) + "\n "
+        message = "\n".join(usage_text) + "\n \n"
 
         if _print:
             sys.stdout.write(message)
