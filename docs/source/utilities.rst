@@ -66,7 +66,21 @@ pieces of functionality:
 1. it checks the exit code and raises an exception if not zero (this can be
    disabled by passing ``check_exit=False``).
 2. It takes an argument called ``run_after`` which is ignored but can be used
-   to declare dependencies between tasks.
+   to declare dependencies between tasks. Thus, it can be used to ensure that a
+   specific process only runs after something else has run::
+
+    from jug.utils import jug_execute
+    from jug import TaskGenerator
+
+    @TaskGenerator
+    def my_computation(input, ouput_filename):
+        ...
+
+    tok = my_computation(input, 'output.txt')
+    # We want to run gzip, but **only after** `my_computation` has run:
+    jug_execute(['gzip', 'output.txt'], run_after=tok)
+
+
 
 .. automodule:: jug.utils
     :members:
