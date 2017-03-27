@@ -42,6 +42,12 @@ call and after the barrier call. When a barrier call is reached, if there are
 any tasks that have not run, then the jugfile is not loaded any further. This
 ensures that **after the call** you can load the results of previous tasks.
 
+``barrier()`` is also useful when there are dependencies that Jug cannot see
+(e.g., one task which writes a file which later tasks rely on). An alternative
+solution (not always applicable) is to `add these dependencies through unused
+parameters
+<utilities.html#using-identity-to-induce-dependencies>`__.
+
 bvalue
 ------
 
