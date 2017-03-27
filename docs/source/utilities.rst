@@ -57,6 +57,32 @@ Now, the long list is only hashed once! It is transformed into a ``Task`` (we
 reuse the name ``inputs`` to keep things clear) and each ``process`` call can
 now compute its hash very fast.
 
+Using ``identity`` to induce dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``identity`` can also be used to introduce dependencies. One can define a
+helper function::
+
+    def value_after(val, token):
+        from jug.utils import identity
+        return identity( [val, token] )[0]
+
+Now, this function, will always return its first argument, but will only run
+once its second argument is available. Here is a typical use case:
+
+1. Function ``process`` takes an output file name
+2. Function ``postprocess`` takes as input the output filename of ``process``
+
+Now, you want to run ``process`` and **then** ``postprocess``, but since
+communication is done with files, Jug does not see that these functions depend
+on each other. ``value_after`` is the solution::
+
+    token = process(input, ofile='output.txt')
+    postprocess(value_after('output.txt', token))
+
+This works independently of whatever ``process`` returns (even if it is
+``None``).
+
 jug_execute
 -----------
 
@@ -76,9 +102,9 @@ pieces of functionality:
     def my_computation(input, ouput_filename):
         ...
 
-    tok = my_computation(input, 'output.txt')
+    token = my_computation(input, 'output.txt')
     # We want to run gzip, but **only after** `my_computation` has run:
-    jug_execute(['gzip', 'output.txt'], run_after=tok)
+    jug_execute(['gzip', 'output.txt'], run_after=token)
 
 
 
