@@ -32,6 +32,7 @@ __all__ = [
     'identity',
     'jug_execute',
     'CustomHash',
+    'sync_move',
     ]
 
 def _identity(x):
@@ -201,3 +202,20 @@ def jug_execute(args, check_exit=True, run_after=None):
     ret = subprocess.call(args)
     if check_exit and ret != 0:
         raise SystemError("Error in system")
+
+def sync_move(src, dst):
+    '''Sync the file and move it
+
+    This ensures that the move is truly atomic
+
+    Parameters
+    ----------
+    src : filename
+        Source file
+    dst: filename
+        Destination file
+    '''
+    from jug.backends.file_store import fsync_dir
+    from os import rename
+    fsync_dir(src)
+    rename(src, dst)

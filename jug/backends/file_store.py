@@ -52,7 +52,7 @@ def create_directories(dname):
             raise
 
 
-def _fsync_dir(fname):
+def fsync_dir(fname):
     import errno
     parent = dirname(fname)
     try:
@@ -137,7 +137,7 @@ class file_store(base_store):
                 output.flush()
                 os.fsync(output.fileno())
                 output.close()
-                _fsync_dir(fname)
+                fsync_dir(fname)
                 os.rename(fname, name)
                 return
         except ImportError:
@@ -153,7 +153,7 @@ class file_store(base_store):
         output.close()
 
         # Rename is atomic even over NFS.
-        _fsync_dir(fname)
+        fsync_dir(fname)
         os.rename(fname, name)
 
     def list(self):
