@@ -51,6 +51,28 @@ def test_copy():
     assert parsed.pdb
     assert not parsed.aggressive_unload
 
+def test_sys_argv():
+    from sys import argv
+    parsed = jug.options.parse(
+        ["execute", "--pdb"])
+    assert argv == ['jugfile.py']
+
+    parsed = jug.options.parse(
+        ["execute", 'jugfile.py'])
+    assert argv == ['jugfile.py']
+
+    parsed = jug.options.parse(
+        ["execute", 'jugfile.py', '--', 'arg'])
+    assert argv == ['jugfile.py', 'arg']
+
+    parsed = jug.options.parse(
+        ["execute", 'jugfile.py', 'arg'])
+    assert argv == ['jugfile.py', 'arg']
+
+    parsed = jug.options.parse(
+        ["execute", 'jugfile.py', 'arg', '--', '--hello'])
+    assert argv == ['jugfile.py', 'arg', '--hello']
+
 def test_bool():
     from jug.options import _str_to_bool
     assert not _str_to_bool("")

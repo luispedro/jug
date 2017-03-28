@@ -227,19 +227,12 @@ def parse(args=None, optionsfile=None):
     # To workaround we re-define all global options in all subparsers
     for sub in subparsers:
         define_options(sub)
+        sub.add_argument('user_args', nargs='*', default=[])
 
     if args is None:
         # If reading from sys.argv, argparse discards the first argument
         # Since we filter sys.argv manually, we do the same here
         args = sys.argv[1:]
-
-    try:
-        end_pos = args.index('--')
-    except ValueError:
-        remaining_args = []
-    else:
-        remaining_args = args[end_pos + 1:]
-        args = args[:end_pos]
 
     argopts = parser.parse_args(args)
 
@@ -251,7 +244,6 @@ def parse(args=None, optionsfile=None):
     for key, val in vars(argopts).items():
         if val is not None:
             setattr(cmdline, key, val)
-
     try:
         nlevel = {
             'DEBUG': logging.DEBUG,
@@ -274,8 +266,8 @@ def parse(args=None, optionsfile=None):
     logging.debug("continuing with: %s", cmdline.__dict__)
 
     # jugscripts can rely on having the jugfile as first argument and the remaining
-    # arguments after --
-    sys.argv[:] = [cmdline.jugfile] + remaining_args
+    # arguments thereafer
+    sys.argv[:] = [cmdline.jugfile] + argopts.user_args
 
     return cmdline
 
