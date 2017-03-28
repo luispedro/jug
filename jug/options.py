@@ -227,6 +227,19 @@ def parse(args=None, optionsfile=None):
     for sub in subparsers:
         define_options(sub)
 
+    if args is None:
+        # If reading from sys.argv, argparse discards the first argument
+        # Since we filter sys.argv manually, we do the same here
+        args = sys.argv[1:]
+
+    try:
+        end_pos = args.index('--')
+    except ValueError:
+        remaining_args = []
+    else:
+        remaining_args = args[end_pos + 1:]
+        args = args[:end_pos]
+
     argopts = parser.parse_args(args)
 
     inifile = read_configuration_file(optionsfile, default_options=default_options)
@@ -258,6 +271,10 @@ def parse(args=None, optionsfile=None):
     logging.debug("default args: %s", default_options.__dict__)
     logging.debug("default subcommand args: %s", default_options.next.__dict__)
     logging.debug("continuing with: %s", cmdline.__dict__)
+
+    # jugscripts can rely on having the jugfile as first argument and the remaining
+    # arguments after --
+    sys.argv[:] = [cmdline.jugfile] + remaining_args
 
     return cmdline
 
