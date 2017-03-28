@@ -180,3 +180,34 @@ No. Jug processes do not need a server running. They need a shared *backend*.
 This may be the filesystem or a *redis* database. But **jug does not need any
 sort of jug server**.
 
+Can I pass command line arguments to a Jugfile?
+-----------------------------------------------
+
+Yes. They will be available using ``sys.argv`` as usual.
+
+If you need to pass arguments starting with a dash, you can use ``--`` (double
+dash) to terminate option processing. For example, if your jugfile contains::
+
+    import sys
+    print(sys.argv)
+
+Now you can call it as::
+
+    # Argv[0] is the name of the script
+    $ jug execute
+    ['jugfile.py']
+
+    $ jug execute jugfile.py
+    ['jugfile.py']
+
+    # Using a jug option does not change ``sys.argv``
+    $ jug execute --verbose=info jugfile.py
+    ['jugfile.py']
+
+    $ jug execute --verbose=info jugfile.py argument
+    ['jugfile.py', 'argument']
+
+    # Use -- to terminate argument processing
+    $ jug execute --verbose=info jugfile.py argument -- --arg --arg2=yes
+    ['jugfile.py', 'argument', '--arg', '--arg2=yes']
+
