@@ -209,8 +209,9 @@ def parse(args=None, optionsfile=None):
     import argparse
     from .subcommands import cmdapi
 
-    if len(sys.argv) == 1:
-        cmdapi.usage()
+    if args is None:
+        if len(sys.argv) <= 1:
+            cmdapi.usage()
 
     parser = argparse.ArgumentParser(
         description=cmdapi.usage(_print=False, exit=False),
