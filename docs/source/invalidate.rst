@@ -67,7 +67,7 @@ Jug invalidation helps you with the second task.
 
 ::
 
-    $ jug invalidate add_counts
+    $ jug invalidate --target add_counts
     Invalidated  Task name
     -----------------------------------------------------------
                1  jugfile.add_counts

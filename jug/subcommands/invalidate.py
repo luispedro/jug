@@ -86,7 +86,7 @@ class InvalidateCommand(SubCommand):
             print_task_summary_table(options, [("Invalidated", task_counts)])
 
     def parse(self, parser):
-        parser.add_argument('--invalid', required=True, action='store',
+        parser.add_argument('--target', '--invalid', required=True, action='store',
                             dest='invalid_name',
                             help='Task name to invalidate')
 
