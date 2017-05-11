@@ -52,7 +52,7 @@ def _lockname(name):
 
 _LOCKED = 1
 
-_redis_urlpat = re.compile(r'redis://(?P<host>[A-Za-z0-9\.\-]+)(\:(?P<port>[0-9]+))?/')
+_redis_urlpat = re.compile(r'redis://(?P<host>[A-Za-z0-9\.\-]+)(\:(?P<port>[0-9]+))?/?')
 
 
 class redis_store(base_store):
