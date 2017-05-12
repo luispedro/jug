@@ -143,7 +143,7 @@ class redis_store(base_store):
     def listlocks(self):
         locks = self.redis.keys('lock:*')
         for lk in locks:
-            yield lk[len('lock:')]
+            yield lk[len('lock:'):]
 
 
     def getlock(self, name):
