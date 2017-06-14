@@ -66,17 +66,18 @@ def invalidate(tasklist, reverse, task):
         print("Building task DAG... (only performed once)")
         for t in tasklist:
             for d in t.dependencies():
-                reverse.setdefault(id(d), []).append(t)
-    seen = set([id(task)])
+                reverse.setdefault(d.hash(), []).append(t)
+    seen = set([task.hash()])
     task.invalidate()
-    queue = reverse[id(task)]
+    queue = reverse[task.hash()]
+    queue = queue[:]
     while queue:
         d = queue.pop()
-        if id(d) in seen:
+        if task.hash() in seen:
             continue
-        seen.add(id(d))
+        seen.add(task.hash())
         d.invalidate()
-        queue.extend([t for t in reverse.get(id(d), []) if id(t) not in seen])
+        queue.extend([t for t in reverse.get(task.hash(), []) if task.hash() not in seen])
 
 
 class ShellCommand(SubCommand):
