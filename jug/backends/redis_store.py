@@ -123,11 +123,15 @@ class redis_store(base_store):
         existing = list(self.list())
         for act in active:
             try:
-                existing.remove(_resultname(act))
-            except KeyError:
+                existing.remove(_resultname(act.hash()))
+            except ValueError:
                 pass
+
+        cleaned = len(existing)
         for superflous in existing:
             self.redis.delete(_resultname(superflous))
+
+        return cleaned
 
     def remove_locks(self):
         locks = self.redis.keys('lock:*')
