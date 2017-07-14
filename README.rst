@@ -30,7 +30,9 @@ Python 2.6/2.7 and Python 3.3+ are supported.
 Short Example
 -------------
 
-Here is a one minute example. Save the following to a file called ``primes.py``::
+Here is a one minute example. Save the following to a file called ``primes.py``
+(if you have installed jug, you can obtain a slightly longer version of this
+example by running ``jug demo`` on the command line)::
 
     from jug import TaskGenerator
     from time import sleep

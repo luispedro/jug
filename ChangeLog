@@ -1,4 +1,5 @@
 version 1.4.0+git
+	* Add 'demo' subcommand
 	* Add is_jug_running() function
 	* Fix bug in finding config files
 	* Improved --debug mode: check for unsupported recursive task creation

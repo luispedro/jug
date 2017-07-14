@@ -265,7 +265,7 @@ def main(argv=None):
     jugspace = None
     store = None
 
-    if options.subcommand not in ('status', 'execute', 'webstatus', 'test-jug'):
+    if options.subcommand not in ('demo', 'status', 'execute', 'webstatus', 'test-jug'):
         store, jugspace = init(options.jugfile, options.jugdir)
 
     from .subcommands import cmdapi
