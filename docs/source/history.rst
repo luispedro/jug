@@ -2,6 +2,19 @@
 History
 =======
 
+version **1.5.0** (Sun Jul 16 2017)
+- Add 'demo' subcommand
+- Add is_jug_running() function
+- Fix bug in finding config files
+- Improved --debug mode: check for unsupported recursive task creation
+- Add invalidate() to shell environment
+- Use ~/.config/jug/jugrc as configuration file
+- Add experimental support for extensible commands, use
+  ``~/.config/jug/jug_user_commands.py``
+- jugrc: execute_wait_cycle_time_secs is now execute_wait_cycle_time
+- Expose sync_move in jug.utils
+
+
 version **1.4.0** (Tue Jan 3 2017)
 - Fix bug with writing very large objects to disk
 - Smarter handling of --aggressive-unload (do not unload what will be

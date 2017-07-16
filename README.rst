@@ -93,6 +93,18 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+version **1.5.0** (Sun Jul 16 2017)
+- Add 'demo' subcommand
+- Add is_jug_running() function
+- Fix bug in finding config files
+- Improved --debug mode: check for unsupported recursive task creation
+- Add invalidate() to shell environment
+- Use ~/.config/jug/jugrc as configuration file
+- Add experimental support for extensible commands, use
+  ``~/.config/jug/jug_user_commands.py``
+- jugrc: execute_wait_cycle_time_secs is now execute_wait_cycle_time
+- Expose sync_move in jug.utils
+
 version **1.4.0** (Tue Jan 3 2017)
 - Fix bug with writing very large objects to disk
 - Smarter handling of --aggressive-unload (do not unload what will be
@@ -163,30 +175,6 @@ version **0.9.5** (May 27 2013)
 - Even better map.reduce.map using blocked access
 - Python 3 support
 - Documentation improvements
-
-version **0.9.4** (Apr 15 2013)
-
-- Add CustomHash wrapper to set __jug_hash__
-- Print traceback on import error
-- Exit when no progress is made even with barrier
-- Use Tasklets for better jug.mapreduce.map
-- Use Ipython debugger if available (patch by Alex Ford)
-- Faster --aggressive-unload
-- Add currymap() function
-
-version **0.9.3** (Dec 2 2012)
-
-- Fix parsing of ports on redis URL (patch by Alcides Viamontes)
-- Make hashing robust to different orders when using randomized hashing
-  (patch by Alcides Viamontes)
-- Allow regex in invalidate command (patch by Alcides Viamontes)
-- Add ``--cache --clear`` suboption to status
-- Allow builtin functions for tasks
-- Fix status --cache`` (a general bug which seems to be triggered mainly by
-  ``bvalue()`` usage).
-- Fix ``CompoundTask`` (broken by earlier ``__jug_hash__`` hook introduction)
-- Make ``Tasklets`` more flexible by allowing slicing with ``Tasks``
-  (previously, slicing with tasks was **not** allowed)
 
 For older version see ``ChangeLog`` file.
 

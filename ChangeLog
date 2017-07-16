@@ -1,4 +1,4 @@
-version 1.4.0+git
+version 1.5.0 Sun Jul 16 2017 by luispedro
 	* Add 'demo' subcommand
 	* Add is_jug_running() function
 	* Fix bug in finding config files
