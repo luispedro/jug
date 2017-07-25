@@ -116,6 +116,7 @@ import sys
 import traceback
 from ..options import Options
 from abc import ABCMeta, abstractmethod, abstractproperty
+from six import add_metaclass
 
 
 class SubCommandError(Exception):
@@ -146,10 +147,10 @@ Original error was:
 """ % (module, e))
 
 
+@add_metaclass(ABCMeta)
 class SubCommand:
     """Define a subcommand and its command-line options
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         cmdapi._register(self.name, self)
