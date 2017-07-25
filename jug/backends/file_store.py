@@ -242,9 +242,9 @@ class file_store(base_store):
         except OSError:
             return False
 
-    def cleanup(self, active):
+    def cleanup(self, active, keeplocks=False):
         '''
-        nr_removed = store.cleanup(active)
+        nr_removed = store.cleanup(active, keeplocks)
 
         Implement 'cleanup' command
 
@@ -252,6 +252,8 @@ class file_store(base_store):
         ----------
         active : sequence
             files *not to remove*
+        keeplocks : boolean
+            whether to preserve or remove locks
 
         Returns
         -------
@@ -261,6 +263,8 @@ class file_store(base_store):
         active = frozenset(self._getfname(t.hash()) for t in active)
         removed = 0
         for dir,_,fs in os.walk(self.jugdir):
+            if keeplocks and dir == "locks":
+                continue
             for f in fs:
                 f = path.join(dir, f)
                 if f not in active:

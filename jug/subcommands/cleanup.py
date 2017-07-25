@@ -44,16 +44,22 @@ class CleanupCommand(SubCommand):
             removed = store.remove_locks()
         else:
             tasks = task.alltasks
-            removed = store.cleanup(tasks)
+            removed = store.cleanup(tasks, keeplocks=options.cleanup_keep_locks)
+
         options.print_out('Removed %s files' % removed)
 
     def parse(self, parser):
-        parser.add_argument('--locks-only',
-                            action='store_const', const=True,
-                            dest='cleanup_locks_only')
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('--locks-only',
+                           action='store_const', const=True,
+                           dest='cleanup_locks_only')
+        group.add_argument('--keep-locks',
+                           action='store_const', const=True,
+                           dest='cleanup_keep_locks')
 
     def parse_defaults(self):
         return {
+            "cleanup_keep_locks": False,
             "cleanup_locks_only": False,
         }
 
