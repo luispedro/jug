@@ -116,8 +116,12 @@ class dict_store(base_store):
                 existing.remove(_resultname(act))
             except KeyError:
                 pass
+
+        cleaned = len(existing)
         for superflous in existing:
             del self.store[superflous]
+
+        return cleaned
 
     def remove_locks(self):
         '''
