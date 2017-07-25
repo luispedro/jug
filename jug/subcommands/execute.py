@@ -80,6 +80,7 @@ class ExecuteCommand(SubCommand):
 
         nr_wait_cycles = int(options.execute_nr_wait_cycles)
         noprogress = 0
+        failures = False
         while noprogress < nr_wait_cycles:
             del tasks[:]
             store, jugspace = init(options.jugfile, options.jugdir, store=store)
@@ -89,7 +90,7 @@ class ExecuteCommand(SubCommand):
                     t.hash()
 
             previous = sum(tstats.executed.values())
-            execution_loop(tasks, options)
+            failures = execution_loop(tasks, options) or failures
             after = sum(tstats.executed.values())
             done = not jugspace.get('__jug__hasbarrier__', False)
             if done:
@@ -106,6 +107,9 @@ class ExecuteCommand(SubCommand):
         jug_hook('execute.finished_pre_status')
         print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
         jug_hook('execute.finished_post_status')
+
+        if failures:
+            sys.exit(1)
 
     def parse(self, parser):
         defaults = self.parse_defaults()
