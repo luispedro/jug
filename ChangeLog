@@ -2,6 +2,7 @@ version 1.5.0+git
 	* 'jug execute --keep-going' now ends with non-zero exit code in case of failures
 	* Add 'graph' subcommand - Generates a graph of tasks
 	* Fix bug with cleanup in dict_store not providing the number of removed records
+	* Add 'jug cleanup --keep-locks' to remove obsolete results without affecting locks
 
 version 1.5.0 Sun Jul 16 2017 by luispedro
 	* Add 'demo' subcommand

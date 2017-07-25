@@ -100,7 +100,7 @@ class memoize_store(base_store):
         '''
         raise NotImplementedError
 
-    def cleanup(self, active):
+    def cleanup(self, active, keeplocks=False):
         '''
         cleanup()
 

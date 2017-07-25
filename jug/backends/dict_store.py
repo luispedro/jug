@@ -104,7 +104,7 @@ class dict_store(base_store):
             del self.store[_resultname(name)]
 
 
-    def cleanup(self, active):
+    def cleanup(self, active, keeplocks=False):
         '''
         cleanup()
 
@@ -116,6 +116,13 @@ class dict_store(base_store):
                 existing.remove(_resultname(act))
             except KeyError:
                 pass
+
+        if keeplocks:
+            for lock in self.listlocks():
+                try:
+                    existing.remove(_lockname(lock))
+                except ValueError:
+                    pass
 
         cleaned = len(existing)
         for superflous in existing:

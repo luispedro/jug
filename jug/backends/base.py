@@ -121,9 +121,9 @@ class base_store(object):
         '''
 
     @abstractmethod
-    def cleanup(self, active):
+    def cleanup(self, active, keeplocks=False):
         '''
-        nr_removed = store.cleanup(active)
+        nr_removed = store.cleanup(active, keeplocks)
 
         Implement 'cleanup' command
 
@@ -131,6 +131,8 @@ class base_store(object):
         ----------
         active : sequence
             files *not to remove*
+        keeplocks : boolean
+            whether to preserve or remove locks
 
         Returns
         -------
