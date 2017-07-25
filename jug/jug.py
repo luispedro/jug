@@ -136,6 +136,7 @@ def execution_loop(tasks, options):
         tasks = [t for t in tasks if task_matcher(t.name)]
         logging.info('Non-matching tasks discarded. Remaining (%s tasks)' % len(tasks))
 
+    failures = False
     prevtask = None
     while tasks:
         upnext = [] # tasks that can be run
@@ -248,11 +249,15 @@ def execution_loop(tasks, options):
                                 logging.critical('Other tasks are dependent on this one! Parallel processors will be held waiting!')
                 if not options.execute_keep_going:
                     raise
+                else:
+                    failures = True
             finally:
                 if locked:
                     t.unlock()
             if options.aggressive_unload and prevtask is not None:
                 prevtask.unload()
+
+    return failures
 
 
 def main(argv=None):
