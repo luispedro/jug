@@ -24,8 +24,10 @@
 memoize_store: a wrapper that never repeats a lookup.
 '''
 
+from .base import base_store, base_lock
 
-class memoize_store(object):
+
+class memoize_store(base_store):
     def __init__(self, base, list_base=False):
         '''
         '''
@@ -56,6 +58,16 @@ class memoize_store(object):
         return self.cache['can-load',name]
 
 
+    def list(self):
+        '''
+        for key in store.list():
+            ...
+
+        Iterates over all the keys in the store
+        '''
+        raise NotImplementedError
+
+
     def load(self, name):
         '''
         obj = load(name)
@@ -75,6 +87,18 @@ class memoize_store(object):
         '''
         raise NotImplementedError
 
+    def remove_locks(self):
+        '''
+        removed = store.remove_locks()
+
+        Remove all locks
+
+        Returns
+        -------
+        removed : int
+            Number of locks removed
+        '''
+        raise NotImplementedError
 
     def cleanup(self, active):
         '''
@@ -94,7 +118,7 @@ class memoize_store(object):
 
 
 _UNKNOWN, _NOT_LOCKED, _LOCKED = -1,False,True
-class cache_lock(object):
+class cache_lock(base_lock):
     '''
     cache_lock
 
