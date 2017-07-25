@@ -29,7 +29,7 @@ import six
 from six.moves import cPickle as pickle
 from collections import defaultdict
 
-from .base import base_store
+from .base import base_store, base_lock
 
 def _gen_key(key, name):
     if type(name) != six.text_type:
@@ -173,7 +173,7 @@ class dict_store(base_store):
 
 
 _NOT_LOCKED, _LOCKED = 0,1
-class dict_lock(object):
+class dict_lock(base_lock):
     '''
     dict_lock
 

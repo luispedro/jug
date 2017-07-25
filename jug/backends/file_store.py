@@ -32,7 +32,7 @@ import errno
 import tempfile
 import shutil
 
-from .base import base_store
+from .base import base_store, base_lock
 from jug.backends.encode import encode_to, decode_from
 
 def create_directories(dname):
@@ -356,7 +356,7 @@ class file_store(base_store):
             shutil.rmtree(jugdir)
 
 
-class file_based_lock(object):
+class file_based_lock(base_lock):
     '''
     file_based_lock: File-system based locks
 
