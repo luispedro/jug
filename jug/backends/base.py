@@ -27,10 +27,11 @@ backend.
 It can be used as a starting point (template) for writing new backends.
 '''
 
+from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 
+@add_metaclass(ABCMeta)
 class base_store(object):
-    __metaclass__ = ABCMeta
     def __init__(self, name):
         '''
         base_store(name)
@@ -202,8 +203,8 @@ class base_store(object):
         return None
 
 
+@add_metaclass(ABCMeta)
 class base_lock(object):
-    __metaclass__ = ABCMeta
     '''
 
     Functions:
