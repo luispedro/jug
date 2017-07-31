@@ -74,7 +74,10 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
         jugfile = 'jugfile'
     if store is None:
         store = set_jugdir(jugdir)
-    sys.path.insert(0, os.path.abspath('.'))
+
+    curdir = os.path.abspath('.')
+    if curdir not in sys.path or curdir != sys.path[0]:
+        sys.path.insert(0, curdir)
 
     # The reason for this implementation is that it is the only that seems to
     # work with both barrier and pickle()ing of functions inside the jugfile
