@@ -5,3 +5,4 @@ jugdata
 build
 Jug.egg-info
 dist/
+.tox
