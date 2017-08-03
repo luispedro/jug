@@ -1,7 +1,7 @@
 version 1.5.0+git
 	* 'jug execute --keep-going' now ends with non-zero exit code in case of failures
 	* Add 'graph' subcommand - Generates a graph of tasks
-
+  
 version 1.5.0 Sun Jul 16 2017 by luispedro
 	* Add 'demo' subcommand
 	* Add is_jug_running() function
