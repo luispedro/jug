@@ -22,7 +22,7 @@
 #  THE SOFTWARE.
 
 import os
-import sys
+from sys import stderr
 from .. import task
 from . import SubCommand
 from subprocess import check_call, CalledProcessError
@@ -104,11 +104,16 @@ class GraphCommand(SubCommand):
 
             fh.write("}\n")
 
+        error_msg = '''\
+Couldn't render graph file. Is graphviz installed?
+You will have to manually render the dotfile: {}
+'''.format(dotfile)
         try:
             check_call(["dot", dotfile, "-Tpng", "-o", "jugfile.png"])
+        except FileNotFoundError:
+            stderr.write(error_msg)
         except CalledProcessError:
-            sys.stderr.write("Couldn't render graph file. Is graphviz installed?\n")
-            sys.stderr.write("You will have to manually render the dotfile\n")
+            stderr.write(error_msg)
 
     def parse(self, parser):
         parser.add_argument("--no-status",
