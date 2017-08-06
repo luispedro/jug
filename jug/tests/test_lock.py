@@ -32,6 +32,37 @@ def test_twolocks():
     bar.release()
 
 
+@with_setup(teardown=_remove_file_store)
+def test_fail_and_lock():
+    lock = file_based_lock(_storedir, 'foo')
+    assert not lock.is_failed()
+    assert not lock.is_locked()
+
+    assert not lock.fail()
+    assert not lock.is_failed()
+    assert not lock.is_locked()
+
+    assert lock.get()
+    assert not lock.is_failed()
+    assert lock.is_locked()
+
+    assert lock.fail()
+    assert lock.is_failed()
+    assert lock.is_locked()
+
+    assert lock.fail()
+    assert lock.is_failed()
+    assert lock.is_locked()
+
+    assert not lock.get()
+    assert lock.is_failed()
+    assert lock.is_locked()
+
+    lock.release()
+    assert not lock.is_failed()
+    assert not lock.is_locked()
+
+
 def double(x):
     return x*2
 

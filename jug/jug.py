@@ -180,6 +180,7 @@ def execution_loop(tasks, options):
                 jug_hook('execute.task-loadable', (t,))
                 continue
             locked = False
+            task_failed = False
             try:
                 locked = t.lock()
                 if t.can_load(): # This can be true if the task ran between the check above and this one
@@ -207,6 +208,8 @@ def execution_loop(tasks, options):
             except SystemExit:
                 raise
             except Exception as e:
+                failures = task_failed = True
+
                 if options.pdb:
                     import sys
                     _,_, tb = sys.exc_info()
@@ -251,13 +254,19 @@ def execution_loop(tasks, options):
                         for dep in other.dependencies():
                             if dep is t:
                                 logging.critical('Other tasks are dependent on this one! Parallel processors will be held waiting!')
+
+                if options.execute_keep_failed:
+                    t.fail()
+
                 if not options.execute_keep_going:
                     raise
-                else:
-                    failures = True
+
             finally:
                 if locked:
-                    t.unlock()
+                    # We only keep the lock if task failed and keep_failed is enabled.
+                    if not (task_failed and options.execute_keep_failed):
+                        t.unlock()
+
             if options.aggressive_unload and prevtask is not None:
                 prevtask.unload()
 

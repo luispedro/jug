@@ -183,7 +183,7 @@ class dict_store(base_store):
     __del__ = close
 
 
-_NOT_LOCKED, _LOCKED = 0,1
+_NOT_LOCKED, _LOCKED, _FAILED = 0,1,2
 class dict_lock(base_lock):
     '''
     dict_lock
@@ -213,8 +213,11 @@ class dict_lock(base_lock):
 
         previous = self.store.get(self.name, _NOT_LOCKED)
         self.store[self.name] = _LOCKED
-        return previous == _NOT_LOCKED
 
+        if previous == _FAILED:
+            self.store[self.name] = _FAILED
+
+        return previous == _NOT_LOCKED
 
     def release(self):
         '''
@@ -230,6 +233,29 @@ class dict_lock(base_lock):
         locked = lock.is_locked()
         '''
         self.counts[_gen_key('islock', self.name)] += 1
-        return (self.store.get(self.name, _NOT_LOCKED) == _LOCKED)
+        return (self.store.get(self.name, _NOT_LOCKED) in (_LOCKED, _FAILED))
+
+    def fail(self):
+        '''
+        lock.fail()
+
+        Mark a task as failed.
+        Has no effect if the task isn't locked
+        '''
+        self.counts[_gen_key('fail', self.name)] += 1
+
+        if self.store.get(self.name, _NOT_LOCKED) == _LOCKED:
+            self.store[self.name] = _FAILED
+
+        return self.store[self.name] == _FAILED
+
+    def is_failed(self):
+        '''
+        failed = lock.is_failed()
+
+        Returns whether this task is marked as failed.
+        '''
+        self.counts[_gen_key('isfail', self.name)] += 1
+        return (self.store.get(self.name, _NOT_LOCKED) == _FAILED)
 
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:

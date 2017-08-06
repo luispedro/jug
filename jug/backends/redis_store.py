@@ -51,6 +51,7 @@ def _lockname(name):
     return six.b('lock:') + name
 
 _LOCKED = 1
+_FAILED = 2
 
 _redis_urlpat = re.compile(r'redis://(?P<host>[A-Za-z0-9\.\-]+)(\:(?P<port>[0-9]+))?/?')
 
@@ -192,7 +193,12 @@ class redis_lock(base_lock):
         '''
         lock.get()
         '''
+        # We need getset to be race-free
         previous = self.redis.getset(self.name, _LOCKED)
+
+        if previous == _FAILED:
+            self.redis.set(self.name, previous)
+
         return (previous is None)
 
 
@@ -210,5 +216,34 @@ class redis_lock(base_lock):
         locked = lock.is_locked()
         '''
         status = self.redis.get(self.name)
-        return status is not None and status == _LOCKED
+        return status is not None and status in (_LOCKED, _FAILED)
 
+
+    def fail(self):
+        '''
+        lock.fail()
+
+        Mark a task as failed.
+        Has no effect if the task isn't locked
+
+        Since we have to check the state of the lock before failing this
+        call is not atomic nor race-free.
+        '''
+        status = self.redis.get(self.name)
+        if status == _LOCKED:
+            self.redis.set(self.name, _FAILED)
+            return True
+        elif status == _FAILED:
+            return True
+        else:
+            return False
+
+
+    def is_failed(self):
+        '''
+        failed = lock.is_failed()
+
+        Returns whether this task is marked as failed.
+        '''
+        status = self.redis.get(self.name)
+        return status is not None and status == _FAILED

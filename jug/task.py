@@ -341,6 +341,35 @@ tricky to support since the general code relies on the function name)''')
             self._lock = self.store.getlock(self.hash())
         return self._lock.is_locked()
 
+    def fail(self):
+        '''
+        task.fail()
+
+        Marks the task as failed
+
+        If the lock was not held, and exception will be raised
+        '''
+        return self._lock.fail()
+
+    def is_failed(self):
+        '''
+        is_failed = t.is_failed()
+
+        Returns
+        -------
+        is_failed : boolean
+            Whether the task is in failed state.
+
+        See Also
+        --------
+        lock : create lock
+        unlock : destroy lock
+        '''
+        if not hasattr(self, '_lock'):
+            self._lock = self.store.getlock(self.hash())
+        return self._lock.is_failed()
+
+
 class Tasklet(TaskletMixin):
     '''
     Tasklet

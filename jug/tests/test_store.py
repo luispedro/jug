@@ -72,7 +72,47 @@ def test_stores():
             store.close()
         except redisConnectionError:
             raise SkipTest()
-    functions = (load_get, lock, lock_remove)
+    def lock_fail(store):
+        try:
+            assert len(list(store.listlocks())) == 0
+            key = six.b('jugisbestthingever')
+            lock = store.getlock(key)
+            assert not lock.is_locked()
+            assert lock.get()
+            assert not lock.get()
+            lock.fail()
+            assert lock.is_failed()
+            assert len(list(store.listlocks())) == 1
+            store.remove_locks()
+            assert not lock.is_failed()
+            assert len(list(store.listlocks())) == 0
+            store.close()
+        except redisConnectionError:
+            raise SkipTest()
+    def lock_fail_other(store):
+        # is_failed should return True even if we can't acquire the lock
+        try:
+            assert len(list(store.listlocks())) == 0
+            key = six.b('jugisbestthingever')
+            lock1 = store.getlock(key)
+            lock2 = store.getlock(key)
+            assert not lock1.is_locked()
+            assert not lock2.is_locked()
+            assert lock1.get()
+            assert not lock2.get()
+            assert not lock1.is_failed()
+            assert not lock2.is_failed()
+            lock1.fail()
+            assert lock2.is_failed()
+            assert len(list(store.listlocks())) == 1
+            store.remove_locks()
+            assert not lock1.is_failed()
+            assert not lock2.is_failed()
+            assert len(list(store.listlocks())) == 0
+            store.close()
+        except redisConnectionError:
+            raise SkipTest()
+    functions = (load_get, lock, lock_remove, lock_fail, lock_fail_other)
     stores = [
             lambda: jug.backends.file_store.file_store('jugtests'),
             jug.backends.dict_store.dict_store,
