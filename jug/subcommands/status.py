@@ -41,6 +41,7 @@ unknown = 'unknown'
 waiting = 'waiting'
 ready = 'ready'
 running = 'running'
+failed = 'failed'
 finished = 'finished'
 
 
@@ -113,6 +114,7 @@ def update_status(store, ht, deps, rdeps):
     tasks_waiting = defaultdict(int)
     tasks_ready = defaultdict(int)
     tasks_running = defaultdict(int)
+    tasks_failed = defaultdict(int)
     tasks_finished = defaultdict(int)
 
     store = memoize_store(store, list_base=True)
@@ -133,8 +135,12 @@ def update_status(store, ht, deps, rdeps):
             if can_run:
                 lock = store.getlock(hash)
                 if lock.is_locked():
-                    tasks_running[name] += 1
-                    nstatus = running
+                    if lock.is_failed():
+                        tasks_failed[name] += 1
+                        nstatus = failed
+                    else:
+                        tasks_running[name] += 1
+                        nstatus = running
                 else:
                     tasks_ready[name] += 1
                     nstatus = ready
@@ -144,23 +150,25 @@ def update_status(store, ht, deps, rdeps):
         assert nstatus is not None, 'update_status: nstatus not assigned'
         if status != nstatus:
             dirty[i] = nstatus
-    return tasks_waiting, tasks_ready, tasks_running, tasks_finished, dirty
+    return tasks_waiting, tasks_ready, tasks_running, tasks_failed, tasks_finished, dirty
 
 
-def _print_status(options, waiting, ready, running, finished):
+def _print_status(options, waiting, ready, running, failed, finished):
     if options.short:
         n_ready = sum(ready.values())
         n_running = sum(running.values())
+        n_failed = sum(failed.values())
         n_waiting = sum(waiting.values())
         n_finished = sum(finished.values())
-        if not n_waiting and not n_running and not n_ready:
+        if not n_waiting and not n_running and not n_failed and not n_ready:
             options.print_out('All finished ({0} tasks).'.format(n_finished))
         elif not n_running:
-            options.print_out('{0} tasks to be run, {1} finished, (none running).'.format(n_waiting + n_ready, n_finished))
+            options.print_out('{0} tasks to be run, {1} failed, {2} finished, (none running).'.format(n_waiting + n_ready, n_failed, n_finished))
         else:
-            options.print_out('{0} tasks to be run, {1} finished, ({2} running).'.format(n_waiting + n_ready, n_finished, n_running))
+            options.print_out('{0} tasks to be run, {1} failed, {2} finished, ({3} running).'.format(n_waiting + n_ready, n_failed, n_finished, n_running))
     else:
         print_task_summary_table(options, [
+                                ("Failed", failed),
                                 ("Waiting", waiting),
                                 ("Ready", ready),
                                 ("Finished", finished),
@@ -186,8 +194,8 @@ def _status_cached(options):
         store, ht, deps, rdeps = load_jugfile(options)
         mode = create
 
-    tw, tre, tru, tf, dirty = update_status(store, ht, deps, rdeps)
-    _print_status(options, tw, tre, tru, tf)
+    tw, tre, tru, tfa, tf, dirty = update_status(store, ht, deps, rdeps)
+    _print_status(options, tw, tre, tru, tfa, tf)
     if mode == update:
         with _open_connection(options) as connection:
             save_dirty3(connection, dirty)
@@ -207,18 +215,22 @@ def _status_nocache(options):
     tasks_waiting = defaultdict(int)
     tasks_ready = defaultdict(int)
     tasks_running = defaultdict(int)
+    tasks_failed = defaultdict(int)
     tasks_finished = defaultdict(int)
     for t in task.alltasks:
         if t.can_load():
             tasks_finished[t.name] += 1
         elif t.can_run():
             if t.is_locked():
-                tasks_running[t.name] += 1
+                if t.is_failed():
+                    tasks_failed[t.name] += 1
+                else:
+                    tasks_running[t.name] += 1
             else:
                 tasks_ready[t.name] += 1
         else:
             tasks_waiting[t.name] += 1
-    _print_status(options, tasks_waiting, tasks_ready, tasks_running, tasks_finished)
+    _print_status(options, tasks_waiting, tasks_ready, tasks_running, tasks_failed, tasks_finished)
     return sum(tasks_finished.values())
 
 

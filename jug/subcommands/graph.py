@@ -55,8 +55,9 @@ class GraphCommand(SubCommand):
     _label_template = (
         '"{name}" [label=<'
         "<table cellpadding='0' cellborder='0' border='0'>"
-        "<tr><td colspan='4'>{name}</td></tr>"
+        "<tr><td colspan='5'>{name}</td></tr>"
         "<tr>"
+        "<td><font color='#ff4080'><b>{failed}!</b></font></td>"
         "<td><font color='#f98cb6'><b>{waiting}W</b></font></td>"
         "<td><font color='#fca985'><b>{ready}E</b></font></td>"
         "<td><font color='#7589bf'><b>{running}R</b></font></td>"
@@ -79,6 +80,7 @@ class GraphCommand(SubCommand):
                     targets[t.name] = {
                         "name": t.name,
                         "finished": 0,
+                        "failed": 0,
                         "running": 0,
                         "ready": 0,
                         "waiting": 0,
@@ -89,7 +91,10 @@ class GraphCommand(SubCommand):
                     targets[t.name]["finished"] += 1
                 elif t.can_run():
                     if t.is_locked():
-                        targets[t.name]["running"] += 1
+                        if t.is_failed():
+                            targets[t.name]["failed"] += 1
+                        else:
+                            targets[t.name]["running"] += 1
                     else:
                         targets[t.name]["ready"] += 1
                 else:

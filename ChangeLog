@@ -36,6 +36,7 @@ version 1.6.0 Thu Aug 24 by luispedro
 	* jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
 	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
 	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
+	* 'jug status' and 'jug graph' now display failed tasks
 
 version 1.5.0 Sun Jul 16 2017 by luispedro
 	* Add 'demo' subcommand
