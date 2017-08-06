@@ -371,6 +371,9 @@ class file_based_lock(base_lock):
     - release(): release the lock
     - is_locked(): check lock state
     '''
+    # We use epoch + 1 second to mark a task as failed
+    # More at https://github.com/luispedro/jug/issues/55
+    _FAILED_TIMESTAMP = (1, 1)  # atime, mtime
 
     def __init__(self, jugdir, name):
         import six
@@ -428,3 +431,36 @@ class file_based_lock(base_lock):
         '''
         return path.exists(self.fullname)
 
+    def fail(self):
+        '''
+        lock.fail()
+
+        Mark a task as failed.
+        Has no effect if the task isn't locked
+        '''
+        try:
+            os.utime(self.fullname, self._FAILED_TIMESTAMP)
+        except OSError:
+            return False
+        else:
+            return True
+
+    def is_failed(self):
+        '''
+        failed = lock.is_failed()
+
+        Returns whether this task is marked as failed.
+
+        This code is not race-condition free. It may happen that by the time
+        this function returns, the failed lock has been released.
+        '''
+        if self.is_locked():
+            try:
+                t = os.stat(self.fullname)
+            except OSError:
+                pass
+            else:
+                if t.st_mtime == self._FAILED_TIMESTAMP[0]:
+                    return True
+
+        return False

@@ -94,3 +94,58 @@ def test_target_wild():
 
     assert len(store.store) < len(alltasks)
     assert len(store.store) == 16
+
+@task_reset
+def test_failed_task_keep_going():
+    from jug.jug import execution_loop
+    from jug.task import alltasks
+    options = default_options.copy()
+    options.jugfile = os.path.join(_jugdir, 'failing.py')
+    # these 3 silence errors during execution and ensure jug isn't kept waiting
+    options.execute_keep_going = True
+    options.execute_nr_wait_cycles = 1
+    options.execute_wait_cycle_time = 0
+    # keep_failed ensures errored tasks are marked as failed
+    options.execute_keep_failed = True
+
+    store, space = jug.jug.init(options.jugfile, 'dict_store')
+    # the failing.py jugfile has a total of 20 reachable tasks
+    assert len(alltasks) == 20
+    # Keep a copy of all tasks to check for failed tasks later
+    alltasks_copy = alltasks[:]
+
+    execution_loop(alltasks, options)
+
+    # 14 results + 3 failures
+    assert len(store.store) == 17
+    # 3 tasks should remain in waiting state due to 3 failures upstream
+    assert len(alltasks) == 3
+    assert len([x for x in alltasks_copy if x.is_failed()]) == 3
+
+@task_reset
+def test_failed_task():
+    from jug.jug import execution_loop
+    from jug.task import alltasks
+    from jug.tests.jugfiles.exceptions import FailingTask
+    options = default_options.copy()
+    options.jugfile = os.path.join(_jugdir, 'failing.py')
+    # keep_failed ensures errored tasks are marked as failed
+    options.execute_keep_failed = True
+
+    store, space = jug.jug.init(options.jugfile, 'dict_store')
+    # the failing.py jugfile has a total of 20 reachable tasks
+    assert len(alltasks) == 20
+    # Keep a copy of all tasks to check for failed tasks later
+    alltasks_copy = alltasks[:]
+
+    try:
+        execution_loop(alltasks, options)
+    except FailingTask:  # Using a custom exception to make sure we don't silence any errors
+        pass
+
+    # The third task fails so we get 2 results and 1 failed lock
+    # NOTE: This might be incorrect if order of execution is not guaranteed
+    assert len(store.store) == 3
+    # 10 tasks could be run and were taken. Only the 10 waiting remain
+    assert len(alltasks) == 10
+    assert len([x for x in alltasks_copy if x.is_failed()]) == 1

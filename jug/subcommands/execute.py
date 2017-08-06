@@ -131,12 +131,17 @@ class ExecuteCommand(SubCommand):
                             action='store_const', const=True,
                             dest='execute_keep_going',
                             help='Continue after errors')
+        parser.add_argument('--keep-failed',
+                            action='store_const', const=True,
+                            dest='execute_keep_failed',
+                            help='Keep failed tasks locked')
 
     def parse_defaults(self):
         wait_cycle_time = 12
 
         default_values = {
             "execute_keep_going": False,
+            "execute_keep_failed": False,
             "execute_target": None,
             "execute_wait_cycle_time": wait_cycle_time,
             "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,

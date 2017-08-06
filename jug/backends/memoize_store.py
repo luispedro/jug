@@ -127,7 +127,7 @@ class memoize_store(base_store):
         pass
 
 
-_UNKNOWN, _NOT_LOCKED, _LOCKED = -1,False,True
+_UNKNOWN, _NOT_LOCKED, _LOCKED, _FAILED = -1, 0, 1, 2
 class cache_lock(base_lock):
     '''
     cache_lock
@@ -151,7 +151,6 @@ class cache_lock(base_lock):
         '''
         raise NotImplementedError
 
-
     def release(self):
         '''
         lock.release()
@@ -165,6 +164,25 @@ class cache_lock(base_lock):
         locked = lock.is_locked()
         '''
         if self.status == _UNKNOWN:
-            self.status = (_LOCKED if self.base.is_locked() else _NOT_LOCKED)
-        return self.status
+            self.status = _LOCKED if self.base.is_locked() else _NOT_LOCKED
+        return bool(self.status)  # returns True for _LOCKED and _FAILED
 
+    def fail(self):
+        '''
+        lock.fail()
+
+        Mark a task as failed.
+        '''
+        raise NotImplementedError
+
+    def is_failed(self):
+        '''
+        failed = lock.is_failed()
+
+        Returns whether this task is marked as failed.
+        '''
+        self.is_locked()
+        if self.status == _LOCKED:
+            if self.base.is_failed():
+                self.status = _FAILED
+        return self.status == _FAILED

@@ -271,3 +271,31 @@ class base_lock(object):
         locked : boolean
         '''
 
+    @abstractmethod
+    def fail(self):
+        '''
+        lock.fail()
+
+        Mark a task as failed.
+        Should have no effect if the task isn't locked
+
+        Returns
+        -------
+        failed : bool
+            Whether the task was marked as failed
+        '''
+
+    @abstractmethod
+    def is_failed(self):
+        '''
+        failed = lock.is_failed()
+
+        Returns whether this task is marked as failed.
+
+        This code is not race-condition free. It may happen that by the time
+        this function returns, the failed lock has been released.
+
+        Returns
+        -------
+        failed : boolean
+        '''
