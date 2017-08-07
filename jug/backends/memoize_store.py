@@ -68,6 +68,16 @@ class memoize_store(base_store):
         raise NotImplementedError
 
 
+    def listlocks(self):
+        '''
+        for key in store.listlocks():
+            ...
+
+        Iterates over all the locks in the store
+        '''
+        raise NotImplementedError
+
+
     def load(self, name):
         '''
         obj = load(name)
