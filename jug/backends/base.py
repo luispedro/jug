@@ -67,6 +67,14 @@ class base_store(object):
         Iterates over all the keys in the store
         '''
 
+    @abstractmethod
+    def listlocks(self):
+        '''
+        for key in store.listlocks():
+            ...
+
+        Iterates over all the locks in the store
+        '''
 
     @abstractmethod
     def can_load(self, name):
