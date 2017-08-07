@@ -65,7 +65,6 @@ def test_cleanup():
     jug.subcommands.cleanup.cleanup(store, opts)
     assert not store.can_load(h)
 
-
 @task_reset
 def test_shell_invalidate():
     jugfile = os.path.join(_jugdir, 'simple.py')
@@ -80,3 +79,40 @@ def test_shell_invalidate():
     print(len(tasks) - 4)
     assert loaded == len(tasks) - 4
 
+@task_reset
+def test_cleanup_failed_only():
+    jugfile = os.path.join(_jugdir, 'tasklets.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    h = space['t'].hash()
+
+    # With locked tasks we need to bypass execute waiting mechanisms
+    from jug.task import alltasks
+    from jug.jug import execution_loop
+
+    opts = Options(default_options)
+    opts.execute_nr_wait_cycles = 1
+    opts.execute_wait_cycle_time = 0
+    opts.execute_keep_failed = True
+    execution_loop(alltasks, opts)
+
+    # Fail one task manually
+    lock = store.getlock(h)
+    assert lock.get()
+    assert lock.fail()
+    assert lock.is_failed()
+
+    # Keep locks should not remove failed tasks
+    opts = Options(default_options)
+    opts.cleanup_keep_locks = True
+    jug.subcommands.cleanup.cleanup(store, opts)
+
+    assert lock.is_locked()
+    assert lock.is_failed()
+
+    # Failed only should remove failed tasks
+    opts = Options(default_options)
+    opts.cleanup_failed_only = True
+    jug.subcommands.cleanup.cleanup(store, opts)
+
+    assert not lock.is_locked()
+    assert not lock.is_failed()

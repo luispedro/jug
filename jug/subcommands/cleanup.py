@@ -42,6 +42,13 @@ class CleanupCommand(SubCommand):
 
         if options.cleanup_locks_only:
             removed = store.remove_locks()
+        elif options.cleanup_failed_only:
+            removed = 0
+            for name in list(store.listlocks()):
+                lock = store.getlock(name)
+                if lock.is_failed():
+                    lock.release()
+                    removed += 1
         else:
             tasks = task.alltasks
             removed = store.cleanup(tasks, keeplocks=options.cleanup_keep_locks)
@@ -53,6 +60,9 @@ class CleanupCommand(SubCommand):
         group.add_argument('--locks-only',
                            action='store_const', const=True,
                            dest='cleanup_locks_only')
+        group.add_argument('--failed-only',
+                           action='store_const', const=True,
+                           dest='cleanup_failed_only')
         group.add_argument('--keep-locks',
                            action='store_const', const=True,
                            dest='cleanup_keep_locks')
@@ -60,6 +70,7 @@ class CleanupCommand(SubCommand):
     def parse_defaults(self):
         return {
             "cleanup_keep_locks": False,
+            "cleanup_failed_only": False,
             "cleanup_locks_only": False,
         }
 
