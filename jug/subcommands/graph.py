@@ -109,7 +109,7 @@ Couldn't render graph file. Is graphviz installed?
 You will have to manually render the dotfile: {}
 '''.format(dotfile)
         try:
-            check_call(["dot", dotfile, "-Tpng", "-o", "jugfile.png"])
+            check_call(["dot", dotfile, "-Tpng", "-o", jugfile + ".png"])
         except FileNotFoundError:
             stderr.write(error_msg)
         except CalledProcessError:
