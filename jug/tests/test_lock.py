@@ -1,9 +1,10 @@
-from jug.backends.file_store import file_store, file_based_lock
+from jug.backends.file_store import file_store, file_based_lock, file_keepalive_based_lock
 from jug.backends.dict_store import dict_store
 from jug.tests.task_reset import task_reset
 from jug.backends import memoize_store
 from nose.tools import with_setup
 from jug import Task
+from time import sleep
 
 _storedir = 'jugtests'
 def _remove_file_store():
@@ -92,3 +93,44 @@ def test_lock_bytes2():
     lock2 = store.getlock(b'foo')
     lock.get()
     assert lock2.is_locked()
+
+@with_setup(teardown=_remove_file_store)
+def test_lock_keepalive():
+    lock = file_keepalive_based_lock(_storedir, 'foo')
+    assert lock.monitor is None
+    assert lock.get()
+    assert lock.monitor.poll() is None
+    p = lock.monitor
+    assert not lock.get()
+    assert p == lock.monitor, "A new process was started and shouldn't"
+    assert lock.monitor.poll() is None
+    lock.release()
+
+    # Give max 5 secs for subprocess to return an exitcode
+    for i in range(25):
+        ret = p.poll()
+        if ret is None:
+            sleep(.2)
+        else:
+            break
+
+    assert ret == -9  # SIGKILL
+
+    assert lock.get()
+    assert p != lock.monitor, "A new process should have been started but wasn't"
+    assert lock.monitor.poll() is None
+    p = lock.monitor
+    assert not lock.get()
+    assert lock.monitor.poll() is None
+    assert p == lock.monitor, "A new process was started and shouldn't"
+    lock.release()
+
+    # Give max 5 secs for subprocess to return an exitcode
+    for i in range(25):
+        ret = p.poll()
+        if ret is None:
+            sleep(.2)
+        else:
+            break
+
+    assert ret == -9  # SIGKILL

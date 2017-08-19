@@ -26,11 +26,15 @@ file_store : file-system based data store & locks.
 
 
 import os
+import sys
 from os import path, mkdir
 from os.path import dirname, exists
 import errno
+import logging
 import tempfile
 import shutil
+from subprocess import Popen
+from time import time
 
 from .base import base_store, base_lock
 from jug.backends.encode import encode_to, decode_from
@@ -461,6 +465,144 @@ class file_based_lock(base_lock):
                 pass
             else:
                 if t.st_mtime == self._FAILED_TIMESTAMP[0]:
+                    return True
+
+        return False
+
+
+class file_keepalive_store(file_store):
+    def __repr__(self):
+        return 'file_keepalive_store({})'.format(self.jugdir)
+    __str__ = __repr__
+
+    def getlock(self, name):
+        '''
+        lock = store.getlock(name)
+
+        Retrieve a lock object associated with ``name``.
+
+        Parameters
+        ----------
+        name : str
+            Key
+
+        Returns
+        -------
+        lock : Lock object
+            This is a file_lock object
+        '''
+        return file_keepalive_based_lock(self.jugdir, name)
+
+
+class file_keepalive_based_lock(file_based_lock):
+    '''
+    file_keepalive_based_lock: File-system based locks
+
+    Works much like file_based_lock but implements a mechanism to keep locks
+    alive during execution, making it possible to recognize crashed/killed jobs
+    as failed.
+
+    Functions:
+    ----------
+
+    - get(): acquire the lock
+    - release(): release the lock
+    - is_locked(): check lock state
+    '''
+    def __init__(self, *args, **kwargs):
+        self.monitor = None
+        super(file_keepalive_based_lock, self).__init__(*args, **kwargs)
+
+    def start_monitor(self):
+        """Start side-kick process that ensures locks are refreshed while
+        main process is active on this task
+        """
+        # No need to be gentle. Killing it straight away is safe.
+        self.monitor = Popen([sys.executable, "-m", "jug.backends.file_keepalive_monitor", self.fullname])
+
+    def stop_monitor(self):
+        """Stop side-kick process that ensures locks are refreshed while
+        main process is active on this lock
+        """
+        if self.monitor is None:
+            return
+
+        try:
+            self.monitor.kill()
+        except OSError as e:
+            logging.warning('keepalive process failed to die with %s' % e)
+
+        # subprocess module implements a cleanup mechanism that kicks in when
+        # a Popen instance is deleted. This prevents leaking subprocesses and
+        # avoids having to explicitly block and .wait() for a task to finish
+        del self.monitor
+        self.monitor = None
+
+    def get(self):
+        '''
+        lock.get()
+
+        Create a lock for name in an NFS compatible way.
+        And start a lock monitor job
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        locked : bool
+            Whether the lock was created
+        '''
+        acquired = super(file_keepalive_based_lock, self).get()
+
+        if acquired:
+            self.start_monitor()
+
+        return acquired
+
+    def release(self):
+        '''
+        lock.release()
+
+        Removes lock
+        And stops lock monitor job
+        '''
+        self.stop_monitor()
+        return super(file_keepalive_based_lock, self).release()
+
+    def fail(self):
+        '''
+        lock.fail()
+
+        Mark a task as failed.
+        Has no effect if the task isn't locked other than stopping the monitoring
+        process if it exists
+        '''
+        self.stop_monitor()
+        return super(file_keepalive_based_lock, self).fail()
+
+    def is_failed(self):
+        '''
+        failed = lock.is_failed()
+
+        Returns whether this task has a lock in failed state.
+
+        A lock in failed state is one that exists and was last modified more
+        than 30 minutes ago.
+
+        This code is not race-condition free. It may happen that by the time
+        this function returns, the failed lock has been released.
+        '''
+        failed_lock = time() - (30 * 60)  # 30 minutes old lock is a dead lock
+
+        if self.is_locked():
+            try:
+                t = os.stat(self.fullname)
+            except OSError:
+                pass
+            else:
+                if t.st_mtime <= failed_lock:
                     return True
 
         return False
