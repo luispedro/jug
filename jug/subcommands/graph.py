@@ -33,6 +33,16 @@ __all__ = [
 ]
 
 
+def handle_tasklet(tlet):
+    '''Find the first non-Tasklet dependency and return its name'''
+    dep = next(tlet.dependencies())
+
+    if isinstance(dep, task.Tasklet):
+        return handle_tasklet(dep)
+    else:
+        return dep.name
+
+
 class GraphCommand(SubCommand):
     '''Graph: produce a diagram of task dependencies
 
@@ -43,14 +53,14 @@ class GraphCommand(SubCommand):
     name = "graph"
 
     _label_template = (
-        '"{}" [label=<'
+        '"{name}" [label=<'
         "<table cellpadding='0' cellborder='0' border='0'>"
-        "<tr><td colspan='4'>{}</td></tr>"
+        "<tr><td colspan='4'>{name}</td></tr>"
         "<tr>"
-        "<td><font color='#f98cb6'><b>{}</b></font></td>"
-        "<td><font color='#fca985'><b>{}</b></font></td>"
-        "<td><font color='#7589bf'><b>{}</b></font></td>"
-        "<td><font color='#85ca5d'><b>{}</b></font></td>"
+        "<td><font color='#f98cb6'><b>{waiting}</b></font></td>"
+        "<td><font color='#fca985'><b>{ready}</b></font></td>"
+        "<td><font color='#7589bf'><b>{running}</b></font></td>"
+        "<td><font color='#85ca5d'><b>{finished}</b></font></td>"
         "</tr>"
         "</table>"
         ">]\n"
@@ -67,6 +77,7 @@ class GraphCommand(SubCommand):
             for t in task.alltasks:
                 if t.name not in targets:
                     targets[t.name] = {
+                        "name": t.name,
                         "finished": 0,
                         "running": 0,
                         "ready": 0,
@@ -85,19 +96,20 @@ class GraphCommand(SubCommand):
                     targets[t.name]["waiting"] += 1
 
                 for d in t.dependencies():
-                    targets[t.name]["deps"].add((d.name, t.name))
+                    if isinstance(d, task.Tasklet):
+                        # Tasklets don't have a name so we need to get one
+                        # from higher in the dependency chain
+                        dep_name = handle_tasklet(d)
+                    else:
+                        dep_name = d.name
+
+                    targets[t.name]["deps"].add((dep_name, t.name))
 
             for name in targets:
                 if options.graph_no_status:
-                    fh.write('"{}"\n'.format(name))
+                    fh.write('"{name}"\n'.format(**targets[name]))
                 else:
-                    fh.write(self._label_template.format(
-                        name, name,
-                        targets[name]["waiting"],
-                        targets[name]["ready"],
-                        targets[name]["running"],
-                        targets[name]["finished"],
-                    ))
+                    fh.write(self._label_template.format(**targets[name]))
 
                 for dep in targets[name]["deps"]:
                     fh.write('"{}" -> "{}"\n'.format(*dep))
