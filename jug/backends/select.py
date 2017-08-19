@@ -50,5 +50,7 @@ def select(jugdir):
         return dict_store()
     if jugdir.startswith('dict_store:'):
         return dict_store(jugdir[len('dict_store:'):])
+    if jugdir.startswith('file_keepalive:'):
+        return file_store.file_keepalive_store(jugdir[len('file_keepalive:'):])
     return file_store.file_store(jugdir)
 
