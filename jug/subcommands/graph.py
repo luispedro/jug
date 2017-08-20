@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2017, Renato Alves and Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -121,7 +121,7 @@ Couldn't render graph file. Is graphviz installed?
 You will have to manually render the dotfile: {}
 '''.format(dotfile)
         try:
-            check_call(["dot", dotfile, "-Tpng", "-o", jugfile + ".png"])
+            check_call(["dot", dotfile, "-T" + options.graph_format, "-o", jugfile + "." + options.graph_format])
         except FileNotFoundError:
             stderr.write(error_msg)
         except CalledProcessError:
@@ -132,10 +132,15 @@ You will have to manually render the dotfile: {}
                             action="store_const", const=True,
                             dest="graph_no_status",
                             help="Disable inclusion of status information")
+        parser.add_argument("--file-format",
+                            action="store", default="png",
+                            dest="graph_format",
+                            help="Set format of graph output file (supported formats are the ones supported by the `dot` command)")
 
     def parse_defaults(self):
         return {
             "graph_no_status": False,
+            "garph_format": "png",
         }
 
 
