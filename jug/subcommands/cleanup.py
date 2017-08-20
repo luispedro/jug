@@ -59,13 +59,16 @@ class CleanupCommand(SubCommand):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('--locks-only',
                            action='store_const', const=True,
-                           dest='cleanup_locks_only')
+                           dest='cleanup_locks_only',
+                           help="Cleanup locks leaving computed results untouched")
         group.add_argument('--failed-only',
                            action='store_const', const=True,
-                           dest='cleanup_failed_only')
+                           dest='cleanup_failed_only',
+                           help="Cleanup failed locks leaving computed results and active locks untouched")
         group.add_argument('--keep-locks',
                            action='store_const', const=True,
-                           dest='cleanup_keep_locks')
+                           dest='cleanup_keep_locks',
+                           help="Cleanup unused results leaving locks untouched")
 
     def parse_defaults(self):
         return {
