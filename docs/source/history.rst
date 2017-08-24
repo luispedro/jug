@@ -2,6 +2,12 @@
 History
 =======
 
+version **1.6.0** (Thu Aug 24 2017)
+- Add 'graph' subcommand - Generates a graph of tasks
+- 'jug execute --keep-going' now ends with non-zero exit code in case of failures
+- Fix bug with cleanup in dict_store not providing the number of removed records
+- Add 'jug cleanup --keep-locks' to remove obsolete results without affecting locks
+
 version **1.5.0** (Sun Jul 16 2017)
 - Add 'demo' subcommand
 - Add is_jug_running() function
