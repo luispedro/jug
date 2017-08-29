@@ -2,6 +2,9 @@
 History
 =======
 
+version **1.6.1** (Thu Aug 29 2017)
+- Fix bug with ``invalidate()`` in the shell
+
 version **1.6.0** (Thu Aug 24 2017)
 - Add 'graph' subcommand - Generates a graph of tasks
 - 'jug execute --keep-going' now ends with non-zero exit code in case of failures

@@ -5,6 +5,7 @@ import jug.jug
 import jug.task
 import jug.subcommands.invalidate
 import jug.subcommands.cleanup
+import jug.subcommands.shell
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.options import Options, default_options
@@ -63,4 +64,19 @@ def test_cleanup():
     opts.cleanup_locks_only = False
     jug.subcommands.cleanup.cleanup(store, opts)
     assert not store.can_load(h)
+
+
+@task_reset
+def test_shell_invalidate():
+    jugfile = os.path.join(_jugdir, 'simple.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    tasks = jug.task.alltasks[:]
+    simple_execute()
+    loaded = sum([t.can_load() for t in tasks])
+    assert loaded == len(tasks)
+    jug.subcommands.shell.invalidate(tasks, {}, tasks[0])
+    loaded = sum([t.can_load() for t in tasks])
+    print(loaded)
+    print(len(tasks) - 4)
+    assert loaded == len(tasks) - 4
 

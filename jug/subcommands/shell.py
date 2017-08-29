@@ -72,12 +72,12 @@ def invalidate(tasklist, reverse, task):
     queue = reverse[task.hash()]
     queue = queue[:]
     while queue:
-        d = queue.pop()
+        task = queue.pop()
         if task.hash() in seen:
             continue
         seen.add(task.hash())
-        d.invalidate()
-        queue.extend([t for t in reverse.get(task.hash(), []) if task.hash() not in seen])
+        task.invalidate()
+        queue.extend([t for t in reverse.get(task.hash(), []) if t.hash() not in seen])
 
 
 class ShellCommand(SubCommand):
