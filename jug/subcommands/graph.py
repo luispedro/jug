@@ -133,14 +133,14 @@ You will have to manually render the dotfile: {}
                             dest="graph_no_status",
                             help="Disable inclusion of status information")
         parser.add_argument("--file-format",
-                            action="store", default="png",
+                            action="store_const", const="png",
                             dest="graph_format",
                             help="Set format of graph output file (supported formats are the ones supported by the `dot` command)")
 
     def parse_defaults(self):
         return {
             "graph_no_status": False,
-            "garph_format": "png",
+            "graph_format": "png",
         }
 
 
