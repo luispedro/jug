@@ -161,18 +161,18 @@ def _print_status(options, waiting, ready, running, failed, finished):
         n_waiting = sum(waiting.values())
         n_finished = sum(finished.values())
         if not n_waiting and not n_running and not n_failed and not n_ready:
-            options.print_out('All finished ({0} tasks).'.format(n_finished))
+            options.print_out('All tasks complete ({0} tasks).'.format(n_finished))
         elif not n_running:
-            options.print_out('{0} tasks to be run, {1} failed, {2} finished, (none running).'.format(n_waiting + n_ready, n_failed, n_finished))
+            options.print_out('{0} tasks waiting to be run, {1} failed, {2} complete, (none active).'.format(n_waiting + n_ready, n_failed, n_finished))
         else:
-            options.print_out('{0} tasks to be run, {1} failed, {2} finished, ({3} running).'.format(n_waiting + n_ready, n_failed, n_finished, n_running))
+            options.print_out('{0} tasks waiting to be run, {1} failed, {2} complete, ({3} active).'.format(n_waiting + n_ready, n_failed, n_finished, n_running))
     else:
         print_task_summary_table(options, [
                                 ("Failed", failed),
                                 ("Waiting", waiting),
                                 ("Ready", ready),
-                                ("Finished", finished),
-                                ("Running", running)])
+                                ("Complete", finished),
+                                ("Active", running)])
 
 
 def _clear_cache(options):

@@ -57,11 +57,11 @@ class GraphCommand(SubCommand):
         "<table cellpadding='0' cellborder='0' border='0'>"
         "<tr><td colspan='5'>{name}</td></tr>"
         "<tr>"
-        "<td><font color='#ff4080'><b>{failed}!</b></font></td>"
+        "<td><font color='#ff4080'><b>{failed}F</b></font></td>"
         "<td><font color='#f98cb6'><b>{waiting}W</b></font></td>"
-        "<td><font color='#fca985'><b>{ready}E</b></font></td>"
-        "<td><font color='#7589bf'><b>{running}R</b></font></td>"
-        "<td><font color='#85ca5d'><b>{finished}F</b></font></td>"
+        "<td><font color='#fca985'><b>{ready}R</b></font></td>"
+        "<td><font color='#7589bf'><b>{active}A</b></font></td>"
+        "<td><font color='#85ca5d'><b>{complete}C</b></font></td>"
         "</tr>"
         "</table>"
         ">]\n"
@@ -79,22 +79,22 @@ class GraphCommand(SubCommand):
                 if t.name not in targets:
                     targets[t.name] = {
                         "name": t.name,
-                        "finished": 0,
+                        "complete": 0,
                         "failed": 0,
-                        "running": 0,
+                        "active": 0,
                         "ready": 0,
                         "waiting": 0,
                         "deps": set(),
                     }
 
                 if t.can_load():
-                    targets[t.name]["finished"] += 1
+                    targets[t.name]["complete"] += 1
                 elif t.can_run():
                     if t.is_locked():
                         if t.is_failed():
                             targets[t.name]["failed"] += 1
                         else:
-                            targets[t.name]["running"] += 1
+                            targets[t.name]["active"] += 1
                     else:
                         targets[t.name]["ready"] += 1
                 else:
