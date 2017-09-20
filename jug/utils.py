@@ -176,10 +176,13 @@ def prepare_task_matcher(pattern):
 
 
 @TaskGenerator
-def jug_execute(args, check_exit=True, run_after=None):
-    '''jug_execute(args, check_exit=True, run_after=None)
+def jug_execute(args, check_exit=True, run_after=None, return_value=None):
+    '''jug_execute(args, check_exit=True, run_after=None, return_value=None)
 
     Wrapper around ``subprocess.call()``
+
+    The ``run_after`` and ``return_value`` arguments are used only for setting
+    dependencies.
 
     Examples
     --------
@@ -189,6 +192,13 @@ def jug_execute(args, check_exit=True, run_after=None):
         create_input_tmp = jug_execute(['cp', 'input', 'input.tmp'])
         jug_execute(['wc', '-l', 'input.tmp'], run_after=create_input_tmp)
 
+        # Use the return_value argument:
+
+        oname = 'input.tmp'
+        oname = jug_execute(['cp', 'input', oname], return_value=oname)
+        jug_execute(['wc', '-l', oname]) # <- Now depends on previous task
+
+
     Parameters
     ----------
     args : list of str
@@ -197,11 +207,14 @@ def jug_execute(args, check_exit=True, run_after=None):
     run_after : any, optional
         This is unused by the function, but can be used to order different
         calls to jug_execute
+    return_value : any, optional
+        A value to return. Used to induce task dependencies
     '''
     import subprocess
     ret = subprocess.call(args)
     if check_exit and ret != 0:
         raise SystemError("Error in system")
+    return return_value
 
 def sync_move(src, dst):
     '''Sync the file and move it

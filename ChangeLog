@@ -1,3 +1,6 @@
+version 1.6.1+
+	* Add return_value argument to jug_execute
+
 version 1.6.1 Thu Aug 29 by luispedro
 	* Fix bug with `invalidate()` in the shell
 
