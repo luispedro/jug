@@ -50,11 +50,13 @@ example by running ``jug demo`` on the command line)::
 
     primes100 = [is_prime(n) for n in range(2,101)]
 
-Of course, this is only for didactical purposes, normally you would use a
-better method. Similarly, the ``sleep`` function is so that it does not run too
-fast.
+This is a brute-force way to find all the prime numbers up to 100. Of course,
+this is only for didactical purposes, normally you would use a better method.
+Similarly, the ``sleep`` function is so that it does not run too fast. Still,
+it illustrates the basic functionality of Jug for embarassingly parallel
+problems.
 
-Now type ``jug status primes.py`` to get::
+Type ``jug status primes.py`` to get::
 
     Task name                  Waiting       Ready    Finished     Running
     ----------------------------------------------------------------------
