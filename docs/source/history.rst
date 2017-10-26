@@ -2,6 +2,10 @@
 History
 =======
 
+version **1.6.2** (Thu Oct 26 2017)
+- Add return_value argument to jug_execute
+- Add exit_env_vars
+
 version **1.6.1** (Thu Aug 29 2017)
 - Fix bug with ``invalidate()`` in the shell
 

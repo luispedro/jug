@@ -1,5 +1,6 @@
-version 1.6.1+
+version 1.6.2 Thu Oct 26 by luispedro
 	* Add return_value argument to jug_execute
+	* Add exit_env_vars
 
 version 1.6.1 Thu Aug 29 by luispedro
 	* Fix bug with `invalidate()` in the shell
