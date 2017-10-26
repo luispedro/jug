@@ -81,3 +81,54 @@ def exit_after_time(hours=0, minutes=0, seconds=0):
             exit(0)
     hooks.register_hook('execute.task-executed1', check_time)
 
+def exit_env_vars(environ=None):
+    '''
+    exit_env_vars(environ={os.environ})
+
+    Set exit markers based on the environment.
+
+    The following variables are used if they are set (if they are not set, they
+    are ignored).
+
+    JUG_MAX_TASKS: Maximum nr. of tasks.
+
+    JUG_MAX_HOURS: Maximum hours
+    JUG_MAX_MINUTES: Maximum minutes
+    JUG_MAX_SECONDS: Maximum seconds
+
+    For the time based limits, see the comment on `exit_after_time` on how
+    these limits are not strict as they are only checked after each task
+    completion event.
+
+    If either of the variables above is set, its value should be an int or an
+    error will be raised.
+
+    JUG_EXIT_IF_FILE_EXISTS: Set exit file name
+
+    See Also
+    --------
+    exit_after_n_tasks
+    exit_after_time
+    exit_if_file_exists
+    '''
+
+    if environ is None:
+        import os
+        environ = os.environ
+    if 'JUG_MAX_TASKS' in environ:
+        exit_after_n_tasks(int(environ['JUG_MAX_TASKS']))
+    
+    hours = 0
+    minutes = 0
+    seconds = 0
+    if 'JUG_MAX_HOURS' in environ:
+        hours = int(environ['JUG_MAX_HOURS'])
+    if 'JUG_MAX_MINUTES' in environ:
+        minutes = int(environ['JUG_MAX_MINUTES'])
+    if 'JUG_MAX_SECONDS' in environ:
+        seconds = int(environ['JUG_MAX_SECONDS'])
+    if hours or minutes or seconds:
+        exit_after_time(hours=hours, minutes=minutes, seconds=seconds)
+
+    if 'JUG_EXIT_IF_FILE_EXISTS' in environ:
+        exit_if_file_exists(os['JUG_EXIT_IF_FILE_EXISTS'])
