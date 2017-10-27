@@ -30,6 +30,18 @@ Python 2.6/2.7 and Python 3.3+ are supported.
 *Mailing List*: `http://groups.google.com/group/jug-users
 <http://groups.google.com/group/jug-users>`__
 
+
+Citation
+--------
+
+If you use Jug to generate results for a scientific publication, please cite
+
+    Coelho, L.P., (2016). Jug: Software for Parallel Reproducible Computation in
+    Python. Journal of Open Research Software. 5(1), p.30.
+
+    http://doi.org/10.5334/jors.161O
+
+
 Short Example
 -------------
 
