@@ -16,3 +16,9 @@ API Documentation
 
 .. automodule:: jug.utils
     :members:
+
+.. automodule:: jug.hooks
+    :members:
+
+.. automodule:: jug.hooks.exit_checks
+    :members:
