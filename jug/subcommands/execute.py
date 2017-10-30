@@ -29,7 +29,7 @@ from .. import task
 from ..hooks import jug_hook, register_hook, register_hook_once
 from ..io import print_task_summary_table
 from ..jug import init
-from . import SubCommand
+from . import SubCommand, maybe_print_citation_info
 
 
 __all__ = [
@@ -105,6 +105,7 @@ class ExecuteCommand(SubCommand):
             logging.info('No tasks can be run!')
 
         jug_hook('execute.finished_pre_status')
+        maybe_print_citation_info(options)
         print_task_summary_table(options, [("Executed", tstats.executed), ("Loaded", tstats.loaded)])
         jug_hook('execute.finished_post_status')
 

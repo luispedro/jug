@@ -83,6 +83,7 @@ def load_default_options(opt):
     opt.pdb = False
     opt.verbose = 'quiet'
     opt.debug = False
+    opt.will_cite = False
 
     # Current hierarchy of options is the following:
     #   default_options
@@ -198,6 +199,10 @@ Debug mode. This adds a little more error checking, thus it can be slower.
 However, it detects certain types of errors and prints an error message. If
 --pdb is passed, --debug is automatically implied, but the opposite is not
 true: you can use --debug mode without --pdb.''')
+    group.add_argument('--will-cite',
+                       action='store_true',
+                       dest='will_cite',
+                       help='Suppresses request for citation')
 
 
 def parse(args=None, optionsfile=None):

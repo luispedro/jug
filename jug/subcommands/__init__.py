@@ -115,6 +115,7 @@ import pkgutil
 import sys
 import traceback
 from ..options import Options
+from ..jug_version import CITATION
 from abc import ABCMeta, abstractmethod, abstractproperty
 from six import add_metaclass
 
@@ -338,5 +339,14 @@ Subcommands
 
         return parsers
 
+def maybe_print_citation_info(options):
+    '''Unless options.will_cite, prints citation information'''
+    if not options.will_cite:
+        print("If you use Jug in a published research paper please cite")
+        print(CITATION)
+        print('')
+        print('Use the --will-cite option to suppress this message')
+        print('(Or set will_cite = True in the Jug configuration file)')
+        print('')
 
 cmdapi = SubCommandManager()
