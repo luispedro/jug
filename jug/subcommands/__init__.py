@@ -285,6 +285,15 @@ jug SUBCOMMAND [JUGFILE] [OPTIONS...]
 Docs: https://jug.readthedocs.io/
 Copyright: 2008-2017, Luis Pedro Coelho
 
+If you use Jug for generating results for a peer-reviewed publication, please
+cite:
+
+    Coelho, L.P., (2016). Jug: Software for Parallel Reproducible Computation in
+    Python. Journal of Open Research Software. 5(1), p.30.
+
+    http://doi.org/10.5334/jors.161O
+
+
 Subcommands
 -----------
 ''']
