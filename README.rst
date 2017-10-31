@@ -131,16 +131,14 @@ version **1.5.0** (Sun Jul 16 2017)
 - Improved --debug mode: check for unsupported recursive task creation
 - Add invalidate() to shell environment
 - Use ~/.config/jug/jugrc as configuration file
-- Add experimental support for extensible commands, use
-  ``~/.config/jug/jug_user_commands.py``
+- Add experimental support for extensible commands, use ``~/.config/jug/jug_user_commands.py``
 - jugrc: execute_wait_cycle_time_secs is now execute_wait_cycle_time
 - Expose sync_move in jug.utils
 
 version **1.4.0** (Tue Jan 3 2017)
 - Fix bug with writing very large objects to disk
-- Smarter handling of --aggressive-unload (do not unload what will be
-  immediately necessary)
-- Work around corner case in `jug shell` command
+- Smarter handling of --aggressive-unload (do not unload what will be immediately necessary)
+- Work around corner case in ``jug shell`` command
 - Add test-jug subcommand
 - Add return_tuple decorator
 
@@ -153,13 +151,11 @@ version **1.3.0** (Tue Nov 1 2016)
 - Add timing functionality
 
 version **1.2.2** (Sat Jun 25 2016)
-- Fix bugs in shell subcommand and a few corner cases in encoding/decoding
-  results
+- Fix bugs in shell subcommand and a few corner cases in encoding/decoding results
 
 
 version **1.2.1** (Mon Feb 15 2016)
-- Changed execution loop to ensure that all tasks are checked (issue #33 on
-  github)
+- Changed execution loop to ensure that all tasks are checked (issue #33 on github)
 - Fixed bug that made 'check' or 'sleep-until' slower than necessary
 - Fixed jug on Windows (which does not support fsync on directories)
 - Made Tasklets use slightly less memory
