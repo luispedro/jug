@@ -200,7 +200,12 @@ However, it detects certain types of errors and prints an error message. If
 --pdb is passed, --debug is automatically implied, but the opposite is not
 true: you can use --debug mode without --pdb.''')
     group.add_argument('--will-cite',
-                       action='store_true',
+                       # We **cannot** use store_true because that will set it
+                       # to False if the argument is not passsed.
+                       # In this case, this is undesired behaviour as then the
+                       # value in the configuration file will not be used.
+                       action='store_const',
+                       const=True,
                        dest='will_cite',
                        help='Suppresses request for citation')
 
