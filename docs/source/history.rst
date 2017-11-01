@@ -2,6 +2,9 @@
 History
 =======
 
+version **1.6.3** (Wed Nov 1 2017)
+- Add citation request
+
 version **1.6.2** (Thu Oct 26 2017)
 - Add return_value argument to jug_execute
 - Add exit_env_vars
