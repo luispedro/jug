@@ -52,7 +52,7 @@ def exit_after_n_tasks(n):
     executed = [0]
     def exit_after(_t):
         executed[0] += 1
-        if executed[0] > n:
+        if executed[0] >= n:
            exit(0)
     hooks.register_hook('execute.task-executed1', exit_after)
 
