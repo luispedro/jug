@@ -110,10 +110,16 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+version **1.6.4** (Thu Nov 2 2017)
+
+- Fix exit_after_n_tasks. It would previously execute one task too many
+
 version **1.6.3** (Wed Nov 1 2017)
+
 - Add citation request
 
 version **1.6.2** (Thu Oct 26 2017)
+
 - Add return_value argument to jug_execute
 - Add exit_env_vars
 
