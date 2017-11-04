@@ -8,6 +8,9 @@ Jug: A Task-Based Parallelization Framework
 .. image:: https://zenodo.org/badge/205237.svg
    :target: https://zenodo.org/badge/latestdoi/205237
 
+.. image:: https://anaconda.org/conda-forge/jug/badges/installer/conda.svg
+    :target: https://anaconda.org/conda-forge/jug
+
 
 Jug allows you to write code that is broken up into
 tasks and run different tasks on different processors.
@@ -30,6 +33,20 @@ Python 2.6/2.7 and Python 3.3+ are supported.
 *Mailing List*: `http://groups.google.com/group/jug-users
 <http://groups.google.com/group/jug-users>`__
 
+
+Install
+-------
+
+You can install Jug with pip::
+
+    pip install Jug
+
+or use, if you are using `conda <http://anaconda.org/>`__, you can install jug
+from `conda-forge <https://conda-forge.github.io/>`__ using the following
+commands::
+
+    conda config --add channels conda-forge
+    conda install jug
 
 Citation
 --------
