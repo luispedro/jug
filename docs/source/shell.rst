@@ -5,6 +5,12 @@ Jug Shell
 The ``jug shell`` subcommand opens up a shell within the environment of the
 Jugfile. It can be used for debugging and exploration of the task structure.
 
+To obtain a ``list`` of all tasks seen by jug you can run ``tasks = get_tasks()``
+
+.. versionadded:: 1.6.5
+    ``get_tasks()`` was only added to the shell in version 1.6.5. Before that you
+    can access tasks directly by importing ``from jug.task import alltasks as tasks``.
+
 Inside the environment, you can use the ``value(task)`` function to load
 results (if available; otherwise, an exception is thrown).
 
