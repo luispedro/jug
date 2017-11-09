@@ -125,7 +125,7 @@ class ShellCommand(SubCommand):
             '''Recursively invalidates its argument, i.e. removes from the store
             results of any task which may (even indirectly) depend on its argument.
 
-            This is analogous to the ``jug status`` subcommand.
+            This is analogous to the ``jug invalidate`` subcommand.
 
             Parameters
             ----------
@@ -138,10 +138,17 @@ class ShellCommand(SubCommand):
             from ..task import alltasks
             return invalidate(alltasks, reverse_cache, t)
 
+        def _get_tasks():
+            '''Returns a list of all tasks seen by jug
+            '''
+            from ..task import alltasks
+            return alltasks
+
         local_ns = {
             'load_all': _load_all,
             'value': value,
             'invalidate': _invalidate,
+            'get_tasks': _get_tasks,
         }
         # This is necessary for some versions of Ipython. See:
         # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a

@@ -1,3 +1,6 @@
+version 1.6.5 Unreleased
+	* Add get_tasks() to 'jug shell' and document 'from jug.task import alltasks'
+
 version 1.6.4 Wed Nov 1 by luispedro
 	* Fix exit_after_n_tasks. It would previously execute one task too many
 
