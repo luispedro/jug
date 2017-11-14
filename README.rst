@@ -2,6 +2,9 @@
 Jug: A Task-Based Parallelization Framework
 ===========================================
 
+Jug allows you to write code that is broken up into
+tasks and run different tasks on different processors.
+
 .. image:: https://travis-ci.org/luispedro/jug.png
        :target: https://travis-ci.org/luispedro/jug
 
@@ -11,9 +14,9 @@ Jug: A Task-Based Parallelization Framework
 .. image:: https://anaconda.org/conda-forge/jug/badges/installer/conda.svg
     :target: https://anaconda.org/conda-forge/jug
 
+.. image:: https://img.shields.io/badge/CITATION-doi.org%2F10.5334%2Fjors.161-green.svg
+   :target: http://doi.org/10.5334/jors.161
 
-Jug allows you to write code that is broken up into
-tasks and run different tasks on different processors.
 
 It uses the filesystem to communicate between processes and
 works correctly over NFS, so you can coordinate processes on
