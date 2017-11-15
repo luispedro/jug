@@ -38,10 +38,13 @@ Implementing a __jug_hash__ method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When jug wants to hash an object, first it checks whether the object has a
-``__jug_hash__`` method. If so, it will call that and it is done. Next, it
-checks whether the object is one of its known types (dict, list, tuple, numpy
-array, ...). If so, it will use optimized code. Otherwise; it resorts to
-calling pickle on the object and then hashing the pickled representation.
+``__jug_hash__`` method. If so, that method should return ``bytes`` (or a
+bytes-like object that can be used by a `hashlib
+<https://docs.python.org/3.6/library/hashlib.html>`__ object. If there is no
+``__jug_hash__`` method, jug checks whether the object is one of its known
+types (dict, list, tuple, numpy array, ...). If so, it will use optimized code.
+Otherwise; it resorts to calling pickle on the object and then hashing the
+pickled representation.
 
 This fallback can be very inefficient. For example, let's say you have an
 object which is basically just a numpy array loaded from disk, which remembers

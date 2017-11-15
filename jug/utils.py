@@ -81,8 +81,8 @@ class CustomHash(object):
     This is an advanced feature and you can shoot yourself in the foot with it.
     Make sure you know what you are doing. In particular, hash_function should
     be a strong hash: ``hash_function(obj0) == hash_function(obj1)`` is taken
-    to imply that ``obj0 == obj1``
-
+    to imply that ``obj0 == obj1``. The hash function should return a ``bytes``
+    object.
 
     You can use the helpers in the ``jug.hash`` module (in particular
     ``hash_one``) to help you. The implementation of ``timed_path`` is a good
