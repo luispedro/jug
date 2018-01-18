@@ -43,31 +43,41 @@ fast.
 
 Now type ``jug status primes.py`` to get::
 
-    Task name                     Waiting       Ready    Finished     Running
-    -------------------------------------------------------------------------
-    primes.is_prime                     0          99           0           0
-    .........................................................................
-    Total:                              0          99           0           0
+
+     Waiting       Ready    Finished     Running  Task name                    
+    ---------------------------------------------------------------------------
+           1           0           0           0  primes.count_primes          
+           0          99           0           0  primes.is_prime              
+           1           0           0           0  primes.write_output          
+    ...........................................................................
+           2          99           0           0  Total                        
 
 
-This tells you that you have 99 tasks called ``primes.is_prime`` ready to run.
-So run ``jug execute primes.py &``. You can even run multiple instances in the
-background (if you have multiple cores, for example). After starting 4
-instances and waiting a few seconds, you can check the status again (with ``jug
-status primes.py``)::
 
-    Task name                     Waiting       Ready    Finished     Running
-    -------------------------------------------------------------------------
-    primes.is_prime                     0          63          32           4
-    .........................................................................
-    Total:                              0          63          32           4
+
+This tells you that you have 99 tasks called ``primes.is_prime`` ready to run,
+while both other tasks are _waiting_ (i.e., they need the ``primes.is_prime``
+tasks to finish).  So run ``jug execute primes.py &``. You can even run
+multiple instances in the background (if you have multiple cores, for example).
+After starting 4 instances and waiting a few seconds, you can check the status
+again (with ``jug status primes.py``)::
+
+
+     Waiting       Ready    Finished     Running  Task name                    
+    ---------------------------------------------------------------------------
+           1           0           0           0  primes.count_primes          
+           0          63          32           4  primes.is_prime              
+           1           0           0           0  primes.write_output          
+    ...........................................................................
+           2          99           0           0  Total                        
 
 
 Now you have 32 tasks finished, 4 running, and 63 still ready. Eventually, they
-will all finish and you can inspect the results with ``jug shell primes.py``.
-This will give you an ``ipython`` shell. The `primes100` variable is available,
-but it is an ugly list of `jug.Task` objects. To get the actual value, you call
-the `value` function::
+will all finish (including ``count_primes`` and ``write_output`) and you can
+inspect the results with ``jug shell primes.py``.  This will give you an
+``ipython`` shell. The `primes100` variable is available, but it is an ugly
+list of `jug.Task` objects. To get the actual value, you call the `value`
+function::
 
     In [1]: primes100 = value(primes100)
 
