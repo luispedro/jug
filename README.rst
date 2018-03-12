@@ -130,6 +130,11 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+version **1.6.5** (Mon Mar 12 2018)
+
+- Add get_tasks() to 'jug shell' and document 'from jug.task import
+  alltasks' (patch by Renato Alves)
+
 version **1.6.4** (Thu Nov 2 2017)
 
 - Fix exit_after_n_tasks. It would previously execute one task too many
