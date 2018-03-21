@@ -118,6 +118,12 @@ def execution_loop(tasks, options):
 
     logging.info('Execute start (%s tasks)' % len(tasks))
 
+    # If we are running with a target, exclude non-matching tasks
+    if options.execute_target:
+        task_matcher = prepare_task_matcher(options.execute_target)
+        tasks = [t for t in tasks if task_matcher(t.name)]
+        logging.info('Non-matching tasks discarded. Remaining (%s tasks)' % len(tasks))
+
     # For the special (but common) case where most (if not all) of the tasks
     # can be loaded directly, just skip them as fast as possible:
     first_unloadable = 0
@@ -130,11 +136,6 @@ def execution_loop(tasks, options):
     if options.debug:
         start_task_set = set([id(t) for t in task.alltasks])
 
-    # If we are running with a target, exclude non-matching tasks
-    if options.execute_target:
-        task_matcher = prepare_task_matcher(options.execute_target)
-        tasks = [t for t in tasks if task_matcher(t.name)]
-        logging.info('Non-matching tasks discarded. Remaining (%s tasks)' % len(tasks))
 
     failures = False
     prevtask = None
