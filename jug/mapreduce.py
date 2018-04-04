@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License : MIT
 
@@ -8,7 +8,7 @@ mapreduce: Build tasks that follow a map-reduce pattern.
 '''
 
 
-from .task import Task
+from .task import Task, TaskletMixin
 from .utils import identity
 from .hash import hash_one
 
@@ -98,8 +98,8 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
     else:
         assert False, 'This is a bug'
 
-class block_access_slice(object):
-    __slots__ = ('base', 'start', 'stop', 'stride', '_hvalue')
+class block_access_slice(TaskletMixin):
+    __slots__ = ('start', 'stop', 'stride', '_hvalue')
     def __init__(self, access, orig):
         self.base = access
         self.start,self.stop,self.stride = orig
@@ -137,7 +137,11 @@ class block_access_slice(object):
         from .task import value
         return [value(self[i]) for i in range(len(self))]
 
-class block_access(object):
+    def can_load(self):
+        return self.base.can_load()
+
+
+class block_access(TaskletMixin):
     __slots__ = ('blocks','block_size', 'len','_hvalue')
     def __init__(self, blocks, block_size, len):
         self.blocks = blocks
@@ -175,6 +179,9 @@ class block_access(object):
     def __jug_value__(self):
         from .task import value
         return [value(self[i]) for i in range(len(self))]
+
+    def can_load(self):
+        return all(b.can_load() for b in self.blocks)
 
 def map(mapper, sequence, map_step=4):
     '''

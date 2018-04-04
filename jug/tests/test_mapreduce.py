@@ -87,6 +87,7 @@ def test_taskgenerator_mapreduce():
 def test_taskgenerator_map():
     jugfile = os.path.join(_jugdir, 'mapgenerator.py')
     store, space = jug.jug.init(jugfile, 'dict_store')
+    assert not space['s'].can_run()
     simple_execute()
     assert len(value(space['v2s'])) == 16
 

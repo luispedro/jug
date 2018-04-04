@@ -1,5 +1,6 @@
 version 1.6.5+
 	* Fix bug in shell's invalidate() function
+	* Fix wrong dependency handling with mapreduce.map()
 
 version 1.6.5 Mon Mar 12 by luispedro
 	* Add get_tasks() to 'jug shell' and document 'from jug.task import

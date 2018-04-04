@@ -1,6 +1,5 @@
 from jug import TaskGenerator
 import jug.mapreduce
-import math
 
 @TaskGenerator
 def double(x):
