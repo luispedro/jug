@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -225,7 +225,7 @@ tricky to support since the general code relies on the function name)''')
         while queue:
             deps = queue.pop()
             for dep in deps:
-                if isinstance(dep, (Task, Tasklet)):
+                if isinstance(dep, TaskletMixin):
                     yield dep
                 elif isinstance(dep, (list, tuple)):
                     queue.append(dep)
@@ -383,6 +383,9 @@ class Tasklet(TaskletMixin):
         yield self.base
 
     def value(self):
+        return self.__jug_value__()
+
+    def __jug_value__(self):
         return self.f(value(self.base))
 
     def can_load(self):
