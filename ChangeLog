@@ -1,3 +1,6 @@
+version 1.6.5+
+	* Fix bug in shell's invalidate() function
+
 version 1.6.5 Mon Mar 12 by luispedro
 	* Add get_tasks() to 'jug shell' and document 'from jug.task import
 	alltasks' (patch by Renato Alves)

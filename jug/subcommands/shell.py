@@ -67,10 +67,8 @@ def invalidate(tasklist, reverse, task):
         for t in tasklist:
             for d in t.dependencies():
                 reverse.setdefault(d.hash(), []).append(t)
-    seen = set([task.hash()])
-    task.invalidate()
-    queue = reverse[task.hash()]
-    queue = queue[:]
+    queue = [task]
+    seen = set()
     while queue:
         task = queue.pop()
         if task.hash() in seen:
