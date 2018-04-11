@@ -1,3 +1,10 @@
+version x Unreleased
+	* jug.backend.base_store has 1 new method 'listlocks'
+	* jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
+	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
+	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
+	* 'jug status' and 'jug graph' now display failed tasks
+
 version 1.6.7+
 	* Add `cached_glob()` function
 	* Fix NoLoad (issue #73)
@@ -32,11 +39,6 @@ version 1.6.0 Thu Aug 24 by luispedro
 	* 'jug execute --keep-going' now ends with non-zero exit code in case of failures
 	* Fix bug with cleanup in dict_store not providing the number of removed records
 	* Add 'jug cleanup --keep-locks' to remove obsolete results without affecting locks
-	* jug.backend.base_store has 1 new method 'listlocks'
-	* jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
-	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
-	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
-	* 'jug status' and 'jug graph' now display failed tasks
 
 version 1.5.0 Sun Jul 16 2017 by luispedro
 	* Add 'demo' subcommand
