@@ -12,3 +12,4 @@ vs = list(range(16))
 v2s = mapreduce.map(double, vs)
 
 s = sum_all(v2s)
+v4s = mapreduce.map(double, v2s)

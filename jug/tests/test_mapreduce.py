@@ -90,6 +90,7 @@ def test_taskgenerator_map():
     assert not space['s'].can_run()
     simple_execute()
     assert len(value(space['v2s'])) == 16
+    assert len(value(space['v4s'])) == 16
 
 @task_reset
 def test_currymap():

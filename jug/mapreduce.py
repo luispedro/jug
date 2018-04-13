@@ -99,7 +99,7 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
         assert False, 'This is a bug'
 
 class block_access_slice(TaskletMixin):
-    __slots__ = ('start', 'stop', 'stride', '_hvalue')
+    __slots__ = ('base', 'start', 'stop', 'stride', '_hvalue')
     def __init__(self, access, orig):
         self.base = access
         self.start,self.stop,self.stride = orig
