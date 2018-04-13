@@ -42,7 +42,10 @@ def _can_load_limit_recursion(t, alltasks):
     while True:
         try:
             return t.can_load()
-        except RecursionError:
+        # RecursionError was introduced in Python 3.5, so we cannot use it
+        # until we stop supporting that version of Python
+        except RuntimeError:
+        # except RecursionError:
             from random import choice
             if not alltasks:
                 raise
