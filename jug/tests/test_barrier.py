@@ -61,3 +61,12 @@ def test_bvalue():
     assert space['four'] == 4
 
 
+@task_reset
+def test_recursive():
+    jugfile = os.path.join(_jugdir, 'barrier_recurse.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    assert 's2' not in space
+    simple_execute()
+    store, space = jug.jug.init(jugfile, store)
+    assert 's2' in space
+

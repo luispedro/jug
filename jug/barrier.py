@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2010-2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2010-2018, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,29 @@ class BarrierError(Exception):
     '''
     pass
 
+def _can_load_limit_recursion(t, alltasks):
+    # This is a hack to get around Python limitations with recursion (Python doesn't like it)
+    # Because Task objects cache their hashes, the recursion is naturally
+    # limited whenever the computation hits upon previously computed hashes.
+    # Thus, whenever we hit a RecursionError, we compute a few hashes and keep
+    # retrying.
+    original = True
+    while True:
+        try:
+            return t.can_load()
+        except RecursionError:
+            from random import choice
+            if not alltasks:
+                raise
+            if original:
+                alltasks = alltasks[:]
+                original = False
+            top = min(256, len(alltasks))
+            for ot in alltasks[:top]:
+                ot.__jug_hash__()
+            del alltasks[:top]
+
+
 def barrier():
     '''
     barrier()
@@ -53,7 +76,7 @@ def barrier():
     # we would still be referring to the old version
     from .task import alltasks
     for t in reversed(alltasks):
-        if not t.can_load():
+        if not _can_load_limit_recursion(t, alltasks):
             raise BarrierError
 
 
