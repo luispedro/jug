@@ -130,6 +130,11 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+version **1.6.7** (Fri Apr 13)
+
+- Fix issue with deeply recursive dependency structures and barrier()
+- Allow mapreduce.map() results to be used as dependencies
+
 version **1.6.6** (Sat Apr  7)
 
 - Fix bug in shell's invalidate() function
