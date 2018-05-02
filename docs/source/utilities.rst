@@ -107,6 +107,23 @@ pieces of functionality:
     jug_execute(['gzip', 'output.txt'], run_after=token)
 
 
+cached_glob
+-----------
+
+
+``cached_glob`` is a simple utility to perform the following common operation::
+
+    from glob import glob
+    from jug import CachedFunction
+    files = CachedFunction(glob, pattern)
+    files.sort()
+
+Where ``pattern`` is a glob pattern can be simply written as::
+
+    from jug.utils import cached_glob
+    files = cached_glob(pattern)
+
+
 
 .. automodule:: jug.utils
     :members:

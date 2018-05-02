@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2018, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,6 +33,7 @@ __all__ = [
     'jug_execute',
     'CustomHash',
     'sync_move',
+    'cached_glob',
     ]
 
 def _identity(x):
@@ -232,3 +233,43 @@ def sync_move(src, dst):
     from os import rename
     fsync_dir(src)
     rename(src, dst)
+
+def glob_sort(pat):
+    '''Glob and sort
+
+    Parameters
+    ----------
+    pat: Same as glob.glob
+
+    Returns
+    -------
+    files : list of str
+    '''
+    from glob import glob
+    rs = glob(pat)
+    rs.sort()
+    return rs
+
+def cached_glob(pat):
+    '''
+    A short-hand for
+
+        from glob import globg
+        CacheFunction(glob, pattern)
+
+    with the extra bonus that results are returns *sorted*
+
+    Parameters
+    ----------
+    pat: Same as glob.glob
+
+    Returns
+    -------
+    files : list of str
+    '''
+    from .task import Task
+    t = Task(glob_sort, pat)
+    if not t.can_load():
+        return t.run()
+    return t.value()
+
