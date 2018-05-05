@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2013-2018, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -9,6 +9,13 @@ Jug.IO module
 '''
 
 from .task import TaskGenerator
+__all__ = [
+        'NoLoad',
+        'write_task_out',
+        'write_metadata',
+        'print_task_summary_table',
+        ]
+
 
 class NoLoad(object):
     def __init__(self, t):
