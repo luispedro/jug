@@ -22,3 +22,6 @@ API Documentation
 
 .. automodule:: jug.hooks.exit_checks
     :members:
+
+.. automodule:: jug.io
+    :members:
