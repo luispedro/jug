@@ -8,7 +8,7 @@ Jug.IO module
 - write_task_out: write out results, possibly with metadata.
 '''
 
-from .task import TaskGenerator
+from .task import TaskGenerator, Tasklet
 __all__ = [
         'NoLoad',
         'write_task_out',
@@ -16,14 +16,25 @@ __all__ = [
         'print_task_summary_table',
         ]
 
+class NoLoad(Tasklet):
+    '''
+    NoLoad can be used to decorate a Task result such that when it is passed to
+    another Task, then it is passed directly (instead of passing the result).
 
-class NoLoad(object):
-    def __init__(self, t):
-        self.t = t
+    This is **for advanced usage**.
+    '''
 
-    def __jug_hash__(self):
-        from .hash import hash_one
-        return hash_one(['NoLoad', self.t.hash()])
+    def __init__(self, base):
+        Tasklet.__init__(self, base, 'NoLoad')
+
+    @property
+    def t(self):
+        import warnings
+        warnings.warn("Using NoLoad.t is deprecated. Use the `base` accessor", DeprecationWarning)
+        return self.base
+
+    def __getitem__(self, _):
+        raise NotImplementedError("You cannot slice a NoLoad object")
 
     def __jug_value__(self):
         return self
