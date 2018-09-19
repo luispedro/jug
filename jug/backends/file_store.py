@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -221,15 +221,15 @@ class file_store(base_store):
             The object that was saved under ``name``
         '''
         fname = self._getfname(name)
-        input = open(fname, 'rb')
-        try:
-            import numpy as np
-            return np.lib.format.read_array(input)
-        except ValueError:
-            input.seek(0)
-        except ImportError:
-            pass
-        return decode_from(input)
+        with open(fname, 'rb') as ifile:
+            try:
+                import numpy as np
+                return np.lib.format.read_array(ifile)
+            except ValueError:
+                ifile.seek(0)
+            except ImportError:
+                pass
+            return decode_from(ifile)
 
     def remove(self, name):
         '''

@@ -136,6 +136,7 @@ def read_configuration_file(fp=None, default_options=None):
     from six.moves import configparser
     config = configparser.RawConfigParser()
     config.readfp(fp)
+    fp.close()
 
     for section in config.sections():
         for key, value in config.items(section):
