@@ -97,9 +97,9 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     jugmodule.__file__ = os.path.abspath(jugfile)
     jugspace = jugmodule.__dict__
     sys.modules[jugmodname] = jugmodule
-    jugfile_contents = open(jugfile).read()
     try:
-        exec(compile(jugfile_contents, jugfile, 'exec'), jugspace, jugspace)
+        with open(jugfile) as jfile:
+            exec(compile(jfile.read(), jugfile, 'exec'), jugspace, jugspace)
     except BarrierError:
         jugspace['__jug__hasbarrier__'] = True
     except Exception as e:
