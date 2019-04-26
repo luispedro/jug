@@ -40,7 +40,7 @@ First version::
     def select_first(t):
         return t[0]
     result = Task(...)
-    result0 = Tasklet(select_first, result)
+    result0 = Tasklet(result, select_first)
     next = Task(next_step,result0)
 
 If you look closely, you will see that we are now using a *Tasklet*. This
@@ -53,7 +53,7 @@ automatically*:
 Second version::
 
     result = Task(...)
-    next = Task(next_function,result[0])
+    next = Task(next_function, result[0])
 
 Now, we have a version that is both idiomatic Python and efficient.
 
