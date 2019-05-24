@@ -281,7 +281,7 @@ tricky to support since the general code relies on the function name)''')
 
     def __repr__(self):
         '''Detailed representation'''
-        return 'Task(%s, args=%s, kwargs=%s)' % (self.name, self.args, self.kwargs)
+        return 'Task({}, args={}, kwargs={})'.format(self.name, self.args, self.kwargs)
 
     def lock(self):
         '''
