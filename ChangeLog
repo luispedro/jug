@@ -1,40 +1,38 @@
-version x Unreleased
-	* jug.backend.base_store has 1 new method 'listlocks'
-	* jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
+version 2.0.0-b0
 	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
 	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
 	* 'jug status' and 'jug graph' now display failed tasks
-
-version 1.6.7+
 	* Add `cached_glob()` function
 	* Fix NoLoad (issue #73)
+	* jug.backend.base_store has one new method 'listlocks'
+	* jug.backend.base_lock has two new methods 'fail' and 'is_failed'
 
-version 1.6.7 Fri Apr 13 by luispedro
+version 1.6.7 Fri Apr 13 2018 by luispedro
 	* Fix issue with deeply recursive dependency structures and barrier()
 	* Allow mapreduce.map() results to be used as dependencies
 
-version 1.6.6 Sat Apr  7 by luispedro
+version 1.6.6 Sat Apr 7 2018 by luispedro
 	* Fix bug in shell's invalidate() function
 	* Fix wrong dependency handling with mapreduce.map()
 
-version 1.6.5 Mon Mar 12 by luispedro
+version 1.6.5 Mon Mar 12 2018 by luispedro
 	* Add get_tasks() to 'jug shell' and document 'from jug.task import
 	alltasks' (patch by Renato Alves)
 
-version 1.6.4 Wed Nov 1 by luispedro
+version 1.6.4 Thu Nov 2 2017 by luispedro
 	* Fix exit_after_n_tasks. It would previously execute one task too many
 
-version 1.6.3 Wed Nov 1 by luispedro
+version 1.6.3 Wed Nov 1 2017 by luispedro
 	* Add citation request
 
-version 1.6.2 Thu Oct 26 by luispedro
+version 1.6.2 Thu Oct 26 2017 by luispedro
 	* Add return_value argument to jug_execute
 	* Add exit_env_vars
 
-version 1.6.1 Thu Aug 29 by luispedro
+version 1.6.1 Thu Aug 29 2017 by luispedro
 	* Fix bug with `invalidate()` in the shell
 
-version 1.6.0 Thu Aug 24 by luispedro
+version 1.6.0 Thu Aug 24 2017 by luispedro
 	* Add 'graph' subcommand - Generates a graph of tasks
 	* 'jug execute --keep-going' now ends with non-zero exit code in case of failures
 	* Fix bug with cleanup in dict_store not providing the number of removed records

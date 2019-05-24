@@ -130,6 +130,18 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+version **2.0.0-beta0** (Sat May 25 2019)
+
+This version adds the concept of *failing tasks* (thanks to Renato Alves)
+
+- Add 'jug execute --keep-failed' to preserve locks on failing tasks.
+- Add 'jug cleanup --failed-only' to remove locks from failed tasks
+- 'jug status' and 'jug graph' now display failed tasks
+- Add ``cached_glob()`` function
+- Fix NoLoad (issue #73)
+- jug.backend.base_store has one new method 'listlocks'
+- jug.backend.base_lock has two new methods 'fail' and 'is_failed'
+
 version **1.6.7** (Fri Apr 13 2018)
 
 - Fix issue with deeply recursive dependency structures and barrier()

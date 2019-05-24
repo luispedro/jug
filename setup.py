@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,6 +49,8 @@ classifiers = [
 'Programming Language :: Python :: 3.4',
 'Programming Language :: Python :: 3.5',
 'Programming Language :: Python :: 3.6',
+'Programming Language :: Python :: 3.7',
+'Programming Language :: Python :: 3.8',
 'Topic :: Scientific/Engineering',
 'Topic :: Software Development',
 'Topic :: System :: Distributed Computing',
@@ -59,6 +61,7 @@ setuptools.setup(name = 'Jug',
       version = __version__,
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
+      long_description_content_type = 'text/x-rst',
       author = 'Luis Pedro Coelho',
       author_email = 'luis@luispedro.org',
       license = 'MIT',
