@@ -1,6 +1,7 @@
 version 1.6.7+
 	* Add `cached_glob()` function
 	* Fix NoLoad (issue #73)
+	* Fix `jug shell`'s invalidate function with Tasklets (issue #77)
 
 version 1.6.7 Fri Apr 13 by luispedro
 	* Fix issue with deeply recursive dependency structures and barrier()

@@ -68,7 +68,7 @@ def test_cleanup():
 
 @task_reset
 def test_shell_invalidate():
-    jugfile = os.path.join(_jugdir, 'simple.py')
+    jugfile = os.path.join(_jugdir, 'iteratetask.py')
     store, space = jug.jug.init(jugfile, 'dict_store')
     tasks = jug.task.alltasks[:]
     simple_execute()
@@ -77,6 +77,6 @@ def test_shell_invalidate():
     jug.subcommands.shell.invalidate(tasks, {}, tasks[0])
     loaded = sum([t.can_load() for t in tasks])
     print(loaded)
-    print(len(tasks) - 4)
-    assert loaded == len(tasks) - 4
+    print(len(tasks) - 2)
+    assert loaded == len(tasks) - 2
 
