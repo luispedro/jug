@@ -8,3 +8,7 @@ vals = [0,1,2]
 t = Task(double, vals)
 t0,t1,t2 = iteratetask(t, 3)
 
+f2 = Task(double, [t0, t1])
+
+f3 = Task(double, [2,3,4])
+

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -63,9 +63,12 @@ Enjoy...
 
 def invalidate(tasklist, reverse, task):
     if not reverse:
+        from jug.task import Tasklet
         print("Building task DAG... (only performed once)")
         for t in tasklist:
             for d in t.dependencies():
+                while isinstance(d, Tasklet):
+                    d = d.base
                 reverse.setdefault(d.hash(), []).append(t)
     queue = [task]
     seen = set()
