@@ -2,12 +2,17 @@
 History
 =======
 
-version **1.6.7** (Fri Apr 13)
+version **1.6.8** (Wed July 10 2019)
+- Add ``cached_glob()`` function
+- Fix NoLoad (issue #73)
+- Fix ``jug shell``'s invalidate function with Tasklets (issue #77)
+
+version **1.6.7** (Fri Apr 13 2018)
 
 - Fix issue with deeply recursive dependency structures and barrier()
 - Allow mapreduce.map() results to be used as dependencies
 
-version **1.6.6** (Sat Apr  7)
+version **1.6.6** (Sat Apr  7 2018)
 
 - Fix bug in shell's invalidate() function
 - Fix wrong dependency handling with mapreduce.map()
