@@ -1,3 +1,6 @@
+version 1.6.x
+	* Fix saving on newer version of numpy
+
 version 1.6.8 Wed July 10 2019 by luispedro
 	* Add `cached_glob()` function
 	* Fix NoLoad (issue #73)
