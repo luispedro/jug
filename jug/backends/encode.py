@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -64,12 +64,14 @@ def encode_to(object, stream):
     if object is None:
         return
     prefix = six.b('P')
-    write = lambda f,a: pickle.dump(f, a, protocol=pickle.HIGHEST_PROTOCOL)
+    write = lambda obj,s: pickle.dump(obj, s, protocol=pickle.HIGHEST_PROTOCOL)
     try:
         import numpy as np
         if type(object) == np.ndarray:
             prefix = six.b('N')
-            write = (lambda f,a: np.save(a,f))
+            # We need to switch the arguments around because pickle.dump and
+            # np.save have different argument orders:
+            write = (lambda arr,s: np.save(s, arr))
     except ImportError:
         pass
     stream = compress_stream(stream)
@@ -82,6 +84,11 @@ class compress_stream(object):
         self.stream = stream
         self.C = zlib.compressobj()
 
+
+    def read(self, *args, **kwargs):
+        raise NotImplementedError("compress_stream.read only exists to make numpy treat compress_stream as a file-object")
+
+
     def write(self, s):
         MAX_BLOCK = 2000000000
         if len(s) > MAX_BLOCK:
@@ -89,6 +96,7 @@ class compress_stream(object):
             self.write(s[MAX_BLOCK:])
         else:
             self.stream.write(self.C.compress(s))
+
 
     def flush(self):
         self.stream.write(self.C.flush())

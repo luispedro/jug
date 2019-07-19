@@ -4,13 +4,14 @@ version x Unreleased
 	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
 	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
 	* 'jug status' and 'jug graph' now display failed tasks
+	* Fix saving on newer version of numpy
 
-version 1.6.7+
+version 1.6.8 Wed July 10 2019 by luispedro
 	* Add `cached_glob()` function
 	* Fix NoLoad (issue #73)
 	* Fix `jug shell`'s invalidate function with Tasklets (issue #77)
 
-version 1.6.7 Fri Apr 13 by luispedro
+version 1.6.7 Fri Apr 13 2018 by luispedro
 	* Fix issue with deeply recursive dependency structures and barrier()
 	* Allow mapreduce.map() results to be used as dependencies
 
