@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,6 +24,7 @@
 import sys
 
 from .. import task
+from ..jug import init
 from . import SubCommand
 
 __all__ = [
@@ -67,8 +68,13 @@ class SleepUntilCommand(SubCommand):
     '''
     name = "sleep-until"
 
-    def run(self, store, options, *args, **kwargs):
-        sys.exit(_check_or_sleep_until(store, True))
+    def run(self, options, store, jugspace, *args, **kwargs):
+        while True:
+            _check_or_sleep_until(store, True)
+            hasbarrier = jugspace.get('__jug__hasbarrier__', False)
+            if not hasbarrier:
+                sys.exit(0)
+            store, jugspace = init(options.jugfile, options.jugdir, store=store)
 
 
 def _check_or_sleep_until(store, sleep_until):
