@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -70,9 +70,13 @@ class ExecuteCommand(SubCommand):
 
     def run(self, options, *args, **kwargs):
         from signal import signal, SIGTERM
+        from ..hooks.exit_checks import exit_env_vars
         from ..jug import execution_loop
 
         signal(SIGTERM, _sigterm)
+        if not options.execute_no_check_environment:
+            exit_env_vars()
+
         tasks = task.alltasks
         tstats = TaskStats()
         store = None
@@ -135,6 +139,10 @@ class ExecuteCommand(SubCommand):
                             action='store_const', const=True,
                             dest='execute_keep_failed',
                             help='Keep failed tasks locked')
+        parser.add_argument('--no-check-environment',
+                            action='store_const', const=True,
+                            dest='execute_no_check_environment',
+                            help='Do not check environment variables JUG_*')
 
     def parse_defaults(self):
         wait_cycle_time = 12
@@ -145,6 +153,7 @@ class ExecuteCommand(SubCommand):
             "execute_target": None,
             "execute_wait_cycle_time": wait_cycle_time,
             "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
+            "execute_no_check_environment": False,
         }
 
         return default_values
