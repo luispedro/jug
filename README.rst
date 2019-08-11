@@ -130,6 +130,17 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+
+version **1.6.9** (Tue Aug 6 2019)
+
+- Fix saving on newer version of numpy
+
+version **1.6.8** (Wed July 10 2019)
+
+- Add ``cached_glob()`` function
+- Fix NoLoad (issue #73)
+- Fix ``jug shell``'s invalidate function with Tasklets (issue #77)
+
 version **1.6.7** (Fri Apr 13 2018)
 
 - Fix issue with deeply recursive dependency structures and barrier()

@@ -4,6 +4,8 @@ version x Unreleased
 	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
 	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
 	* 'jug status' and 'jug graph' now display failed tasks
+
+version 1.6.9 Tue Aug 6 2019 by luispedro
 	* Fix saving on newer version of numpy
 
 version 1.6.8 Wed July 10 2019 by luispedro
