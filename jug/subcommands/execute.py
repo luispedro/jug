@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -70,12 +70,13 @@ class ExecuteCommand(SubCommand):
 
     def run(self, options, *args, **kwargs):
         from signal import signal, SIGTERM
-        from ..hooks.exit_checks import exit_env_vars
+        from ..hooks.exit_checks import exit_env_vars, exit_if_file_exists
         from ..jug import execution_loop
 
         signal(SIGTERM, _sigterm)
         if not options.execute_no_check_environment:
             exit_env_vars()
+            exit_if_file_exists('__jug_please_stop_running.txt')
 
         tasks = task.alltasks
         tstats = TaskStats()
@@ -142,7 +143,7 @@ class ExecuteCommand(SubCommand):
         parser.add_argument('--no-check-environment',
                             action='store_const', const=True,
                             dest='execute_no_check_environment',
-                            help='Do not check environment variables JUG_*')
+                            help='Do not check environment variables JUG_* and file __jug_please_stop_running.txt')
 
     def parse_defaults(self):
         wait_cycle_time = 12

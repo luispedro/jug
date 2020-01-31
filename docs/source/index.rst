@@ -134,6 +134,7 @@ Documentation Contents
     segmentation-example.rst
     subcommands.rst
     status.rst
+    exit.md
     shell.rst
     types.rst
     tasks.rst

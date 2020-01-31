@@ -6,6 +6,11 @@
 #
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
+from recommonmark.parser import CommonMarkParser
+
+source_parsers = {
+    '.md': CommonMarkParser,
+}
 
 import sys, os
 from jug.jug_version import __version__ as jug_version
@@ -31,11 +36,11 @@ extensions = [
 
 templates_path = ['.templates']
 
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 project = 'Jug'
-copyright = '2008-2016, Luis Pedro Coelho'
+copyright = '2008-2020, Luis Pedro Coelho'
 
 # The short X.Y version.
 version = jug_version[:3]
