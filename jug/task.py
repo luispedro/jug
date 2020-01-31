@@ -93,7 +93,7 @@ tricky to support since the general code relies on the function name)''')
 
     def run(self, force=False, save=True, debug_mode=False):
         '''
-        task.run(force=False, save=True)
+        task.run(force=False, save=True, debug_mode=False)
 
         Performs the task.
 
@@ -105,6 +105,12 @@ tricky to support since the general code relies on the function name)''')
         save : boolean, optional
             if true, save the result to the store
             (default: True)
+        debug_mode : boolean, optional
+            whether to run in debug mode (adds extra checks)
+
+        Returns
+        -------
+        val : return value from Task
         '''
         assert self.can_run()
         if debug_mode: self._check_hash()
