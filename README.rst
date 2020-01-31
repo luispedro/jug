@@ -130,6 +130,15 @@ reasonably large set of parameter combinations" - Andreas Longva
 What's New
 ----------
 
+version **2.0.0** (Sat Feb 1 2020)
+- jug.backend.base_store has 1 new method 'listlocks'
+- jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
+- Add 'jug execute --keep-failed' to preserve locks on failing tasks.
+- Add 'jug cleanup --failed-only' to remove locks from failed tasks
+- 'jug status' and 'jug graph' now display failed tasks
+- Check environmental exit variables by default (suggested by Renato Alves, issue #66)
+- Fix 'jug sleep-until' in the presence of barrier() (issue #71)
+
 
 version **1.6.9** (Tue Aug 6 2019)
 
