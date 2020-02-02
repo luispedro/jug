@@ -5,8 +5,8 @@ Jug: A Task-Based Parallelization Framework
 Jug allows you to write code that is broken up into
 tasks and run different tasks on different processors.
 
-.. image:: https://travis-ci.org/luispedro/jug.png
-       :target: https://travis-ci.org/luispedro/jug
+.. image:: https://travis-ci.com/luispedro/jug.png
+       :target: https://travis-ci.com/luispedro/jug
 
 .. image:: https://zenodo.org/badge/205237.svg
    :target: https://zenodo.org/badge/latestdoi/205237
