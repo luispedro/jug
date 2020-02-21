@@ -134,7 +134,7 @@ the `value` function::
 What's New
 ----------
 
-version **2.0.0** (Sat Feb 1 2020)
+version **2.0.0** (Fri Feb 21 2020)
 - jug.backend.base_store has 1 new method 'listlocks'
 - jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
 - Add 'jug execute --keep-failed' to preserve locks on failing tasks.
