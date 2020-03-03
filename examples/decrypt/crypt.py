@@ -2,14 +2,14 @@ import numpy as np
 
 
 def decode(text, passwd):
-    cipher = np.tile(passwd, len(text) / len(passwd))
+    cipher = np.tile(passwd, len(text) // len(passwd))
     text = text ^ cipher
     return "".join(map(chr, text))
 encode = decode
 
 
 def preprocess(ciphertext):
-    return np.array(list(map(ord, ciphertext)), np.uint8)
+    return np.array(list(ciphertext), np.uint8)
 
 
 def isgood(text):

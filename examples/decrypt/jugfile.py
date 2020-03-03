@@ -6,7 +6,7 @@ from jug import TaskGenerator
 from crypt import decode, letters, isgood, preprocess
 
 
-with open('secret.msg') as f:
+with open('secret.msg', 'rb') as f:
     ciphertext = f.read()
 ciphertext = preprocess(ciphertext)
 
