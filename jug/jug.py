@@ -211,43 +211,8 @@ def execution_loop(tasks, options):
                 failures = task_failed = True
 
                 if options.pdb:
-                    import sys
-                    _,_, tb = sys.exc_info()
-
-                    # The code below is a complex attempt to load IPython
-                    # debugger which works with multiple versions of IPython.
-                    #
-                    # Unfortunately, their API kept changing prior to the 1.0.
-                    try:
-                        import IPython
-                        try:
-                            import IPython.core.debugger
-                            try:
-                                from IPython.terminal.ipapp import load_default_config
-                                config = load_default_config()
-                                colors = config.TerminalInteractiveShell.colors
-                            except:
-                                import IPython.core.ipapi
-                                ip = IPython.core.ipapi.get()
-                                colors = ip.colors
-                            try:
-                                debugger = IPython.core.debugger.Pdb(colors.get_value(initial='Linux'))
-                            except AttributeError:
-                                debugger = IPython.core.debugger.Pdb(colors)
-                        except ImportError:
-                            #Fallback to older version of IPython API
-                            import IPython.ipapi
-                            import IPython.Debugger
-                            shell = IPython.Shell.IPShell(argv=[''])
-                            ip = IPython.ipapi.get()
-                            debugger = IPython.Debugger.Pdb(ip.options.colors)
-                    except ImportError:
-                        #Fallback to standard debugger
-                        import pdb
-                        debugger = pdb.Pdb()
-
-                    debugger.reset()
-                    debugger.interaction(None, tb)
+                    from .internal.debugger import debug_exception
+                    debug_exception()
                 else:
                     logging.critical('Exception while running %s: %s' % (t.name,e))
                     for other in itertools.chain(upnext, tasks):
@@ -283,14 +248,21 @@ def main(argv=None):
     jugspace = None
     store = None
 
-    if options.subcommand not in ('demo', 'status', 'execute', 'webstatus', 'test-jug'):
-        store, jugspace = init(options.jugfile, options.jugdir)
-
-    from .subcommands import cmdapi
-    cmdapi.run(options.subcommand, options=options, store=store, jugspace=jugspace)
-
-    if store is not None:
-        store.close()
+    try:
+        if options.subcommand not in ('demo', 'status', 'execute', 'webstatus', 'test-jug'):
+            on_error = ('propagate' if options.pdb else 'exit')
+            store, jugspace = init(options.jugfile, options.jugdir, on_error=on_error)
+        from .subcommands import cmdapi
+        cmdapi.run(options.subcommand, options=options, store=store, jugspace=jugspace)
+    except:
+        if options.pdb:
+            from .internal.debugger import debug_exception
+            debug_exception()
+        else:
+            raise
+    finally:
+        if store is not None:
+            store.close()
 
 
 if __name__ == '__main__':

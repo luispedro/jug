@@ -1,3 +1,7 @@
+Post version 2.0.0
+	* Extend `--pdb` to exceptions raised while importing the jugfile (issue
+	#79)
+
 version 2.0.0 Fri Feb 21 2020 by luispedro
 	* jug.backend.base_store has 1 new method 'listlocks'
 	* jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'

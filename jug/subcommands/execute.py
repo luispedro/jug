@@ -88,7 +88,8 @@ class ExecuteCommand(SubCommand):
         failures = False
         while noprogress < nr_wait_cycles:
             del tasks[:]
-            store, jugspace = init(options.jugfile, options.jugdir, store=store)
+            on_error = ('propagate' if options.pdb else 'exit')
+            store, jugspace = init(options.jugfile, options.jugdir, on_error=on_error, store=store)
             if options.debug:
                 for t in tasks:
                     # Trigger hash computation:
