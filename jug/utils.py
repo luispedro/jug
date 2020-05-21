@@ -142,10 +142,11 @@ def hash_with_mtime_size(path):
 def timed_path(path):
     '''path = timed_path(path)
 
-    Returns a Task object that simply returns `path` with the exception that it
-    uses the paths mtime (modification time) and the file size in the hash.
-    Thus, if the file is touched or changes size, this triggers an invalidation
-    of the results (which propagates to all dependent tasks).
+    Returns an  object that returns `path` when passed to a jug Task with the
+    exception that it uses the paths mtime (modification time) and the file
+    size in the hash. Thus, if the file is touched or changes size, this
+    triggers an invalidation of the results (which propagates to all dependent
+    tasks).
 
     Parameters
     ----------
