@@ -1,6 +1,7 @@
 # Early exit
 
-_Since 1.7_
+_This functionality is available since 1.7, but needed to be explicitly
+activated until version 2.0_
 
 Note that, in all cases, _the process will only exit after finishing a task_.
 If you set a time limit and that time is reach while a task is running, then

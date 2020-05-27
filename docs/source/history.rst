@@ -2,20 +2,51 @@
 History
 =======
 
-version **2.0.0** (Fri Feb 21 2020)
-- jug.backend.base_store has 1 new method 'listlocks'
-- jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
-- Add 'jug execute --keep-failed' to preserve locks on failing tasks.
-- Add 'jug cleanup --failed-only' to remove locks from failed tasks
-- 'jug status' and 'jug graph' now display failed tasks
-- Check environmental exit variables by default (suggested by Renato Alves, issue #66)
-- Fix 'jug sleep-until' in the presence of barrier() (issue #71)
+Version 2.0.0
+-------------
 
-version **1.6.9** (Tue Aug 6 2019)
+*Released Fri Feb 21 2020*
+
+User-visible improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Jug can now keep track of failed tasks.
+   
+Use ``jug execute --keep-failed`` to preserve locks on failing tasks and ``jug
+cleanup --failed-only`` to remove locks from failed tasks. Similarly, ``jug
+status`` and ``jug graph`` now display failed tasks
+
+This avoids the situation where a failing task (for whatever reason) blocks the
+rest of the process. It improves on ``jug --keep-going`` (which does the same)
+as with ``--keep-going``, each new process will attempt to run the task. If the
+task reproducibly fails after a long period, this results in wasted
+computation.
+
+2. The `exit environmental variable <exit.html>`__ are now checked by default.
+   Create a file called ``__jug_please_stop_running.txt`` in the current
+   working directory and ``Jug`` will stop after it finishes the current task.
+
+
+Bugfixes
+~~~~~~~~
+
+- Fix ``jug sleep-until`` in the presence of barrier() (issue #71)
+
+Internal improvements
+~~~~~~~~~~~~~~~~~~~~~
+
+- jug.backend.base_store has 1 new method ``listlocks``
+- jug.backend.base_lock has 2 new methods ``fail`` and ``is_failed``
+
+Version 1.6.9
+-------------
+
+*Released on Tue Aug 6 2019*
 
 - Fix saving on newer version of numpy
 
 version **1.6.8** (Wed July 10 2019)
+
 - Add ``cached_glob()`` function
 - Fix NoLoad (issue #73)
 - Fix ``jug shell``'s invalidate function with Tasklets (issue #77)
