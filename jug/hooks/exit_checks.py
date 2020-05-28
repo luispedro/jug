@@ -137,4 +137,4 @@ def exit_env_vars(environ=None):
         exit_after_time(hours=hours, minutes=minutes, seconds=seconds)
 
     if 'JUG_EXIT_IF_FILE_EXISTS' in environ:
-        exit_if_file_exists(os['JUG_EXIT_IF_FILE_EXISTS'])
+        exit_if_file_exists(environ['JUG_EXIT_IF_FILE_EXISTS'])
