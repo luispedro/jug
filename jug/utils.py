@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -255,8 +255,9 @@ def cached_glob(pat):
     '''
     A short-hand for
 
-        from glob import globg
-        CacheFunction(glob, pattern)
+        from jug import CachedFunction
+        from glob import glob
+        CachedFunction(glob, pattern)
 
     with the extra bonus that results are returns *sorted*
 

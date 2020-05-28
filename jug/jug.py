@@ -191,7 +191,7 @@ def execution_loop(tasks, options):
 
                     if options.aggressive_unload:
                         if prevtask is not None:
-                            active = set([id(d) for d in t.dependencies()])
+                            active = set(id(d) for d in t.dependencies())
                             for d in itertools.chain(prevtask.dependencies(), [prevtask]):
                                 if id(d) not in active:
                                     d.unload()
