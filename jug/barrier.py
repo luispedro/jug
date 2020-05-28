@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2010-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2010-2020, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -32,30 +32,35 @@ class BarrierError(Exception):
     '''
     pass
 
-def _can_load_limit_recursion(t, alltasks):
+
+def _can_load_limit_recursion(tsk, alltasks):
     # This is a hack to get around Python limitations with recursion (Python doesn't like it)
-    # Because Task objects cache their hashes, the recursion is naturally
-    # limited whenever the computation hits upon previously computed hashes.
-    # Thus, whenever we hit a RecursionError, we compute a few hashes and keep
-    # retrying.
-    original = True
-    while True:
-        try:
-            return t.can_load()
-        # RecursionError was introduced in Python 3.5, so we cannot use it
-        # until we stop supporting that version of Python
-        except RuntimeError:
-        # except RecursionError:
-            from random import choice
-            if not alltasks:
-                raise
-            if original:
-                alltasks = alltasks[:]
-                original = False
-            top = min(256, len(alltasks))
-            for ot in alltasks[:top]:
-                ot.__jug_hash__()
-            del alltasks[:top]
+
+    # So, if we have a recursion error, we switch methods and first compute the
+    # list of dependencies with an explicit stack (`q`). Then, we iterate over
+    # the list of dependencies and trigger hash computation for each of the
+    # dependencies. This should ensures that the next call to `can_load()`
+    # returns immediately.
+
+    try:
+        return tsk.can_load()
+    # RecursionError was introduced in Python 3.5, so we cannot use it
+    # until we stop supporting earlier versions of Python
+    except RuntimeError:
+    # except RecursionError:
+        dependencies = set()
+        q = [tsk]
+        while q:
+            top = q.pop()
+            ndeps = top.dependencies()
+            ndeps = [t for t in ndeps if id(t) not in dependencies]
+            q.extend(ndeps)
+            dependencies.update(id(t) for t in ndeps)
+
+        for t in alltasks:
+            if id(t) in dependencies:
+                t.__jug_hash__()
+        return tsk.can_load()
 
 
 def barrier():
