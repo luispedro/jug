@@ -35,12 +35,13 @@ def exit_when_true(f, function_takes_Task=False):
         f = lambda t : f()
     def exit_when(t):
         if f(t):
-           exit(0)
+            exit(0)
     hooks.register_hook('execute.task-executed1', exit_when)
+
 
 def exit_after_n_tasks(n):
     '''Exit after a specific number of tasks have been executed
-    
+
     Parameters
     ----------
     n : int
@@ -50,11 +51,13 @@ def exit_after_n_tasks(n):
     # In newer Python, we could use nonlocal, but this is a work around
     # (http://stackoverflow.com/questions/9603278/is-there-something-like-nonlocal-in-python-3/9603491#9603491)
     executed = [0]
+
     def exit_after(_t):
         executed[0] += 1
         if executed[0] >= n:
-           exit(0)
+            exit(0)
     hooks.register_hook('execute.task-executed1', exit_after)
+
 
 def exit_after_time(hours=0, minutes=0, seconds=0):
     '''Exit after a specific number of tasks have been executed
@@ -81,6 +84,7 @@ def exit_after_time(hours=0, minutes=0, seconds=0):
             exit(0)
     hooks.register_hook('execute.task-executed1', check_time)
 
+
 def exit_env_vars(environ=None):
     '''
     exit_env_vars(environ={os.environ})
@@ -90,11 +94,13 @@ def exit_env_vars(environ=None):
     The following variables are used if they are set (if they are not set, they
     are ignored).
 
-    JUG_MAX_TASKS: Maximum nr. of tasks.
+    ``JUG_MAX_TASKS``: Maximum nr. of tasks.
 
-    JUG_MAX_HOURS: Maximum hours
-    JUG_MAX_MINUTES: Maximum minutes
-    JUG_MAX_SECONDS: Maximum seconds
+    ``JUG_MAX_HOURS``: Maximum hours
+
+    ``JUG_MAX_MINUTES``: Maximum minutes
+
+    ``JUG_MAX_SECONDS``: Maximum seconds
 
     For the time based limits, see the comment on `exit_after_time` on how
     these limits are not strict as they are only checked after each task
@@ -117,7 +123,7 @@ def exit_env_vars(environ=None):
         environ = os.environ
     if 'JUG_MAX_TASKS' in environ:
         exit_after_n_tasks(int(environ['JUG_MAX_TASKS']))
-    
+
     hours = 0
     minutes = 0
     seconds = 0
