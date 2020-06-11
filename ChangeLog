@@ -1,5 +1,6 @@
 Post version 2.0.0+
 	* Fix handling of `JUG_EXIT_IF_FILE_EXISTS` environmental variable
+	* Fix passing an argument to jug.main() function
 
 Post version 2.0.0
 	* Extend `--pdb` to exceptions raised while importing the jugfile (issue
