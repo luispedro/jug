@@ -16,3 +16,7 @@ script:
   - cd _test
   - nosetests jug
   - jug -h
+  - cp ../jug/tests/jugfiles/run-simple-create-file.py .
+  - jug execute run-simple-create-file.py
+  - test -f test-result.txt
+
