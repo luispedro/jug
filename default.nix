@@ -10,7 +10,7 @@ in
 pythonPackages.buildPythonPackage {
   name = "jug-${version}";
   buildInputs = [
-    pythonPackages.nose
+    pythonPackages.pytest
   ];
   propagatedBuildInputs = [
     python

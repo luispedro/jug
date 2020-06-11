@@ -1,7 +1,7 @@
 import inspect
 import os
 
-from jug.tests.task_reset import task_reset
+from .task_reset import task_reset_at_exit, task_reset
 from jug.tests.utils import simple_execute
 import jug.jug
 

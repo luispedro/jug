@@ -9,8 +9,8 @@ import jug.subcommands.shell
 from jug.task import Task
 from jug.backends.dict_store import dict_store
 from jug.options import Options, default_options
-from jug.tests.utils import simple_execute
-from jug.tests.task_reset import task_reset
+from .utils import simple_execute
+from .task_reset import task_reset_at_exit, task_reset
 jug.jug.silent = True
 
 

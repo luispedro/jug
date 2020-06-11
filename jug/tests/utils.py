@@ -1,23 +1,25 @@
-from nose.tools import with_setup
+import inspect
+from os import path
+import pytest
+
+@pytest.fixture(scope='function')
+def tmp_file_store(tmpdir):
+    from jug.backends.file_store import file_store
+    from jug import task
+    prev = task.Task.store
+    yield file_store(str(tmpdir))
+    task.Task.store = prev
+
 
 def simple_execute():
     from jug.jug import execution_loop
     from jug.task import alltasks
-    from jug.options import default_options
-    execution_loop(alltasks, default_options)
+    from jug.options import parse
+    execution_loop(alltasks, parse(['execute']))
 
-def remove_files(flist, dlist=[]):
-    def teardown():
-        from os import unlink
-        for f in flist:
-            try:
-                unlink(f)
-            except:
-                pass
-        from shutil import rmtree
-        for dir in dlist:
-            try:
-                rmtree(dir)
-            except:
-                pass
-    return with_setup(None, teardown)
+_jugdir = path.abspath(inspect.getfile(inspect.currentframe()))
+_jugdir = path.join(path.dirname(_jugdir), 'jugfiles')
+
+def find_test_jugfile(jugfile):
+    return path.join(_jugdir, jugfile)
+

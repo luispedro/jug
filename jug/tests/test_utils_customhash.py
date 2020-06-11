@@ -2,7 +2,7 @@ import inspect
 import os
 
 from jug.tests.utils import simple_execute
-from jug.tests.task_reset import task_reset
+from .task_reset import task_reset, task_reset_at_exit
 import jug.jug
 
 

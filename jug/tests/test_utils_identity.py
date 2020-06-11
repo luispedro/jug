@@ -1,5 +1,5 @@
 from jug.utils import identity
-from .task_reset import task_reset
+from .task_reset import task_reset_at_exit, task_reset
 
 @task_reset
 def test_utils_identity():

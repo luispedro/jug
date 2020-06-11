@@ -3,13 +3,8 @@ import jug.backends.redis_store
 import jug.backends.file_store
 import jug.backends.dict_store
 from jug.backends.redis_store import redis
-from nose.tools import with_setup
-from nose import SkipTest
+import pytest
 import six
-
-_storedir = 'jugtests'
-def _remove_file_store():
-    jug.backends.file_store.file_store.remove_store(_storedir)
 
 if not os.getenv('TEST_REDIS'):
     redis = None
@@ -19,121 +14,105 @@ try:
 except:
     redisConnectionError = SystemError
 
-def test_stores():
-    def load_get(store):
+@pytest.fixture(scope='function', params=['file', 'dict', 'redis'])
+def store(tmpdir, request):
+    if request.param == 'file':
+        tmpdir = str(tmpdir)
+        yield jug.backends.file_store.file_store(tmpdir)
+        jug.backends.file_store.file_store.remove_store(tmpdir)
+    elif request.param == 'dict':
+        yield jug.backends.dict_store.dict_store()
+    elif request.param == 'redis':
+        if redis is None:
+            pytest.skip()
         try:
-            assert len(list(store.list())) == 0
-            key = six.b('jugisbestthingever')
-            assert not store.can_load(key)
-            object = list(range(232))
-            store.dump(object, key)
-            assert store.can_load(key)
-            assert store.load(key) == object
-
-            flist = list(store.list())
-            assert len(flist) == 1
-            assert flist[0] == key
-
-            store.remove(key)
-            assert not store.can_load(key)
-            store.close()
+            st = jug.redis_store.redis_store('redis:')
+            yield st
+            st.close()
         except redisConnectionError:
-            raise SkipTest()
+            pytest.skip()
 
+def test_load_get(store):
+    assert len(list(store.list())) == 0
+    key = six.b('jugisbestthingever')
+    assert not store.can_load(key)
+    object = list(range(232))
+    store.dump(object, key)
+    assert store.can_load(key)
+    assert store.load(key) == object
 
-    def lock(store):
-        try:
-            assert len(list(store.listlocks())) == 0
-            key = six.b('jugisbestthingever')
-            lock = store.getlock(key)
-            assert not lock.is_locked()
-            assert lock.get()
-            assert not lock.get()
-            lock2 = store.getlock(key)
-            assert not lock2.get()
-            assert len(list(store.listlocks())) == 1
-            lock.release()
-            assert lock2.get()
-            lock2.release()
-            store.close()
-        except redisConnectionError:
-            raise SkipTest()
-    def lock_remove(store):
-        try:
-            assert len(list(store.listlocks())) == 0
-            key = six.b('jugisbestthingever')
-            lock = store.getlock(key)
-            assert not lock.is_locked()
-            assert lock.get()
-            assert not lock.get()
-            assert len(list(store.listlocks())) == 1
-            store.remove_locks()
-            assert len(list(store.listlocks())) == 0
-            store.close()
-        except redisConnectionError:
-            raise SkipTest()
-    def lock_fail(store):
-        try:
-            assert len(list(store.listlocks())) == 0
-            key = six.b('jugisbestthingever')
-            lock = store.getlock(key)
-            assert not lock.is_locked()
-            assert lock.get()
-            assert not lock.get()
-            lock.fail()
-            assert lock.is_failed()
-            assert len(list(store.listlocks())) == 1
-            store.remove_locks()
-            assert not lock.is_failed()
-            assert len(list(store.listlocks())) == 0
-            store.close()
-        except redisConnectionError:
-            raise SkipTest()
-    def lock_fail_other(store):
-        # is_failed should return True even if we can't acquire the lock
-        try:
-            assert len(list(store.listlocks())) == 0
-            key = six.b('jugisbestthingever')
-            lock1 = store.getlock(key)
-            lock2 = store.getlock(key)
-            assert not lock1.is_locked()
-            assert not lock2.is_locked()
-            assert lock1.get()
-            assert not lock2.get()
-            assert not lock1.is_failed()
-            assert not lock2.is_failed()
-            lock1.fail()
-            assert lock2.is_failed()
-            assert len(list(store.listlocks())) == 1
-            store.remove_locks()
-            assert not lock1.is_failed()
-            assert not lock2.is_failed()
-            assert len(list(store.listlocks())) == 0
-            store.close()
-        except redisConnectionError:
-            raise SkipTest()
-    functions = (load_get, lock, lock_remove, lock_fail, lock_fail_other)
-    stores = [
-            lambda: jug.backends.file_store.file_store('jugtests'),
-            jug.backends.dict_store.dict_store,
-            ]
-    if redis is not None:
-        stores.append(
-            lambda: jug.redis_store.redis_store('redis:')
-            )
-    teardowns = (None, _remove_file_store, None)
-    for f in functions:
-        for s,tear in zip(stores,teardowns):
-            f.teardown = tear
-            yield f, s()
+    flist = list(store.list())
+    assert len(flist) == 1
+    assert flist[0] == key
 
-@with_setup(teardown=_remove_file_store)
-def test_numpy_array():
+    store.remove(key)
+    assert not store.can_load(key)
+
+def test_lock(store):
+    assert len(list(store.listlocks())) == 0
+    key = six.b('jugisbestthingever')
+    lock = store.getlock(key)
+    assert not lock.is_locked()
+    assert lock.get()
+    assert not lock.get()
+    lock2 = store.getlock(key)
+    assert not lock2.get()
+    assert len(list(store.listlocks())) == 1
+    lock.release()
+    assert lock2.get()
+    lock2.release()
+
+def test_lock_remove(store):
+    assert len(list(store.listlocks())) == 0
+    key = six.b('jugisbestthingever')
+    lock = store.getlock(key)
+    assert not lock.is_locked()
+    assert lock.get()
+    assert not lock.get()
+    assert len(list(store.listlocks())) == 1
+    store.remove_locks()
+    assert len(list(store.listlocks())) == 0
+
+def test_lock_fail(store):
+    assert len(list(store.listlocks())) == 0
+    key = six.b('jugisbestthingever')
+    lock = store.getlock(key)
+    assert not lock.is_locked()
+    assert lock.get()
+    assert not lock.get()
+    lock.fail()
+    assert lock.is_failed()
+    assert len(list(store.listlocks())) == 1
+    store.remove_locks()
+    assert not lock.is_failed()
+    assert len(list(store.listlocks())) == 0
+
+def test_lock_fail_other(store):
+    # is_failed should return True even if we can't acquire the lock
+    assert len(list(store.listlocks())) == 0
+    key = six.b('jugisbestthingever')
+    lock1 = store.getlock(key)
+    lock2 = store.getlock(key)
+    assert not lock1.is_locked()
+    assert not lock2.is_locked()
+    assert lock1.get()
+    assert not lock2.get()
+    assert not lock1.is_failed()
+    assert not lock2.is_failed()
+    lock1.fail()
+    assert lock2.is_failed()
+    assert len(list(store.listlocks())) == 1
+    store.remove_locks()
+    assert not lock1.is_failed()
+    assert not lock2.is_failed()
+    assert len(list(store.listlocks())) == 0
+
+def test_numpy_array(tmpdir):
     try:
         import numpy as np
     except ImportError:
-        raise SkipTest()
-    store = jug.backends.file_store.file_store(_storedir)
+        pytest.skip()
+    store = jug.backends.file_store.file_store(str(tmpdir))
     arr = np.arange(100) % 17
     arr = arr.reshape((10,10))
     key = 'mykey'
@@ -143,13 +122,12 @@ def test_numpy_array():
     store.remove(key)
     store.close()
 
-@with_setup(teardown=_remove_file_store)
-def test_numpy_array_no_compress():
+def test_numpy_array_no_compress(tmpdir):
     try:
         import numpy as np
     except ImportError:
-        raise SkipTest()
-    store = jug.backends.file_store.file_store(_storedir, compress_numpy=False)
+        pytest.skip()
+    store = jug.backends.file_store.file_store(str(tmpdir), compress_numpy=False)
     arr = np.arange(100) % 17
     arr = arr.reshape((10,10))
     key = 'mykey'

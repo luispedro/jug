@@ -1,7 +1,7 @@
 import jug.options
 
 from six import StringIO
-from nose.tools import raises
+from pytest import raises
 
 def test_chaining():
     first = jug.options.Options(None)
@@ -18,12 +18,12 @@ def test_chaining():
     assert second.one == 1
     assert second.two == 'two'
     assert third.three == 'three'
-    @raises(AttributeError)
-    def not_present_key(obj, key):
-        return obj.key
 
-    yield not_present_key, first, 'two'
-    yield not_present_key, second, 'three'
+    with raises(AttributeError):
+        first.two
+
+    with raises(AttributeError):
+        second.three
 
 _options_file = '''
 [main]

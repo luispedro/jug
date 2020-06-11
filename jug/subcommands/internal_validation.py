@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,15 +43,13 @@ class InternalValidationCommand(SubCommand):
 
     def run(self, *args, **kwargs):
         try:
-            import nose
+            import pytest
         except ImportError:
-            logging.critical('jug test requires nose library')
+            logging.critical('jug test requires pytest library')
             return
         currentdir = path.dirname(__file__)
         updir = path.join(currentdir, '..')
-        argv = ['', '--exe', '-w', updir]
-        argv.append('--verbose')
-        return nose.run('jug', argv=argv)
+        return pytest.main([updir])
 
 
 internal_validation = InternalValidationCommand()

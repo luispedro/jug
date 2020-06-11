@@ -6,7 +6,7 @@ import jug.task
 import jug.subcommands.check
 from jug.task import Task
 from jug.backends.dict_store import dict_store
-from jug.tests.task_reset import task_reset
+from jug.tests.task_reset import task_reset_at_exit, task_reset
 from jug.tests.utils import simple_execute
 from jug.options import default_options
 

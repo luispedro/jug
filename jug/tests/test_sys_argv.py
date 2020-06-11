@@ -2,7 +2,7 @@
 
 import sys
 import tempfile
-from .task_reset import task_reset
+from .task_reset import task_reset_at_exit, task_reset
 from jug.jug import init
 from jug.options import parse
 from jug.subcommands.execute import execute

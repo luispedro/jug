@@ -2,15 +2,16 @@ import inspect
 import os
 
 import numpy as np
+from functools import reduce
 
 import jug.mapreduce
+import jug.utils
+
 from jug.backends.dict_store import dict_store
 from jug.tests.utils import simple_execute
 from jug.mapreduce import _break_up, _get_function
 from jug import value, TaskGenerator
-from jug.tests.task_reset import task_reset
-import jug.utils
-from functools import reduce
+from .task_reset import task_reset_at_exit, task_reset
 
 
 _jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))

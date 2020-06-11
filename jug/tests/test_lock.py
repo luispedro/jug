@@ -1,18 +1,14 @@
 from jug.backends.file_store import file_store, file_based_lock, file_keepalive_based_lock
 from jug.backends.dict_store import dict_store
-from jug.tests.task_reset import task_reset
+from jug.tests.utils import tmp_file_store
+from .task_reset import task_reset_at_exit, task_reset
 from jug.backends import memoize_store
-from nose.tools import with_setup
 from jug import Task
 from time import sleep
 
-_storedir = 'jugtests'
-def _remove_file_store():
-    file_store.remove_store(_storedir)
 
-@with_setup(teardown=_remove_file_store)
-def test_twice():
-    lock = file_based_lock(_storedir, 'foo')
+def test_twice(tmpdir):
+    lock = file_based_lock(str(tmpdir), 'foo')
     assert lock.get()
     assert not lock.get()
     lock.release()
@@ -21,10 +17,9 @@ def test_twice():
     assert not lock.get()
     lock.release()
 
-@with_setup(teardown=_remove_file_store)
-def test_twolocks():
-    foo = file_based_lock(_storedir, 'foo')
-    bar = file_based_lock(_storedir, 'bar')
+def test_twolocks(tmpdir):
+    foo = file_based_lock(str(tmpdir), 'foo')
+    bar = file_based_lock(str(tmpdir), 'bar')
     assert foo.get()
     assert bar.get()
     assert not foo.get()
@@ -33,9 +28,8 @@ def test_twolocks():
     bar.release()
 
 
-@with_setup(teardown=_remove_file_store)
-def test_fail_and_lock():
-    lock = file_based_lock(_storedir, 'foo')
+def test_fail_and_lock(tmpdir):
+    lock = file_based_lock(str(tmpdir), 'foo')
     assert not lock.is_failed()
     assert not lock.is_locked()
 
@@ -68,9 +62,7 @@ def double(x):
     return x*2
 
 @task_reset
-@with_setup(teardown=_remove_file_store)
-def test_memoize_lock():
-    Task.store = file_store(_storedir)
+def test_memoize_lock(tmp_file_store):
 
     t = Task(double, 2)
     assert t.lock()
@@ -80,9 +72,8 @@ def test_memoize_lock():
     t2 = Task(double, 2)
     assert t2.is_locked()
 
-@with_setup(teardown=_remove_file_store)
-def test_lock_bytes():
-    store = file_store(_storedir)
+def test_lock_bytes(tmp_file_store):
+    store = tmp_file_store
     lock = store.getlock('foo')
     lock2 = store.getlock(b'foo')
     assert lock.fullname == lock2.fullname
@@ -94,9 +85,8 @@ def test_lock_bytes2():
     lock.get()
     assert lock2.is_locked()
 
-@with_setup(teardown=_remove_file_store)
-def test_lock_keepalive():
-    lock = file_keepalive_based_lock(_storedir, 'foo')
+def test_lock_keepalive(tmpdir):
+    lock = file_keepalive_based_lock(str(tmpdir), 'foo')
     assert lock.monitor is None
     assert lock.get()
     assert lock.monitor.poll() is None

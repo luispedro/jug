@@ -1,20 +1,15 @@
-import inspect
-import os
-
 import jug.jug
 import jug.task
 from jug.task import Task
 from jug.tests.utils import simple_execute
 from jug.backends.dict_store import dict_store
-from jug.options import default_options
-from .task_reset import task_reset
+from jug.options import parse
+from .task_reset import task_reset_at_exit, task_reset
+from .utils import find_test_jugfile
+import pytest
 
 import random
 jug.jug.silent = True
-
-
-_jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
-_jugdir = os.path.join(os.path.dirname(_jugdir), 'jugfiles')
 
 
 @task_reset
@@ -49,28 +44,28 @@ def test_jug_execute_deps():
     assert False not in A
     assert max(store.counts.values()) < 5
 
-def test_aggressive_unload():
+@pytest.mark.parametrize('jugfile',
+      ['tasklet_simple.py',
+      'tasklets.py',
+      'barrier_mapreduce.py',
+      'compound_nonsimple.py',
+      'slice_task.py'])
+def test_aggressive_unload(jugfile):
     from jug.jug import execution_loop
     from jug.task import alltasks
-    from jug.options import default_options
-    options = default_options.copy()
+
+    options = parse(['execute'])
     options.aggressive_unload = True
-    @task_reset
-    def run_jugfile(jugfile):
-        store, space = jug.jug.init(jugfile, 'dict_store')
-        execution_loop(alltasks, options)
-    yield run_jugfile, os.path.join(_jugdir, 'tasklet_simple.py')
-    yield run_jugfile, os.path.join(_jugdir, 'tasklets.py')
-    yield run_jugfile, os.path.join(_jugdir, 'barrier_mapreduce.py')
-    yield run_jugfile, os.path.join(_jugdir, 'compound_nonsimple.py')
-    yield run_jugfile, os.path.join(_jugdir, 'slice_task.py')
+    options.execute_target = None
+    store, space = jug.jug.init(find_test_jugfile(jugfile), 'dict_store')
+    execution_loop(alltasks, options)
 
 @task_reset
 def test_target_exact():
     from jug.jug import execution_loop
     from jug.task import alltasks
-    options = default_options.copy()
-    options.jugfile = os.path.join(_jugdir, 'simple.py')
+    options = parse(['execute'])
+    options.jugfile = find_test_jugfile('simple.py')
     # Test if restricting to this target we skip the other tasks
     options.execute_target = "simple.double"
 
@@ -84,8 +79,8 @@ def test_target_exact():
 def test_target_wild():
     from jug.jug import execution_loop
     from jug.task import alltasks
-    options = default_options.copy()
-    options.jugfile = os.path.join(_jugdir, 'simple_multiple.py')
+    options = parse(['execute'])
+    options.jugfile = find_test_jugfile('simple_multiple.py')
     # Test if restricting to this target we skip the other tasks
     options.execute_target = "simple_multiple.sum_"
 
@@ -99,8 +94,8 @@ def test_target_wild():
 def test_failed_task_keep_going():
     from jug.jug import execution_loop
     from jug.task import alltasks
-    options = default_options.copy()
-    options.jugfile = os.path.join(_jugdir, 'failing.py')
+    options = parse(['execute'])
+    options.jugfile = find_test_jugfile('failing.py')
     # these 3 silence errors during execution and ensure jug isn't kept waiting
     options.execute_keep_going = True
     options.execute_nr_wait_cycles = 1
@@ -108,6 +103,7 @@ def test_failed_task_keep_going():
     # keep_failed ensures errored tasks are marked as failed
     options.execute_keep_failed = True
 
+    options.execute_target = None
     store, space = jug.jug.init(options.jugfile, 'dict_store')
     # the failing.py jugfile has a total of 20 reachable tasks
     assert len(alltasks) == 20
@@ -127,10 +123,11 @@ def test_failed_task():
     from jug.jug import execution_loop
     from jug.task import alltasks
     from jug.tests.jugfiles.exceptions import FailingTask
-    options = default_options.copy()
-    options.jugfile = os.path.join(_jugdir, 'failing.py')
+    options = parse(['execute'])
+    options.jugfile = find_test_jugfile('failing.py')
     # keep_failed ensures errored tasks are marked as failed
     options.execute_keep_failed = True
+    options.execute_target = None
 
     store, space = jug.jug.init(options.jugfile, 'dict_store')
     # the failing.py jugfile has a total of 20 reachable tasks

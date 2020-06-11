@@ -2,8 +2,8 @@ import inspect
 import os
 
 import jug.task
-from jug.tests.task_reset import task_reset
-from jug.tests.utils import simple_execute
+from .task_reset import task_reset_at_exit, task_reset
+from .utils import simple_execute
 
 
 _jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))

@@ -6,7 +6,7 @@ python:
   - "3.7"
 sudo: false
 install:
-  - pip install numpy
+  - pip install pytest
   - pip install six
   - pip install redis
   - pip install pyyaml
@@ -14,8 +14,7 @@ install:
 script:
   - mkdir _test
   - cd _test
-  - nosetests jug
-  - jug -h
+  - jug test-jug
   - cp ../jug/tests/jugfiles/run-simple-create-file.py .
   - jug execute run-simple-create-file.py
   - test -f test-result.txt

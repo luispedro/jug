@@ -72,7 +72,6 @@ setuptools.setup(name = 'Jug',
           ],
       },
       scripts = ['bin/jug-execute'],
-      test_suite = 'nose.collector',
       install_requires=['six', 'redis'],
       )
 

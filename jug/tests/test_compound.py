@@ -8,7 +8,7 @@ from jug.backends.dict_store import dict_store
 from jug.tests.utils import simple_execute
 from jug.compound import CompoundTask
 from jug.tests.test_mapreduce import mapper, reducer, dfs_run
-from jug.tests.task_reset import task_reset
+from jug.tests.task_reset import task_reset_at_exit, task_reset
 
 
 _jugdir = os.path.abspath(inspect.getfile(inspect.currentframe()))
