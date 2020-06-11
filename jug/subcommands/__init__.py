@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -284,7 +284,7 @@ class SubCommandManager:
 jug SUBCOMMAND [JUGFILE] [OPTIONS...]
 
 Docs: https://jug.readthedocs.io/
-Copyright: 2008-2019, Luis Pedro Coelho
+Copyright: 2008-2020, Luis Pedro Coelho
 Citation: http://doi.org/10.5334/jors.161
 
 If you use Jug for generating results for a peer-reviewed publication, please
