@@ -2,6 +2,19 @@
 History
 =======
 
+Version 2.0.1
+-------------
+
+*Released Thu Jun 11 2020*
+
+Bugfixes
+~~~~~~~~
+
+- Fix handling of ``JUG_EXIT_IF_FILE_EXISTS`` environmental variable
+- Fix passing an argument to ``jug.main()`` function
+- Extend ``--pdb`` to exceptions raised while importing the jugfile (issue #79)
+
+
 Version 2.0.0
 -------------
 

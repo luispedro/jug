@@ -134,7 +134,15 @@ the `value` function::
 What's New
 ----------
 
+
+Version 2.0.1 (Thu Jun 11 2020)
+
+- Fix handling of ``JUG_EXIT_IF_FILE_EXISTS`` environmental variable
+- Fix passing an argument to ``jug.main()`` function
+- Extend ``--pdb`` to exceptions raised while importing the jugfile (issue #79)
+
 version **2.0.0** (Fri Feb 21 2020)
+
 - jug.backend.base_store has 1 new method 'listlocks'
 - jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
 - Add 'jug execute --keep-failed' to preserve locks on failing tasks.
