@@ -244,7 +244,8 @@ def main(argv=None):
     from .options import parse
     if argv is None:
         from sys import argv
-    options = parse(argv)
+    # The interface to `parse` requires us to skip the first element:
+    options = parse(argv[1:])
     jugspace = None
     store = None
 

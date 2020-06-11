@@ -219,10 +219,14 @@ def parse(args=None, optionsfile=None):
     '''
     import argparse
     from .subcommands import cmdapi
+    import sys
 
     if args is None:
-        if len(sys.argv) <= 1:
-            cmdapi.usage()
+        # If reading from sys.argv, argparse discards the first argument
+        # Since we filter sys.argv manually, we do the same here
+        args = sys.argv[1:]
+    if not args:
+        cmdapi.usage()
 
     parser = argparse.ArgumentParser(
         description=cmdapi.usage(_print=False, exit=False),
@@ -239,11 +243,6 @@ def parse(args=None, optionsfile=None):
     for sub in subparsers:
         define_options(sub)
         sub.add_argument('user_args', nargs='*', default=[])
-
-    if args is None:
-        # If reading from sys.argv, argparse discards the first argument
-        # Since we filter sys.argv manually, we do the same here
-        args = sys.argv[1:]
 
     argopts = parser.parse_args(args)
 

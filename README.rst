@@ -134,6 +134,9 @@ the `value` function::
 What's New
 ----------
 
+Version 2.0.2 (Thu Jun 11 2020)
+
+- Fix command line argument parsing
 
 Version 2.0.1 (Thu Jun 11 2020)
 

@@ -2,6 +2,16 @@
 History
 =======
 
+Version 2.0.2
+-------------
+
+*Released Thu Jun 11 2020*
+
+Bugfixes
+~~~~~~~~
+
+- Fix command line argument parsing
+
 Version 2.0.1
 -------------
 
