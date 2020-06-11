@@ -15,3 +15,4 @@ script:
   - mkdir _test
   - cd _test
   - nosetests jug
+  - jug -h
