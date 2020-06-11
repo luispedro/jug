@@ -31,4 +31,4 @@ def test_describe_load():
     import json
     assert desc == json.load(open('x.meta.json'))
     import yaml
-    assert desc == yaml.load(open('x.meta.yaml'))
+    assert desc == yaml.safe_load(open('x.meta.yaml'))
