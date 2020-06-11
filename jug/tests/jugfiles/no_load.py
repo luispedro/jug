@@ -11,7 +11,7 @@ def sum_partials(ts):
     total = 0.0
 
     for t in ts:
-        total+= jug.value(t.t)
+        total+= jug.value(t.base)
     return total
 
 @jug.TaskGenerator
