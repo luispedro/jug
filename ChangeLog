@@ -2,6 +2,7 @@ Unreleased
 	* Removed Python 2.7 support
 	* Fix output encoding for Python 3.8
 	* Fix bug mixing mapreduce() & status --cache
+	* Add type hints where appropriate (makes Jug Python 3.5+ only)
 
 Version 2.0.2 Thu Jun 11 2020 by luispedro
 	* Fix jug argument parsing

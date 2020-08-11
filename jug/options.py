@@ -95,11 +95,11 @@ def load_default_options(opt):
 default_options = Options(None, autoinit=load_default_options)
 
 
-def _str_to_bool(s):
+def _str_to_bool(s: str) -> bool:
     return s.lower() not in ('', '0', 'false', 'off')
 
 
-def key_to_option(s):
+def key_to_option(s: str) -> str:
     return s.replace('-', '_')
 
 

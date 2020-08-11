@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -136,7 +136,7 @@ tricky to support since the general code relies on the function name)''')
         return self.result
 
 
-    def can_run(self):
+    def can_run(self) -> bool:
         '''
         bool = task.can_run()
 
@@ -241,7 +241,7 @@ tricky to support since the general code relies on the function name)''')
                     queue.append(iter(dep.values()))
 
 
-    def can_load(self, store=None):
+    def can_load(self, store=None) -> bool:
         '''
         bool = task.can_load()
 
@@ -427,7 +427,7 @@ class Tasklet(TaskletMixin):
     def __jug_value__(self):
         return self.f(value(self.base))
 
-    def can_load(self):
+    def can_load(self) -> bool:
         return self.base.can_load()
 
     def _base_hash(self):

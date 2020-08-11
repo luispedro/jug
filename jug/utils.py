@@ -24,6 +24,7 @@
 import os
 import re
 from functools import partial
+import typing
 
 from .task import Task, TaskGenerator, Tasklet, value
 
@@ -161,7 +162,7 @@ def timed_path(path):
     return CustomHash(path, hash_with_mtime_size)
 
 
-def prepare_task_matcher(pattern):
+def prepare_task_matcher(pattern : str):
     if re.match(r'/.*/', pattern):
         # Looks like a regular expression
         regex = re.compile(pattern.strip('/'))
@@ -178,7 +179,7 @@ def prepare_task_matcher(pattern):
 
 
 @TaskGenerator
-def jug_execute(args, check_exit=True, run_after=None, return_value=None):
+def jug_execute(args, check_exit: bool = True, run_after: typing.Optional[bool] = None, return_value=None):
     '''jug_execute(args, check_exit=True, run_after=None, return_value=None)
 
     Wrapper around ``subprocess.call()``
@@ -235,7 +236,7 @@ def sync_move(src, dst):
     fsync_dir(src)
     rename(src, dst)
 
-def glob_sort(pat):
+def glob_sort(pat : str) -> typing.List[str]:
     '''Glob and sort
 
     Parameters
@@ -251,7 +252,7 @@ def glob_sort(pat):
     rs.sort()
     return rs
 
-def cached_glob(pat):
+def cached_glob(pat : str):
     '''
     A short-hand for
 
