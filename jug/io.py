@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2013-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -44,14 +44,15 @@ def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadat
     from .task import describe
     if metadata_fname is not None:
         description = describe(result.t)
-        if metadata_format.lower() == 'yaml':
-            import yaml
-            yaml.dump(description, open(metadata_fname, 'w'))
-        elif metadata_format.lower() == 'json':
-            import json
-            json.dump(description, open(metadata_fname, 'w'))
-        else:
-            raise ValueError('jug.io.write_task_out: Unknown metadata format "{}" [supported are "yaml" and "json"]'.format(metadata_format))
+        with open(metadata_fname, 'w') as output:
+            if metadata_format.lower() == 'yaml':
+                import yaml
+                yaml.dump(description, output)
+            elif metadata_format.lower() == 'json':
+                import json
+                json.dump(description, output)
+            else:
+                raise ValueError('jug.io.write_task_out: Unknown metadata format "{}" [supported are "yaml" and "json"]'.format(metadata_format))
     try:
         import numpy as np
         if isinstance(result_value, np.ndarray):
@@ -61,7 +62,8 @@ def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadat
         pass
     if oname is not None:
         import pickle
-        pickle.dump(result_value, open(oname, 'wb'))
+        with open(oname, 'wb') as output:
+            pickle.dump(result_value, output)
 
 def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     '''
