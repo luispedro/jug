@@ -134,6 +134,10 @@ the `value` function::
 What's New
 ----------
 
+Version 2.0.3 (20 Sep 2020)
+
+- Fix for Python 2.8
+
 Version 2.0.2 (Thu Jun 11 2020)
 
 - Fix command line argument parsing

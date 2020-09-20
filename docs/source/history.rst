@@ -2,6 +2,17 @@
 History
 =======
 
+Version 2.0.3
+-------------
+
+*Released September 20 2020*
+
+Bugfixes
+~~~~~~~~
+
+- Fix for Python 3.8
+
+
 Version 2.0.2
 -------------
 
