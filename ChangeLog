@@ -1,4 +1,4 @@
-Unreleased
+Version 2.0.3 Sep 20 2020 by luispedro
 	* Fix output encoding for Python 3.8
 
 Version 2.0.2 Thu Jun 11 2020 by luispedro
