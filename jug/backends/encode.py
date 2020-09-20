@@ -93,6 +93,7 @@ class compress_stream(object):
 
     def write(self, s):
         MAX_BLOCK = 2000000000
+        s = memoryview(s)
         if len(s) > MAX_BLOCK:
             self.stream.write(self.C.compress(s[:MAX_BLOCK]))
             self.write(s[MAX_BLOCK:])
