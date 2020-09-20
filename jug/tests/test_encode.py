@@ -10,6 +10,9 @@ def test_encode():
 def test_numpy():
     assert np.all(decode(encode(np.arange(33))) == np.arange(33))
 
+    x = decode(encode({'res': np.arange(1024*1024)}))
+    assert np.all(x['res'] == np.arange(1024*1024))
+
 
 def test_decompress_stream_seek():
     s = encode(list(range(33)))
