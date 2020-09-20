@@ -1,4 +1,5 @@
 Unreleased
+	* Removed Python 2.7 support
 	* Fix output encoding for Python 3.8
 
 Version 2.0.2 Thu Jun 11 2020 by luispedro
