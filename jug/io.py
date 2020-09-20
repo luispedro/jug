@@ -43,7 +43,7 @@ class NoLoad(Tasklet):
 def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadata_format='yaml'):
     from .task import describe
     if metadata_fname is not None:
-        description = describe(result.t)
+        description = describe(result.base)
         with open(metadata_fname, 'w') as output:
             if metadata_format.lower() == 'yaml':
                 import yaml
