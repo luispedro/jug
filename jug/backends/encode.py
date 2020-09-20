@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2019, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -87,6 +87,8 @@ class compress_stream(object):
 
     def read(self, *args, **kwargs):
         raise NotImplementedError("compress_stream.read only exists to make numpy treat compress_stream as a file-object")
+    def readinto(self, buf):
+        raise NotImplementedError("compress_stream.readinto only exists to make numpy treat compress_stream as a file-object")
 
 
     def write(self, s):
@@ -129,6 +131,15 @@ class decompress_stream(object):
             res += self.D.decompress(buf, nbytes - len(res))
         self.lastread = res
         return res
+
+    def readinto(self, buf):
+        # FIXME: this is a very-bad-awful implementation, but it is needed for
+        # Python 3.8
+        buf = memoryview(buf)
+        block = self.read(len(buf))
+        buf[:len(block)] = block
+        return len(block)
+
 
     def seek(self, offset, whence):
         if whence != 1:
