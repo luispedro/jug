@@ -176,6 +176,10 @@ class block_access(TaskletMixin):
         self._hvalue = value
         return value
 
+
+    def __jug_dependencies__(self):
+        return self.blocks
+
     def __jug_value__(self):
         from .task import value
         return [value(self[i]) for i in range(len(self))]

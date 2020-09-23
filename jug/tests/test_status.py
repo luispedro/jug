@@ -41,6 +41,19 @@ def test_cache():
     assert status.status(options) == 8 * 4
 
 @task_reset
+def test_cache_block_status():
+    jugfile = os.path.join(_jugdir, 'block_access.py')
+
+    options = default_options.copy()
+    options.jugdir = 'dict_store'
+    options.jugfile = jugfile
+    options.verbose = 'quiet'
+    options.status_cache = True
+    options.status_cache_file = ':memory:'
+
+    assert status.status(options) == 0
+
+@task_reset
 def test_cache_bvalue():
     jugfile = os.path.join(_jugdir, 'bvalue.py')
     store, space = jug.jug.init(jugfile, 'dict_store')

@@ -231,7 +231,9 @@ tricky to support since the general code relies on the function name)''')
         while queue:
             deps = queue.pop()
             for dep in deps:
-                if isinstance(dep, TaskletMixin):
+                if hasattr(dep, '__jug_dependencies__'):
+                    queue.append(dep.__jug_dependencies__())
+                elif isinstance(dep, Task):
                     yield dep
                 elif isinstance(dep, (list, tuple)):
                     queue.append(dep)
@@ -414,8 +416,10 @@ class Tasklet(TaskletMixin):
     def unload_recursive(self):
         self.base.unload_recursive()
 
+
     def dependencies(self):
         yield self.base
+    __jug_dependencies__ = dependencies
 
     def value(self):
         return self.__jug_value__()
