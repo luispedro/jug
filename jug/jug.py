@@ -249,12 +249,13 @@ def main(argv=None):
     jugspace = None
     store = None
 
+
     try:
         if options.subcommand not in ('demo', 'status', 'execute', 'webstatus', 'test-jug'):
             on_error = ('propagate' if options.pdb else 'exit')
             store, jugspace = init(options.jugfile, options.jugdir, on_error=on_error)
         from .subcommands import cmdapi
-        cmdapi.run(options.subcommand, options=options, store=store, jugspace=jugspace)
+        retval = cmdapi.run(options.subcommand, options=options, store=store, jugspace=jugspace)
     except:
         if options.pdb:
             from .internal.debugger import debug_exception
@@ -264,6 +265,7 @@ def main(argv=None):
     finally:
         if store is not None:
             store.close()
+    sys.exit(retval)
 
 
 if __name__ == '__main__':
