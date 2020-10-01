@@ -54,6 +54,10 @@ You can install Jug with pip::
 
     pip install Jug
 
+and if you are using linux or mac os you can install Jug using::
+
+    pip3 install Jug
+    
 or use, if you are using `conda <http://anaconda.org/>`__, you can install jug
 from `conda-forge <https://conda-forge.github.io/>`__ using the following
 commands::
