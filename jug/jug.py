@@ -260,6 +260,7 @@ def main(argv=None):
         if options.pdb:
             from .internal.debugger import debug_exception
             debug_exception()
+            retval = 1
         else:
             raise
     finally:
