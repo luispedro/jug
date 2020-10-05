@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License : MIT
 
@@ -182,7 +182,10 @@ class block_access(TaskletMixin):
 
     def __jug_value__(self):
         from .task import value
-        return [value(self[i]) for i in range(len(self))]
+        res = []
+        for blk in self.blocks:
+            res.extend(value(blk))
+        return res
 
     def can_load(self):
         return all(b.can_load() for b in self.blocks)
