@@ -5,6 +5,10 @@ python:
   - "3.7"
   - "3.8"
 sudo: false
+
+services:
+  - redis-server
+
 install:
   - pip install pytest
   - pip install six
@@ -14,7 +18,7 @@ install:
 script:
   - mkdir _test
   - cd _test
-  - jug test-jug
+  - TEST_REDIS=1 jug test-jug
   - cp ../jug/tests/jugfiles/run-simple-create-file.py .
   - jug execute run-simple-create-file.py
   - test -f test-result.txt
