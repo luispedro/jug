@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -50,8 +50,8 @@ def _lockname(name):
         name = name.encode('utf-8')
     return six.b('lock:') + name
 
-_LOCKED = 1
-_FAILED = 2
+_LOCKED = b'L'
+_FAILED = b'F'
 
 _redis_urlpat = re.compile(r'redis://(?P<host>[A-Za-z0-9\.\-]+)(\:(?P<port>[0-9]+))?/?')
 
@@ -179,9 +179,9 @@ class redis_lock(base_lock):
     Functions:
     ----------
 
-        * get(): acquire the lock
-        * release(): release the lock
-        * is_locked(): check lock state
+    - get(): acquire the lock
+    - release(): release the lock
+    - is_locked(): check lock state
     '''
 
     def __init__(self, redis, name):
