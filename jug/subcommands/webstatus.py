@@ -140,13 +140,13 @@ class WebStatusCommand(SubCommand):
                             action='store', 
                             dest='webstatus_port',
                             help=('Port for the webstatus serve to listen on'
-                                  '(Default: 8080')
+                                  ' (Default: 8080)')
         )
         parser.add_argument('--ip',
                             action='store',
                             dest='webstatus_ip',
                             help=('The IP address the webstatus server will listen on.'
-                                  '(Default: localhost')
+                                  ' (Default: localhost)')
         )
 
     def parse_defaults(self):
