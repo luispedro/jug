@@ -122,17 +122,38 @@ class WebStatusCommand(SubCommand):
             return
 
         app = bottle.Bottle()
-
         @app.route('/')
         def status():
             ht, deps, rdeps = st.retrieve_sqlite3(connection)
-            tw, tre, tru, tf, dirty = st.update_status(store, ht, deps, rdeps)
+            tw, tre, tru, tfailed, tf, dirty = st.update_status(store, ht, deps, rdeps)
             st.save_dirty3(connection, dirty)
             return template % {
                 'jugfile': options.jugfile,
                 'table': _format_counts(tw, tre, tru, tf),
             }
-        bottle.run(app)
+        bottle.run(app, port=options.webstatus_port,
+                   host=options.webstatus_ip)
+
+    def parse(self, parser):
+        defaults = self.parse_defaults()
+        parser.add_argument('--port',
+                            action='store', 
+                            dest='webstatus_port',
+                            help=('Port for the webstatus serve to listen on'
+                                  '(Default: 8080')
+        )
+        parser.add_argument('--ip',
+                            action='store',
+                            dest='webstatus_ip',
+                            help=('The IP address the webstatus server will listen on.'
+                                  '(Default: localhost')
+        )
+
+    def parse_defaults(self):
+        return {
+            "webstatus_port": '8080',
+            "webstatus_ip": 'localhost'
+        }
 
 
 webstatus = WebStatusCommand()
