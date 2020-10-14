@@ -28,7 +28,9 @@ from . import SubCommand
 template = '''
 <html>
 <head>
-
+<head>
+  <meta http-equiv="refresh" content="%(refresh)s">
+</head>
 <title>Jug Status :: %(jugfile)s</title>
 <style>
 body {
@@ -107,6 +109,7 @@ class WebStatusCommand(SubCommand):
 
         try:
             import bottle
+            from bottle import request
         except ImportError:
             from sys import stderr
             stderr.write('''
@@ -129,10 +132,11 @@ class WebStatusCommand(SubCommand):
             st.save_dirty3(connection, dirty)
             return template % {
                 'jugfile': options.jugfile,
+                'refresh': request.query.refresh or "3",
                 'table': _format_counts(tw, tre, tru, tf),
             }
         bottle.run(app, port=options.webstatus_port,
-                   host=options.webstatus_ip)
+                   host=options.webstatus_ip, quiet=True)
 
     def parse(self, parser):
         defaults = self.parse_defaults()
