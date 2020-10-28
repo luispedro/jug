@@ -21,7 +21,7 @@
 #  THE SOFTWARE.
 
 
-from six.moves import cPickle as pickle
+import pickle
 from six import BytesIO
 import six
 import zlib
@@ -63,12 +63,12 @@ def encode_to(object, stream):
     '''
     if object is None:
         return
-    prefix = six.b('P')
+    prefix = b'P'
     write = lambda obj,s: pickle.dump(obj, s, protocol=pickle.HIGHEST_PROTOCOL)
     try:
         import numpy as np
         if type(object) == np.ndarray:
-            prefix = six.b('N')
+            prefix = b'N'
             # We need to switch the arguments around because pickle.dump and
             # np.save have different argument orders:
             write = (lambda arr,s: np.save(s, arr))
@@ -79,7 +79,7 @@ def encode_to(object, stream):
     write(object, stream)
     stream.flush()
 
-class compress_stream(object):
+class compress_stream:
     def __init__(self, stream):
         self.stream = stream
         self.C = zlib.compressobj()
@@ -105,13 +105,13 @@ class compress_stream(object):
         self.stream.write(self.C.flush())
         self.stream.flush()
 
-class decompress_stream(object):
+class decompress_stream:
     def __init__(self, stream, block=8192):
         self.stream = stream
         self.D = zlib.decompressobj()
         self.block = block
-        self.lastread = six.b('')
-        self.queue = six.b('')
+        self.lastread = b''
+        self.queue = b''
 
     def read(self, nbytes):
         if len(self.queue) >= nbytes:
@@ -120,7 +120,7 @@ class decompress_stream(object):
             self.lastread = res
             return res
         res = self.queue
-        self.queue = six.b('')
+        self.queue = b''
 
         if self.D.unconsumed_tail:
             res += self.D.decompress(self.D.unconsumed_tail, nbytes - len(res))
@@ -156,7 +156,6 @@ class decompress_stream(object):
             self.queue = self.lastread[skip:]
 
     def readline(self):
-        import six
         qi = self.queue.find(six.b('\n'))
         if qi >= 0:
             qi += 1
@@ -211,9 +210,9 @@ def decode_from(stream):
     prefix = stream.read(1)
     if not prefix:
         return None
-    elif prefix == six.b('P'):
+    elif prefix == b'P':
         return pickle.load(stream)
-    elif prefix == six.b('N'):
+    elif prefix == b'N':
         import numpy as np
         return np.load(stream)
     else:

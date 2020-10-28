@@ -45,7 +45,7 @@ def _log_loadable(t):
     logging.info('Loadable {0}...'.format(t.name))
 
 
-class TaskStats(object):
+class TaskStats:
     def __init__(self):
         self.loaded = defaultdict(int)
         self.executed = defaultdict(int)

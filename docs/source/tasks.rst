@@ -58,7 +58,7 @@ makes jug easy to use but has some drawbacks:
 If you control the types of your arguments, you can add a ``__jug_hash__``
 method to your type directly. This method should return a string::
 
-    class MySpecialThing(object):
+    class MySpecialThing:
         def __jug_hash__(self):
             return some_string
 

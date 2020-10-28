@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -112,9 +112,8 @@ class file_store(base_store):
         return path.join(self.jugdir, 'tempfiles')
 
     def _getfname(self, name):
-        import six
-        if type(name) != six.text_type:
-            name = six.text_type(name, 'utf-8')
+        if type(name) != str:
+            name = name.decode('utf-8')
         return path.join(self.jugdir, name[:2], name[2:])
 
 

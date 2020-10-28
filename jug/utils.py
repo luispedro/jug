@@ -73,7 +73,7 @@ def identity(x):
     t.name = 'identity'
     return t
 
-class CustomHash(object):
+class CustomHash:
     '''
     value = CustomHash(obj, hash_function)
 

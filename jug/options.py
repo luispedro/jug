@@ -40,7 +40,7 @@ import six
 import sys
 
 
-class Options(object):
+class Options:
     def __init__(self, next, autoinit=False):
         self.next = next
         self._autoinit = autoinit

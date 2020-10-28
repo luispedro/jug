@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2014-2020, Luis Pedro Coelho <luis@luispedro.org>
 from time import time
 
 def _mean(vs):
     return sum(vs)/float(len(vs))
 
-class TimeTasks(object):
+class TimeTasks:
     def __init__(self):
         from collections import defaultdict
         self.times = defaultdict(list)

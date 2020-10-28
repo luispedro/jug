@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2018, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -27,7 +27,7 @@ __all__ = [
 
 alltasks = []
 
-class _getitem(object):
+class _getitem:
     __slots__ = ('slice',)
     def __init__(self, slice):
         self.slice = slice
@@ -45,7 +45,7 @@ class _getitem(object):
     def __str__(self):
         return 'jug.task._getitem(%s)' % self.slice
 
-class TaskletMixin(object):
+class TaskletMixin:
     __slots__ = ()
     def __getitem__(self, slice):
         return Tasklet(self, _getitem(slice))
@@ -573,7 +573,7 @@ def CachedFunction(f,*args,**kwargs):
         t.run()
     return value(t)
 
-class TaskGenerator(object):
+class TaskGenerator:
     '''
     @TaskGenerator
     def f(arg0, arg1, ...)
@@ -636,7 +636,7 @@ class TaskGenerator(object):
 
 
 # This is lower case to be used like a function
-class iteratetask(object):
+class iteratetask:
     '''
     Examples::
 

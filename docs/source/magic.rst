@@ -57,7 +57,7 @@ rely on the jug hashing machinery to access the optimized version!
 Here is how we'd do it::
 
     import numpy as np
-    class NamedNumpy(object):
+    class NamedNumpy:
         def __init__(self, ifile):
             self.data = np.load(ifile)
             self.name = ifile

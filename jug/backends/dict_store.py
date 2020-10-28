@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2014, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2020, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -25,15 +25,14 @@ dict_store: an in-memory dictionary.
 Does not support multiple processes!
 '''
 
-import six
-from six.moves import cPickle as pickle
+import pickle
 from collections import defaultdict
 
 from .base import base_store, base_lock
 
 def _gen_key(key, name):
-    if type(name) != six.text_type:
-        name = six.text_type(name, 'utf-8')
+    if type(name) != str:
+        name = name.decode('utf-8')
     return '{0}:{1}'.format(key, name).encode('utf-8')
 
 def _resultname(name):
@@ -145,7 +144,7 @@ class dict_store(base_store):
                 # we need a copy of the keys because we change it inside
                 # iteration:
         for k in list(self.store.keys()):
-            if k.startswith(six.b('lock:')):
+            if k.startswith(b'lock:'):
                 del self.store[k]
                 removed += 1
         return removed
@@ -158,7 +157,7 @@ class dict_store(base_store):
         Iterates over all the keys in the store
         '''
         for k in self.store.keys():
-            if k.startswith(six.b('result:')):
+            if k.startswith(b'result:'):
                 yield k[len('result:'):]
 
     def listlocks(self):
@@ -169,7 +168,7 @@ class dict_store(base_store):
         Iterates over all the keys in the store
         '''
         for k in self.store.keys():
-            if k.startswith(six.b('lock:')):
+            if k.startswith(b'lock:'):
                 yield k[len('lock:'):]
 
 

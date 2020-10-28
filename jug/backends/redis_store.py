@@ -26,7 +26,6 @@ redis_store: store based on a redis backend
 
 
 import re
-import six
 import logging
 from base64 import b64encode, b64decode
 from jug.backends.encode import encode, decode
@@ -41,14 +40,14 @@ except ImportError:
     redis_functional = False
 
 def _resultname(name):
-    if type(name) == type(six.u('')):
+    if type(name) == str:
         name = name.encode('utf-8')
-    return six.b('result:') + name
+    return b'result:' + name
 
 def _lockname(name):
-    if type(name) == type(six.u('')):
+    if type(name) == str:
         name = name.encode('utf-8')
-    return six.b('lock:') + name
+    return b'lock:' + name
 
 _LOCKED = b'L'
 _FAILED = b'F'

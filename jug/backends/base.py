@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2011-2020, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -212,7 +212,7 @@ class base_store(object):
 
 
 @add_metaclass(ABCMeta)
-class base_lock(object):
+class base_lock:
     '''
 
     Functions:
