@@ -23,12 +23,18 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install dependencies and Jug
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f test-requirements.txt ]; then pip install -r test-requirements.txt; fi
-    - name: Test with pytest
+        pip install .
+    - name: Test Jug script
       run: |
-        pytest
+        mkdir _test
+        cd _test
+        jug test-jug
+        cp ../jug/tests/jugfiles/run-simple-create-file.py .
+        jug execute run-simple-create-file.py
+        test -f test-result.txt
