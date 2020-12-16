@@ -1,7 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python package
+name: Test Jug
 
 on:
   push:
@@ -30,11 +27,15 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f test-requirements.txt ]; then pip install -r test-requirements.txt; fi
         pip install .
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.1.0
+      with:
+        redis-version: 6
     - name: Test Jug script
       run: |
         mkdir _test
         cd _test
-        jug test-jug
+        TEST_REDIS=1 jug test-jug
         cp ../jug/tests/jugfiles/run-simple-create-file.py .
         jug execute run-simple-create-file.py
         test -f test-result.txt
