@@ -35,6 +35,9 @@ On linux, the package is often called python-setuptools\n''')
 exec(compile(open('jug/jug_version.py').read(), 'jug/jug_version.py', 'exec'))
 long_description = open('README.rst').read()
 
+install_requires = open('requirements.txt').read()
+tests_require = open('test-requirements.txt').read()
+
 classifiers = [
 'Development Status :: 5 - Production/Stable',
 'Environment :: Console',
@@ -56,7 +59,7 @@ classifiers = [
 ]
 
 setuptools.setup(name = 'Jug',
-      version = __version__,
+      version = __version__, # noqa: F821
       description = 'A Task Based Parallelization Framework',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
@@ -72,7 +75,8 @@ setuptools.setup(name = 'Jug',
           ],
       },
       scripts = ['bin/jug-execute'],
-      install_requires=['six', 'redis'],
+      install_requires = install_requires,
+      tests_require = tests_require,
       )
 
 
