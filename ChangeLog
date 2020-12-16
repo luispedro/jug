@@ -4,6 +4,7 @@ Unreleased
 	* Fix bug mixing mapreduce() & status --cache
 	* Make block_access (used in mapreduce()) much faster (20x)
 	* Fix important redis bug
+	* More precise output in `cleanup` command
 
 Version 2.0.2 Thu Jun 11 2020 by luispedro
 	* Fix jug argument parsing
