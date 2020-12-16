@@ -36,7 +36,6 @@ try:
     import redis
     redis_functional = True
 except ImportError:
-    redis = None
     redis_functional = False
 
 def _resultname(name):
@@ -59,7 +58,7 @@ class redis_store(base_store):
     def __init__(self, url):
         '''
         '''
-        if redis is None:
+        if not redis_functional:
             raise IOError('jug.redis_store: redis module is not found!')
         redis_params = {}
         match = _redis_urlpat.match(url)
