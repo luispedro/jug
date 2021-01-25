@@ -96,12 +96,24 @@ def load_jugfile(options):
     h2idx = {}
     ht = []
     deps = {}
-    for i, t in enumerate(task.alltasks):
-        deps[i] = [h2idx[d.hash() if isinstance(d, Task) else d._base_hash()]
-                   for d in t.dependencies()]
-        hash = t.hash()
-        ht.append((i, t.name, hash, unknown))
-        h2idx[hash] = i
+    try:
+        for i, t in enumerate(task.alltasks):
+            deps[i] = [h2idx[d.hash() if isinstance(d, Task) else d._base_hash()]
+                       for d in t.dependencies()]
+            hash = t.hash()
+            ht.append((i, t.name, hash, unknown))
+            h2idx[hash] = i
+    except KeyError:
+        import sys
+        sys.stderr.write("Could not build dependency graph!\n")
+        sys.stderr.write("This normally indicates a bug in your code!\n")
+        sys.stderr.write("\n")
+        sys.stderr.write("A common error is to build a Task with a mutable argument and subsequently modifying.\n")
+        sys.stderr.write("\n")
+        sys.stderr.write("For help, you can use the jug-users mailing-list: https://groups.google.com/g/jug-users\n")
+        sys.stderr.write("\n")
+
+        sys.exit(1)
 
     rdeps = defaultdict(list)
     for k, v in deps.items():
