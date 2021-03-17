@@ -2,6 +2,21 @@
 History
 =======
 
+Version 2.1.0
+-------------
+
+*Released 18 March 2021*
+
+- Improvements to webstatus (by Robert Denham)
+- Removed Python 2.7 support
+- Fix output encoding for Python 3.8
+- Fix bug mixing ``mapreduce()`` & ``status --cache``
+- Make block_access (used in ``mapreduce()``) much faster (20x)
+- Fix important redis bug
+- More precise output in ``cleanup`` command
+
+
+
 Version 2.0.2
 -------------
 

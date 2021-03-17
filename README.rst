@@ -134,6 +134,16 @@ the `value` function::
 What's New
 ----------
 
+Version 2.1.0 (*18 March 2021*)
+
+- Improvements to webstatus (by Robert Denham)
+- Removed Python 2.7 support
+- Fix output encoding for Python 3.8
+- Fix bug mixing ``mapreduce()`` & ``status --cache``
+- Make block_access (used in ``mapreduce()``) much faster (20x)
+- Fix important redis bug
+- More precise output in ``cleanup`` command
+
 Version 2.0.2 (Thu Jun 11 2020)
 
 - Fix command line argument parsing
@@ -154,18 +164,9 @@ version **2.0.0** (Fri Feb 21 2020)
 - Check environmental exit variables by default (suggested by Renato Alves, issue #66)
 - Fix 'jug sleep-until' in the presence of barrier() (issue #71)
 
+For older version see ``ChangeLog`` file or the `full history
+<https://jug.readthedocs.io/en/latest/history.html>`__.
 
-version **1.6.9** (Tue Aug 6 2019)
-
-- Fix saving on newer version of numpy
-
-version **1.6.8** (Wed July 10 2019)
-
-- Add ``cached_glob()`` function
-- Fix NoLoad (issue #73)
-- Fix ``jug shell``'s invalidate function with Tasklets (issue #77)
-
-For older version see ``ChangeLog`` file.
 
 
 

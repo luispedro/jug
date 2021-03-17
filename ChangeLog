@@ -1,4 +1,5 @@
-Unreleased
+Version 2.1.0 Thu 18 Mar 2021 by luispedro
+	* Improvements to webstatus (by Robert Denham)
 	* Removed Python 2.7 support
 	* Fix output encoding for Python 3.8
 	* Fix bug mixing mapreduce() & status --cache
