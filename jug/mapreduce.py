@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License : MIT
 
@@ -29,13 +29,13 @@ def _get_function(f):
     return f
 
 def _jug_map_reduce(reducer, mapper, inputs):
-    from six.moves import reduce
+    from functools import reduce
     reducer = _get_function(reducer)
     mapper = _get_function(mapper)
     return reduce(reducer, _jug_map(mapper, inputs))
 
 def _jug_reduce(reducer, inputs):
-    from six.moves import reduce
+    from functools import reduce
     reducer = _get_function(reducer)
     return reduce(reducer, chain(inputs))
 

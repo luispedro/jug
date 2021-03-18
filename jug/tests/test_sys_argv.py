@@ -7,7 +7,7 @@ from jug.jug import init
 from jug.options import parse
 from jug.subcommands.execute import execute
 import json
-from six import StringIO
+from io import StringIO
 
 
 class catch_stdout:

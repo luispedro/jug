@@ -19,7 +19,6 @@ pythonPackages.buildPythonPackage {
     pythonPackages.pyyaml
     pythonPackages.numpy
     pythonPackages.redis
-    pythonPackages.six
 
     zlib
   ];

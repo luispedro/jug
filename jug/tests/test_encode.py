@@ -1,5 +1,4 @@
-from six import BytesIO
-import six
+from io import BytesIO
 from jug.backends.encode import compress_stream, decompress_stream, encode, decode
 import numpy as np
 def test_encode():
@@ -35,17 +34,17 @@ def test_decompress_stream_seek():
     assert first == second[:6]
 
 def test_decompress_stream_readline():
-    text = six.b("1\n2\n3\n4")
+    text = b"1\n2\n3\n4"
     s = BytesIO()
     cstream = compress_stream(s)
     cstream.write(text)
     cstream.flush()
     dstream = decompress_stream(BytesIO(s.getvalue()))
-    assert dstream.readline() == six.b("1\n")
-    assert dstream.readline() == six.b("2\n")
-    assert dstream.readline() == six.b("3\n")
-    assert dstream.readline() == six.b("4")
-    assert dstream.readline() == six.b("")
+    assert dstream.readline() == b"1\n"
+    assert dstream.readline() == b"2\n"
+    assert dstream.readline() == b"3\n"
+    assert dstream.readline() == b"4"
+    assert dstream.readline() == b""
 
 
 class Derived(np.ndarray):

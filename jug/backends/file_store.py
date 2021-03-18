@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -379,9 +379,8 @@ class file_based_lock(base_lock):
     _FAILED_TIMESTAMP = (1, 1)  # atime, mtime
 
     def __init__(self, jugdir, name):
-        import six
-        if type(name) != six.text_type:
-            name = six.text_type(name, 'utf-8')
+        if type(name) != str:
+            name = str(name, 'utf-8')
         self.fullname = path.join(jugdir, 'locks', '{0}.lock'.format(name))
 
     def get(self):

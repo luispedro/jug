@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2011-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,11 +27,9 @@ backend.
 It can be used as a starting point (template) for writing new backends.
 '''
 
-from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 
-@add_metaclass(ABCMeta)
-class base_store(object):
+class base_store(metaclass=ABCMeta):
     def __init__(self, name):
         '''
         base_store(name)
@@ -211,8 +209,7 @@ class base_store(object):
         return None
 
 
-@add_metaclass(ABCMeta)
-class base_lock:
+class base_lock(metaclass=ABCMeta):
     '''
 
     Functions:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2013, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2011-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,9 +37,7 @@ def hash_update(M, elems):
     M : hashlib object
         This is the same object as the argument
     '''
-    from six.moves import cPickle as pickle
-    from six.moves import map
-    import six
+    import pickle
 
     try:
         import numpy as np
@@ -53,22 +51,22 @@ def hash_update(M, elems):
             M.update(repr(type(e)).encode('utf-8'))
             hash_update(M, enumerate(e))
         elif type(e) == set:
-            M.update(six.b('set'))
+            M.update(b'set')
             # With randomized hashing, different runs of Python might result in
             # different orders, so sort. We cannot trust that all the elements
             # in the set will be comparable, so we convert them to their hashes
             # beforehand.
-            items = list(map(hash_one, e))
+            items = [hash_one(el) for el in e]
             items.sort()
             hash_update(M, enumerate(items))
         elif type(e) == dict:
-            M.update(six.b('dict'))
+            M.update(b'dict')
             items = [(hash_one(k),v) for k,v in e.items()]
             items.sort(key=(lambda k_v:k_v[0]))
 
             hash_update(M, items)
         elif np is not None and type(e) == np.ndarray:
-            M.update(six.b('np.ndarray'))
+            M.update(b'np.ndarray')
             M.update(pickle.dumps(e.dtype))
             M.update(pickle.dumps(e.shape))
             try:

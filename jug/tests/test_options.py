@@ -1,6 +1,6 @@
 import jug.options
 
-from six import StringIO
+from io import StringIO
 from pytest import raises
 
 def test_chaining():

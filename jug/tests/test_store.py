@@ -4,7 +4,6 @@ import jug.backends.file_store
 import jug.backends.dict_store
 from jug.backends.redis_store import redis
 import pytest
-import six
 
 if not os.getenv('TEST_REDIS'):
     redis = None
@@ -34,7 +33,7 @@ def store(tmpdir, request):
 
 def test_load_get(store):
     assert len(list(store.list())) == 0
-    key = six.b('jugisbestthingever')
+    key = b'jugisbestthingever'
     assert not store.can_load(key)
     object = list(range(232))
     store.dump(object, key)
@@ -50,7 +49,7 @@ def test_load_get(store):
 
 def test_lock(store):
     assert len(list(store.listlocks())) == 0
-    key = six.b('jugisbestthingever')
+    key = b'jugisbestthingever'
     lock = store.getlock(key)
     assert not lock.is_locked()
     assert lock.get()
@@ -64,7 +63,7 @@ def test_lock(store):
 
 def test_lock_remove(store):
     assert len(list(store.listlocks())) == 0
-    key = six.b('jugisbestthingever')
+    key = b'jugisbestthingever'
     lock = store.getlock(key)
     assert not lock.is_locked()
     assert lock.get()
@@ -75,7 +74,7 @@ def test_lock_remove(store):
 
 def test_lock_fail(store):
     assert len(list(store.listlocks())) == 0
-    key = six.b('jugisbestthingever')
+    key = b'jugisbestthingever'
     lock = store.getlock(key)
     assert not lock.is_locked()
     assert lock.get()
@@ -90,7 +89,7 @@ def test_lock_fail(store):
 def test_lock_fail_other(store):
     # is_failed should return True even if we can't acquire the lock
     assert len(list(store.listlocks())) == 0
-    key = six.b('jugisbestthingever')
+    key = b'jugisbestthingever'
     lock1 = store.getlock(key)
     lock2 = store.getlock(key)
     assert not lock1.is_locked()

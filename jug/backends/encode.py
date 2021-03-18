@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,8 +22,7 @@
 
 
 import pickle
-from six import BytesIO
-import six
+from io import BytesIO
 import zlib
 
 __all__ = ['encode', 'decode', 'encode_to', 'decode_from']
@@ -156,18 +155,18 @@ class decompress_stream:
             self.queue = self.lastread[skip:]
 
     def readline(self):
-        qi = self.queue.find(six.b('\n'))
+        qi = self.queue.find(b'\n')
         if qi >= 0:
             qi += 1
             res = self.queue[:qi]
             self.queue = self.queue[qi:]
             return res
-        line = six.b('')
+        line = b''
         while True:
             block = self.read(self.block)
             if not block:
                 return line
-            ln = block.find(six.b('\n'))
+            ln = block.find(b'\n')
             if ln == -1:
                 line += block
             else:

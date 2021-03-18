@@ -1,5 +1,5 @@
 import jug.backends.encode
-from six import BytesIO
+from io import BytesIO
 
 def test_encode_decode_empty_string():
     # This is a regression test for

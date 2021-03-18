@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,7 +36,6 @@ Options
 import logging
 from datetime import datetime
 from .jug_version import __version__
-import six
 import sys
 
 
@@ -78,7 +77,7 @@ def load_default_options(opt):
     opt.aggressive_unload = False
     opt.invalid_name = None
     opt.argv = None
-    opt.print_out = six.print_
+    opt.print_out = print
     opt.short = False
     opt.pdb = False
     opt.verbose = 'quiet'
@@ -133,7 +132,7 @@ def read_configuration_file(fp=None, default_options=None):
         else:
             return inifile
 
-    from six.moves import configparser
+    import configparser
     config = configparser.RawConfigParser()
     config.read_file(fp)
     fp.close()

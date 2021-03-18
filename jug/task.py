@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -436,9 +436,8 @@ class Tasklet(TaskletMixin):
         return self.base.hash()
 
     def __jug_hash__(self):
-        import six
         M = new_hash_object()
-        M.update(six.b('Tasklet'))
+        M.update(b'Tasklet')
         hash_update(M, [
                 ('base', self.base),
                 ('f', self.f),
