@@ -2,6 +2,13 @@
 History
 =======
 
+Version 2.1.1
+-------------
+
+*Released 18 March 2021*
+
+- Include requirements files in distribution
+
 Version 2.1.0
 -------------
 

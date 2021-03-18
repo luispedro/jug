@@ -1,4 +1,6 @@
 include README.rst
 include COPYING.MIT
 include examples/*
-
+include requirements.txt
+include test-requirements.txt
+include readthedocs-requirements.txt
