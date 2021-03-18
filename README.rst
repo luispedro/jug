@@ -134,6 +134,10 @@ the `value` function::
 What's New
 ----------
 
+Version 2.1.1 (*18 March 2021*)
+
+- Include requirements files in distribution
+
 Version 2.1.0 (*18 March 2021*)
 
 - Improvements to webstatus (by Robert Denham)
