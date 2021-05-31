@@ -2,6 +2,14 @@
 History
 =======
 
+Unreleased
+----------
+
+- Make ``get_tasks()`` return a copy of the tasks instead of the internal list.
+  This is arguably a breaking change for some workflows, but returning the
+  internal version was arguably a bug
+- Removed dependency on the ``six`` library as we no longer support Python 2.7.
+
 Version 2.1.1
 -------------
 

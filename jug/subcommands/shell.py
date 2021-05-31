@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -139,10 +139,18 @@ class ShellCommand(SubCommand):
             from ..task import alltasks
             return invalidate(alltasks, reverse_cache, t)
 
-        def _get_tasks():
+        def _get_tasks(copy=True):
             '''Returns a list of all tasks seen by jug
+
+
+            Parameters
+            ----------
+            copy : boolean, optional
+                If true (default), it will return a _copy_ of the internal list
             '''
             from ..task import alltasks
+            if copy:
+                return alltasks[:]
             return alltasks
 
         local_ns = {
