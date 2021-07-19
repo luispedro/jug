@@ -43,7 +43,7 @@ def get_data(title):
 
 
 def isstopword(titlewords, w):
-    if not re.match('^\w+$', w):
+    if not re.match(r'^\w+$', w):
         return True
     if w in titlewords:
         return True
