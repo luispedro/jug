@@ -1,0 +1,10 @@
+cff-version: 1.1.0
+message: If you use this software, please cite it as below.
+title: 'Jug: Software for Parallel Reproducible Computation in Python'
+authors:
+- family-names: Coelho
+  given-names: Luis Pedro
+  orcid: http://orcid.org/0000-0002-9280-7885
+doi: 10.5334/jors.161
+date-released: '2017-10-27'
+version: "2.1.1"
