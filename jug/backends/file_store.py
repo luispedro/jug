@@ -27,7 +27,7 @@ file_store : file-system based data store & locks.
 
 import os
 import sys
-from os import path, mkdir
+from os import path
 from os.path import dirname, exists
 import errno
 import logging
@@ -38,22 +38,6 @@ from time import time
 
 from .base import base_store, base_lock
 from jug.backends.encode import encode_to, decode_from
-
-def create_directories(dname):
-    '''
-    create_directories(dname)
-
-    Recursively create directories.
-    '''
-    if dname.endswith('/'): dname = dname[:-1]
-    head, tail = path.split(dname)
-    if path.exists(dname): return
-    if head: create_directories(head)
-    try:
-        mkdir(dname)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
 
 
 def fsync_dir(fname):
@@ -98,8 +82,8 @@ class file_store(base_store):
         '''
         Recursively create directories.
         '''
-        create_directories(self.jugdir)
-        create_directories(self.tempdir())
+        os.makedirs(self.jugdir, exist_ok=True)
+        os.makedirs(self.tempdir(), exist_ok=True)
 
     def _maybe_create(self):
         '''
@@ -130,7 +114,7 @@ class file_store(base_store):
         '''
         self._maybe_create()
         name = self._getfname(name)
-        create_directories(dirname(name))
+        os.makedirs(dirname(name), exist_ok=True)
         fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
         output = os.fdopen(fd, 'wb')
         try:
@@ -399,7 +383,7 @@ class file_based_lock(base_lock):
             Whether the lock was created
         '''
         if exists(self.fullname): return False
-        create_directories(path.dirname(self.fullname))
+        os.makedirs(path.dirname(self.fullname), exist_ok=True)
         try:
             import socket
             from datetime import datetime
