@@ -15,7 +15,7 @@ tasks and run different tasks on different processors.
     :target: https://anaconda.org/conda-forge/jug
 
 .. image:: https://img.shields.io/badge/CITATION-doi.org%2F10.5334%2Fjors.161-green.svg
-   :target: http://doi.org/10.5334/jors.161
+   :target: https://doi.org/10.5334/jors.161
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :alt: Join the chat at https://gitter.im/luispedro/jug
@@ -37,8 +37,8 @@ Python versions 3.5 and above are supported.
 *Video*: On `vimeo <http://vimeo.com/8972696>`__ or `showmedo
 <http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`__
 
-*Mailing List*: `http://groups.google.com/group/jug-users
-<http://groups.google.com/group/jug-users>`__
+*Mailing List*: `https://groups.google.com/group/jug-users
+<https://groups.google.com/group/jug-users>`__
 
 Testimonials
 ------------
@@ -54,7 +54,7 @@ You can install Jug with pip::
 
     pip install Jug
 
-or use, if you are using `conda <http://anaconda.org/>`__, you can install jug
+or use, if you are using `conda <https://anaconda.org/>`__, you can install jug
 from `conda-forge <https://conda-forge.github.io/>`__ using the following
 commands::
 
@@ -69,7 +69,7 @@ If you use Jug to generate results for a scientific publication, please cite
     Coelho, L.P., (2017). Jug: Software for Parallel Reproducible Computation in
     Python. Journal of Open Research Software. 5(1), p.30.
 
-    http://doi.org/10.5334/jors.161
+    https://doi.org/10.5334/jors.161
 
 
 Short Example
