@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,6 +39,8 @@ from time import time
 from .base import base_store, base_lock
 from jug.backends.encode import encode_to, decode_from
 
+MAX_FILESIZE_IN_PACK = 512
+
 
 def fsync_dir(fname):
     import errno
@@ -73,6 +75,13 @@ class file_store(base_store):
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
         self.compress_numpy = compress_numpy
+        self.packed = {}
+        if path.exists(self._packfile()):
+            with open(self._packfile(), 'rb') as pfile:
+                self.packed = decode_from(pfile)
+
+    def _packfile(self):
+        return path.join(self.jugdir, 'packs', 'jugpack')
 
     def __repr__(self):
         return 'file_store({})'.format(self.jugdir)
@@ -101,17 +110,21 @@ class file_store(base_store):
         return path.join(self.jugdir, name[:2], name[2:])
 
 
-    def dump(self, object, name):
+    def dump(self, value, name):
         '''
-        store.dump(object, name)
+        store.dump(value, name)
 
         Performs roughly the same as
 
-        pickle.dump(object, open(name,'w'))
+        pickle.dump(value, open(name,'w'))
 
         but does it in a way that is guaranteed to be atomic even over NFS and
         using compression on the disk for faster access.
         '''
+        if name in self.packed:
+            del self.packed[name]
+            self.resave_pack()
+
         self._maybe_create()
         name = self._getfname(name)
         os.makedirs(dirname(name), exist_ok=True)
@@ -119,8 +132,8 @@ class file_store(base_store):
         output = os.fdopen(fd, 'wb')
         try:
             import numpy as np
-            if not self.compress_numpy and type(object) == np.ndarray:
-                np.lib.format.write_array(output, object)
+            if not self.compress_numpy and type(value) == np.ndarray:
+                np.lib.format.write_array(output, value)
                 output.flush()
                 os.fsync(output.fileno())
                 output.close()
@@ -134,7 +147,7 @@ class file_store(base_store):
         except ValueError:
             pass
 
-        encode_to(object, output)
+        encode_to(value, output)
         output.flush()
         os.fsync(output.fileno())
         output.close()
@@ -143,21 +156,66 @@ class file_store(base_store):
         fsync_dir(fname)
         os.rename(fname, name)
 
+    def _iter_filekeys(self):
+        '''
+        for f in store._iter_filekeys():
+            ...
+
+        Internal. Use `self.keys()`
+
+        '''
+        if not exists(self.jugdir):
+            return
+
+        for d in os.listdir(self.jugdir):
+            if len(d) == 2:
+                for f in os.listdir(path.join(self.jugdir, d)):
+                    yield (d+f).encode('ascii')
+
     def list(self):
         '''
         keys = store.list()
 
         Returns a list of all the keys in the store
         '''
-        if not exists(self.jugdir):
-            return []
+        return list(self.packed.keys()) + list(self._iter_filekeys())
 
-        keys = []
-        for d in os.listdir(self.jugdir):
-            if len(d) == 2:
-                for f in os.listdir(path.join(self.jugdir, d)):
-                    keys.append((d+f).encode('ascii'))
-        return keys
+    def update_pack(self):
+        to_remove = []
+        for k in self._iter_filekeys():
+            f = self._getfname(k)
+            s = os.stat(f)
+            if s.st_size <= MAX_FILESIZE_IN_PACK:
+                with open(f, 'rb') as ifile:
+                    self.packed[k] = decode_from(ifile)
+                    to_remove.append(k)
+        self.resave_pack()
+        for k in to_remove:
+            os.unlink(self._getfname(k))
+        return len(to_remove)
+
+
+    def resave_pack(self):
+        os.makedirs(path.join(self.jugdir, 'packs'), exist_ok=True)
+        lock = self.getlock('pack-save')
+        for i in range(10):
+            if lock.get():
+                break
+            from time import sleep
+            sleep(2**i)
+        else:
+            raise Exception('Could not obtain lock to save packed data')
+        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
+        output = os.fdopen(fd, 'wb')
+        encode_to(self.packed, output)
+        output.flush()
+        os.fsync(output.fileno())
+        output.close()
+
+        # Rename is atomic even over NFS.
+        fsync_dir(fname)
+        os.rename(fname, path.join(self.jugdir, 'packs', 'jugpack'))
+        lock.release()
 
 
     def listlocks(self):
@@ -183,7 +241,7 @@ class file_store(base_store):
         can = store.can_load(name)
         '''
         fname = self._getfname(name)
-        return exists(fname)
+        return name in self.packed or exists(fname)
 
 
     def load(self, name):
@@ -203,6 +261,8 @@ class file_store(base_store):
         obj : any
             The object that was saved under ``name``
         '''
+        if name in self.packed:
+            return self.packed[name]
         fname = self._getfname(name)
         with open(fname, 'rb') as ifile:
             try:
@@ -214,6 +274,7 @@ class file_store(base_store):
                 pass
             return decode_from(ifile)
 
+
     def remove(self, name):
         '''
         was_removed = store.remove(name)
@@ -222,12 +283,18 @@ class file_store(base_store):
 
         Returns whether any entry was actually removed.
         '''
+        removed = False
+        if name in self.packed:
+            del self.packed[name]
+            self.resave_pack()
+            removed = True
         try:
             fname = self._getfname(name)
             os.unlink(fname)
             return True
         except OSError:
-            return False
+            return removed
+
 
     def cleanup(self, active, keeplocks=False):
         '''
@@ -247,17 +314,26 @@ class file_store(base_store):
         nr_removed : integer
             number of removed files
         '''
-        active = frozenset(self._getfname(t.hash()) for t in active)
+        active = frozenset(t.hash() for t in active)
+        active_fnames = frozenset(self._getfname(h) for h in active)
         removed = 0
         for dir,_,fs in os.walk(self.jugdir):
             if keeplocks and dir == "locks":
                 continue
             for f in fs:
                 f = path.join(dir, f)
-                if f not in active:
+                if f not in active_fnames:
                     os.unlink(f)
                     removed += 1
+        pack_dirty = False
+        for k in frozenset(self.packed.keys()) & active:
+            del self.packed[k]
+            pack_dirty = True
+            removed += 1
+        if pack_dirty:
+            self.resave_pack()
         return removed
+
 
     def remove_locks(self):
         '''
@@ -588,3 +664,4 @@ class file_keepalive_based_lock(file_based_lock):
                     return True
 
         return False
+

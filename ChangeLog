@@ -1,6 +1,7 @@
 Unreleased
 	* Remove six dependency
 	* Make get_tasks() return a copy of the tasks
+	* Add `jug pack` subcommand
 
 Version 2.1.1 Thu 18 Mar 2021 by luispedro
 	* Include requirements files in distribution
