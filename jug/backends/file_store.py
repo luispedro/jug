@@ -202,6 +202,7 @@ class file_store(base_store):
             if lock.get():
                 break
             from time import sleep
+            logging.warning("Waiting for lock file 'pack-save'")
             sleep(2**i)
         else:
             raise Exception('Could not obtain lock to save packed data')
