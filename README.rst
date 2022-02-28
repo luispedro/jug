@@ -5,8 +5,8 @@ Jug: A Task-Based Parallelization Framework
 Jug allows you to write code that is broken up into
 tasks and run different tasks on different processors.
 
-.. image:: https://travis-ci.com/luispedro/jug.png
-       :target: https://travis-ci.com/luispedro/jug
+.. image:: https://github.com/luispedro/jug/actions/workflows/python-package.yml/badge.svg
+       :target: https://github.com/luispedro/jug/actions/workflows/python-package.yml
 
 .. image:: https://zenodo.org/badge/205237.svg
    :target: https://zenodo.org/badge/latestdoi/205237
@@ -16,10 +16,6 @@ tasks and run different tasks on different processors.
 
 .. image:: https://img.shields.io/badge/CITATION-doi.org%2F10.5334%2Fjors.161-green.svg
    :target: https://doi.org/10.5334/jors.161
-
-.. image:: https://badges.gitter.im/Join%20Chat.svg
-   :alt: Join the chat at https://gitter.im/luispedro/jug
-   :target: https://gitter.im/luispedro/jug?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 
 It uses the filesystem to communicate between processes and
