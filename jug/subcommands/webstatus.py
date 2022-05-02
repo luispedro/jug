@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012-2016, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2012-2022, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -72,28 +72,29 @@ TH.task-name {
 '''
 _row_template = '''
 <tr>
-    <th class="task-name">%s</th>
-    <td>%s</td>
-    <td>%s</td>
-    <td>%s</td>
-    <td>%s</td>
+    <th class="task-name">{}</th>
+    <td>{}</td>
+    <td>{}</td>
+    <td>{}</td>
+    <td>{}</td>
 </tr>'''
 
 
-def _format_counts(tw, tre, tru, tf):
-    r = ''
+def _format_counts(ts):
+    table = []
     names = set()
-    for t in [tw, tre, tru, tf]:
+    for t in [ts.waiting, ts.ready, ts.running, ts.finished]:
         names.update(list(t.keys()))
     for n in names:
-        r += _row_template % (n, tw[n], tre[n], tru[n], tf[n])
-    r += _row_template % ('', '', '', '', '')
-    r += _row_template % ('Total',
-                          sum(tw.values()),
-                          sum(tre.values()),
-                          sum(tru.values()),
-                          sum(tf.values()))
-    return r
+        table.append(
+                _row_template.format(n, ts.waiting[n], ts.ready[n], ts.running[n], ts.finished[n]))
+    table.append(_row_template.format('', '', '', '', ''))
+    table.append(_row_template.format('Total',
+                          sum(ts.waiting.values()),
+                          sum(ts.ready.values()),
+                          sum(ts.running.values()),
+                          sum(ts.finished.values())))
+    return ''.join(table)
 
 
 class WebStatusCommand(SubCommand):
@@ -128,12 +129,12 @@ class WebStatusCommand(SubCommand):
         @app.route('/')
         def status():
             ht, deps, rdeps = st.retrieve_sqlite3(connection)
-            tw, tre, tru, tfailed, tf, dirty = st.update_status(store, ht, deps, rdeps)
+            ts, dirty = st.update_status(store, ht, deps, rdeps)
             st.save_dirty3(connection, dirty)
             return template % {
                 'jugfile': options.jugfile,
                 'refresh': request.query.refresh or "3",
-                'table': _format_counts(tw, tre, tru, tf),
+                'table': _format_counts(ts),
             }
         bottle.run(app, port=options.webstatus_port,
                    host=options.webstatus_ip, quiet=True)
@@ -141,7 +142,7 @@ class WebStatusCommand(SubCommand):
     def parse(self, parser):
         defaults = self.parse_defaults()
         parser.add_argument('--port',
-                            action='store', 
+                            action='store',
                             dest='webstatus_port',
                             help=('Port for the webstatus serve to listen on'
                                   ' (Default: 8080)')

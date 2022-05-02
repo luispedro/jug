@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 
 import jug
@@ -51,7 +51,7 @@ def create_sqlite3(connection, ht, deps, rdeps):
             id INTEGER PRIMARY KEY,
             name CHAR(128),
             hash CHAR(128),
-            status INT);
+            status CHAR(32));
     CREATE TABLE dep (
         source INT,
         target INT);
@@ -67,6 +67,22 @@ def create_sqlite3(connection, ht, deps, rdeps):
 
 
 def retrieve_sqlite3(connection):
+    '''
+    Retrieves status from an SQLite3 DB
+
+    Parameters
+    ----------
+
+    connection: DB connection
+
+    Returns
+    -------
+    ht : status list. See Table ht
+    dep : dict
+        dependencies
+    rdep : dict
+        reverse dependencies
+    '''
     ht = connection. \
             execute('SELECT * FROM ht ORDER BY id'). \
             fetchall()
@@ -84,6 +100,8 @@ def save_dirty3(connection, dirty):
 
 @contextmanager
 def _open_connection(options):
+    '''Opens sqlite3 connection as a context manager
+    '''
     import sqlite3
     connection = sqlite3.connect(options.status_cache_file)
     yield connection
@@ -122,19 +140,24 @@ def load_jugfile(options):
     return store, ht, deps, dict(rdeps)
 
 
+class TaskStatus:
+    def __init__(self):
+        self.failed=defaultdict(int)
+        self.waiting=defaultdict(int)
+        self.ready=defaultdict(int)
+        self.running=defaultdict(int)
+        self.finished=defaultdict(int)
+
+
 def update_status(store, ht, deps, rdeps):
-    tasks_waiting = defaultdict(int)
-    tasks_ready = defaultdict(int)
-    tasks_running = defaultdict(int)
-    tasks_failed = defaultdict(int)
-    tasks_finished = defaultdict(int)
+    ts = TaskStatus()
 
     store = memoize_store(store, list_base=True)
     dirty = {}
     for i, name, hash, status in ht:
         nstatus = None
         if status == finished or store.can_load(hash):
-            tasks_finished[name] += 1
+            ts.finished[name] += 1
             nstatus = finished
         else:
             can_run = True
@@ -148,30 +171,30 @@ def update_status(store, ht, deps, rdeps):
                 lock = store.getlock(hash)
                 if lock.is_locked():
                     if lock.is_failed():
-                        tasks_failed[name] += 1
+                        ts.failed[name] += 1
                         nstatus = failed
                     else:
-                        tasks_running[name] += 1
+                        ts.running[name] += 1
                         nstatus = running
                 else:
-                    tasks_ready[name] += 1
+                    ts.ready[name] += 1
                     nstatus = ready
             else:
-                tasks_waiting[name] += 1
+                ts.waiting[name] += 1
                 nstatus = waiting
         assert nstatus is not None, 'update_status: nstatus not assigned'
         if status != nstatus:
             dirty[i] = nstatus
-    return tasks_waiting, tasks_ready, tasks_running, tasks_failed, tasks_finished, dirty
+    return ts, dirty
 
 
-def _print_status(options, waiting, ready, running, failed, finished):
+def _print_status(options, ts):
     if options.short:
-        n_ready = sum(ready.values())
-        n_running = sum(running.values())
-        n_failed = sum(failed.values())
-        n_waiting = sum(waiting.values())
-        n_finished = sum(finished.values())
+        n_ready = sum(ts.ready.values())
+        n_running = sum(ts.running.values())
+        n_failed = sum(ts.failed.values())
+        n_waiting = sum(ts.waiting.values())
+        n_finished = sum(ts.finished.values())
         if not n_waiting and not n_running and not n_failed and not n_ready:
             options.print_out('All tasks complete ({0} tasks).'.format(n_finished))
         elif not n_running:
@@ -180,11 +203,11 @@ def _print_status(options, waiting, ready, running, failed, finished):
             options.print_out('{0} tasks waiting to be run, {1} failed, {2} complete, ({3} active).'.format(n_waiting + n_ready, n_failed, n_finished, n_running))
     else:
         print_task_summary_table(options, [
-                                ("Failed", failed),
-                                ("Waiting", waiting),
-                                ("Ready", ready),
-                                ("Complete", finished),
-                                ("Active", running)])
+                                ("Failed", ts.failed),
+                                ("Waiting", ts.waiting),
+                                ("Ready", ts.ready),
+                                ("Complete", ts.finished),
+                                ("Active", ts.running)])
 
 
 def _clear_cache(options):
@@ -206,8 +229,8 @@ def _status_cached(options):
         store, ht, deps, rdeps = load_jugfile(options)
         mode = create
 
-    tw, tre, tru, tfa, tf, dirty = update_status(store, ht, deps, rdeps)
-    _print_status(options, tw, tre, tru, tfa, tf)
+    ts, dirty = update_status(store, ht, deps, rdeps)
+    _print_status(options, ts)
     if mode == update:
         with _open_connection(options) as connection:
             save_dirty3(connection, dirty)
@@ -217,33 +240,30 @@ def _status_cached(options):
             ht[k] = (k, name, hash, dirty[k])
         with _open_connection(options) as connection:
             create_sqlite3(connection, ht, deps, rdeps)
-    return sum(tf.values())
+    return sum(ts.finished.values())
 
 
 def _status_nocache(options):
     store, _ = jug.init(options.jugfile, options.jugdir)
     Task.store = memoize_store(store, list_base=True)
 
-    tasks_waiting = defaultdict(int)
-    tasks_ready = defaultdict(int)
-    tasks_running = defaultdict(int)
-    tasks_failed = defaultdict(int)
-    tasks_finished = defaultdict(int)
+    ts = TaskStatus()
+
     for t in task.alltasks:
         if t.can_load():
-            tasks_finished[t.name] += 1
+            ts.finished[t.name] += 1
         elif t.can_run():
             if t.is_locked():
                 if t.is_failed():
-                    tasks_failed[t.name] += 1
+                    ts.failed[t.name] += 1
                 else:
-                    tasks_running[t.name] += 1
+                    ts.running[t.name] += 1
             else:
-                tasks_ready[t.name] += 1
+                ts.ready[t.name] += 1
         else:
-            tasks_waiting[t.name] += 1
-    _print_status(options, tasks_waiting, tasks_ready, tasks_running, tasks_failed, tasks_finished)
-    return sum(tasks_finished.values())
+            ts.waiting[t.name] += 1
+    _print_status(options, ts)
+    return sum(ts.finished.values())
 
 
 class StatusCommand(SubCommand):
