@@ -130,6 +130,12 @@ the `value` function::
 What's New
 ----------
 
+Version 2.2.0 (*3 May 2022*)
+
+- Add ``jug pack`` subcommand
+- Make ``get_tasks()`` return a copy of the tasks inside ``jug shell``
+- Remove ``six`` dependency
+
 Version 2.1.1 (*18 March 2021*)
 
 - Include requirements files in distribution

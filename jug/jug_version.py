@@ -1,4 +1,4 @@
-__version__ = '2.1.1-post'
+__version__ = '2.2.0'
 CITATION = '''\
     Coelho, L.P., (2017). Jug: Software for Parallel Reproducible Computation in
     Python. Journal of Open Research Software. 5(1), p.30.
