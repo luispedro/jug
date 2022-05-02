@@ -2,11 +2,12 @@ import os
 import jug.backends.redis_store
 import jug.backends.file_store
 import jug.backends.dict_store
-from jug.backends.redis_store import redis
 import pytest
 
 if not os.getenv('TEST_REDIS'):
     redis = None
+else:
+    from jug.backends.redis_store import redis
 
 try:
     redisConnectionError = redis.ConnectionError
