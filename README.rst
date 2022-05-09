@@ -14,6 +14,9 @@ tasks and run different tasks on different processors.
 .. image:: https://anaconda.org/conda-forge/jug/badges/installer/conda.svg
     :target: https://anaconda.org/conda-forge/jug
 
+.. image:: https://static.pepy.tech/personalized-badge/jug?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads
+   :target: https://pepy.tech/project/jug
+
 .. image:: https://img.shields.io/badge/CITATION-doi.org%2F10.5334%2Fjors.161-green.svg
    :target: https://doi.org/10.5334/jors.161
 
