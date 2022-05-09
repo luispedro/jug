@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -153,11 +153,21 @@ class ShellCommand(SubCommand):
                 return alltasks[:]
             return alltasks
 
+        def _get_filtered_tasks(loadable=False, failed=False, available=False):
+            return [t
+                    for t in _get_tasks()
+                    if (loadable and t.can_load()) or
+                        (failed and t.is_failed()) or
+                        (available and not t.can_load() and t.can_run())
+                        ]
+
+
         local_ns = {
             'load_all': _load_all,
             'value': value,
             'invalidate': _invalidate,
             'get_tasks': _get_tasks,
+            'get_filtered_tasks': _get_filtered_tasks,
         }
         # This is necessary for some versions of Ipython. See:
         # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a

@@ -1,3 +1,7 @@
+Unreleased
+	* Add `get_filtered_tasks()` for `jug shell`
+
+
 Version 2.2.0 Tue 3 May 2022 by luispedro
 	* Add `jug pack` subcommand
 	* Remove six dependency
