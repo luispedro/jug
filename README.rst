@@ -133,6 +133,9 @@ the `value` function::
 What's New
 ----------
 
+Version 2.2.1 (*19 May 2022*)
+- Fix bug with ``jug cleanup`` and the redis backend (`#86 <https://github.com/luispedro/jug/issues/86>`__)
+
 Version 2.2.0 (*3 May 2022*)
 
 - Add ``jug pack`` subcommand
