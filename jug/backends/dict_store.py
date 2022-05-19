@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2022, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ class dict_store(base_store):
         existing = set(self.store.keys())
         for act in active:
             try:
-                existing.remove(_resultname(act))
+                existing.remove(_resultname(act.hash()))
             except KeyError:
                 pass
 

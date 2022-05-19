@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2022, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -119,23 +119,17 @@ class redis_store(base_store):
 
         Implement 'cleanup' command
         '''
-        existing = list(self.list())
-        for act in active:
-            try:
-                existing.remove(_resultname(act.hash()))
-            except ValueError:
-                pass
 
-        if keeplocks:
-            for lock in self.listlocks():
-                try:
-                    existing.remove(_lockname(lock))
-                except ValueError:
-                    pass
+
+        existing = set(self.list())
+        existing -= set(act.hash() for act in active)
 
         cleaned = len(existing)
         for superflous in existing:
             self.redis.delete(_resultname(superflous))
+
+        if not keeplocks:
+            cleaned += self.remove_locks()
 
         return cleaned
 
