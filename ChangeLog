@@ -1,4 +1,4 @@
-Unreleased
+Version 2.2.1 Thu 19 May 2022 by luispedro
 	* Fix `jug cleanup` for redis backend
 
 Version 2.2.0 Tue 3 May 2022 by luispedro
