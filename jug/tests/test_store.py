@@ -136,3 +136,31 @@ def test_numpy_array_no_compress(tmpdir):
     assert np.all(arr2 == arr)
     store.remove(key)
     store.close()
+
+class MockHash:
+    def __init__(self, h):
+        self.h = h
+
+    def hash(self):
+        return self.h
+
+def test_cleanup(store):
+    assert len(list(store.listlocks())) == 0
+    key1 = b'jugisbestthingever'
+    key2 = b'jug_key2'
+    ob1 = [1]
+    ob2 = [1, 2]
+    store.dump(ob1, key1)
+    store.dump(ob2, key2)
+
+    assert len(list(store.list())) == 2
+    assert store.cleanup([MockHash(key1), MockHash(key2)]) == 0
+    assert store.cleanup([MockHash(key1), MockHash(key2)], keeplocks=False) == 0
+
+    assert len(list(store.list())) == 2
+    assert store.cleanup([MockHash(key1)]) == 1
+    assert len(list(store.list())) == 1
+    assert store.cleanup([MockHash(key2)]) == 1
+    assert len(list(store.list())) == 0
+
+

@@ -1,3 +1,6 @@
+Unreleased
+	* Fix `jug cleanup` for redis backend
+
 Version 2.2.0 Tue 3 May 2022 by luispedro
 	* Add `jug pack` subcommand
 	* Remove six dependency
