@@ -6,11 +6,6 @@
 #
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
-from recommonmark.parser import CommonMarkParser
-
-source_parsers = {
-    '.md': CommonMarkParser,
-}
 
 import sys, os
 from jug.jug_version import __version__ as jug_version
@@ -32,6 +27,7 @@ extensions = [
         'sphinx.ext.intersphinx',
         'sphinx.ext.coverage',
         'sphinx.ext.doctest',
+        'myst_parser',
         ]
 
 templates_path = ['.templates']
