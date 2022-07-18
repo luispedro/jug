@@ -318,16 +318,18 @@ class file_store(base_store):
         active = frozenset(t.hash() for t in active)
         active_fnames = frozenset(self._getfname(h) for h in active)
         removed = 0
-        for dir,_,fs in os.walk(self.jugdir):
-            if keeplocks and dir == "locks":
+        for dirpath,_,fs in os.walk(self.jugdir):
+            if keeplocks and path.basename(dirpath) == "locks":
+                continue
+            if path.basename(dirpath) == "packs":
                 continue
             for f in fs:
-                f = path.join(dir, f)
+                f = path.join(dirpath, f)
                 if f not in active_fnames:
                     os.unlink(f)
                     removed += 1
         pack_dirty = False
-        for k in frozenset(self.packed.keys()) & active:
+        for k in frozenset(self.packed.keys()) - active:
             del self.packed[k]
             pack_dirty = True
             removed += 1

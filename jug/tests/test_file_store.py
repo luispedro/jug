@@ -52,3 +52,35 @@ def test_create_pack(tmpdir):
     fs = file_store(tmpdir)
     assert_contains_data(fs, data)
     fs.close()
+
+class MockHash:
+    def __init__(self, h):
+        self.h = h
+
+    def hash(self):
+        return self.h
+
+def test_pack_cleanup(tmpdir):
+    tmpdir = str(tmpdir)
+    fs = file_store(tmpdir)
+    assert len(list(fs.listlocks())) == 0
+    key1 = b'jugisbestthingever'
+    key2 = b'jug_key2'
+    ob1 = [1]
+    ob2 = [1, 2]
+    fs.dump(ob1, key1)
+    fs.dump(ob2, key2)
+
+    assert len(list(fs.list())) == 2
+    assert fs.cleanup([MockHash(key1), MockHash(key2)], keeplocks=False) == 0
+
+    assert len(list(fs.list())) == 2
+    packed = fs.update_pack()
+    assert packed == 2
+    assert fs.cleanup([MockHash(key1), MockHash(key2)], keeplocks=False) == 0
+    assert len(list(fs.list())) == 2
+
+    fs.close()
+
+    fs = file_store(tmpdir)
+    assert len(list(fs.list())) == 2
