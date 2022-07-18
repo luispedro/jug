@@ -2,12 +2,12 @@
 History
 =======
 
-Version 2.2.1
+Version 2.2.2
 -------------
 
-*Released 19 May 2022*
+*Released 19 July 2022*
 
-- Fix bug with ``jug cleanup`` and the redis backend (`#86 <https://github.com/luispedro/jug/issues/86>`__)
+- Fix ``jug cleanup`` when packs are used (``jug pack``)
 
 Version 2.2.0
 -------------
