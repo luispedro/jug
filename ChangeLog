@@ -1,6 +1,9 @@
 Unreleased
 	* Add `get_filtered_tasks()` for `jug shell`
 
+Version 2.2.2 Tue 19 Jul 2022 by luispedro
+	* Fix `jug cleanup` when packs are used (`jug pack`)
+
 Version 2.2.1 Thu 19 May 2022 by luispedro
 	* Fix `jug cleanup` for redis backend
 
