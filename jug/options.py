@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -157,11 +157,10 @@ def read_configuration_file(fp=None, default_options=None):
     return inifile
 
 
-def define_options(parser):
+def add_common_options(parser):
     group = parser.add_argument_group("common")
     group.add_argument('jugfile', action='store', nargs='?',
                        help="Python script to use. (Default: %(default)s)" % {"default": default_options.jugfile})
-    group.add_argument('--version', action="version", version=__version__)
     group.add_argument('--aggressive-unload',
                        action='store_true',
                        dest='aggressive_unload',
@@ -232,6 +231,8 @@ def parse(args=None, optionsfile=None):
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
+    parser.add_argument('--version', action="version", version=__version__)
+
     sub = parser.add_subparsers(dest="subcommand", help=argparse.SUPPRESS)
     sub.required = True
     subparsers = cmdapi.get_subcommand_parsers(sub)
@@ -240,7 +241,7 @@ def parse(args=None, optionsfile=None):
     # causing dependency loops in required arguments.
     # To workaround we re-define all global options in all subparsers
     for sub in subparsers:
-        define_options(sub)
+        add_common_options(sub)
         sub.add_argument('user_args', nargs='*', default=[])
 
     argopts = parser.parse_args(args)

@@ -1,5 +1,7 @@
 Unreleased
 	* Add `get_filtered_tasks()` for `jug shell`
+	* Fix `jug --version` (which had been broken in the refactoring to use
+	subcommands)
 
 Version 2.2.2 Tue 19 Jul 2022 by luispedro
 	* Fix `jug cleanup` when packs are used (`jug pack`)
