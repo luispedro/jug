@@ -167,9 +167,9 @@ class file_store(base_store):
         if not exists(self.jugdir):
             return
 
-        for d in os.listdir(self.jugdir):
+        for d in sorted(os.listdir(self.jugdir)):
             if len(d) == 2:
-                for f in os.listdir(path.join(self.jugdir, d)):
+                for f in sorted(os.listdir(path.join(self.jugdir, d))):
                     yield (d+f).encode('ascii')
 
     def list(self):
