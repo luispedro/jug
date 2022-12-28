@@ -70,6 +70,10 @@ def invalidate(tasklist, reverse, task):
                 while isinstance(d, Tasklet):
                     d = d.base
                 reverse.setdefault(d.hash(), []).append(t)
+        if not reverse:
+            # This can happen if the script is very trivial
+            # Which can then lead to multiple "only performed once" messages
+            reverse['#'] = None
     queue = [task]
     seen = set()
     while queue:
