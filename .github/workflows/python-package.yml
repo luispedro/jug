@@ -4,8 +4,9 @@ on: [ push, pull_request ]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    # We need to use an older version of ubuntu to support older versions of Python
+    # https://github.com/actions/setup-python/issues/544
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: ['3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
