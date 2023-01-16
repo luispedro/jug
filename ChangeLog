@@ -1,5 +1,6 @@
 Unreleased
-	* Add `get_filtered_tasks()` for `jug shell`
+	* file_store: ensure that the temporary directory exists
+	* jug shell: Add `get_filtered_tasks()`
 	* Fix `jug --version` (which had been broken in the refactoring to use
 	subcommands)
 	* Fix message in `jug shell` when there are no dependencies (it would

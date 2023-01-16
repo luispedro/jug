@@ -206,6 +206,7 @@ class file_store(base_store):
             sleep(2**i)
         else:
             raise Exception('Could not obtain lock to save packed data')
+        self._maybe_create()
         fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
         output = os.fdopen(fd, 'wb')
         encode_to(self.packed, output)
