@@ -277,6 +277,26 @@ class file_store(base_store):
             return decode_from(ifile)
 
 
+    def remove_many(self, names):
+        '''
+        store.remove_many(names)
+
+        Removes the objects with the given names from the store.
+        '''
+        removed = set()
+        for name in names:
+            if name in self.packed:
+                del self.packed[name]
+                removed.add(name)
+            try:
+                fname = self._getfname(name)
+                os.unlink(fname)
+                removed.add(name)
+            except OSError:
+                pass
+        self.resave_pack()
+        return removed
+
     def remove(self, name):
         '''
         was_removed = store.remove(name)
@@ -285,17 +305,7 @@ class file_store(base_store):
 
         Returns whether any entry was actually removed.
         '''
-        removed = False
-        if name in self.packed:
-            del self.packed[name]
-            self.resave_pack()
-            removed = True
-        try:
-            fname = self._getfname(name)
-            os.unlink(fname)
-            return True
-        except OSError:
-            return removed
+        return bool(self.remove_many([name]))
 
 
     def cleanup(self, active, keeplocks=False):

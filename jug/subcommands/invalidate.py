@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2023, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -77,8 +77,9 @@ class InvalidateCommand(SubCommand):
             options.print_out('No results invalidated.')
             return
         task_counts = defaultdict(int)
+        removed = store.remove_many(t.hash() for t in invalid)
         for t in invalid:
-            if store.remove(t.hash()):
+            if t.hash() in removed:
                 task_counts[t.name] += 1
         if sum(task_counts.values()) == 0:
             options.print_out('Tasks invalidated, but no results removed')

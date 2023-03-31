@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2021, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2011-2023, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -106,6 +106,33 @@ class base_store(metaclass=ABCMeta):
         obj : any
             The object that was saved under ``name``
         '''
+
+    def remove_many(self, names):
+        '''
+        removed = store.remove_many(names)
+
+        Remove the entry associated with ``names``.
+
+        Returns set of names that were actually removed.
+
+        Default implementation calls ``remove`` for each name, but this can be
+        overridden for efficiency.
+
+        Parameters
+        ----------
+        names : iterable of str
+            Keys
+
+        Returns
+        -------
+        removed : set of str
+            Keys that were actually removed
+        '''
+        removed = []
+        for name in names:
+            if self.remove(name):
+                removed.append(name)
+        return removed
 
     @abstractmethod
     def remove(self, name):
