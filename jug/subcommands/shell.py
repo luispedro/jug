@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2023, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -99,23 +99,17 @@ class ShellCommand(SubCommand):
     def run(self, store, options, jugspace, *args, **kwargs):
         try:
             import IPython
-            if IPython.version_info[0] >= 1:
-                from IPython.terminal.embed import InteractiveShellEmbed
-                from IPython.terminal.ipapp import load_default_config
-            else:
-                from IPython.frontend.terminal.embed import InteractiveShellEmbed
-                from IPython.frontend.terminal.ipapp import load_default_config
+            from IPython.terminal.embed import InteractiveShellEmbed
+            from IPython.terminal.ipapp import load_default_config
             config = load_default_config()
-            ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
+            if IPython.core.getipython.get_ipython() is None:
+                ipshell = InteractiveShellEmbed.instance(config=config, display_banner=_ipython_banner)
+            else:
+                ipshell = InteractiveShellEmbed(config=config, display_banner=_ipython_banner)
         except ImportError:
-            try:
-                # Fallback for older Python:
-                from IPython.Shell import IPShellEmbed
-                ipshell = IPShellEmbed(banner=_ipython_banner)
-            except ImportError:
-                import sys
-                sys.stderr.write(_ipython_not_found_msg)
-                sys.exit(1)
+            import sys
+            sys.stderr.write(_ipython_not_found_msg)
+            sys.exit(1)
 
         def _load_all():
             '''
