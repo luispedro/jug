@@ -1,3 +1,6 @@
+Version 2.2.3 Tue 19 Jul 2022 by luispedro
+	* jug shell: Fix for newer versions of IPython
+
 Version 2.2.2 Tue 19 Jul 2022 by luispedro
 	* Fix `jug cleanup` when packs are used (`jug pack`)
 

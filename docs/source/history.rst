@@ -2,6 +2,14 @@
 History
 =======
 
+Version 2.2.3
+-------------
+
+*Released 26 May 2023*
+
+- Fix ``jug shell`` for newer versions of IPython
+
+
 Version 2.2.2
 -------------
 
