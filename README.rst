@@ -130,6 +130,9 @@ the `value` function::
 What's New
 ----------
 
+Version 2.2.3 (*26 May 2023*)
+- Fix ``jug shell`` for newer versions of IPython
+
 Version 2.2.2 (*19 July 2022*)
 - Fix ``jug cleanup`` when packs are used (``jug pack``)
 
