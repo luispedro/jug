@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2010-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2010-2023, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -44,10 +44,7 @@ def _can_load_limit_recursion(tsk, alltasks):
 
     try:
         return tsk.can_load()
-    # RecursionError was introduced in Python 3.5, so we cannot use it
-    # until we stop supporting earlier versions of Python
-    except RuntimeError:
-    # except RecursionError:
+    except RecursionError:
         dependencies = set()
         q = [tsk]
         while q:
