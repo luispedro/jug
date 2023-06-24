@@ -133,6 +133,14 @@ the `value` function::
 What's New
 ----------
 
+Version 2.3.0 (*25 June 2023*)
+
+- jug shell: Add ``get_filtered_tasks()``
+- jug: Fix ``jug --version`` (which had been broken in the refactoring to use subcommands)
+- jug shell: Fix message in jug shell when there are no dependencies (it would repeatedly print the message stating *this will only be run once*)
+- jug pack: Make it much faster to invalidate elements
+- file_store: ensure that the temporary directory exists
+
 Version 2.2.3 (*26 May 2023*)
 - Fix ``jug shell`` for newer versions of IPython
 
