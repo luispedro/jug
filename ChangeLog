@@ -1,3 +1,6 @@
+Unreleased
+	* jug: update for Python 3.12
+
 Version 2.3.0 Tue 25 June 2023 by luispedro
 	* jug shell: Add `get_filtered_tasks()`
 	* jug: Fix `jug --version` (which had been broken in the refactoring to

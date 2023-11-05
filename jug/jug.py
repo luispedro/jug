@@ -66,7 +66,7 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     store : storage object
     jugspace : dictionary
     '''
-    import imp
+    import types
     from .options import set_jugdir
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
 
@@ -93,7 +93,7 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     # if BarrierError is raised.
     #
     jugmodname = os.path.basename(jugfile[:-len('.py')])
-    jugmodule = imp.new_module(jugmodname)
+    jugmodule = types.ModuleType(jugmodname)
     jugmodule.__file__ = os.path.abspath(jugfile)
     jugspace = jugmodule.__dict__
     sys.modules[jugmodname] = jugmodule
