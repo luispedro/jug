@@ -44,11 +44,11 @@ def clear_default(default):
 
 
 class TestSubCommandAPI():
-    def setup(self):
+    def setup_method(self):
         self._old_commands = cmdapi._commands.copy()
         cmdapi._commands.clear()
 
-    def teardown(self):
+    def teardown_method(self):
         cmdapi._commands.clear()
         cmdapi._commands.update(self._old_commands)
 
