@@ -133,6 +133,10 @@ the `value` function::
 What's New
 ----------
 
+Version 2.3.1 (*5 November 2023*)
+
+- Update for Python 3.12
+
 Version 2.3.0 (*25 June 2023*)
 
 - jug shell: Add ``get_filtered_tasks()``

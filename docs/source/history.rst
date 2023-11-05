@@ -2,6 +2,13 @@
 History
 =======
 
+Version 2.3.1
+-------------
+
+*Released 5 November 2023*
+
+- Update for Python 3.12
+
 Version 2.3.0
 -------------
 
