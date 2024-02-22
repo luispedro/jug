@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2024, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -440,7 +440,7 @@ class Tasklet(TaskletMixin):
         M.update(b'Tasklet')
         hash_update(M, [
                 ('base', self.base),
-                ('f', self.f),
+                ('f', self.f if getattr(self.f, '__name__', '') != '<lambda>' else ('<lambda>', self.f.__code__.co_code))
             ])
         return M.hexdigest().encode('utf-8')
 

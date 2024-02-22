@@ -4,6 +4,9 @@ Tasklets
 .. versionadded:: 0.8
    Tasklets were added in version 0.8, starting with the betas (named 0.7.9..)
 
+.. versionchanged:: 2.4.0
+   Since version 2.4.0, Tasklets can use a lambda function
+
 A Tasklet is a light-weight task. It looks very similar to a Task *except that
 it does not save its results to disk*. Every time you need its output, it is
 recomputed. Other than that, you can pass it around, just like a Task.

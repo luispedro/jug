@@ -15,4 +15,6 @@ t0 = t[0]
 t2 = t[2]
 t0_2 = Task(sum2, t0, t2)
 t0_2_1 = Tasklet(t0_2, plus1)
+t0_2_2 = Tasklet(t0_2_1, lambda x: x + 1)
 
+final = Task(sum2, t0_2_1, t0_2_2)
