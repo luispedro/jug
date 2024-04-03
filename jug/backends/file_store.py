@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2024, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -78,7 +78,9 @@ class file_store(base_store):
         self.packed = {}
         if path.exists(self._packfile()):
             with open(self._packfile(), 'rb') as pfile:
+                sys.path.insert(0, '.')
                 self.packed = decode_from(pfile)
+                del sys.path[0]
 
     def _packfile(self):
         return path.join(self.jugdir, 'packs', 'jugpack')
