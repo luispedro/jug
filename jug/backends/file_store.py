@@ -485,7 +485,7 @@ class file_based_lock(base_lock):
             F.write('Lock created on {0}\n'.format(datetime.now().strftime('%Y-%m-%d (%Hh%M.%S)')))
             F.close()
             return True
-        except OSError:
+        except FileExistsError:
             return False
 
     def release(self):

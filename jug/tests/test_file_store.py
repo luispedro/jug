@@ -2,6 +2,8 @@ import jug.backends.encode
 from jug.backends.file_store import file_store
 from jug.hash import hash_one
 
+import pytest
+import os
 from io import BytesIO
 
 def test_encode_decode_empty_string():
@@ -84,3 +86,16 @@ def test_pack_cleanup(tmpdir):
 
     fs = file_store(tmpdir)
     assert len(list(fs.list())) == 2
+
+
+def test_lock_permissions(tmpdir):
+    tmpdir = str(tmpdir)
+    os.makedirs(tmpdir, exist_ok=True)
+    fs = file_store(tmpdir)
+    lock = fs.getlock(hash_one('k0'))
+    assert lock.get()
+    lock.release()
+    os.chmod(tmpdir + '/locks', 0o444)
+    with pytest.raises(PermissionError):
+        lock.get()
+
