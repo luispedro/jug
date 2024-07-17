@@ -11,7 +11,7 @@ tasks and run different tasks on different processors.
 .. image:: https://zenodo.org/badge/205237.svg
    :target: https://zenodo.org/badge/latestdoi/205237
 
-.. image:: https://anaconda.org/conda-forge/jug/badges/installer/conda.svg
+.. image:: https://img.shields.io/badge/install%20with-conda-brightgreen.svg?style=flat
     :target: https://anaconda.org/conda-forge/jug
 
 .. image:: https://static.pepy.tech/personalized-badge/jug?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads
