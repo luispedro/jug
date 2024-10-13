@@ -1,4 +1,5 @@
 from jug.hash import hash_one
+from jug.utils import UnsafeNoHash
 import numpy as np
 
 
@@ -31,4 +32,9 @@ def test_hash_numpy_copy():
 
 def test_hash_set():
     assert hash_one(set([1,2,3])) != hash_one([1,2,3])
+
+
+
+def test_unsafe_nohash():
+    assert hash_one([1,2,UnsafeNoHash(3)]) == hash_one([1,2,UnsafeNoHash(7)])
 

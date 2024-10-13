@@ -125,5 +125,22 @@ Where ``pattern`` is a glob pattern can be simply written as::
 
 
 
+UnsafeNoHash
+------------
+
+This marks certain arguments to Tasks as not being part of the hash that
+defines the results. It can be useful for arguments that do not change the
+results, but nonetheless need to be passsed to functions.
+
+Example usage::
+
+    jug_execute(['SemiBin2', 'single_easy_bin',
+                    '--cpus', UnsafeNoHash('8'),
+                    '-i', 'input/contigs.fna.gz',
+                    '--bam', 'input/mapped.bam',
+                    '--output', 'output'
+                    ])
+
+
 .. automodule:: jug.utils
     :members:
