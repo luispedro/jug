@@ -6,3 +6,4 @@ build
 Jug.egg-info
 dist/
 .tox
+.pytest_cache/
