@@ -32,7 +32,6 @@ __all__ = [
     'identity',
     'jug_execute',
     'CustomHash',
-    'UnsafeNoHash',
     'sync_move',
     'cached_glob',
     ]
@@ -118,37 +117,6 @@ class CustomHash:
 
     def __jug_value__(self):
         return value(self.obj)
-
-class UnsafeNoHash:
-    '''
-    Class that indicates that no hashing is to be done on an object.
-
-    This is useful when you want to indicate that the object should not be
-    hashed as its value is not important.
-
-    For example, if you are using jug_execute and one of the arguments is the
-    number of CPUs:
-
-    ::
-
-        jug_execute(['make', '-j', UnsafeNoHash(4)])
-
-    This way, the number of CPUs is not hashed and the task will be **not** be
-    rerun if the number of CPUs changes.
-
-    Parameters
-    ----------
-    obj : any object
-    '''
-    def __init__(self, obj):
-        self.obj = obj
-
-    def __jug_value__(self):
-        return self.obj
-
-    def __jug_hash__(self):
-        return b'nohash'
-
 
 
 def hash_with_mtime_size(path):
