@@ -2,6 +2,37 @@
 History
 =======
 
+Version 2.4.0
+-------------
+
+*Released 8 May 2025*
+
+User-visible improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Adds support for lambda functions in ``Tasklets``
+* Adds ``NoHash`` class to disable hashing for some arguments. This is in
+  ``jug.unsafe`` as it can be used to "fool" Jug, but it can be useful when
+  there are nuisance arguments that are not relevant for the task (e.g., number
+  of threads)
+* jug.file_store: create files with better permissions
+
+Internal improvements
+~~~~~~~~~~~~~~~~~~~~~
+* Convert to ``pyproject.toml`` for building
+
+Bugfixes
+~~~~~~~~
+
+* Better error detection for permission problems
+* Bugfix when using local imports and ``jug pack``
+
+
+Drops support for versions of Python older than 3.7. Technically, it should
+still work, but they are too old to test in Github CI, so we will not support
+them.
+
+
 Version 2.3.1
 -------------
 
