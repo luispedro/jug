@@ -65,6 +65,34 @@ def fsync_dir(fname):
         os.close(fd)
 
 
+def _make_temp_file(tempdir):
+    '''Create temporary file in tempdir
+
+    This is better than using tempfile.mkstemp because that function creates files
+    with mode 0600, which is not always the right thing to do. This function
+    results in the same permissions as the regular open() function.
+
+    Parameters
+    ----------
+    tempdir : str
+        Directory where to create the temporary
+
+    Returns
+    -------
+    fname : str
+        Filename
+    output : file
+    '''
+    import random
+    import string
+    while True:
+        fname = path.join(tempdir,
+                    ''.join(random.choices(string.ascii_letters, k=24)))
+        try:
+            return fname, open(fname, 'bx')
+        except FileExistsError:
+            pass
+
 class file_store(base_store):
     def __init__(self, dname, compress_numpy=False):
         '''
@@ -130,8 +158,7 @@ class file_store(base_store):
         self._maybe_create()
         name = self._getfname(name)
         os.makedirs(dirname(name), exist_ok=True)
-        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
-        output = os.fdopen(fd, 'wb')
+        fname, output = _make_temp_file(self.tempdir())
         try:
             import numpy as np
             if not self.compress_numpy and type(value) == np.ndarray:
