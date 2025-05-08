@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Jug"
+dynamic = ['version']
+description = "A Task Based Parallelization Framework"
+readme = "README.rst"
+license = {text = "MIT"}
+authors = [
+  {name = "Luis Pedro Coelho", email = "luis@luispedro.org"}
+]
+requires-python = ">=3.7"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Operating System :: POSIX",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Software Development",
+  "Topic :: System :: Distributed Computing",
+  "Intended Audience :: Science/Research",
+]
+
+dependencies = [
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "numpy",
+    "pyyaml",
+    "redis",
+    ]
+
+[project.urls]
+Homepage = "https://jug.readthedocs.io"
+
+[project.scripts]
+jug = "jug.jug:main"
+jug-execute = "jug.jug:main_execute"
+
+[tool.setuptools]
+packages = [
+    'jug',
+    'jug.subcommands',
+    'jug.internal',
+    'jug.backends',
+    'jug.tests',
+    'jug.hooks',
+    'jug.tests.jugfiles',
+]
+
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "jug.jug_version.__version__"}
+

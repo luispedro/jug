@@ -269,6 +269,13 @@ def main(argv=None):
     sys.exit(retval)
 
 
+def main_execute():
+    import sys
+    args = sys.argv[:]
+    args.insert(1, 'execute')
+    return main(args)
+
+
 if __name__ == '__main__':
     try:
         main()
