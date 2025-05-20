@@ -167,6 +167,7 @@ def test_cleanup(store):
 def test_polars_io(tmpdir):
     try:
         import polars as pl
+        import polars.testing
     except ImportError:
         pytest.skip()
     store = jug.backends.file_store.file_store(str(tmpdir), compress_numpy=False)
@@ -181,6 +182,6 @@ def test_polars_io(tmpdir):
     store.dump(arr, key)
 
     arr2 = store.load(key)
-    assert arr.equals(arr2)
+    pl.testing.assert_frame_equal(arr, arr2)
     store.remove(key)
     store.close()
