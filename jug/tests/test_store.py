@@ -11,7 +11,7 @@ else:
 
 try:
     redisConnectionError = redis.ConnectionError
-except:
+except AttributeError:
     redisConnectionError = SystemError
 
 @pytest.fixture(scope='function', params=['file', 'dict', 'redis'])
@@ -164,3 +164,23 @@ def test_cleanup(store):
     assert len(list(store.list())) == 0
 
 
+def test_polars_io(tmpdir):
+    try:
+        import polars as pl
+    except ImportError:
+        pytest.skip()
+    store = jug.backends.file_store.file_store(str(tmpdir), compress_numpy=False)
+    arr = pl.DataFrame({
+        'a': [1, 2, 3],
+        'b': [4.2, 5.5, 6.3],
+        'c': [True, False, True],
+        'd': ['a', 'b', 'c'],
+        'e': [1, 2, 3],
+        })
+    key = 'mykey'
+    store.dump(arr, key)
+
+    arr2 = store.load(key)
+    assert arr.equals(arr2)
+    store.remove(key)
+    store.close()

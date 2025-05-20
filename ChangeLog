@@ -1,3 +1,6 @@
+Unreleased
+	* jug.backend.file_store: Special case saving polars DataFrames for speed
+
 Version 2.4.0 Thu 8 May 2025 by luispedro
 	* Tasklet: Support for lambda functions in Tasklets
 	* pack: bugfix when using local imports

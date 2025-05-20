@@ -64,6 +64,33 @@ def fsync_dir(fname):
         os.close(fd)
 
 
+def _write_to(value, output, compress_numpy):
+    try:
+        import numpy as np
+        if not compress_numpy and type(value) is np.ndarray:
+            np.lib.format.write_array(output, value)
+            return
+    except ImportError:
+        pass
+    except OSError:
+        pass
+    except ValueError:
+        pass
+    try:
+        import polars as pl
+        if not compress_numpy and type(value) is pl.DataFrame:
+            value.write_parquet(output)
+            return
+    except ImportError:
+        pass
+    except OSError:
+        pass
+    except ValueError:
+        pass
+
+    encode_to(value, output)
+
+
 def _make_temp_file(tempdir):
     '''Create temporary file in tempdir
 
@@ -158,24 +185,8 @@ class file_store(base_store):
         name = self._getfname(name)
         os.makedirs(dirname(name), exist_ok=True)
         fname, output = _make_temp_file(self.tempdir())
-        try:
-            import numpy as np
-            if not self.compress_numpy and type(value) is np.ndarray:
-                np.lib.format.write_array(output, value)
-                output.flush()
-                os.fsync(output.fileno())
-                output.close()
-                fsync_dir(fname)
-                os.rename(fname, name)
-                return
-        except ImportError:
-            pass
-        except OSError:
-            pass
-        except ValueError:
-            pass
+        _write_to(value, output, self.compress_numpy)
 
-        encode_to(value, output)
         output.flush()
         os.fsync(output.fileno())
         output.close()
@@ -302,6 +313,14 @@ class file_store(base_store):
                 ifile.seek(0)
             except ImportError:
                 pass
+            if ifile.peek(4)[:4] == b'PAR1':
+                try:
+                    import polars as pl
+                    return pl.read_parquet(ifile)
+                except ImportError:
+                    pass
+                except Exception:
+                    ifile.seek(0)
             return decode_from(ifile)
 
 
