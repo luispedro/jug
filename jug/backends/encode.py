@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2021, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2025, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,6 +27,7 @@ import zlib
 
 __all__ = ['encode', 'decode', 'encode_to', 'decode_from']
 
+
 def encode(object):
     '''
     s = encode(object)
@@ -49,6 +50,7 @@ def encode(object):
     encode_to(object, output)
     return output.getvalue()
 
+
 def encode_to(object, stream):
     '''
     encode_to(object, stream)
@@ -66,7 +68,7 @@ def encode_to(object, stream):
     write = lambda obj,s: pickle.dump(obj, s, protocol=pickle.HIGHEST_PROTOCOL)
     try:
         import numpy as np
-        if type(object) == np.ndarray:
+        if type(object) is np.ndarray:
             prefix = b'N'
             # We need to switch the arguments around because pickle.dump and
             # np.save have different argument orders:
@@ -77,6 +79,7 @@ def encode_to(object, stream):
     stream.write(prefix)
     write(object, stream)
     stream.flush()
+
 
 class compress_stream:
     def __init__(self, stream):

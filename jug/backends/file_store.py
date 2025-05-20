@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2024, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2025, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +29,6 @@ import os
 import sys
 from os import path
 from os.path import dirname, exists
-import errno
 import logging
 import tempfile
 import shutil
@@ -93,6 +92,7 @@ def _make_temp_file(tempdir):
         except FileExistsError:
             pass
 
+
 class file_store(base_store):
     def __init__(self, dname, compress_numpy=False):
         '''
@@ -135,10 +135,9 @@ class file_store(base_store):
         return path.join(self.jugdir, 'tempfiles')
 
     def _getfname(self, name):
-        if type(name) != str:
+        if not isinstance(name, str):
             name = name.decode('utf-8')
         return path.join(self.jugdir, name[:2], name[2:])
-
 
     def dump(self, value, name):
         '''
@@ -161,7 +160,7 @@ class file_store(base_store):
         fname, output = _make_temp_file(self.tempdir())
         try:
             import numpy as np
-            if not self.compress_numpy and type(value) == np.ndarray:
+            if not self.compress_numpy and type(value) is np.ndarray:
                 np.lib.format.write_array(output, value)
                 output.flush()
                 os.fsync(output.fileno())
@@ -482,7 +481,7 @@ class file_based_lock(base_lock):
     _FAILED_TIMESTAMP = (1, 1)  # atime, mtime
 
     def __init__(self, jugdir, name):
-        if type(name) != str:
+        if not isinstance(name, str):
             name = str(name, 'utf-8')
         self.fullname = path.join(jugdir, 'locks', '{0}.lock'.format(name))
 
