@@ -27,7 +27,7 @@ different machines.
 
 Jug is a pure Python implementation and should work on any platform.
 
-Python versions 3.5 and above are supported.
+Python versions 3.7 and above are supported.
 
 *Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`__
 

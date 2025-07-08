@@ -28,7 +28,6 @@ For example::
             results.append(poly(n, 2*n, poly(n,n,n)))
         return max3(results)
 
-    # Work in Python2 & Python3
     numbers = list(range(192))
     intermediate = buildup(numbers)
     ...
@@ -77,7 +76,6 @@ been computed::
             results.append(poly(n, 2*n, poly(n,n,n)))
         return max3(results)
 
-    # Work in Python2 & Python3
     numbers = list(range(192))
     intermediate = buildup(numbers)
     ...
