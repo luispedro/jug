@@ -11,7 +11,8 @@ def inc_A():
 def reset_hooks_at_exit():
     yield
     reset_all_hooks()
-    del A[:] # A.clear() is not available in Python 2.x
+    A.clear()
+
 
 def test_basic(reset_hooks_at_exit):
     assert len(A) == 0

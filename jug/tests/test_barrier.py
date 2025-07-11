@@ -56,10 +56,6 @@ def test_bvalue():
 
 @task_reset
 def test_recursive():
-    from sys import version_info
-    if version_info[0] == 2 and version_info[1] == 6:
-        "We skip this test on Python 2.6"
-        return
     jugfile = find_test_jugfile('barrier_recurse.py')
     store, space = jug.jug.init(jugfile, 'dict_store')
     assert 's2' not in space
