@@ -208,3 +208,12 @@ def test_polars_io(tmpdir):
     pl.testing.assert_frame_equal(arr, arr2)
     store.remove(key)
     store.close()
+
+
+def test_listlocks(store):
+    # Test that listlocks returns an empty list when no locks are present
+    assert list(store.listlocks()) == []
+    lock = store.getlock(b'foo')
+    lock.get()
+    assert list(store.listlocks()) == [b'foo']
+
