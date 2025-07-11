@@ -149,7 +149,10 @@ def read_configuration_file(fp=None, default_options=None):
                 old_value = getattr(default_options, new_name, None)
                 if old_value is not None:
                     # Cast the config object to the same type as the default
-                    value = type(old_value)(value)
+                    if isinstance(old_value, bool):
+                        value = _str_to_bool(value)
+                    else:
+                        value = type(old_value)(value)
 
             logging.debug("Setting %s to %s", new_name, value)
             setattr(inifile, new_name, value)
