@@ -11,8 +11,8 @@ What Backends Are Available?
 ----------------------------
 
 There are three backend available: one is based on the filesystem, the other is a
-`redis`_ backend and a simple in-memory backend which does not allow sharing
-across processes.
+`redis <https://redis.io/>`__ backend and a simple in-memory backend which does
+not allow sharing across processes.
 
 Filesystem
 ..........
@@ -57,6 +57,4 @@ take very long), it is also faster and, if your results are small, takes up
 significantly less space.
 
 The tradeoffs are speed and space vs. convenience.
-
-.. _redis: http://code.google.com/p/redis
 

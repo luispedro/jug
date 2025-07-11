@@ -49,7 +49,7 @@ def exit_after_n_tasks(n):
     '''
     from jug import hooks
     # In newer Python, we could use nonlocal, but this is a work around
-    # (http://stackoverflow.com/questions/9603278/is-there-something-like-nonlocal-in-python-3/9603491#9603491)
+    # (https://stackoverflow.com/questions/9603278/is-there-something-like-nonlocal-in-python-3/9603491#9603491)
     executed = [0]
 
     def exit_after(_t):

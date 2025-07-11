@@ -71,7 +71,7 @@ FURTHER READING
 The online documentation contains further reading. You can read the next
 tutorial here:
 
-http://jug.readthedocs.io/en/latest/decrypt-example.html
+https://jug.readthedocs.io/en/latest/decrypt-example.html
 ''')
         if path.exists('jug-demo'):
             print("Jug-demo previously created")

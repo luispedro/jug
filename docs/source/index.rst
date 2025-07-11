@@ -9,7 +9,7 @@ Jug: A Task-Based Parallelization Framework
         Coelho, L.P., (2017). Jug: Software for Parallel Reproducible Computation in
         Python. Journal of Open Research Software. 5(1), p.30.
 
-        http://doi.org/10.5334/jors.161
+        https://doi.org/10.5334/jors.161
 
 What is Jug?
 ------------
@@ -93,11 +93,9 @@ the `examples/` directory.
 Links
 -----
 
-- `Mailing list <http://groups.google.com/group/jug-users>`__
-- `Github <http://github.com/luispedro/jug>`__
-- `Freshmeat <http://freshmeat.net/projects/jug>`__
-- `Documentation <http://packages.python.org/Jug/>`__
-- `Homepage <http://luispedro.org/software/jug>`__
+- `Mailing list <https://groups.google.com/group/jug-users>`__
+- `Github <https://github.com/luispedro/jug>`__
+- `Documentation <https://jug.readthedocs.io/>`__
 
 How do I get Jug?
 -----------------
@@ -109,9 +107,9 @@ pip install jug
 
 You can either get the git repository at
 
-`http://github.com/luispedro/jug <http://github.com/luispedro/jug>`__
+`https://github.com/luispedro/jug <https://github.com/luispedro/jug>`__
 
-Or download the package from `PyPI <http://pypi.python.org/pypi/Jug>`__
+Or download the package from `PyPI <https://pypi.python.org/pypi/Jug>`__
 
 
 Testimonials

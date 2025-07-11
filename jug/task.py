@@ -56,11 +56,11 @@ You cannot iterate over Task results.
 
 If the Task returns an iterator of a fixed size, `iteratetask` may fit your usage:
 
-http://jug.readthedocs.io/en/latest/api.html?highlight=iteratetask#jug.iteratetask
+https://jug.readthedocs.io/en/latest/api.html?highlight=iteratetask#jug.iteratetask
 
 Otherwise, you may wish to consider `bvalue`:
 
-http://jug.readthedocs.io/en/latest/api.html?highlight=bvalue#jug.bvalue
+https://jug.readthedocs.io/en/latest/api.html?highlight=bvalue#jug.bvalue
 """)
 
 class Task(TaskletMixin):

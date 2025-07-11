@@ -168,7 +168,7 @@ class ShellCommand(SubCommand):
             'get_filtered_tasks': _get_filtered_tasks,
         }
         # This is necessary for some versions of Ipython. See:
-        # http://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
+        # https://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
         try:
             del jugspace['__builtins__']
         except KeyError:

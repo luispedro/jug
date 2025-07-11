@@ -58,7 +58,7 @@ Given that jobs can join the computation at any time and all of the
 communication is through the backend (file system by default), jug is
 especially suited for these environments.
 
-The project `gridjug <http://gridjug.readthedocs.io/>`__ integrates jug with
+The project `gridjug <https://gridjug.readthedocs.io/>`__ integrates jug with
 `gridmap <https://github.com/pygridtools/gridmap>`__ to help run jug on SGE
 clusters (this is an external project).
 
@@ -150,7 +150,7 @@ It would also slow things down. Even if it checked only the Python code: it
 would need to check the function code & all dependencies + global variables at
 the time of task generation.
 
-I believe `sumatra <http://pythonhosted.org/Sumatra/>`__ accomplishes this.
+I believe `sumatra <https://pythonhosted.org/Sumatra/>`__ accomplishes this.
 Consider using it if you desire all this functionality.
 
 2) I was also afraid that this would make people wary of refactoring their
@@ -170,7 +170,7 @@ Long answer: Yes, with a little bit of special code. If you have another way to
 get them from one machine to another, you could write a special backend for
 that. Right now, only ``numpy`` arrays are treated as a special case (they are
 not pickled, but rather saved in their native format), but you could extend
-this. Ask on the `mailing list <http://groups.google.com/group/jug-users>`_ if
+this. Ask on the `mailing list <https://groups.google.com/group/jug-users>`_ if
 you want to learn more.
 
 Is jug based on a background server?

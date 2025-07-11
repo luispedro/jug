@@ -22,7 +22,7 @@ not sure how to reproduce again.
 Therefore, I decided I was going to write a solution for this.
 
 The initial idea was something like an enhanced Makefile language. This evolved
-into something similiar to `scons <http://www.scons.org/>`__. Very rapidily it
+into something similar to `scons <https://www.scons.org/>`__. Very rapidly it
 became apparent that a good solution involved *Tasks* and saving results to
 files based on a hash of the inputs. This is still the basis of jug's
 architecture. All of this was at the paper napkin stage, written in some off

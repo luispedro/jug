@@ -25,7 +25,7 @@ def get_data(title):
               'rvprop': 'content',
               'format': 'json',
               'titles': title}
-    r = requests.get('http://en.wikipedia.org/w/api.php', params=params)
+    r = requests.get('https://en.wikipedia.org/w/api.php', params=params)
     data = json.loads(r.text)
     data = list(data['query']['pages'].values())[0]
     text = data['revisions'][0]['*']

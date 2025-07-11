@@ -4,14 +4,14 @@ Image Segmentation Tutorial
 
 This was originally material for a presentation and `blog post
 <https://metarabbit.wordpress.com/2013/05/20/segmenting-images-in-parallel-with-python-jug/>`__.
-You can get the `slides online <http://luisepdro.org/talks/2013/jug-meetup>`__.
+You can get the `slides online <https://luisepdro.org/talks/2013/jug-meetup>`__.
 
 Let us imagine you are trying to compare two image segmentation algorithms
 based on human-segmented images. This is a completely real-world example as it
 `was one of the projects where I first used jug
 <https://github.com/luispedro/Coelho2009_ISBI_NuclearSegmentation>`__ [#]_.
 
-It depends on `mahotas <http://mahotas.readthedocs.org/>`__ for image
+It depends on `mahotas <https://mahotas.readthedocs.org/>`__ for image
 processing.
 
 We are going to build this up piece by piece.
@@ -46,7 +46,7 @@ Here, we test two thresholding-based segmentation method, called ``method1`` and
 
 
 We need a way to compare these. We will use the `Adjusted Rand Index
-<http://en.wikipedia.org/wiki/Rand_index>`__ [#]_::
+<https://en.wikipedia.org/wiki/Rand_index>`__ [#]_::
 
     @TaskGenerator
     def compare(labeled, ref):
@@ -118,5 +118,5 @@ The full script above including data is available `from github
 
 .. [#] Again, you can do better than Adjusted Rand, as we show in the paper;
    but **this is a demo**. This way, we can just call a function in `milk
-   <http://luispedro.org/software/milk>`__
+   <https://luispedro.org/software/milk>`__
 
