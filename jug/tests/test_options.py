@@ -83,3 +83,17 @@ def test_bool():
     assert _str_to_bool("on")
     assert _str_to_bool("true")
     assert _str_to_bool("1")
+
+
+_bool_options_file = """
+[main]
+will-cite=false
+"""
+
+
+def test_bool_from_config():
+    opts = jug.options.read_configuration_file(
+        StringIO(_bool_options_file),
+        default_options=jug.options.default_options,
+    )
+    assert opts.will_cite is False
