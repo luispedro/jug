@@ -2,6 +2,7 @@ import inspect
 import os
 
 import jug.task
+from pytest import raises
 from .task_reset import task_reset_at_exit, task_reset
 from .utils import simple_execute
 
@@ -136,6 +137,12 @@ def test_hash_different_func():
     T1 = jug.task.Task(add2,0)
 
     assert T0.hash() != T1.hash()
+
+
+@task_reset
+def test_task_rejects_lambda():
+    with raises(ValueError):
+        jug.task.Task(lambda x: x + 1, 0)
 
 
 @task_reset

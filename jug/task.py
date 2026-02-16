@@ -79,7 +79,7 @@ class Task(TaskletMixin):
     store = None
     # __slots__ = ('name', 'f', 'args', 'kwargs', '_hash','_lock')
     def __init__(self, f, *args, **kwargs):
-        if getattr(f, 'func_name', '') == '<lambda>':
+        if getattr(f, '__name__', getattr(f, 'func_name', '')) == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
 
 Write an email to the authors if you feel you have a strong reason to use them (they are a bit
@@ -748,4 +748,3 @@ def describe(t):
     elif isinstance(t, tuple):
         return tuple(list(t))
     return t
-
