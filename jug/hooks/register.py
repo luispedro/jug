@@ -12,7 +12,7 @@ _known_hooks = frozenset([
         'execute.finished_post_status',
         ])
 
-def jug_hook(name, args=(), kwargs={}):
+def jug_hook(name, args=(), kwargs=None):
     '''Call hook
 
     Calls ``f(*args, **kwargs)`` for all functions registered with name ``name``.
@@ -29,6 +29,8 @@ def jug_hook(name, args=(), kwargs={}):
     res : list
         A list with the result of all the functions
     '''
+    if kwargs is None:
+        kwargs = {}
     return [f(*args, **kwargs) for f in _hooks.get(name, [])]
 
 _registered = set([])
