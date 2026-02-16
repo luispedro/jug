@@ -133,70 +133,69 @@ the `value` function::
 What's New
 ----------
 
-Version 2.3.1 (*5 November 2023*)
+Unreleased
+----------
+
+User-visible improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Support project-local configuration files (``.jugrc`` or ``jugrc``). Jug now
+  walks up the directory tree from the current working directory (up to the git
+  project root) looking for local configuration files. See
+  :doc:`configuration` for details.
+
+
+Version 2.4.0
+-------------
+
+*Released 8 May 2025*
+
+User-visible improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Adds support for lambda functions in ``Tasklets``
+* Adds ``NoHash`` class to disable hashing for some arguments. This is in
+  ``jug.unsafe`` as it can be used to "fool" Jug, but it can be useful when
+  there are nuisance arguments that are not relevant for the task (e.g., number
+  of threads)
+* jug.file_store: create files with better permissions
+
+Internal improvements
+~~~~~~~~~~~~~~~~~~~~~
+* Convert to ``pyproject.toml`` for building
+
+Bugfixes
+~~~~~~~~
+
+* Better error detection for permission problems
+* Bugfix when using local imports and ``jug pack``
+
+
+Drops support for versions of Python older than 3.7. Technically, it should
+still work, but they are too old to test in Github CI, so we will not support
+them.
+
+
+Version 2.3.1
+-------------
+
+*Released 5 November 2023*
 
 - Update for Python 3.12
 
-Version 2.3.0 (*25 June 2023*)
+Version 2.3.0
+-------------
+
+*Released 25 June 2023*
 
 - jug shell: Add ``get_filtered_tasks()``
 - jug: Fix ``jug --version`` (which had been broken in the refactoring to use subcommands)
 - jug shell: Fix message in jug shell when there are no dependencies (it would repeatedly print the message stating *this will only be run once*)
 - jug pack: Make it much faster to invalidate elements
 - file_store: ensure that the temporary directory exists
-
-Version 2.2.3 (*26 May 2023*)
-- Fix ``jug shell`` for newer versions of IPython
-
-Version 2.2.2 (*19 July 2022*)
-- Fix ``jug cleanup`` when packs are used (``jug pack``)
-
-Version 2.2.1 (*19 May 2022*)
-- Fix bug with ``jug cleanup`` and the redis backend (`#86 <https://github.com/luispedro/jug/issues/86>`__)
-
-Version 2.2.0 (*3 May 2022*)
-
-- Add ``jug pack`` subcommand
-- Make ``get_tasks()`` return a copy of the tasks inside ``jug shell``
-- Remove ``six`` dependency
-
-Version 2.1.1 (*18 March 2021*)
-
-- Include requirements files in distribution
-
-Version 2.1.0 (*18 March 2021*)
-
-- Improvements to webstatus (by Robert Denham)
-- Removed Python 2.7 support
-- Fix output encoding for Python 3.8
-- Fix bug mixing ``mapreduce()`` & ``status --cache``
-- Make block_access (used in ``mapreduce()``) much faster (20x)
-- Fix important redis bug
-- More precise output in ``cleanup`` command
-
-Version 2.0.2 (Thu Jun 11 2020)
-
-- Fix command line argument parsing
-
-Version 2.0.1 (Thu Jun 11 2020)
-
-- Fix handling of ``JUG_EXIT_IF_FILE_EXISTS`` environmental variable
-- Fix passing an argument to ``jug.main()`` function
-- Extend ``--pdb`` to exceptions raised while importing the jugfile (issue #79)
-
-version **2.0.0** (Fri Feb 21 2020)
-
-- jug.backend.base_store has 1 new method 'listlocks'
-- jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
-- Add 'jug execute --keep-failed' to preserve locks on failing tasks.
-- Add 'jug cleanup --failed-only' to remove locks from failed tasks
-- 'jug status' and 'jug graph' now display failed tasks
-- Check environmental exit variables by default (suggested by Renato Alves, issue #66)
-- Fix 'jug sleep-until' in the presence of barrier() (issue #71)
+- Drops support for Python 3.4
 
 For older version see ``ChangeLog`` file or the `full history
 <https://jug.readthedocs.io/en/latest/history.html>`__.
-
-
 
 
