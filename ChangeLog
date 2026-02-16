@@ -2,6 +2,7 @@ Unreleased
 	* jug.backend.file_store: Special case saving polars DataFrames for speed
 	* jug.backend.dict_store: Fix for Python 3
 	* jug.task: fix describe for Python 3
+	* jug.options: More flexible parsing of booleans
 
 Version 2.4.0 Thu 8 May 2025 by luispedro
 	* Tasklet: Support for lambda functions in Tasklets

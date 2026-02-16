@@ -83,3 +83,24 @@ def test_bool():
     assert _str_to_bool("on")
     assert _str_to_bool("true")
     assert _str_to_bool("1")
+
+
+def test_parse_bool_from_config_false():
+    parsed = jug.options.parse(
+        ["execute"],
+        StringIO("[main]\nwill-cite=false\n"))
+    assert not parsed.will_cite
+
+
+def test_parse_bool_from_config_off():
+    parsed = jug.options.parse(
+        ["execute"],
+        StringIO("[main]\nwill-cite=off\n"))
+    assert not parsed.will_cite
+
+
+def test_parse_bool_from_config_zero():
+    parsed = jug.options.parse(
+        ["execute"],
+        StringIO("[main]\nwill-cite=0\n"))
+    assert not parsed.will_cite
