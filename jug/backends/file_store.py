@@ -134,8 +134,10 @@ class file_store(base_store):
         if path.exists(self._packfile()):
             with open(self._packfile(), 'rb') as pfile:
                 sys.path.insert(0, '.')
-                self.packed = decode_from(pfile)
-                del sys.path[0]
+                try:
+                    self.packed = decode_from(pfile)
+                finally:
+                    del sys.path[0]
 
     def _packfile(self):
         return path.join(self.jugdir, 'packs', 'jugpack')
@@ -725,4 +727,3 @@ class file_keepalive_based_lock(file_based_lock):
                     return True
 
         return False
-

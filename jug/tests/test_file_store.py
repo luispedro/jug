@@ -4,6 +4,7 @@ from jug.hash import hash_one
 
 import pytest
 import os
+import sys
 from io import BytesIO
 
 def test_encode_decode_empty_string():
@@ -99,3 +100,14 @@ def test_lock_permissions(tmpdir):
     with pytest.raises(PermissionError):
         lock.get()
 
+
+def test_pack_decode_error_does_not_leak_sys_path(tmpdir):
+    tmpdir = str(tmpdir)
+    os.makedirs(os.path.join(tmpdir, 'packs'), exist_ok=True)
+    with open(os.path.join(tmpdir, 'packs', 'jugpack'), 'wb') as out:
+        out.write(b'not-a-valid-pack')
+
+    before = list(sys.path)
+    with pytest.raises(Exception):
+        file_store(tmpdir)
+    assert sys.path == before
