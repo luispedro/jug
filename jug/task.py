@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008-2024, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -41,9 +41,9 @@ class _getitem:
         return hash_one(('jug.task._getitem', self.slice))
 
     def __repr__(self):
-        return 'jug.task._getitem(%s)' % self.slice
+        return f'jug.task._getitem({self.slice})'
     def __str__(self):
-        return 'jug.task._getitem(%s)' % self.slice
+        return f'jug.task._getitem({self.slice})'
 
 class TaskletMixin:
     __slots__ = ()
@@ -730,7 +730,7 @@ def describe(t):
         if len(t.args):
             description['args'] = [describe(a) for a in t.args]
         if len(t.kwargs):
-            description['kwargs'] = dict([(k,describe(v)) for k,v in t.kwargs.iteritems()])
+            description['kwargs'] = dict([(k,describe(v)) for k,v in t.kwargs.items()])
         meta = t.store.metadata(t)
         if meta is not None:
             description['meta'] = meta

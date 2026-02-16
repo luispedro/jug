@@ -164,6 +164,17 @@ def test_cleanup(store):
     assert len(list(store.list())) == 0
 
 
+def test_remove_returns(store):
+    """remove() must return True when an entry was actually removed and return
+    False when key doesn't exist."""
+    result = store.remove(b"nonexistent")
+    assert not result
+
+    store.dump("val", b"mykey")
+    result = store.remove(b"mykey")
+    assert result
+
+
 def test_polars_io(tmpdir):
     try:
         import polars as pl

@@ -267,3 +267,19 @@ def test_builtin_function():
     simple_execute()
     a8 = jug.task.value(space['a8'])
     assert np.all(a8 == np.arange(8))
+
+
+@task_reset
+def test_describe_task_with_kwargs():
+    """describe() must work on a Task that has keyword arguments."""
+    from jug.task import Task, describe
+
+    def add(x, y=0):
+        return x + y
+
+    t = Task(add, 1, y=2)
+    t.run()
+    desc = describe(t)
+    assert desc['name'].endswith('add')
+    assert 'kwargs' in desc
+

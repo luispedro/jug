@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2009-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2026, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -101,6 +101,8 @@ class dict_store(base_store):
         if self.can_load(name):
             self.counts[_gen_key('true-del',name)] += 1
             del self.store[_resultname(name)]
+            return True
+        return False
 
 
     def cleanup(self, active, keeplocks=False):
