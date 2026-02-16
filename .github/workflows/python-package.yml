@@ -31,9 +31,9 @@ jobs:
         uv sync --all-extras --dev
         uv pip install flake8 pytest
     - name: Start Redis
-      uses: supercharge/redis-github-action@1.1.0
+      uses: supercharge/redis-github-action@1.8.1
       with:
-        redis-version: 6
+        redis-version: 7
     - name: Test Jug script
       run: |
         mkdir _test
