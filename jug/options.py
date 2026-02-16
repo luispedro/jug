@@ -102,6 +102,86 @@ def key_to_option(s):
     return s.replace('-', '_')
 
 
+def find_local_configuration_files():
+    '''
+    files = find_local_configuration_files()
+
+    Walk up from the current working directory looking for `.jugrc` or `jugrc`
+    files. If a `.git` directory is found, search up to (and including) that
+    directory. If no `.git` is found, only search the current directory.
+
+    Returns
+    -------
+    files : list of str
+        Paths to configuration files, ordered closest-to-cwd first.
+    '''
+    from pathlib import Path
+    cwd = Path.cwd()
+    found = []
+    git_root = None
+
+    # Walk upward to find git root
+    for d in [cwd, *cwd.parents]:
+        if (d / '.git').is_dir():
+            git_root = d
+            break
+
+    # Search directories from cwd upward
+    search = [cwd, *cwd.parents] if git_root is not None else [cwd]
+    for d in search:
+        for name in ['.jugrc', 'jugrc']:
+            candidate = d / name
+            if candidate.is_file():
+                found.append(str(candidate))
+        if git_root is not None and d == git_root:
+            break
+
+    return found
+
+
+def _parse_config_file(fp, next_options, default_options=None):
+    '''Parse a single configuration file into an Options object.
+
+    Parameters
+    ----------
+    fp : file-like object
+        Open file to read.
+    next_options : Options
+        The next Options object in the chain.
+    default_options : Options, optional
+        Used to determine types for casting config values.
+
+    Returns
+    -------
+    options : Options
+    '''
+    import configparser
+    options = Options(next_options)
+    config = configparser.RawConfigParser()
+    config.read_file(fp)
+    fp.close()
+
+    for section in config.sections():
+        for key, value in config.items(section):
+            if section == "main":
+                new_name = key_to_option(key)
+            else:
+                new_name = "{0}_{1}".format(key_to_option(section), key_to_option(key))
+
+            if default_options is not None:
+                old_value = getattr(default_options, new_name, None)
+                if old_value is not None:
+                    if isinstance(old_value, bool):
+                        value = _str_to_bool(value)
+                    else:
+                        value = type(old_value)(value)
+
+            logging.debug("Setting %s to %s", new_name, value)
+            setattr(options, new_name, value)
+
+    return options
+
+
 def read_configuration_file(fp=None, default_options=None):
     '''
     options = read_configuration_file(fp='~/.config/jugrc',
@@ -117,47 +197,39 @@ def read_configuration_file(fp=None, default_options=None):
         Dictionary with the default values for all command-line arguments.
         Used to convert settings in the config file to the correct object type.
     '''
-    inifile = Options(default_options)
+    if fp is not None:
+        return _parse_config_file(fp, default_options, default_options=default_options)
 
-    if fp is None:
-        from os import path
-        for fp in ['~/.config/jug/jugrc', '~/.config/jugrc', '~/.jug/configrc']:
-            fp = path.expanduser(fp)
-            if path.exists(fp):
-                try:
-                    fp = open(fp)
-                except IOError:
-                    return inifile
+    # Start with global config -> defaults chain
+    global_options = Options(default_options)
+    from os import path
+    for gfp in ['~/.config/jug/jugrc', '~/.config/jugrc', '~/.jug/configrc']:
+        gfp = path.expanduser(gfp)
+        if path.exists(gfp):
+            try:
+                f = open(gfp)
+            except IOError:
                 break
-        else:
-            return inifile
+            global_options = _parse_config_file(f, default_options, default_options=default_options)
+            break
 
-    import configparser
-    config = configparser.RawConfigParser()
-    config.read_file(fp)
-    fp.close()
+    # Find local config files (closest-first)
+    local_files = find_local_configuration_files()
 
-    for section in config.sections():
-        for key, value in config.items(section):
-            if section == "main":
-                new_name = key_to_option(key)
-            else:
-                new_name = "{0}_{1}".format(key_to_option(section), key_to_option(key))
+    if not local_files:
+        return global_options
 
-            # Get the type of the default value if a default value exists
-            if default_options is not None:
-                old_value = getattr(default_options, new_name, None)
-                if old_value is not None:
-                    # Cast the config object to the same type as the default
-                    if isinstance(old_value, bool):
-                        value = _str_to_bool(value)
-                    else:
-                        value = type(old_value)(value)
+    # Chain: closest local -> ... -> farthest local -> global -> defaults
+    # Build from farthest to closest so closest ends up on top
+    head = global_options
+    for config_path in reversed(local_files):
+        try:
+            f = open(config_path)
+        except IOError:
+            continue
+        head = _parse_config_file(f, head, default_options=default_options)
 
-            logging.debug("Setting %s to %s", new_name, value)
-            setattr(inifile, new_name, value)
-
-    return inifile
+    return head
 
 
 def add_common_options(parser):

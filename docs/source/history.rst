@@ -2,6 +2,18 @@
 History
 =======
 
+Unreleased
+----------
+
+User-visible improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Support project-local configuration files (``.jugrc`` or ``jugrc``). Jug now
+  walks up the directory tree from the current working directory (up to the git
+  project root) looking for local configuration files. See
+  :doc:`configuration` for details.
+
+
 Version 2.4.0
 -------------
 

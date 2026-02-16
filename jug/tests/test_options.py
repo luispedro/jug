@@ -104,3 +104,76 @@ def test_parse_bool_from_config_zero():
         ["execute"],
         StringIO("[main]\nwill-cite=0\n"))
     assert not parsed.will_cite
+
+
+def test_find_local_config_with_git(tmp_path, monkeypatch):
+    # Create a mock git project with config files at multiple levels
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / ".git").mkdir()
+    (project / ".jugrc").write_text("[main]\njugfile=root.py\n")
+
+    sub = project / "sub"
+    sub.mkdir()
+    (sub / ".jugrc").write_text("[main]\njugfile=sub.py\n")
+
+    monkeypatch.chdir(sub)
+    files = jug.options.find_local_configuration_files()
+    assert len(files) == 2
+    assert files[0] == str(sub / ".jugrc")
+    assert files[1] == str(project / ".jugrc")
+
+
+def test_find_local_config_without_git(tmp_path, monkeypatch):
+    # Without .git, only search cwd
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / ".jugrc").write_text("[main]\njugfile=root.py\n")
+
+    sub = project / "sub"
+    sub.mkdir()
+    (sub / "jugrc").write_text("[main]\njugfile=sub.py\n")
+
+    monkeypatch.chdir(sub)
+    files = jug.options.find_local_configuration_files()
+    assert len(files) == 1
+    assert files[0] == str(sub / "jugrc")
+
+
+def test_find_local_config_both_filenames(tmp_path, monkeypatch):
+    # Both .jugrc and jugrc in the same directory
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / ".jugrc").write_text("[main]\njugfile=dot.py\n")
+    (project / "jugrc").write_text("[main]\njugfile=nodot.py\n")
+
+    monkeypatch.chdir(project)
+    files = jug.options.find_local_configuration_files()
+    assert len(files) == 2
+    assert str(project / ".jugrc") in files
+    assert str(project / "jugrc") in files
+
+
+def test_find_local_config_none(tmp_path, monkeypatch):
+    # No config files at all
+    project = tmp_path / "project"
+    project.mkdir()
+    monkeypatch.chdir(project)
+    files = jug.options.find_local_configuration_files()
+    assert files == []
+
+
+def test_local_config_shadows_farther(tmp_path, monkeypatch):
+    # Closer config should shadow farther config via Options chaining
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / ".git").mkdir()
+    (project / ".jugrc").write_text("[main]\njugfile=root.py\n")
+
+    sub = project / "sub"
+    sub.mkdir()
+    (sub / ".jugrc").write_text("[main]\njugfile=sub.py\n")
+
+    monkeypatch.chdir(sub)
+    opts = jug.options.read_configuration_file(default_options=jug.options.default_options)
+    assert opts.jugfile == 'sub.py'
