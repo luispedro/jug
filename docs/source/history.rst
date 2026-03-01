@@ -13,6 +13,14 @@ User-visible improvements
   project root) looking for local configuration files. See
   :doc:`configuration` for details.
 
+Bugfixes
+~~~~~~~~
+
+* Fix ``_get_terminal_size_linux`` for Python 3.14, which changed how
+  ``fcntl.ioctl`` handles string arguments. Use ``os.get_terminal_size()``
+  instead (patch by justinrporter, `GH #120
+  <https://github.com/luispedro/jug/issues/120>`__).
+
 
 Version 2.4.0
 -------------

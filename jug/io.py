@@ -206,26 +206,8 @@ def _get_terminal_size_tput():
         pass
 
 def _get_terminal_size_linux():
-    def ioctl_GWINSZ(fd):
-        try:
-            import fcntl
-            import termios
-            cr = struct.unpack('hh',
-                               fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
-            return cr
-        except:
-            pass
-    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
-    if not cr:
-        try:
-            fd = os.open(os.ctermid(), os.O_RDONLY)
-            cr = ioctl_GWINSZ(fd)
-            os.close(fd)
-        except:
-            pass
-    if not cr:
-        try:
-            cr = (os.environ['LINES'], os.environ['COLUMNS'])
-        except:
-            return None
-    return int(cr[1]), int(cr[0])
+    try:
+        columns, lines = os.get_terminal_size()
+        return columns, lines
+    except OSError:
+        return None

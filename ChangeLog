@@ -1,4 +1,6 @@
 Unreleased
+	* jug.io: Fix _get_terminal_size_linux for Python 3.14 (patch by
+	justinrporter, GH #120)
 	* jug.backend.file_store: Special case saving polars DataFrames for speed
 	* jug.backend.dict_store: Fix for Python 3
 	* jug.task: fix describe for Python 3
