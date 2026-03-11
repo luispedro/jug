@@ -21,16 +21,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         python-version: ${{ matrix.python-version }}
-        version: "0.5.29"
+        version: "0.10.9"
         enable-cache: true
         cache-dependency-glob: "uv.lock"
     - name: Install dependencies and Jug
       run: |
         uv sync --all-extras --dev
-        uv pip install flake8 pytest
     - name: Start Redis
       uses: supercharge/redis-github-action@1.8.1
       with:
@@ -39,7 +38,7 @@ jobs:
       run: |
         mkdir _test
         cd _test
-        TEST_REDIS=1 jug test-jug
+        TEST_REDIS=1 uv run jug test-jug
         cp ../jug/tests/jugfiles/run-simple-create-file.py .
-        jug execute run-simple-create-file.py
+        uv run jug execute run-simple-create-file.py
         test -f test-result.txt
