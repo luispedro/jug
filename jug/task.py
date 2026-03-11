@@ -91,17 +91,16 @@ tricky to support since the general code relies on the function name)''')
         self.kwargs = kwargs
         alltasks.append(self)
 
-    def run(self, force=False, save=True, debug_mode=False):
+    def run(self, force=None, save=True, debug_mode=False):
         '''
-        task.run(force=False, save=True, debug_mode=False)
+        task.run(save=True, debug_mode=False)
 
         Performs the task.
 
         Parameters
         ----------
         force : boolean, optional
-            if true, always run the task (even if it ran before)
-            (default: False)
+            Deprecated. Does nothing.
         save : boolean, optional
             if true, save the result to the store
             (default: True)
@@ -112,6 +111,9 @@ tricky to support since the general code relies on the function name)''')
         -------
         val : return value from Task
         '''
+        if force is not None:
+            import warnings
+            warnings.warn("The 'force' argument to Task.run() is deprecated and will be removed in a future version of jug (where it will trigger an error).", DeprecationWarning)
         assert self.can_run()
         if debug_mode: self._check_hash()
         self._result = self._execute()
@@ -304,9 +306,6 @@ tricky to support since the general code relies on the function name)''')
                 task.run()
             else:
                 # someone else is already running this task!
-
-        Not that using can_lock() can lead to race conditions. The above
-        is the only fully correct method.
 
         Returns
         -------
@@ -643,8 +642,8 @@ class iteratetask:
         for a in iteratetask(task, n):
             ...
 
-    This creates an iterator that over the sequence ``task[0], task[1], ...,
-    task[n-1]``.
+    This creates a sequence wrapper that iterates over the results of ``task[0],
+    task[1], ..., task[n-1]``.
 
     Parameters
     ----------
@@ -653,7 +652,8 @@ class iteratetask:
 
     Returns
     -------
-    iterator
+    sequence
+        A wrapper implementing __getitem__ and __len__
 
     Bugs
     ----

@@ -286,7 +286,7 @@ true: you can use --debug mode without --pdb.''')
 
 def parse(args=None, optionsfile=None):
     '''
-    options.parse(cmdlist={sys.argv[1:]}, optionsfile=None)
+    options.parse(args={sys.argv[1:]}, optionsfile=None)
 
     Parse the command line options and set the option variables.
     '''

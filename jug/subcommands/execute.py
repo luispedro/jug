@@ -62,7 +62,7 @@ class TaskStats:
 class ExecuteCommand(SubCommand):
     '''Execute tasks
 
-    execute(options)
+    execute.run(options)
 
     Implement 'execute' command
     '''

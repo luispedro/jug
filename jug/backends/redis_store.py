@@ -75,7 +75,7 @@ class redis_store(base_store):
 
     def dump(self, object, name):
         '''
-        dump(object, name)
+        store.dump(object, name)
         '''
         s = encode(object)
         if s:
@@ -85,14 +85,14 @@ class redis_store(base_store):
 
     def can_load(self, name):
         '''
-        can = can_load(name)
+        can = store.can_load(name)
         '''
         return self.redis.exists(_resultname(name))
 
 
     def load(self, name):
         '''
-        obj = load(name)
+        obj = store.load(name)
 
         Loads the object identified by `name`.
         '''
@@ -104,7 +104,7 @@ class redis_store(base_store):
 
     def remove(self, name):
         '''
-        was_removed = remove(name)
+        was_removed = store.remove(name)
 
         Remove the entry associated with name.
 
@@ -115,7 +115,7 @@ class redis_store(base_store):
 
     def cleanup(self, active, keeplocks=False):
         '''
-        cleanup()
+        nr_removed = store.cleanup(active, keeplocks=False)
 
         Implement 'cleanup' command
         '''
@@ -174,6 +174,8 @@ class redis_lock(base_lock):
     - get(): acquire the lock
     - release(): release the lock
     - is_locked(): check lock state
+    - fail(): mark task as failed
+    - is_failed(): check if task is failed
     '''
 
     def __init__(self, redis, name):

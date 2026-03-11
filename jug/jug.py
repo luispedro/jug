@@ -45,7 +45,7 @@ def is_jug_running():
 
 def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     '''
-    store,jugspace = init(jugfile={'jugfile'}, jugdir={'jugdata'}, on_error='exit', store=None)
+    store, jugspace = init(jugfile='jugfile.py', jugdir='jugdata', on_error='exit', store=None)
 
     Initializes jug (create backend connection, ...).
     Imports jugfile

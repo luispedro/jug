@@ -269,7 +269,7 @@ def _status_nocache(options):
 class StatusCommand(SubCommand):
     '''Print status
 
-    status(options)
+    status.run(options)
 
     Implements the status command.
 
@@ -287,7 +287,7 @@ class StatusCommand(SubCommand):
                 from sys import stderr
                 stderr.write('Cached status relies on sqlite3. Falling back to non-cached version')
                 options.status_cache = False
-                return status(options)
+                return self.run(options)
             if options.status_cache_clear:
                 return _clear_cache(options)
             return _status_cached(options)

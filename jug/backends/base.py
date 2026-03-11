@@ -128,10 +128,10 @@ class base_store(metaclass=ABCMeta):
         removed : set of str
             Keys that were actually removed
         '''
-        removed = []
+        removed = set()
         for name in names:
             if self.remove(name):
-                removed.append(name)
+                removed.add(name)
         return removed
 
     @abstractmethod
@@ -245,12 +245,14 @@ class base_lock(metaclass=ABCMeta):
     - get(): acquire the lock
     - release(): release the lock
     - is_locked(): check lock state
+    - fail(): mark task as failed
+    - is_failed(): check if task is failed
     '''
 
     def __init__(self):
         '''
         A lock class does not need to have an __init__ method with any specific
-        signature. It is only to be used from *within* store.lock().
+        signature. It is only to be used from *within* store.getlock().
         '''
 
     @abstractmethod

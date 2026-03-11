@@ -65,7 +65,7 @@ class dict_store(base_store):
 
     def dump(self, object, name):
         '''
-        self.dump(object, name)
+        store.dump(object, name)
         '''
         self.store[_resultname(name)] = pickle.dumps(object)
         self.counts[_gen_key('dump:',name)] += 1
@@ -73,7 +73,7 @@ class dict_store(base_store):
 
     def can_load(self, name):
         '''
-        can = can_load(name)
+        can = store.can_load(name)
         '''
         self.counts[_gen_key('exists', name)] += 1
         return _resultname(name) in self.store
@@ -81,7 +81,7 @@ class dict_store(base_store):
 
     def load(self, name):
         '''
-        obj = load(name)
+        obj = store.load(name)
 
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
@@ -91,7 +91,7 @@ class dict_store(base_store):
 
     def remove(self, name):
         '''
-        was_removed = remove(name)
+        was_removed = store.remove(name)
 
         Remove the entry associated with name.
 
@@ -107,7 +107,7 @@ class dict_store(base_store):
 
     def cleanup(self, active, keeplocks=False):
         '''
-        cleanup()
+        nr_removed = store.cleanup(active, keeplocks=False)
 
         Implement 'cleanup' command
         '''
@@ -192,12 +192,11 @@ class dict_lock(base_lock):
     Functions:
     ----------
 
-    get()
-        acquire the lock
-    release()
-        release the lock
-    is_locked()
-        check lock state
+    - get(): acquire the lock
+    - release(): release the lock
+    - is_locked(): check lock state
+    - fail(): mark task as failed
+    - is_failed(): check if task is failed
     '''
 
     def __init__(self, store, counts, name):

@@ -496,6 +496,8 @@ class file_based_lock(base_lock):
     - get(): acquire the lock
     - release(): release the lock
     - is_locked(): check lock state
+    - fail(): mark task as failed
+    - is_failed(): check if task is failed
     '''
     # We use epoch + 1 second to mark a task as failed
     # More at https://github.com/luispedro/jug/issues/55
@@ -585,7 +587,7 @@ class file_based_lock(base_lock):
             except OSError:
                 pass
             else:
-                if t.st_mtime == self._FAILED_TIMESTAMP[0]:
+                if t.st_mtime == self._FAILED_TIMESTAMP[1]:
                     return True
 
         return False
@@ -629,6 +631,8 @@ class file_keepalive_based_lock(file_based_lock):
     - get(): acquire the lock
     - release(): release the lock
     - is_locked(): check lock state
+    - fail(): mark task as failed
+    - is_failed(): check if task is failed
     '''
     def __init__(self, *args, **kwargs):
         self.monitor = None
