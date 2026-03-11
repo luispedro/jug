@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jug"
+  short_description: "Help write and debug Jug workflows"
+  default_prompt: "Use $jug to write, debug, or explain a Jug jugfile and its execution flow."
