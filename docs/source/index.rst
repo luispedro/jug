@@ -129,6 +129,7 @@ Documentation Contents
     :maxdepth: 2
 
     tutorial.rst
+    ai-assistants.rst
     decrypt-example.rst
     text-example.rst
     segmentation-example.rst

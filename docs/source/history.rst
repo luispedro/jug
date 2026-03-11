@@ -12,6 +12,9 @@ User-visible improvements
   walks up the directory tree from the current working directory (up to the git
   project root) looking for local configuration files. See
   :doc:`configuration` for details.
+* Ship the Jug assistant skill in the Python package and add
+  ``jug install-skills --output DIR`` to install it into Codex or Claude Code
+  skills directories. See :doc:`ai-assistants` for usage details.
 
 Bugfixes
 ~~~~~~~~

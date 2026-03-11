@@ -73,6 +73,17 @@ cleanup
 
 Removes all elements in the store that are not used by your jugfile.
 
+install-skills
+~~~~~~~~~~~~~~
+
+Copies the bundled Jug assistant skill to a target skills directory. This is
+useful for Codex and Claude Code integration::
+
+    jug install-skills --output ~/.codex/skills
+    jug install-skills --output .claude/skills
+
+See :doc:`ai-assistants` for the full workflow and invocation examples.
+
 
 Extending Subcommands
 ---------------------

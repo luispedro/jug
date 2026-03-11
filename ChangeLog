@@ -6,6 +6,9 @@ Unreleased
 	* jug.task: fix describe for Python 3
 	* jug.options: More flexible parsing of booleans
 	* jug.options: Support project-local configuration files (.jugrc/jugrc)
+	* ship the Jug assistant skill in the package
+	* add `jug install-skills --output DIR` to install the bundled skill for
+	  Codex or Claude Code
 
 Version 2.4.0 Thu 8 May 2025 by luispedro
 	* Tasklet: Support for lambda functions in Tasklets
@@ -308,4 +311,3 @@ version 0.5 Sun Dec 13 2009 by luispedro
 	* redis backend
 	* dictionary dependencies
 	* changed command-line interface (jug command jugfile ...)
-

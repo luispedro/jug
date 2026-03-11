@@ -64,6 +64,13 @@ packages = [
 
 include-package-data = true
 
+[tool.setuptools.package-data]
+jug = [
+    "skills/jug/SKILL.md",
+    "skills/jug/agents/*.yaml",
+    "skills/jug/examples/*.py",
+    "skills/jug/references/*.md",
+]
+
 [tool.setuptools.dynamic]
 version = {attr = "jug.jug_version.__version__"}
-

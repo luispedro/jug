@@ -251,7 +251,7 @@ def main(argv=None):
 
 
     try:
-        if options.subcommand not in ('demo', 'status', 'execute', 'webstatus', 'test-jug'):
+        if options.subcommand not in ('demo', 'install-skills', 'status', 'execute', 'webstatus', 'test-jug'):
             on_error = ('propagate' if options.pdb else 'exit')
             store, jugspace = init(options.jugfile, options.jugdir, on_error=on_error)
         from .subcommands import cmdapi
