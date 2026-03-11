@@ -29,9 +29,7 @@ Jug is a pure Python implementation and should work on any platform.
 
 Python versions 3.7 and above are supported.
 
-*Website*: `http://luispedro.org/software/jug <http://luispedro.org/software/jug>`__
-
-*Documentation*: `https://jug.readthedocs.org/ <https://jug.readthedocs.org/>`__
+*Documentation*: `https://jug.readthedocs.io/ <https://jug.readthedocs.io/>`__
 
 *Video*: On `vimeo <http://vimeo.com/8972696>`__ or `showmedo
 <http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975>`__
@@ -52,6 +50,10 @@ Install
 You can install Jug with pip::
 
     pip install Jug
+
+If you want to use ``jug shell``, install IPython as well::
+
+    pip install Jug ipython
 
 or use, if you are using `conda <https://anaconda.org/>`__, you can install jug
 from `conda-forge <https://conda-forge.github.io/>`__ using the following
@@ -121,7 +123,8 @@ status primes.py``)::
 
 Now you have 32 tasks finished, 4 running, and 63 still ready. Eventually, they
 will all finish and you can inspect the results with ``jug shell primes.py``.
-This will give you an ``ipython`` shell. The `primes100` variable is available,
+This requires ``ipython`` to be installed and will give you an ``ipython``
+shell. The `primes100` variable is available,
 but it is an ugly list of `jug.Task` objects. To get the actual value, you call
 the `value` function::
 
@@ -197,5 +200,4 @@ Version 2.3.0
 
 For older version see ``ChangeLog`` file or the `full history
 <https://jug.readthedocs.io/en/latest/history.html>`__.
-
 
