@@ -1,4 +1,4 @@
-Unreleased
+Version 2.5.0 Thu 12 March 2026 by luispedro
 	* jug.io: Fix _get_terminal_size_linux for Python 3.14 (patch by
 	justinrporter, GH #120)
 	* jug.backend.file_store: Special case saving polars DataFrames for speed

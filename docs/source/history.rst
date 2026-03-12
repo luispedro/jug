@@ -2,12 +2,16 @@
 History
 =======
 
-Unreleased
-----------
+Version 2.5.0
+-------------
+
+*Released 12 March 2026*
 
 User-visible improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Special case saving ``polars`` DataFrames in ``file_store`` for speed.
+* More flexible parsing of booleans in ``jug.options``.
 * Support project-local configuration files (``.jugrc`` or ``jugrc``). Jug now
   walks up the directory tree from the current working directory (up to the git
   project root) looking for local configuration files. See
@@ -23,6 +27,8 @@ Bugfixes
   ``fcntl.ioctl`` handles string arguments. Use ``os.get_terminal_size()``
   instead (patch by justinrporter, `GH #120
   <https://github.com/luispedro/jug/issues/120>`__).
+* Fix ``jug.backend.dict_store`` for Python 3.
+* Fix ``describe`` in ``jug.task`` for Python 3.
 
 
 Version 2.4.0
