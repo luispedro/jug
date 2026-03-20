@@ -17,8 +17,8 @@ machines.
 Jug is a pure Python implementation and should work on any platform.
 
 Python versions 3.8 and above are supported (will almost certainly work
-on earlier versions as well, but they are not part of the \[CI
-suite\](<https://github.com/luispedro/jug/actions>).
+on earlier versions as well, but they are not part of the [CI
+suite](<https://github.com/luispedro/jug/actions>).
 
 *Documentation*: <https://jug.readthedocs.io/>
 
