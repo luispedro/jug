@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "Jug"
 dynamic = ['version']
 description = "A Task Based Parallelization Framework"
-readme = "README.rst"
+readme = "README.md"
 license = {text = "MIT"}
 authors = [
   {name = "Luis Pedro Coelho", email = "luis@luispedro.org"}
