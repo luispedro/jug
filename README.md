@@ -7,6 +7,7 @@ different tasks on different processors.
 [![image](https://zenodo.org/badge/205237.svg)](https://zenodo.org/badge/latestdoi/205237)
 [![image](https://img.shields.io/badge/install%20with-conda-brightgreen.svg?style=flat)](https://anaconda.org/conda-forge/jug)
 [![image](https://static.pepy.tech/personalized-badge/jug?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/jug)
+[![Downloads](https://static.pepy.tech/badge/jug/month)](https://pepy.tech/project/jug)
 [![image](https://img.shields.io/badge/CITATION-doi.org%2F10.5334%2Fjors.161-green.svg)](https://doi.org/10.5334/jors.161)
 
 It uses the filesystem to communicate between processes and works
@@ -28,8 +29,8 @@ suite\](<https://github.com/luispedro/jug/actions>).
 
 ## Testimonials
 
-\"I\'ve been using jug with great success to distribute the running of a
-reasonably large set of parameter combinations\" - Andreas Longva
+"I've been using jug with great success to distribute the running of a
+reasonably large set of parameter combinations" - Andreas Longva
 
 ## Install
 
