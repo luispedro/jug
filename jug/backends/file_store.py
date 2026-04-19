@@ -383,6 +383,8 @@ class file_store(base_store):
                 continue
             if path.basename(dirpath) == "packs":
                 continue
+            if path.basename(dirpath) == "tempfiles":
+                continue
             for f in fs:
                 f = path.join(dirpath, f)
                 if f not in active_fnames:
