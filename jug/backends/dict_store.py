@@ -122,7 +122,7 @@ class dict_store(base_store):
             for lock in self.listlocks():
                 try:
                     existing.remove(_lockname(lock))
-                except ValueError:
+                except KeyError:
                     pass
 
         cleaned = len(existing)
