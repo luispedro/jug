@@ -172,7 +172,14 @@ tricky to support since the general code relies on the function name)''')
         Nothing
         '''
         assert self.can_load()
-        self._result = self.store.load(self.hash())
+        try:
+            self._result = self.store.load(self.hash())
+        except Exception as e:
+            h = self.hash().decode()
+            raise RuntimeError(
+                "Failed to load result for task '{}' (hash: {}, at '{}/{}'): {}".format(
+                    self.name, h, h[:2], h[2:], e)
+            ) from e
 
     def invalidate(self):
         '''
