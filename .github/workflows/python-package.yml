@@ -18,12 +18,12 @@ jobs:
           - '3.14'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@v8.2.0
       with:
         python-version: ${{ matrix.python-version }}
-        version: "0.10.9"
+        version: ""
         enable-cache: true
         cache-dependency-glob: "uv.lock"
     - name: Install dependencies and Jug
