@@ -67,7 +67,7 @@ def fsync_dir(fname):
 def _write_to(value, output, compress_numpy):
     try:
         import numpy as np
-        if not compress_numpy and type(value) is np.ndarray:
+        if not compress_numpy and type(value) is np.ndarray and value.dtype != object:
             np.lib.format.write_array(output, value)
             return
     except ImportError:
