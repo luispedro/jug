@@ -28,7 +28,7 @@ def store(tmpdir, request):
         try:
             st = jug.redis_store.redis_store('redis:')
             yield st
-            st.close()
+            st.cleanup(active=set(), keeplocks=False)
         except redisConnectionError:
             pytest.skip()
 
