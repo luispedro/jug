@@ -137,6 +137,18 @@ def test_numpy_array_no_compress(tmpdir):
     store.remove(key)
     store.close()
 
+
+def test_numpy_object_array(store):
+    try:
+        import numpy as np
+    except ImportError:
+        pytest.skip()
+    arr = np.array(['foo', 'bar', 'baz'], dtype=object)
+    store.dump(arr, 'test')
+    arr2 = store.load('test')
+    assert np.array_equal(arr, arr2)
+
+
 class MockHash:
     def __init__(self, h):
         self.h = h
