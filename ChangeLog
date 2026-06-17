@@ -1,6 +1,10 @@
+Unreleased
+	* jug: Better error message when loading results fails (patch by Justin R.
+	Porter, GH #92)
+
 Version 2.5.0 Thu 12 March 2026 by luispedro
 	* jug.io: Fix _get_terminal_size_linux for Python 3.14 (patch by
-	justinrporter, GH #120)
+	justinrporter, GH #90)
 	* jug.backend.file_store: Special case saving polars DataFrames for speed
 	* jug.backend.dict_store: Fix for Python 3
 	* jug.task: fix describe for Python 3
