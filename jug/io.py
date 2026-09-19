@@ -52,16 +52,19 @@ def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadat
                 json.dump(description, output)
             else:
                 raise ValueError(f'jug.io.write_task_out: Unknown metadata format "{metadata_format}" [supported are "yaml" and "json"]')
+    if oname is None:
+        return
     try:
         import numpy as np
-        if isinstance(result_value, np.ndarray):
-            np.save(result, oname)
-            return
-    except:
-        pass
-    if oname is not None:
-        import pickle
-        with open(oname, 'wb') as output:
+    except ImportError:
+        np = None
+    with open(oname, 'wb') as output:
+        if np is not None and isinstance(result_value, np.ndarray):
+            # Passing the file object (not the name) prevents numpy from
+            # appending '.npy' to the output filename
+            np.save(output, result_value)
+        else:
+            import pickle
             pickle.dump(result_value, output)
 
 def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):

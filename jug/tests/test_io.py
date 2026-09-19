@@ -1,6 +1,7 @@
 import pytest
 
 import jug.jug
+from jug.io import write_task_out
 from jug.tests.utils import simple_execute
 from jug.task import describe
 from .task_reset import task_reset_at_exit, task_reset
@@ -42,3 +43,17 @@ def test_describe_load(__remove_files):
     assert desc == json.load(open('x.meta.json'))
     import yaml
     assert desc == yaml.safe_load(open('x.meta.yaml'))
+
+
+@task_reset
+def test_write_task_out_numpy(tmp_path):
+    np = pytest.importorskip('numpy')
+    oname = str(tmp_path / 'out.npy')
+    data = np.arange(5)
+
+    write_task_out(data.copy(), oname)
+    simple_execute()
+
+    with open(oname, 'rb') as ifile:
+        assert ifile.read(6) == b'\x93NUMPY'
+    np.testing.assert_array_equal(np.load(oname), data)
