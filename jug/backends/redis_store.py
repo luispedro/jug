@@ -128,7 +128,7 @@ class redis_store(base_store):
             self.redis.delete(_resultname(superfluous))
 
         if not keeplocks:
-            cleaned += self.remove_locks()
+            self.remove_locks()
 
         return cleaned
 

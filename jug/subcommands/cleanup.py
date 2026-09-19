@@ -52,8 +52,11 @@ class CleanupCommand(SubCommand):
             options.print_out(f'Removed {removed} failure locks')
         else:
             tasks = task.alltasks
-            removed = store.cleanup(tasks, keeplocks=options.cleanup_keep_locks)
+            removed = store.cleanup(tasks, keeplocks=True)
             options.print_out(f'Removed {removed} objects')
+            if not options.cleanup_keep_locks:
+                removed = store.remove_locks()
+                options.print_out(f'Removed {removed} locks')
 
     def parse(self, parser):
         group = parser.add_mutually_exclusive_group()

@@ -176,6 +176,25 @@ def test_cleanup(store):
     assert len(list(store.list())) == 0
 
 
+def test_cleanup_does_not_count_locks(store):
+    key1 = b'jugisbestthingever'
+    key2 = b'jug_key2'
+    store.dump([1], key1)
+    store.dump([1, 2], key2)
+    assert store.getlock(key1).get()
+    assert store.getlock(key2).get()
+    assert len(list(store.listlocks())) == 2
+
+    # keeplocks=True: locks untouched
+    assert store.cleanup([MockHash(key1), MockHash(key2)], keeplocks=True) == 0
+    assert len(list(store.listlocks())) == 2
+
+    # keeplocks=False: locks are removed, but only objects are counted
+    assert store.cleanup([MockHash(key1), MockHash(key2)], keeplocks=False) == 0
+    assert len(list(store.listlocks())) == 0
+    assert len(list(store.list())) == 2
+
+
 def test_remove_returns(store):
     """remove() must return True when an entry was actually removed and return
     False when key doesn't exist."""

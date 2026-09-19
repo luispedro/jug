@@ -119,9 +119,11 @@ class dict_store(base_store):
             for lock in self.listlocks():
                 existing.discard(_lockname(lock))
 
-        cleaned = len(existing)
+        cleaned = 0
         for superfluous in existing:
             del self.store[superfluous]
+            if not superfluous.startswith(b'lock:'):
+                cleaned += 1
 
         return cleaned
 

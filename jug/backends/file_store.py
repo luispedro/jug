@@ -366,13 +366,15 @@ class file_store(base_store):
         Returns
         -------
         nr_removed : integer
-            number of removed files
+            number of removed result objects (removed locks are *not*
+            included in this count; see ``remove_locks()``)
         '''
         active = frozenset(t.hash() for t in active)
         active_fnames = frozenset(self._getfname(h) for h in active)
         removed = 0
         for dirpath,_,fs in os.walk(self.jugdir):
-            if keeplocks and path.basename(dirpath) == "locks":
+            is_lockdir = (path.basename(dirpath) == "locks")
+            if keeplocks and is_lockdir:
                 continue
             if path.basename(dirpath) == "packs":
                 continue
@@ -382,7 +384,8 @@ class file_store(base_store):
                 f = path.join(dirpath, f)
                 if f not in active_fnames:
                     os.unlink(f)
-                    removed += 1
+                    if not is_lockdir:
+                        removed += 1
         pack_dirty = False
         for k in frozenset(self.packed.keys()) - active:
             del self.packed[k]

@@ -66,6 +66,33 @@ def test_cleanup():
     assert not store.can_load(h)
 
 @task_reset
+def test_cleanup_reports_objects_and_locks_separately():
+    jugfile = os.path.join(_jugdir, 'tasklets.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    simple_execute()
+    store.dump(1, b'orphan')
+    assert store.getlock(b'orphan').get()
+    nr_objects = len(list(store.list()))
+    nr_locks = len(list(store.listlocks()))
+    assert nr_locks >= 1
+
+    # with --keep-locks, only objects are reported
+    messages = []
+    opts = Options(default_options)
+    opts.print_out = messages.append
+    opts.cleanup_keep_locks = True
+    jug.subcommands.cleanup.cleanup(store, opts)
+    assert messages == [f'Removed {nr_objects} objects']
+    assert len(list(store.listlocks())) == nr_locks
+
+    # otherwise, objects and locks are reported separately
+    del messages[:]
+    opts.cleanup_keep_locks = False
+    jug.subcommands.cleanup.cleanup(store, opts)
+    assert messages == ['Removed 0 objects', f'Removed {nr_locks} locks']
+    assert len(list(store.listlocks())) == 0
+
+@task_reset
 def test_shell_invalidate():
     jugfile = os.path.join(_jugdir, 'iteratetask.py')
     store, space = jug.jug.init(jugfile, 'dict_store')

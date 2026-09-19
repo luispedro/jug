@@ -170,7 +170,8 @@ class base_store(metaclass=ABCMeta):
         Returns
         -------
         nr_removed : integer
-            number of removed files
+            number of removed result objects (removed locks are *not*
+            included in this count; see ``remove_locks()``)
         '''
 
 
