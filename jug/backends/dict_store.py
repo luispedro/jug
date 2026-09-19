@@ -1,4 +1,3 @@
-#-*- coding: utf-8 -*-
 # Copyright (C) 2009-2026, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,7 +32,7 @@ from .base import base_store, base_lock
 def _gen_key(key, name):
     if type(name) != str:
         name = name.decode('utf-8')
-    return '{0}:{1}'.format(key, name).encode('utf-8')
+    return f'{key}:{name}'.encode('utf-8')
 
 def _resultname(name):
     return _gen_key('result', name)
@@ -57,7 +56,7 @@ class dict_store(base_store):
             try:
                 with open(backend, 'rb') as ifile:
                     self.store = pickle.load(ifile)
-            except IOError:
+            except OSError:
                 self.store = {}
         else:
             self.store = {}

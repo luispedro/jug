@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 import tempfile
 import shutil
@@ -43,7 +41,7 @@ def clear_default(default):
         pass
 
 
-class TestSubCommandAPI():
+class TestSubCommandAPI:
     def setup_method(self):
         self._old_commands = cmdapi._commands.copy()
         cmdapi._commands.clear()
@@ -60,7 +58,7 @@ class TestSubCommandAPI():
         assert "hello-cmd" in cmdapi._commands
 
         output = cmdapi.run(CMD)
-        assert output == MSG, "Expected: '%s' , got: '%s'" % (MSG, output)
+        assert output == MSG, f"Expected: '{MSG}' , got: '{output}'"
 
     def test_user_commands(self):
         payload = """
@@ -83,7 +81,7 @@ hello_command = HelloCommandPayload()
 
         cmdapi._commands._load_user_commands(user_path=tmpdir)
         CMD = "hello-payload"
-        assert CMD in cmdapi._commands, "Expected: '%s' to be in '%s'" % (CMD, cmdapi._commands)
+        assert CMD in cmdapi._commands, f"Expected: '{CMD}' to be in '{cmdapi._commands}'"
 
         output = cmdapi.run(CMD)
         assert output == "This TEST"
@@ -109,7 +107,7 @@ hello_command = HelloCommandPayload()
         assert options.hello_other_value == "undefined"
 
         output = cmdapi.run(CMD, options=options)
-        assert output == "Hello world", "Got '{0}'".format(output)
+        assert output == "Hello world", f"Got '{output}'"
 
     def test_options_config(self):
         "Test if settings read from config file work even for custom subcommands"

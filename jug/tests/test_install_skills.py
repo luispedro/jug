@@ -64,4 +64,4 @@ def test_install_skills_command(tmp_path):
 
     install_skills.run(options=options)
 
-    assert messages == ['Installed Jug skill to {}'.format(tmp_path / 'jug')]
+    assert messages == [f'Installed Jug skill to {tmp_path / "jug"}']

@@ -7,7 +7,7 @@ def double(x):
 @TaskGenerator
 def create_result(r, oname):
     with open(oname, 'wt') as out:
-        out.write('Result is {}\n'.format(r))
+        out.write(f'Result is {r}\n')
 
 two = double(1)
 four = double(2)

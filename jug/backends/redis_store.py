@@ -1,5 +1,4 @@
-#-*- coding: utf-8 -*-
-# Copyright (C) 2009-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2009-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -59,16 +58,16 @@ class redis_store(base_store):
         '''
         '''
         if not redis_functional:
-            raise IOError('jug.redis_store: redis module is not found!')
+            raise OSError('jug.redis_store: redis module is not found!')
         redis_params = {}
         match = _redis_urlpat.match(url)
         if match:
             redis_params = match.groupdict()
-            if redis_params['port'] == None:
+            if redis_params['port'] is None:
                 del redis_params['port']
             else:
                 redis_params['port'] = int( redis_params['port'] )
-        logging.info('connecting to %s' % redis_params)
+        logging.info(f'connecting to {redis_params}')
 
         self.redis = redis.Redis(**redis_params)
 

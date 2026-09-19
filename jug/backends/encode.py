@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2025, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -218,4 +217,4 @@ def decode_from(stream):
         import numpy as np
         return np.load(stream)
     else:
-        raise IOError("jug.backend.decode_from: unknown prefix '%s'" % prefix)
+        raise OSError(f"jug.backend.decode_from: unknown prefix '{prefix}'")

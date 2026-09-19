@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is execfile()d with the current directory set to its containing dir.
 #
 # The contents of this file are pickled, so don't put values in the namespace
@@ -36,7 +35,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 project = 'Jug'
-copyright = '2008-2025, Luis Pedro Coelho'
+copyright = '2008-2026, Luis Pedro Coelho'
 
 # The short X.Y version.
 version = jug_version[:3]

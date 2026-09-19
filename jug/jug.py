@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -119,13 +118,13 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
 def execution_loop(tasks, options):
     from time import sleep
 
-    logging.info('Execute start (%s tasks)' % len(tasks))
+    logging.info(f'Execute start ({len(tasks)} tasks)')
 
     # If we are running with a target, exclude non-matching tasks
     if options.execute_target:
         task_matcher = prepare_task_matcher(options.execute_target)
         tasks = [t for t in tasks if task_matcher(t.name)]
-        logging.info('Non-matching tasks discarded. Remaining (%s tasks)' % len(tasks))
+        logging.info(f'Non-matching tasks discarded. Remaining ({len(tasks)} tasks)')
 
     # For the special (but common) case where most (if not all) of the tasks
     # can be loaded directly, just skip them as fast as possible:
@@ -137,7 +136,7 @@ def execution_loop(tasks, options):
     del tasks[:first_unloadable]
 
     if options.debug:
-        start_task_set = set([id(t) for t in task.alltasks])
+        start_task_set = {id(t) for t in task.alltasks}
 
 
     failures = False
@@ -170,7 +169,7 @@ def execution_loop(tasks, options):
                     break
             if upnext:
                 break
-            logging.info('waiting %s secs for an open task...' % options.execute_wait_cycle_time)
+            logging.info(f'waiting {options.execute_wait_cycle_time} secs for an open task...')
             sleep(int(options.execute_wait_cycle_time))
         if not upnext:
             logging.info('No tasks can be run!')
@@ -186,12 +185,12 @@ def execution_loop(tasks, options):
                 if t.can_load(): # This can be true if the task ran between the check above and this one
                     jug_hook('execute.task-loadable', (t,))
                 elif locked:
-                    logging.info('Executing %s...' % t.name)
+                    logging.info(f'Executing {t.name}...')
                     jug_hook('execute.task-pre-execute', (t,))
 
                     if options.aggressive_unload:
                         if prevtask is not None:
-                            active = set(id(d) for d in t.dependencies())
+                            active = {id(d) for d in t.dependencies()}
                             for d in itertools.chain(prevtask.dependencies(), [prevtask]):
                                 if id(d) not in active:
                                     d.unload()
@@ -202,9 +201,9 @@ def execution_loop(tasks, options):
                         for nt in task.alltasks:
                             if id(nt) not in start_task_set:
                                 raise RuntimeError('Creating tasks while executing another task is not supported.\n'
-                                            'Error detected while running task `{0}`'.format(t.name))
+                                            f'Error detected while running task `{t.name}`')
                 else:
-                    logging.info('Already in execution %s...' % t.name)
+                    logging.info(f'Already in execution {t.name}...')
             except SystemExit:
                 raise
             except Exception as e:
@@ -214,7 +213,7 @@ def execution_loop(tasks, options):
                     from .internal.debugger import debug_exception
                     debug_exception()
                 else:
-                    logging.critical('Exception while running %s: %s' % (t.name,e))
+                    logging.critical(f'Exception while running {t.name}: {e}')
                     for other in itertools.chain(upnext, tasks):
                         for dep in other.dependencies():
                             if dep is t:

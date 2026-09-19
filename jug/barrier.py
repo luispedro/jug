@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
-# Copyright (C) 2010-2023, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2010-2026, Luis Pedro Coelho <luis@luispedro.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -120,7 +119,7 @@ def bvalue(t):
                     if i % 1000 == 0:
                         if output is not None:
                             output.close()
-                        ofile = 'splits.{}.txt'.format(index)
+                        ofile = f'splits.{index}.txt'
                         output = open(ofile, 'wt')
                         index += 1
                         splits.append(ofile)

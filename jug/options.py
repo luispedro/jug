@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -166,7 +165,7 @@ def _parse_config_file(fp, next_options, default_options=None):
             if section == "main":
                 new_name = key_to_option(key)
             else:
-                new_name = "{0}_{1}".format(key_to_option(section), key_to_option(key))
+                new_name = f"{key_to_option(section)}_{key_to_option(key)}"
 
             if default_options is not None:
                 old_value = getattr(default_options, new_name, None)
@@ -208,7 +207,7 @@ def read_configuration_file(fp=None, default_options=None):
         if path.exists(gfp):
             try:
                 f = open(gfp)
-            except IOError:
+            except OSError:
                 break
             global_options = _parse_config_file(f, default_options, default_options=default_options)
             break
@@ -225,7 +224,7 @@ def read_configuration_file(fp=None, default_options=None):
     for config_path in reversed(local_files):
         try:
             f = open(config_path)
-        except IOError:
+        except OSError:
             continue
         head = _parse_config_file(f, head, default_options=default_options)
 
@@ -235,7 +234,7 @@ def read_configuration_file(fp=None, default_options=None):
 def add_common_options(parser):
     group = parser.add_argument_group("common")
     group.add_argument('jugfile', action='store', nargs='?',
-                       help="Python script to use. (Default: %(default)s)" % {"default": default_options.jugfile})
+                       help=f"Python script to use. (Default: {default_options.jugfile})")
     group.add_argument('--aggressive-unload',
                        action='store_true',
                        dest='aggressive_unload',
@@ -246,13 +245,13 @@ memory errors.''')
     group.add_argument('--jugdir',
                        action='store',
                        dest='jugdir',
-                       help='''\
+                       help=f'''\
 Directory in which to save intermediate files
 You can use Python format syntax, the following variables are available:
     - date
     - jugfile (without extension)
 
-    By default, the value of `jugdir` is "%(jugfile)s.jugdata"''' % {"jugfile": default_options.jugfile})
+    By default, the value of `jugdir` is "{default_options.jugfile}.jugdata"''')
     group.add_argument('--verbose',
                        action='store',
                        dest='verbose',

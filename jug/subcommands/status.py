@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -196,11 +195,11 @@ def _print_status(options, ts):
         n_waiting = sum(ts.waiting.values())
         n_finished = sum(ts.finished.values())
         if not n_waiting and not n_running and not n_failed and not n_ready:
-            options.print_out('All tasks complete ({0} tasks).'.format(n_finished))
+            options.print_out(f'All tasks complete ({n_finished} tasks).')
         elif not n_running:
-            options.print_out('{0} tasks waiting to be run, {1} failed, {2} complete, (none active).'.format(n_waiting + n_ready, n_failed, n_finished))
+            options.print_out(f'{n_waiting + n_ready} tasks waiting to be run, {n_failed} failed, {n_finished} complete, (none active).')
         else:
-            options.print_out('{0} tasks waiting to be run, {1} failed, {2} complete, ({3} active).'.format(n_waiting + n_ready, n_failed, n_finished, n_running))
+            options.print_out(f'{n_waiting + n_ready} tasks waiting to be run, {n_failed} failed, {n_finished} complete, ({n_running} active).')
     else:
         print_task_summary_table(options, [
                                 ("Failed", ts.failed),
@@ -306,7 +305,7 @@ class StatusCommand(SubCommand):
                             action='store', metavar="CACHE_FILE",
                             dest='status_cache_file',
                             help=('Name of file to use for status cache. Use with status --cache. '
-                                  '(Default: {status_cache_file}'.format(**defaults)))
+                                  f"(Default: {defaults['status_cache_file']}"))
         parser.add_argument('--clear',
                             action='store_const', const=True,
                             dest='status_cache_clear',

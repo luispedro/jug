@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
@@ -79,13 +78,13 @@ class Task(TaskletMixin):
     store = None
     # __slots__ = ('name', 'f', 'args', 'kwargs', '_hash','_lock')
     def __init__(self, f, *args, **kwargs):
-        if getattr(f, '__name__', getattr(f, 'func_name', '')) == '<lambda>':
+        if getattr(f, '__name__', '') == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
 
 Write an email to the authors if you feel you have a strong reason to use them (they are a bit
 tricky to support since the general code relies on the function name)''')
 
-        self.name = '%s.%s' % (f.__module__, f.__name__)
+        self.name = f'{f.__module__}.{f.__name__}'
         self.f = f
         self.args = args
         self.kwargs = kwargs
@@ -177,8 +176,7 @@ tricky to support since the general code relies on the function name)''')
         except Exception as e:
             h = self.hash().decode()
             raise RuntimeError(
-                "Failed to load result for task '{}' (hash: {}, at '{}/{}'): {}".format(
-                    self.name, h, h[:2], h[2:], e)
+                f"Failed to load result for task '{self.name}' (hash: {h}, at '{h[:2]}/{h[2:]}'): {e}"
             ) from e
 
     def invalidate(self):
@@ -285,7 +283,7 @@ tricky to support since the general code relies on the function name)''')
 
     def _check_hash(self):
         if self.hash() != self._compute_set_hash():
-            hash_error_msg = ('jug error: Hash value of task (name: %s) changed unexpectedly.\n' % self.name)
+            hash_error_msg = f'jug error: Hash value of task (name: {self.name}) changed unexpectedly.\n'
             hash_error_msg += 'Typical cause is that a Task function changed the value of an argument (which messes up downstream computations).'
             raise RuntimeError(hash_error_msg)
     def __jug_hash__(self):
@@ -294,11 +292,11 @@ tricky to support since the general code relies on the function name)''')
 
     def __str__(self):
         '''String representation'''
-        return 'Task: %s()' % self.name
+        return f'Task: {self.name}()'
 
     def __repr__(self):
         '''Detailed representation'''
-        return 'Task({}, args={}, kwargs={})'.format(self.name, self.args, self.kwargs)
+        return f'Task({self.name}, args={self.args}, kwargs={self.kwargs})'
 
     def lock(self):
         '''
@@ -574,7 +572,7 @@ def CachedFunction(f,*args,**kwargs):
     t = Task(f,*args, **kwargs)
     if not t.can_load():
         if not t.can_run():
-            raise ValueError('jug.CachedFunction: unable to run task %s' % t)
+            raise ValueError(f'jug.CachedFunction: unable to run task {t}')
         t.run()
     return value(t)
 
@@ -681,7 +679,7 @@ class iteratetask:
 
 def _get_check(r, i, n):
     if len(r) != n:
-        raise ValueError("Expected a tuple of size {} got {}".format(n, len(r)))
+        raise ValueError(f"Expected a tuple of size {n} got {len(r)}")
     return r[i]
 
 def return_tuple(n):
@@ -737,7 +735,7 @@ def describe(t):
         if len(t.args):
             description['args'] = [describe(a) for a in t.args]
         if len(t.kwargs):
-            description['kwargs'] = dict([(k,describe(v)) for k,v in t.kwargs.items()])
+            description['kwargs'] = {k: describe(v) for k, v in t.kwargs.items()}
         meta = t.store.metadata(t)
         if meta is not None:
             description['meta'] = meta
@@ -751,7 +749,7 @@ def describe(t):
     elif isinstance(t, list):
         return [describe(ti) for ti in t]
     elif isinstance(t, dict):
-        return dict([(k,describe(v)) for k,v in t.items()])
+        return {k: describe(v) for k, v in t.items()}
     elif isinstance(t, tuple):
         return tuple(list(t))
     return t

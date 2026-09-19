@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 import os
 import shutil
@@ -34,7 +33,7 @@ def _remove_existing(path):
 def install_skill(output, force=False):
     source = bundled_skill_path()
     if not os.path.isdir(source):
-        raise RuntimeError('Bundled skill payload is missing: {}'.format(source))
+        raise RuntimeError(f'Bundled skill payload is missing: {source}')
 
     output = os.path.abspath(os.path.expanduser(output))
     target = os.path.join(output, SKILL_NAME)
@@ -42,23 +41,23 @@ def install_skill(output, force=False):
         os.makedirs(output, exist_ok=True)
     except OSError as err:
         raise RuntimeError(
-            'Could not create output directory {}: {}'.format(output, err))
+            f'Could not create output directory {output}: {err}')
 
     if os.path.lexists(target):
         if not force:
             raise RuntimeError(
-                'Destination already exists: {} (use --force to overwrite)'.format(target))
+                f'Destination already exists: {target} (use --force to overwrite)')
         try:
             _remove_existing(target)
         except OSError as err:
             raise RuntimeError(
-                'Could not remove existing destination {}: {}'.format(target, err))
+                f'Could not remove existing destination {target}: {err}')
 
     try:
         shutil.copytree(source, target)
     except OSError as err:
         raise RuntimeError(
-            'Could not install bundled skill to {}: {}'.format(target, err))
+            f'Could not install bundled skill to {target}: {err}')
     return target
 
 
@@ -101,7 +100,7 @@ class InstallSkillsCommand(SubCommand):
             sys.stderr.write(str(err) + '\n')
             sys.exit(1)
 
-        options.print_out('Installed Jug skill to {}'.format(target))
+        options.print_out(f'Installed Jug skill to {target}')
 
 
 install_skills = InstallSkillsCommand()

@@ -18,7 +18,7 @@ def count_primes(ps):
 @TaskGenerator
 def write_output(n):
     with open('output.txt', 'wt') as output:
-        output.write("Found {0} primes <= 100.\n".format(n))
+        output.write(f"Found {n} primes <= 100.\n")
 
 primes100 = []
 for n in range(2, 101):

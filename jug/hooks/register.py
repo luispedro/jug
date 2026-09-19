@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2015, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2014-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # License: MIT
 
@@ -33,7 +33,7 @@ def jug_hook(name, args=(), kwargs=None):
         kwargs = {}
     return [f(*args, **kwargs) for f in _hooks.get(name, [])]
 
-_registered = set([])
+_registered = set()
 def register_hook_once(name, code, f):
     '''Register a hook only once
 
@@ -77,7 +77,7 @@ def register_hook(name, f=None):
         Function to call
     '''
     if name not in _known_hooks:
-        raise ValueError('jug.register_hook: {} is not a known hook name (Known are {}.)'.format(name, list(_known_hooks)))
+        raise ValueError(f'jug.register_hook: {name} is not a known hook name (Known are {list(_known_hooks)}.)')
     if f is None:
         from functools import partial
         return partial(register_hook, name)

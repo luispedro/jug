@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,7 +41,7 @@ class CleanupCommand(SubCommand):
 
         if options.cleanup_locks_only:
             removed = store.remove_locks()
-            options.print_out('Removed {removed} locks'.format(removed=removed))
+            options.print_out(f'Removed {removed} locks')
         elif options.cleanup_failed_only:
             removed = 0
             for name in list(store.listlocks()):
@@ -50,11 +49,11 @@ class CleanupCommand(SubCommand):
                 if lock.is_failed():
                     lock.release()
                     removed += 1
-            options.print_out('Removed {removed} failure locks'.format(removed=removed))
+            options.print_out(f'Removed {removed} failure locks')
         else:
             tasks = task.alltasks
             removed = store.cleanup(tasks, keeplocks=options.cleanup_keep_locks)
-            options.print_out('Removed {removed} objects'.format(removed=removed))
+            options.print_out(f'Removed {removed} objects')
 
     def parse(self, parser):
         group = parser.add_mutually_exclusive_group()

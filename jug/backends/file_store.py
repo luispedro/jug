@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2025, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -143,7 +142,7 @@ class file_store(base_store):
         return path.join(self.jugdir, 'packs', 'jugpack')
 
     def __repr__(self):
-        return 'file_store({})'.format(self.jugdir)
+        return f'file_store({self.jugdir})'
     __str__ = __repr__
 
     def create(self):
@@ -508,7 +507,7 @@ class file_based_lock(base_lock):
     def __init__(self, jugdir, name):
         if not isinstance(name, str):
             name = str(name, 'utf-8')
-        self.fullname = path.join(jugdir, 'locks', '{0}.lock'.format(name))
+        self.fullname = path.join(jugdir, 'locks', f'{name}.lock')
 
     def get(self):
         '''
@@ -532,8 +531,8 @@ class file_based_lock(base_lock):
             from datetime import datetime
             fd = os.open(self.fullname, os.O_RDWR|os.O_CREAT|os.O_EXCL)
             F = os.fdopen(fd, 'w')
-            F.write('PID {0} on HOSTNAME {1}\n'.format(os.getpid(), socket.gethostname()))
-            F.write('Lock created on {0}\n'.format(datetime.now().strftime('%Y-%m-%d (%Hh%M.%S)')))
+            F.write(f'PID {os.getpid()} on HOSTNAME {socket.gethostname()}\n')
+            F.write(f"Lock created on {datetime.now().strftime('%Y-%m-%d (%Hh%M.%S)')}\n")
             F.close()
             return True
         except FileExistsError:
@@ -597,7 +596,7 @@ class file_based_lock(base_lock):
 
 class file_keepalive_store(file_store):
     def __repr__(self):
-        return 'file_keepalive_store({})'.format(self.jugdir)
+        return f'file_keepalive_store({self.jugdir})'
     __str__ = __repr__
 
     def getlock(self, name):
@@ -638,7 +637,7 @@ class file_keepalive_based_lock(file_based_lock):
     '''
     def __init__(self, *args, **kwargs):
         self.monitor = None
-        super(file_keepalive_based_lock, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def start_monitor(self):
         """Start side-kick process that ensures locks are refreshed while
@@ -657,7 +656,7 @@ class file_keepalive_based_lock(file_based_lock):
         try:
             self.monitor.kill()
         except OSError as e:
-            logging.warning('keepalive process failed to die with %s' % e)
+            logging.warning(f'keepalive process failed to die with {e}')
 
         # subprocess module implements a cleanup mechanism that kicks in when
         # a Popen instance is deleted. This prevents leaking subprocesses and
@@ -681,7 +680,7 @@ class file_keepalive_based_lock(file_based_lock):
         locked : bool
             Whether the lock was created
         '''
-        acquired = super(file_keepalive_based_lock, self).get()
+        acquired = super().get()
 
         if acquired:
             self.start_monitor()
@@ -696,7 +695,7 @@ class file_keepalive_based_lock(file_based_lock):
         And stops lock monitor job
         '''
         self.stop_monitor()
-        return super(file_keepalive_based_lock, self).release()
+        return super().release()
 
     def fail(self):
         '''
@@ -707,7 +706,7 @@ class file_keepalive_based_lock(file_based_lock):
         process if it exists
         '''
         self.stop_monitor()
-        return super(file_keepalive_based_lock, self).fail()
+        return super().fail()
 
     def is_failed(self):
         '''

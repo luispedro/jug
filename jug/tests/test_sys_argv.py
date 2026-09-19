@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import sys
 import tempfile
 from .task_reset import task_reset_at_exit, task_reset
@@ -41,4 +39,4 @@ sys.stdout.write(json.dumps(sys.argv) + '\\n')
     output = stdout.readline()
     args = json.loads(output)
     expected = [jugfile.name, "--noarg", "here"]
-    assert args == expected, "Saw {}, expected {}".format(args, expected)
+    assert args == expected, f"Saw {args}, expected {expected}"

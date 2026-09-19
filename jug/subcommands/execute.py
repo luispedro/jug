@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,7 +41,7 @@ def _sigterm(_, __):
 
 
 def _log_loadable(t):
-    logging.info('Loadable {0}...'.format(t.name))
+    logging.info(f'Loadable {t.name}...')
 
 
 class TaskStats:
@@ -124,12 +123,12 @@ class ExecuteCommand(SubCommand):
         parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time',
                             metavar='WAIT_CYCLE_TIME', type=int,
                             help=("How long to wait in each cycle (in seconds) "
-                                  "(Default: {execute_wait_cycle_time})".format(**defaults)))
+                                  f"(Default: {defaults['execute_wait_cycle_time']})"))
         parser.add_argument('--nr-wait-cycles', action='store',
                             dest='execute_nr_wait_cycles',
                             metavar='NR_WAIT_CYCLES', type=int,
                             help=("How many wait cycles to do "
-                                  "(Default: {execute_nr_wait_cycles})".format(**defaults)))
+                                  f"(Default: {defaults['execute_nr_wait_cycles']})"))
         parser.add_argument('--target', action='store', dest='execute_target',
                             metavar='TARGET',
                             help="Restrict tasks to execute based on their name")

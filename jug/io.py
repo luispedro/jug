@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2013-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2013-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 # LICENSE: MIT
 '''
@@ -52,7 +51,7 @@ def _do_write_task_out(result_value, result, oname, metadata_fname=None, metadat
                 import json
                 json.dump(description, output)
             else:
-                raise ValueError('jug.io.write_task_out: Unknown metadata format "{}" [supported are "yaml" and "json"]'.format(metadata_format))
+                raise ValueError(f'jug.io.write_task_out: Unknown metadata format "{metadata_format}" [supported are "yaml" and "json"]')
     try:
         import numpy as np
         if isinstance(result_value, np.ndarray):
@@ -114,9 +113,9 @@ def print_task_summary_table(options, groups):
     """
     if options.short:
         for name,gv in groups:
-            options.print_out("{0}:  {1} tasks".format(name, sum(gv.values())))
-        n = sum([sum(gv.values()) for _,gv in groups])
-        options.print_out("** Total: {0} tasks.".format(n))
+            options.print_out(f"{name}:  {sum(gv.values())} tasks")
+        n = sum(sum(gv.values()) for _, gv in groups)
+        options.print_out(f"** Total: {n} tasks.")
         return
 
     import textwrap
@@ -131,21 +130,23 @@ def print_task_summary_table(options, groups):
     if name_width <= 8: # too short. Output will look ugly in any case
         name_width = 12
 
-    line_format = ("%12s" * num_groups) + '  ' + '%-' + str(name_width) + 's'
+    def format_line(cells, name):
+        return ''.join(f'{c!s:>12}' for c in cells) + f'  {name!s:<{name_width}}'
+
     format_size = (12 * num_groups) + 2 + name_width
 
-    options.print_out(line_format % tuple([g for g, _ in groups] + ["Task name"]))
+    options.print_out(format_line([g for g, _ in groups], "Task name"))
     options.print_out('-' * format_size)
 
     for n in sorted(names):
         name_lines = textwrap.wrap(n, width=name_width - 4)
-        options.print_out(line_format % tuple([g[n] for _, g in groups] + name_lines[:1]))
+        options.print_out(format_line([g[n] for _, g in groups], name_lines[0] if name_lines else ''))
 
         for name_extension in name_lines[1:]:
-            options.print_out(line_format % tuple( ([""] * num_groups) + [(" " * 4) + name_extension]))
+            options.print_out(format_line([""] * num_groups, (" " * 4) + name_extension))
 
     options.print_out('.' * format_size)
-    options.print_out(line_format % tuple([sum(g.values()) for _,g in groups] + ["Total"]))
+    options.print_out(format_line([sum(g.values()) for _, g in groups], "Total"))
     options.print_out()
 
 # Terminal size calculation

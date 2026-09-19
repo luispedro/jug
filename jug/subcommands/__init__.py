@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
@@ -132,19 +131,19 @@ def _get_helptext(command):
     try:
         return command.__doc__.splitlines()[0]
     except AttributeError:
-        raise SubCommandError("Command '%s' is missing a documentation string" % (command,))
+        raise SubCommandError(f"Command '{command}' is missing a documentation string")
 
 
 def _invalid_module(module, e):
     raise SubCommandError(
-        """Invalid subcommand structure.
-Please make sure that the subcommand(s) '%s' conform(s) to the API.
+        f"""Invalid subcommand structure.
+Please make sure that the subcommand(s) '{module}' conform(s) to the API.
 
     help(jug.subcommands) for more information
 
 Original error was:
-%s
-""" % (module, e))
+{e}
+""")
 
 
 class SubCommand(metaclass=ABCMeta):
@@ -196,7 +195,7 @@ class SubCommandDict(dict):
         if command not in self:
             self.load_commands(command)
 
-        return super(SubCommandDict, self).__getitem__(command)
+        return super().__getitem__(command)
 
     def load_commands(self, stop_on_command=None):
         """Load all modules in jug's subcommands and user's jug folder
@@ -255,7 +254,7 @@ class SubCommandManager:
         try:
             return self._commands[command]
         except KeyError:
-            raise NoSuchCommandError("Unknown subcommand '%s'" % (command,))
+            raise NoSuchCommandError(f"Unknown subcommand '{command}'")
 
     def run(self, command, *args, **kwargs):
         """Execute subcommand
@@ -300,7 +299,8 @@ Subcommands
         self._commands.load_commands()
 
         for name, cmd in sorted(self._commands.items()):
-            usage_text.append("   %-15s %s" % (name + ":", _get_helptext(cmd)))
+            label = name + ":"
+            usage_text.append(f"   {label:<15} {_get_helptext(cmd)}")
 
         usage_text.append("\nhelp:")
         usage_text.append("  Use 'jug <subcommand> --help' for subcommand specific options")

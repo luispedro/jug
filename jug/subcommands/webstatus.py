@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2012-2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2012-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -84,7 +83,7 @@ def _format_counts(ts):
     table = []
     names = set()
     for t in [ts.waiting, ts.ready, ts.running, ts.finished]:
-        names.update(list(t.keys()))
+        names.update(t)
     for n in names:
         table.append(
                 _row_template.format(n, ts.waiting[n], ts.ready[n], ts.running[n], ts.finished[n]))

@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2017-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -77,8 +76,8 @@ https://jug.readthedocs.io/en/latest/decrypt-example.html
             print("Jug-demo previously created")
             return
         os.mkdir('jug-demo')
-        output = open('jug-demo/primes.py', 'wt')
-        output.write(r'''
+        with open('jug-demo/primes.py', 'wt') as output:
+            output.write(r'''
 from time import sleep
 
 from jug import TaskGenerator
@@ -97,9 +96,8 @@ def count_primes(ps):
 
 @TaskGenerator
 def write_output(n):
-    output = open('output.txt', 'wt')
-    output.write("Found {0} primes <= 100.\n".format(n))
-    output.close()
+    with open('output.txt', 'wt') as output:
+        output.write(f"Found {n} primes <= 100.\n")
 
 primes100 = []
 for n in range(2, 101):
@@ -108,6 +106,5 @@ for n in range(2, 101):
 n_primes = count_primes(primes100)
 write_output(n_primes)
 ''')
-        output.close()
 
 demo = DemoCommand()

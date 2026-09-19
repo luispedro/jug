@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2017, Renato Alves and Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2017-2026, Renato Alves and Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -112,19 +111,19 @@ class GraphCommand(SubCommand):
 
             for name in targets:
                 if options.graph_no_status:
-                    fh.write('"{name}"\n'.format(**targets[name]))
+                    fh.write(f'"{name}"\n')
                 else:
                     fh.write(self._label_template.format(**targets[name]))
 
-                for dep in targets[name]["deps"]:
-                    fh.write('"{}" -> "{}"\n'.format(*dep))
+                for dep_name, task_name in targets[name]["deps"]:
+                    fh.write(f'"{dep_name}" -> "{task_name}"\n')
 
             fh.write("}\n")
 
-        error_msg = '''\
+        error_msg = f'''\
 Couldn't render graph file. Is graphviz installed?
-You will have to manually render the dotfile: {}
-'''.format(dotfile)
+You will have to manually render the dotfile: {dotfile}
+'''
         try:
             check_call(["dot", dotfile, "-T" + options.graph_format, "-o", jugfile + "." + options.graph_format])
         except FileNotFoundError:

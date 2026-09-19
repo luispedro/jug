@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2008-2023, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,7 +38,7 @@ def load_all(jugspace, local_ns):
         try:
             local_ns[k] = value(v)
         except Exception as e:
-            print('Error while loading %s: %s' % (k, e))
+            print(f'Error while loading {k}: {e}')
 
 
 _ipython_not_found_msg = '''\

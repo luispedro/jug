@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2022, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2022-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,7 +52,7 @@ class PackCommand(SubCommand):
             stderr.write("Cannot pack this store (only basic file-based jugdata directories can be packed)")
             exit(1)
         packed = store.update_pack()
-        options.print_out('Packed {packed} objects'.format(packed=packed))
+        options.print_out(f'Packed {packed} objects')
 
 
 pack = PackCommand()

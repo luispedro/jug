@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2014-2020, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2014-2026, Luis Pedro Coelho <luis@luispedro.org>
 from time import time
 
 def _mean(vs):
@@ -22,7 +21,7 @@ class TimeTasks:
         print("TIMES")
         print("-----\n")
         for k,v in self.times.items():
-            print("{:20} {:.2}s ({} tasks)".format(k, _mean(v), len(v)))
+            print(f"{k:20} {_mean(v):.2}s ({len(v)} tasks)")
 
 
 
