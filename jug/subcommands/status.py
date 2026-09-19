@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from contextlib import contextmanager
 
 import jug

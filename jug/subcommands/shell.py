@@ -168,10 +168,7 @@ class ShellCommand(SubCommand):
         }
         # This is necessary for some versions of Ipython. See:
         # https://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
-        try:
-            del jugspace['__builtins__']
-        except KeyError:
-            pass
+        jugspace.pop('__builtins__', None)
 
         jugspace.update(local_ns)
         local_ns['__name__'] = '__jugfile__'

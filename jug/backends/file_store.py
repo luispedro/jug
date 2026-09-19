@@ -31,6 +31,7 @@ from os.path import dirname, exists
 import logging
 import tempfile
 import shutil
+from contextlib import suppress
 from subprocess import Popen
 from time import time
 
@@ -69,22 +70,14 @@ def _write_to(value, output, compress_numpy):
         if not compress_numpy and type(value) is np.ndarray and value.dtype != object:
             np.lib.format.write_array(output, value)
             return
-    except ImportError:
-        pass
-    except OSError:
-        pass
-    except ValueError:
+    except (ImportError, OSError, ValueError):
         pass
     try:
         import polars as pl
         if not compress_numpy and type(value) is pl.DataFrame:
             value.write_parquet(output)
             return
-    except ImportError:
-        pass
-    except OSError:
-        pass
-    except ValueError:
+    except (ImportError, OSError, ValueError):
         pass
 
     encode_to(value, output)
@@ -336,12 +329,9 @@ class file_store(base_store):
             if name in self.packed:
                 del self.packed[name]
                 removed.add(name)
-            try:
-                fname = self._getfname(name)
-                os.unlink(fname)
+            with suppress(OSError):
+                os.unlink(self._getfname(name))
                 removed.add(name)
-            except OSError:
-                pass
         self.resave_pack()
         return removed
 
@@ -544,10 +534,8 @@ class file_based_lock(base_lock):
 
         Removes lock
         '''
-        try:
+        with suppress(OSError):
             os.unlink(self.fullname)
-        except OSError:
-            pass
 
     def is_locked(self):
         '''

@@ -206,7 +206,7 @@ def read_configuration_file(fp=None, default_options=None):
         gfp = path.expanduser(gfp)
         if path.exists(gfp):
             try:
-                f = open(gfp)
+                f = open(gfp, encoding='utf-8')
             except OSError:
                 break
             global_options = _parse_config_file(f, default_options, default_options=default_options)
@@ -223,7 +223,7 @@ def read_configuration_file(fp=None, default_options=None):
     head = global_options
     for config_path in reversed(local_files):
         try:
-            f = open(config_path)
+            f = open(config_path, encoding='utf-8')
         except OSError:
             continue
         head = _parse_config_file(f, head, default_options=default_options)

@@ -89,10 +89,7 @@ def _check_or_sleep_until(store, sleep_until):
             else:
                 return 1
         for dep in task.recursive_dependencies(t):
-            try:
-                active.remove(dep)
-            except KeyError:
-                pass
+            active.discard(dep)
     return 0
 
 

@@ -113,17 +113,11 @@ class dict_store(base_store):
         '''
         existing = set(self.store.keys())
         for act in active:
-            try:
-                existing.remove(_resultname(act.hash()))
-            except KeyError:
-                pass
+            existing.discard(_resultname(act.hash()))
 
         if keeplocks:
             for lock in self.listlocks():
-                try:
-                    existing.remove(_lockname(lock))
-                except KeyError:
-                    pass
+                existing.discard(_lockname(lock))
 
         cleaned = len(existing)
         for superflous in existing:

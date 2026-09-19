@@ -115,7 +115,7 @@ import sys
 import traceback
 from ..options import Options
 from ..jug_version import CITATION
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 
 class SubCommandError(Exception):
@@ -157,7 +157,8 @@ class SubCommand(metaclass=ABCMeta):
     def __call__(self, *args, **kwargs):
         return self.run(*args, **kwargs)
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def name(self):
         pass
 
