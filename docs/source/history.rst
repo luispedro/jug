@@ -25,8 +25,8 @@ Bugfixes
 
 * Fix ``_get_terminal_size_linux`` for Python 3.14, which changed how
   ``fcntl.ioctl`` handles string arguments. Use ``os.get_terminal_size()``
-  instead (patch by justinrporter, `GH #120
-  <https://github.com/luispedro/jug/issues/120>`__).
+  instead (patch by justinrporter, `GH #90
+  <https://github.com/luispedro/jug/issues/90>`__).
 * Fix ``jug.backend.dict_store`` for Python 3.
 * Fix ``describe`` in ``jug.task`` for Python 3.
 

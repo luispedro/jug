@@ -18,7 +18,7 @@ Jug is a pure Python implementation and should work on any platform.
 
 Python versions 3.8 and above are supported (will almost certainly work
 on earlier versions as well, but they are not part of the [CI
-suite](<https://github.com/luispedro/jug/actions>).
+suite](<https://github.com/luispedro/jug/actions>)).
 
 *Documentation*: <https://jug.readthedocs.io/>
 
@@ -122,10 +122,45 @@ get the actual value, you call the [value]{.title-ref} function:
 
 ### User-visible improvements
 
+- Better error message when loading results fails (patch by Justin R.
+  Porter, [GH #92](https://github.com/luispedro/jug/pull/92))
+- Configuration files are now read as UTF-8 regardless of locale
+
+### Internal improvements
+
+- Use `@property` and `@abstractmethod` instead of the deprecated
+  `abstractproperty`
+
+### Bugfixes
+
+- Fix saving to/loading from a file backend in `jug.backend.dict_store`
+  on Python 3 (pickle files must be opened in binary mode)
+
+## Version 2.5.0
+
+*Released 12 March 2026*
+
+### User-visible improvements
+
+- Special case saving `polars` DataFrames in `file_store` for speed.
+- More flexible parsing of booleans in `jug.options`.
 - Support project-local configuration files (`.jugrc` or `jugrc`). Jug
   now walks up the directory tree from the current working directory (up
   to the git project root) looking for local configuration files. See
   [configuration]{.title-ref} for details.
+- Ship the Jug assistant skill in the Python package and add
+  `jug install-skills --output DIR` to install it into Codex or Claude
+  Code skills directories. See [ai-assistants]{.title-ref} for usage
+  details.
+
+### Bugfixes
+
+- Fix `_get_terminal_size_linux` for Python 3.14, which changed how
+  `fcntl.ioctl` handles string arguments. Use `os.get_terminal_size()`
+  instead (patch by justinrporter, [GH
+  #90](https://github.com/luispedro/jug/issues/90)).
+- Fix `jug.backend.dict_store` for Python 3.
+- Fix `describe` in `jug.task` for Python 3.
 
 ## Version 2.4.0
 
