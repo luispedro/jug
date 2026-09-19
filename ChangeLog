@@ -1,4 +1,6 @@
 Unreleased
+	* jug.backend.dict_store: Fix saving to/loading from a file backend on
+	Python 3 (pickle files must be opened in binary mode)
 	* jug: Better error message when loading results fails (patch by Justin R.
 	Porter, GH #92)
 

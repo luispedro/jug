@@ -55,7 +55,8 @@ class dict_store(base_store):
         '''
         if backend is not None:
             try:
-                self.store = pickle.load(open(backend))
+                with open(backend, 'rb') as ifile:
+                    self.store = pickle.load(ifile)
             except IOError:
                 self.store = {}
         else:
@@ -179,7 +180,8 @@ class dict_store(base_store):
 
     def close(self):
         if self.backend is not None:
-            pickle.dump(self.store, open(self.backend, 'w'))
+            with open(self.backend, 'wb') as ofile:
+                pickle.dump(self.store, ofile)
             self.backend = None
     __del__ = close
 

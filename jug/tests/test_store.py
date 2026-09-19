@@ -217,3 +217,17 @@ def test_listlocks(store):
     lock.get()
     assert list(store.listlocks()) == [b'foo']
 
+
+
+def test_dict_store_persistence(tmp_path):
+    backend = str(tmp_path / 'dict_store.pickle')
+    key = b'jugisbestthingever'
+
+    store = jug.backends.dict_store.dict_store(backend)
+    store.dump(list(range(10)), key)
+    store.close()
+
+    reloaded = jug.backends.dict_store.dict_store(backend)
+    assert reloaded.can_load(key)
+    assert reloaded.load(key) == list(range(10))
+    reloaded.close()
