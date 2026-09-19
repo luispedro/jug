@@ -305,7 +305,7 @@ class StatusCommand(SubCommand):
                             action='store', metavar="CACHE_FILE",
                             dest='status_cache_file',
                             help=('Name of file to use for status cache. Use with status --cache. '
-                                  f"(Default: {defaults['status_cache_file']}"))
+                                  f"(Default: {defaults['status_cache_file']})"))
         parser.add_argument('--clear',
                             action='store_const', const=True,
                             dest='status_cache_clear',
