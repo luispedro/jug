@@ -19,6 +19,12 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+# The pickle protocol is pinned (rather than using pickle's default, which
+# changes between Python versions: 4 up to Python 3.13, 5 from 3.14) so that
+# task hashes, and thus cached results, are stable across interpreter versions.
+# Do not change this without a compatibility plan: it invalidates all hashes.
+_PICKLE_PROTOCOL = 4
+
 def hash_update(M, elems):
     '''
     M = hash_update(M, elems)
@@ -43,7 +49,7 @@ def hash_update(M, elems):
     except ImportError:
         np = None
     for n,e in elems:
-        M.update(pickle.dumps(n))
+        M.update(pickle.dumps(n, protocol=_PICKLE_PROTOCOL))
         if hasattr(e, '__jug_hash__'):
             M.update(e.__jug_hash__())
         elif type(e) in (list, tuple):
@@ -66,15 +72,15 @@ def hash_update(M, elems):
             hash_update(M, items)
         elif np is not None and type(e) == np.ndarray:
             M.update(b'np.ndarray')
-            M.update(pickle.dumps(e.dtype))
-            M.update(pickle.dumps(e.shape))
+            M.update(pickle.dumps(e.dtype, protocol=_PICKLE_PROTOCOL))
+            M.update(pickle.dumps(e.shape, protocol=_PICKLE_PROTOCOL))
             try:
                 buffer = e.data
                 M.update(buffer)
             except:
                 M.update(e.copy().data)
         else:
-            M.update(pickle.dumps(e))
+            M.update(pickle.dumps(e, protocol=_PICKLE_PROTOCOL))
     return M
 
 def new_hash_object():

@@ -38,3 +38,17 @@ def test_hash_set():
 def test_unsafe_nohash():
     assert hash_one([1,2,NoHash(3)]) == hash_one([1,2,NoHash(7)])
 
+def test_hash_stable_across_python_versions():
+    # These digests were computed with pickle protocol 4 (the default up to
+    # Python 3.13). Hashes must not depend on the interpreter's default
+    # pickle protocol (which is 5 from Python 3.14), or cached results would
+    # be invalidated when upgrading Python.
+    assert hash_one([1, 'a', (2, 3)]) == b'072067f4dcf1ed6f65eebc9ac81bb629179c0c9f'
+    assert hash_one({'k': 1.5}) == b'2048fd3dccf8b1a8bdf8d55839918fff0a308a1c'
+
+
+def test_hash_ignores_pickle_default_protocol(monkeypatch):
+    import pickle
+    expected = hash_one([1, 'a', (2, 3)])
+    monkeypatch.setattr(pickle, 'DEFAULT_PROTOCOL', 5 if pickle.DEFAULT_PROTOCOL != 5 else 3)
+    assert hash_one([1, 'a', (2, 3)]) == expected
