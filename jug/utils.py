@@ -150,13 +150,13 @@ def timed_path(path):
 
     Parameters
     ----------
-    ipath : str
+    path : str
         A filesystem path
 
     Returns
     -------
     opath : str
-        A task equivalent to ``(lambda: ipath)``.
+        A task equivalent to ``(lambda: path)``.
     '''
     return CustomHash(path, hash_with_mtime_size)
 
@@ -259,7 +259,7 @@ def cached_glob(pat):
         from glob import glob
         CachedFunction(glob, pattern)
 
-    with the extra bonus that results are returns *sorted*
+    with the extra bonus that results are returned *sorted*
 
     Parameters
     ----------

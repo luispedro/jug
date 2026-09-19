@@ -103,6 +103,10 @@ def _make_temp_file(tempdir):
     '''
     import random
     import string
+    # random.choices is not cryptographic, which is fine: the name only needs
+    # to avoid collisions. With 52**24 possibilities, a collision is
+    # practically impossible, but the exclusive-create ('x') open plus retry
+    # loop guarantees we never overwrite an existing file.
     while True:
         fname = path.join(tempdir,
                     ''.join(random.choices(string.ascii_letters, k=24)))

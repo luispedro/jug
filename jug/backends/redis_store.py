@@ -124,8 +124,8 @@ class redis_store(base_store):
         existing -= set(act.hash() for act in active)
 
         cleaned = len(existing)
-        for superflous in existing:
-            self.redis.delete(_resultname(superflous))
+        for superfluous in existing:
+            self.redis.delete(_resultname(superfluous))
 
         if not keeplocks:
             cleaned += self.remove_locks()

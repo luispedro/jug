@@ -120,8 +120,8 @@ class dict_store(base_store):
                 existing.discard(_lockname(lock))
 
         cleaned = len(existing)
-        for superflous in existing:
-            del self.store[superflous]
+        for superfluous in existing:
+            del self.store[superfluous]
 
         return cleaned
 

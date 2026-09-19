@@ -42,7 +42,7 @@ If you want to use `jug shell`, install IPython as well:
 
     pip install Jug ipython
 
-or use, if you are using [conda](https://anaconda.org/), you can install
+Or, if you use [conda](https://anaconda.org/), you can install
 jug from [conda-forge](https://conda-forge.github.io/) using the
 following commands:
 
@@ -79,10 +79,10 @@ version of this example by running `jug demo` on the command line):
     primes100 = [is_prime(n) for n in range(2,101)]
 
 This is a brute-force way to find all the prime numbers up to 100. Of
-course, this is only for didactical purposes, normally you would use a
+course, this is only for didactic purposes, normally you would use a
 better method. Similarly, the `sleep` function is so that it does not
 run too fast. Still, it illustrates the basic functionality of Jug for
-embarassingly parallel problems.
+embarrassingly parallel problems.
 
 Type `jug status primes.py` to get:
 
@@ -107,16 +107,16 @@ status again (with `jug status primes.py`):
 Now you have 32 tasks finished, 4 running, and 63 still ready.
 Eventually, they will all finish and you can inspect the results with
 `jug shell primes.py`. This requires `ipython` to be installed and will
-give you an `ipython` shell. The [primes100]{.title-ref} variable is
-available, but it is an ugly list of [jug.Task]{.title-ref} objects. To
-get the actual value, you call the [value]{.title-ref} function:
+give you an `ipython` shell. The `primes100` variable is
+available, but it is an ugly list of `jug.Task` objects. To
+get the actual value, you call the `value` function:
 
     In [1]: primes100 = value(primes100)
 
     In [2]: primes100[:10]
     Out[2]: [True, True, False, True, False, True, False, False, False, True]
 
-## What\'s New
+## What's New
 
 ## Unreleased
 
@@ -147,10 +147,10 @@ get the actual value, you call the [value]{.title-ref} function:
 - Support project-local configuration files (`.jugrc` or `jugrc`). Jug
   now walks up the directory tree from the current working directory (up
   to the git project root) looking for local configuration files. See
-  [configuration]{.title-ref} for details.
+  `configuration` for details.
 - Ship the Jug assistant skill in the Python package and add
   `jug install-skills --output DIR` to install it into Codex or Claude
-  Code skills directories. See [ai-assistants]{.title-ref} for usage
+  Code skills directories. See `ai-assistants` for usage
   details.
 
 ### Bugfixes

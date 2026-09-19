@@ -359,7 +359,7 @@ tricky to support since the general code relies on the function name)''')
 
         Marks the task as failed
 
-        If the lock was not held, and exception will be raised
+        If the lock was not held, an exception will be raised
         '''
         return self._lock.fail()
 
@@ -501,8 +501,8 @@ def value(elem):
     '''
     value = value(obj)
 
-    Loads a task object recursively. This correcly handles lists,
-    dictonaries and eny other type handled by the tasks themselves.
+    Loads a task object recursively. This correctly handles lists,
+    dictionaries and any other type handled by the tasks themselves.
 
     Parameters
     ----------
@@ -544,7 +544,7 @@ def CachedFunction(f,*args,**kwargs):
     You can often use ``bvalue`` to achieve similar results::
 
         task = Task(f, *args, **kwargs)
-        value = bvalues(task)
+        value = bvalue(task)
 
     This alternative method is more flexible, but will only be execute lazily.
     In particular, a ``jug status`` will not see past the ``bvalue`` call until

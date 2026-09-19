@@ -26,7 +26,7 @@ This API is currently in experimental stage and may change in the future.
 
 The following serves as an example of how to extend jug's commands.
 
-Lets assume you wanted to create a custom report and have it available as::
+Let's assume you wanted to create a custom report and have it available as::
 
     $ jug my-fancy-report
 
@@ -54,13 +54,13 @@ call the subcommand ``jug my-fancy-report``.
 The ``run`` function will receive the following objects::
 
 * ``options``  - object representing command-line and user options
-* ``store``    - backend object reponsible for handling jobs
+* ``store``    - backend object responsible for handling jobs
 * ``jugspace`` - a namespace of jug internal variables (better not touch)
 
 additional objects may be introduced in the future so make sure your function
 uses ``*args, **kwargs`` to maintain compatibility.
 
-Finally, in order to register the subcommand, you must instanciate the subcommand.
+Finally, in order to register the subcommand, you must instantiate the subcommand.
 
 
 If your subcommand needs configurable options you can expose them via command-line
@@ -82,7 +82,7 @@ by defining two additional methods::
     fancy_report = FancyReport()
 
 The first method configures argparse arguments that will be available as
-``jug my-fancy-report --tofile myreport.txt``. These will also be avaiable to
+``jug my-fancy-report --tofile myreport.txt``. These will also be available to
 the ``run()`` method as part of the ``options`` object.
 
 The second defines default values in case of omission. The ``key`` should match
@@ -183,7 +183,7 @@ class SubCommand(metaclass=ABCMeta):
 
         This code will receive the following arguments:
         * ``options``  - object representing command-line and user options
-        * ``store``    - backend object reponsible for handling jobs
+        * ``store``    - backend object responsible for handling jobs
         * ``jugspace`` - a namespace of jug internal variables (better not touch)
 
         Anything returned by this method is ignored
@@ -240,7 +240,7 @@ class SubCommandManager:
 
     def _register(self, name, cmd_instance):
         if name in self._commands and self._commands[name] != cmd_instance:
-            logging.warning("Jug: command: '%s' will be overriden with code from '%s'",
+            logging.warning("Jug: command: '%s' will be overridden with code from '%s'",
                             name, cmd_instance.__class__.__name__)
 
         self._commands[name] = cmd_instance
