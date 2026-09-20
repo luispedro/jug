@@ -382,6 +382,47 @@ tricky to support since the general code relies on the function name)''')
         return self._lock.is_failed()
 
 
+def _code_hash_key(code):
+    '''Hashable summary of a code object (recursing into nested code objects)'''
+    consts = tuple(
+            _code_hash_key(c) if hasattr(c, 'co_code') else c
+            for c in code.co_consts)
+    return (code.co_code, consts, code.co_names)
+
+def _hashable_or_type(obj):
+    '''Return ``obj`` if it can be hashed, else its type name
+
+    Values captured by a lambda can be arbitrary (modules, open files, other
+    lambdas...) and not all can be pickled. Falling back on the type keeps
+    hashing working for these.
+    '''
+    try:
+        hash_one(obj)
+    except Exception:
+        return ('unhashable', type(obj).__module__, type(obj).__qualname__)
+    return obj
+
+def _lambda_hash_key(f):
+    '''Hash key for a lambda: its code plus everything it captures
+
+    Bytecode alone is not enough: ``lambda v: v + x`` and ``lambda v: v + y``
+    have the same ``co_code`` and differ only in ``co_names``, while
+    ``lambda v: v + 1`` and ``lambda v: v + 2`` differ only in ``co_consts``.
+    Closure cells and default arguments are included as they are the ways
+    a lambda can capture different values with the same code. (Global
+    variables are looked up by name when the lambda is called and cannot be
+    captured.)
+    '''
+    closure = []
+    for cell in (f.__closure__ or ()):
+        try:
+            closure.append(_hashable_or_type(cell.cell_contents))
+        except ValueError: # empty cell
+            closure.append(None)
+    defaults = tuple(_hashable_or_type(d) for d in (f.__defaults__ or ()))
+    kwdefaults = {k: _hashable_or_type(v) for k, v in (f.__kwdefaults__ or {}).items()}
+    return ('<lambda>', _code_hash_key(f.__code__), tuple(closure), defaults, kwdefaults)
+
 class Tasklet(TaskletMixin):
     '''
     Tasklet
@@ -444,7 +485,7 @@ class Tasklet(TaskletMixin):
         M.update(b'Tasklet')
         hash_update(M, [
                 ('base', self.base),
-                ('f', self.f if getattr(self.f, '__name__', '') != '<lambda>' else ('<lambda>', self.f.__code__.co_code))
+                ('f', self.f if getattr(self.f, '__name__', '') != '<lambda>' else _lambda_hash_key(self.f))
             ])
         return M.hexdigest().encode('utf-8')
 
