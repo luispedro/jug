@@ -134,15 +134,6 @@ class decompress_stream:
         self.lastread = res
         return res
 
-    def readinto(self, buf):
-        # FIXME: this is a very-bad-awful implementation, but it is needed for
-        # Python 3.8
-        buf = memoryview(buf)
-        block = self.read(len(buf))
-        buf[:len(block)] = block
-        return len(block)
-
-
     def seek(self, offset, whence):
         if whence != 1:
             raise NotImplementedError

@@ -158,7 +158,7 @@ What do I need to run Jug?
 ---------------------------
 
 It is a Python only package. Jug is `continuously tested
-<https://github.com/luispedro/jug/actions>`__ with Python 3.8 and up.
+<https://github.com/luispedro/jug/actions>`__ with Python 3.9 and up.
 
 How does it work?
 -----------------
