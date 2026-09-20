@@ -118,23 +118,51 @@ get the actual value, you call the `value` function:
 
 ## What's New
 
-## Unreleased
+## Version 2.6.0
+
+*Released 20 September 2026*
+
+### Compatibility notes
+
+Two changes alter task hashes, so cached results for the affected tasks will
+be recomputed the first time you run them with this version:
+
+- The pickle protocol used for hashing is now pinned to protocol 4. This only
+  affects users of Python 3.14 and 3.15 (where pickle's default is protocol 5);
+  Python 3.13 and earlier already used protocol 4. From now on, task hashes are
+  stable across Python versions.
+- Tasklets built from `lambda` functions are now hashed using the lambda's
+  constants, referenced names, closure and default arguments (previously only
+  its bytecode was used, so lambdas that differed only in those hashed
+  identically).
 
 ### User-visible improvements
 
 - Better error message when loading results fails (patch by Justin R.
   Porter, [GH #92](https://github.com/luispedro/jug/pull/92))
 - Configuration files are now read as UTF-8 regardless of locale
+- `jug cleanup` now reports the number of removed objects and of removed
+  locks separately
 
 ### Internal improvements
 
 - Use `@property` and `@abstractmethod` instead of the deprecated
   `abstractproperty`
+- Modernize Python idioms and update documentation
 
 ### Bugfixes
 
+- Fix `write_task_out` for numpy arrays, which are now written in `.npy`
+  format (they were silently pickled instead)
+- Fall back to pickle for numpy arrays of object dtype, which cannot be
+  saved in numpy's native format
+- `file_store.cleanup()` no longer deletes the temporary files of workers
+  that are still running
+- Fix the `tput` fallback in `get_terminal_size`
+- Fix wrong exception type in `dict_store.cleanup()`
 - Fix saving to/loading from a file backend in `jug.backend.dict_store`
   on Python 3 (pickle files must be opened in binary mode)
+- Fix help text of `jug status --cache-file`
 
 ## Version 2.5.0
 

@@ -1,10 +1,26 @@
-Unreleased
+Version 2.6.0 Sun 20 September 2026 by luispedro
 	* jug.hash: Pin the pickle protocol used for hashing to protocol=4.
 	This is a one-time compatibility break for users of Python 3.14 and
 	3.15, where pickle's default protocol is 5: task hashes computed there
 	change, so cached results will be recomputed. Python <= 3.13 (whose
 	default is already 4) is unaffected. From now on, task hashes are
 	stable across Python versions.
+	* jug.task: Tasklets built from lambdas are now hashed using the
+	lambda's constants, referenced names, closure and default arguments
+	(previously only the bytecode was used, so lambdas differing only in
+	those hashed identically). This changes the hash of all Tasklets
+	using lambdas, so their cached results will be recomputed.
+	* jug.io: Fix write_task_out for numpy arrays: they are now written in
+	.npy format (they were silently pickled before)
+	* jug.io: Fix the tput fallback of get_terminal_size
+	* jug.backend: Fall back to pickle for numpy arrays of object dtype
+	(which cannot be saved in numpy's native format)
+	* jug.backend.file_store: cleanup() no longer removes the temporary
+	files of concurrently running workers
+	* jug.backend.dict_store: Fix wrong exception type in cleanup()
+	* jug cleanup: Report the number of removed objects and locks
+	separately (store.cleanup() no longer counts locks)
+	* jug status: Fix help text of --cache-file
 	* jug.options: Read configuration files as UTF-8 regardless of locale
 	* jug.subcommands: Use @property/@abstractmethod instead of the
 	deprecated abstractproperty
