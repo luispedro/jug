@@ -88,3 +88,22 @@ def test_lambda_hash_unpicklable_closure():
     # Must not raise
     _tasklet_hash(make(sys))
     _tasklet_hash(make(lambda: 0))
+
+
+def test_lambda_hash_stable_across_processes():
+    # A lambda such as ``x in {'a', 'b'}`` has a frozenset constant, whose
+    # pickled form depends on PYTHONHASHSEED. Different jug processes must
+    # still compute the same hash.
+    import subprocess
+    import sys
+    code = (
+        "from jug import Task, Tasklet\n"
+        "t = Tasklet(Task(abs, -1), lambda v: v in {'alpha', 'beta', 'gamma', 'delta', 'epsilon'})\n"
+        "d = Tasklet(Task(abs, -1), lambda v, s=frozenset(['a', 'b', 'c', 'd', 'e', 'f']): v in s)\n"
+        "print(t.__jug_hash__().decode(), d.__jug_hash__().decode())\n")
+    hashes = set()
+    for seed in ('1', '2', '3', '4', '5'):
+        env = dict(os.environ, PYTHONHASHSEED=seed)
+        out = subprocess.check_output([sys.executable, '-c', code], env=env)
+        hashes.add(out)
+    assert len(hashes) == 1

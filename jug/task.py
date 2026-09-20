@@ -382,10 +382,24 @@ tricky to support since the general code relies on the function name)''')
         return self._lock.is_failed()
 
 
+def _stable(obj):
+    '''Replace frozensets by sets (recursing into tuples)
+
+    ``hash_update`` sorts sets, but pickles frozensets, whose iteration order
+    for strings depends on hash randomization and would make the hash differ
+    between processes. (The compiler turns ``x in {'a', 'b'}`` into a
+    frozenset constant.)
+    '''
+    if type(obj) is frozenset:
+        return set(obj)
+    if type(obj) is tuple:
+        return tuple(_stable(o) for o in obj)
+    return obj
+
 def _code_hash_key(code):
     '''Hashable summary of a code object (recursing into nested code objects)'''
     consts = tuple(
-            _code_hash_key(c) if hasattr(c, 'co_code') else c
+            _code_hash_key(c) if hasattr(c, 'co_code') else _stable(c)
             for c in code.co_consts)
     return (code.co_code, consts, code.co_names)
 
@@ -400,7 +414,7 @@ def _hashable_or_type(obj):
         hash_one(obj)
     except Exception:
         return ('unhashable', type(obj).__module__, type(obj).__qualname__)
-    return obj
+    return _stable(obj)
 
 def _lambda_hash_key(f):
     '''Hash key for a lambda: its code plus everything it captures
