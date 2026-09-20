@@ -27,7 +27,8 @@ Options
 - jugfile: filesystem name for the Jugfile
 - cmd: command to run.
 - aggressive_unload: --aggressive-unload
-- invalid_name: --invalid
+- invalid_name: --name (for invalidate)
+- invalid_pattern: --pattern (for invalidate)
 - argv: Arguments not captured by jug (for script use)
 - print_out: Print function to be used for output (behaves like Python3's print)
 '''
@@ -75,6 +76,7 @@ def load_default_options(opt):
     opt.subcommand = None
     opt.aggressive_unload = False
     opt.invalid_name = None
+    opt.invalid_pattern = None
     opt.argv = None
     opt.print_out = print
     opt.short = False

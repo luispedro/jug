@@ -22,7 +22,7 @@
 
 from collections import defaultdict
 
-from ..utils import prepare_task_matcher
+from ..utils import prepare_matcher_from_options, add_task_selection_options
 from .. import task
 from ..io import print_task_summary_table
 from . import SubCommand
@@ -43,17 +43,19 @@ class InvalidateCommand(SubCommand):
     ----------
     store : jug.backend
     options : options object
-        Most relevant option is `invalid_name`, a string  with the exact (i.e.,
-        module qualified) name of function to invalidate
+        Most relevant options are `invalid_name`, a string with the name of
+        the function to invalidate (either module qualified or not; may
+        contain wildcards), and `invalid_pattern`, a looser match (substring
+        or /regex/). At least one must be given.
     '''
     name = "invalidate"
 
     def run(self, store, options, *args, **kwargs):
-        invalid_name = options.invalid_name
+        task_matcher = prepare_matcher_from_options(options.invalid_name, options.invalid_pattern)
+        if task_matcher is None:
+            raise ValueError('jug invalidate: one of invalid_name or invalid_pattern must be given')
         tasks = task.alltasks
         cache = {}
-
-        task_matcher = prepare_task_matcher(invalid_name)
 
         def isinvalid(t):
             if isinstance(t, task.Tasklet):
@@ -86,9 +88,8 @@ class InvalidateCommand(SubCommand):
             print_task_summary_table(options, [("Invalidated", task_counts)])
 
     def parse(self, parser):
-        parser.add_argument('--target', '--invalid', required=True, action='store',
-                            dest='invalid_name',
-                            help='Task name to invalidate')
+        add_task_selection_options(parser, 'invalid_name', 'invalid_pattern',
+                                   required=True, what='Invalidate tasks')
 
 
 invalidate = InvalidateCommand()

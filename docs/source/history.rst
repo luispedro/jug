@@ -2,6 +2,44 @@
 History
 =======
 
+Unreleased
+----------
+
+Compatibility notes
+~~~~~~~~~~~~~~~~~~~
+
+``jug execute`` and ``jug invalidate`` select tasks by name using ``--name``
+(strict) or ``--pattern`` (loose). The old ``--target`` option (and
+``--invalid``, for ``jug invalidate``) is now a deprecated synonym of
+``--name`` and prints a warning. This makes it **stricter** than before:
+
+* ``--target function`` used to match any task whose name contained
+  ``function``, so ``jug invalidate --target function`` would also invalidate
+  ``function_other`` (`GH #63 <https://github.com/luispedro/jug/issues/63>`__).
+  It now matches only tasks called ``function``. To get the previous behaviour,
+  use ``--pattern function``.
+* If you use jug's options programmatically, ``execute_target`` is replaced by
+  ``execute_name`` and ``execute_pattern``, and ``invalidate`` has a new
+  ``invalid_pattern`` option alongside ``invalid_name`` (which is now strict).
+
+User-visible improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* New ``--name`` option for ``jug execute`` and ``jug invalidate``: selects
+  tasks by their exact name, either fully qualified (``jugfile.function``) or
+  just the function name (``function``). Wildcards are supported, so
+  ``--name 'function*'`` matches both ``function`` and ``function_other``.
+* New ``--pattern`` option for ``jug execute`` and ``jug invalidate``: matches
+  anywhere in the task name (or a regular expression, if written between
+  slashes: ``--pattern '/compute_.*/'``). This is what ``--target`` used to do.
+* ``--target`` and ``--invalid`` are deprecated (see above).
+
+Internal improvements
+~~~~~~~~~~~~~~~~~~~~~
+
+* New function ``jug.utils.prepare_name_matcher``. ``prepare_task_matcher`` now
+  compiles its regular expression.
+
 Version 2.6.0
 -------------
 

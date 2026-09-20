@@ -36,7 +36,9 @@ jug execute [jugfile] [options]
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--target PATTERN` | (all tasks) | Only execute tasks whose name matches PATTERN (same syntax as `invalidate --target`) |
+| `--name NAME` | (all tasks) | Only execute tasks whose name is NAME: `module.function` or just `function`, `*` is a wildcard (same as `invalidate --name`) |
+| `--pattern PATTERN` | (all tasks) | Only execute tasks whose name contains PATTERN (or matches `/regex/`); looser than `--name` |
+| `--target` | | Deprecated synonym of `--name` (prints a warning) |
 | `--keep-going` | false | Continue executing other tasks after a task fails, instead of stopping |
 | `--keep-failed` | false | Leave failed tasks locked (do not release lock on failure) |
 | `--wait-cycle-time N` | 12 | Seconds to sleep between cycles when no task is ready |
@@ -85,20 +87,27 @@ with thousands of tasks.
 
 ## `jug invalidate`
 
-Remove cached results of tasks matching a pattern, plus all downstream tasks.
+Remove cached results of matching tasks, plus all downstream tasks.
 
 ```
-jug invalidate jugfile --target PATTERN
+jug invalidate jugfile --name NAME
+jug invalidate jugfile --pattern PATTERN
 ```
 
 | Option | Required | Description |
 |--------|----------|-------------|
-| `--target PATTERN` | yes | Pattern to match task names (also accepts `--invalid`) |
+| `--name NAME` | one of `--name`/`--pattern` | Exact task name |
+| `--pattern PATTERN` | one of `--name`/`--pattern` | Loose match on task name |
+| `--target`, `--invalid` | | Deprecated synonyms of `--name` (print a warning) |
 
-**Pattern formats:**
-- `/regex/` — regex applied to the full task name (e.g., `/compute_.*/`)
-- `module.function` — fully qualified name with a dot (e.g., `jugfile.process`)
-- `function` — bare name without a dot, matches `.function` in any module
+**`--name` formats** (must match the whole name):
+- `module.function` — fully qualified name (e.g., `jugfile.process`)
+- `function` — bare function name, matches `module.function` in any module (but not `module.function_other`)
+- `*` and `?` are wildcards (e.g., `'compute_*'` matches `compute_a` and `compute_b`)
+
+**`--pattern` formats** (matches anywhere in the task name):
+- `/regex/` — regex (e.g., `/compute_.*/`)
+- `module.function` or `function` — substring match, so `function` also matches `function_other`
 
 After invalidating, re-run `jug execute` to recompute.
 

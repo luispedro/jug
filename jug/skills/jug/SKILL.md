@@ -134,7 +134,7 @@ making it faster when only one result is needed before continuing. Use
 jug execute jugfile.py
 
 # Restrict to a subset of tasks:
-jug execute jugfile.py --target process
+jug execute jugfile.py --name process
 
 # Continue after task failures:
 jug execute jugfile.py --keep-going
@@ -180,7 +180,7 @@ recovery command:
 - Retry a normal task failure: re-run `jug execute`
 - Clear failed locks from `--keep-failed` or `file_keepalive:`: `jug cleanup --failed-only`
 - Clear stale crash locks: `jug cleanup --locks-only`
-- Remove stale cached results after code changes: `jug invalidate --target ...`
+- Remove stale cached results after code changes: `jug invalidate --name ...`
 - Remove orphaned results from an old graph shape: `jug cleanup`
 
 For exact workflows and failure semantics, see

@@ -56,7 +56,8 @@ def test_aggressive_unload(jugfile):
 
     options = parse(['execute'])
     options.aggressive_unload = True
-    options.execute_target = None
+    options.execute_name = None
+    options.execute_pattern = None
     store, space = jug.jug.init(find_test_jugfile(jugfile), 'dict_store')
     execution_loop(alltasks, options)
 
@@ -67,7 +68,7 @@ def test_target_exact():
     options = parse(['execute'])
     options.jugfile = find_test_jugfile('simple.py')
     # Test if restricting to this target we skip the other tasks
-    options.execute_target = "simple.double"
+    options.execute_name = "simple.double"
 
     store, space = jug.jug.init(options.jugfile, 'dict_store')
     execution_loop(alltasks, options)
@@ -75,20 +76,58 @@ def test_target_exact():
     assert len(store.store) < len(alltasks)
     assert len(store.store) == 8
 
-@task_reset
-def test_target_wild():
+def _execute_with(jugfile, **kwargs):
     from jug.jug import execution_loop
     from jug.task import alltasks
     options = parse(['execute'])
-    options.jugfile = find_test_jugfile('simple_multiple.py')
-    # Test if restricting to this target we skip the other tasks
-    options.execute_target = "simple_multiple.sum_"
-
+    options.jugfile = find_test_jugfile(jugfile)
+    for k, v in kwargs.items():
+        setattr(options, k, v)
     store, space = jug.jug.init(options.jugfile, 'dict_store')
     execution_loop(alltasks, options)
+    return store
 
-    assert len(store.store) < len(alltasks)
+
+@task_reset
+def test_name_bare_function():
+    # sum_2 is a function name (module-less): matches exactly
+    store = _execute_with('simple_multiple.py', execute_name='sum_2')
+    assert len(store.store) == 8
+
+
+@task_reset
+def test_name_is_strict():
+    # 'sum_' is a prefix of function names, but not a function name
+    store = _execute_with('simple_multiple.py', execute_name='sum_')
+    assert len(store.store) == 0
+    store = _execute_with('simple_multiple.py', execute_name='simple_multiple.sum_')
+    assert len(store.store) == 0
+
+
+@task_reset
+def test_name_glob():
+    store = _execute_with('simple_multiple.py', execute_name='sum_*')
     assert len(store.store) == 16
+
+
+@task_reset
+def test_pattern_substring():
+    # The previous behaviour of --target: match anywhere
+    store = _execute_with('simple_multiple.py', execute_pattern='simple_multiple.sum_')
+    assert len(store.store) == 16
+
+
+@task_reset
+def test_pattern_regex():
+    # the $ anchor is only possible with a regular expression
+    store = _execute_with('simple_multiple.py', execute_pattern='/sum_[23]$/')
+    assert len(store.store) == 16
+
+
+@task_reset
+def test_name_and_pattern_combined():
+    store = _execute_with('simple_multiple.py', execute_name='sum_*', execute_pattern='/sum_2/')
+    assert len(store.store) == 8
 
 @task_reset
 def test_failed_task_keep_going():
@@ -103,7 +142,8 @@ def test_failed_task_keep_going():
     # keep_failed ensures errored tasks are marked as failed
     options.execute_keep_failed = True
 
-    options.execute_target = None
+    options.execute_name = None
+    options.execute_pattern = None
     store, space = jug.jug.init(options.jugfile, 'dict_store')
     # the failing.py jugfile has a total of 20 reachable tasks
     assert len(alltasks) == 20
@@ -127,7 +167,8 @@ def test_failed_task():
     options.jugfile = find_test_jugfile('failing.py')
     # keep_failed ensures errored tasks are marked as failed
     options.execute_keep_failed = True
-    options.execute_target = None
+    options.execute_name = None
+    options.execute_pattern = None
 
     store, space = jug.jug.init(options.jugfile, 'dict_store')
     # the failing.py jugfile has a total of 20 reachable tasks

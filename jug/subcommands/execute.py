@@ -28,6 +28,7 @@ from .. import task
 from ..hooks import jug_hook, register_hook, register_hook_once
 from ..io import print_task_summary_table
 from ..jug import init
+from ..utils import add_task_selection_options
 from . import SubCommand, maybe_print_citation_info
 
 
@@ -129,9 +130,8 @@ class ExecuteCommand(SubCommand):
                             metavar='NR_WAIT_CYCLES', type=int,
                             help=("How many wait cycles to do "
                                   f"(Default: {defaults['execute_nr_wait_cycles']})"))
-        parser.add_argument('--target', action='store', dest='execute_target',
-                            metavar='TARGET',
-                            help="Restrict tasks to execute based on their name")
+        add_task_selection_options(parser, 'execute_name', 'execute_pattern',
+                                   required=False, what='Only execute tasks')
         parser.add_argument('--keep-going',
                             action='store_const', const=True,
                             dest='execute_keep_going',
@@ -151,7 +151,8 @@ class ExecuteCommand(SubCommand):
         default_values = {
             "execute_keep_going": False,
             "execute_keep_failed": False,
-            "execute_target": None,
+            "execute_name": None,
+            "execute_pattern": None,
             "execute_wait_cycle_time": wait_cycle_time,
             "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
             "execute_no_check_environment": False,

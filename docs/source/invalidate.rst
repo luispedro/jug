@@ -67,7 +67,7 @@ Jug invalidation helps you with the second task.
 
 ::
 
-    $ jug invalidate --target add_counts
+    $ jug invalidate --name add_counts
     Invalidated  Task name
     -----------------------------------------------------------
                1  jugfile.add_counts
@@ -77,7 +77,21 @@ Jug invalidation helps you with the second task.
 
 will remove results for all the ``add_counts`` tasks, *and all the
 ``divergence`` tasks* because those results depended on results from
-``add_counts``. Now, ``jug status`` gives us::
+``add_counts``.
+
+``--name`` matches the name of the task exactly: either the full name
+(``jugfile.add_counts``) or just the function name (``add_counts``). It will
+*not* match ``add_counts_v2``. If you do want to match several tasks, you can
+use wildcards (``--name 'add_counts*'``) or ``--pattern``, which matches
+anywhere in the task name (``--pattern add_counts`` will match
+``add_counts_v2`` as well) and can also take a regular expression if it is
+written between slashes (``--pattern '/add_counts.*/'``).
+
+.. note::
+
+    Older versions of jug used ``--target`` for this (which behaved like
+    ``--pattern``). ``--target`` and ``--invalid`` still work as synonyms of
+    ``--name``, but they are deprecated and print a warning. Now, ``jug status`` gives us::
 
     \     Waiting       Ready    Finished     Running  Task name
     ------------------------------------------------------------------------------------

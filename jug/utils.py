@@ -20,9 +20,11 @@
 #  THE SOFTWARE.
 
 
+import argparse
+import fnmatch
 import os
 import re
-from functools import partial
+import sys
 
 from .task import Task, TaskGenerator, Tasklet, value
 
@@ -162,19 +164,141 @@ def timed_path(path):
 
 
 def prepare_task_matcher(pattern):
+    '''Build a loose matcher from a ``--pattern`` string
+
+    The pattern is interpreted as follows:
+
+    - ``/regex/``: a regular expression (searched anywhere in the task name)
+    - contains a ``.``: a full task name, but matched *anywhere* in the name
+      (so ``mod.func`` also matches ``mod.func_other``)
+    - otherwise: a function name, matched as ``\\.pattern`` anywhere in the
+      task name (so ``func`` also matches ``mod.func_other``)
+
+    For strict matching, use :func:`prepare_name_matcher`.
+
+    Parameters
+    ----------
+    pattern : str
+
+    Returns
+    -------
+    matcher : callable
+        ``matcher(task_name)`` returns a true value if the name matches
+    '''
     if re.match(r'/.*/', pattern):
         # Looks like a regular expression
         regex = re.compile(pattern.strip('/'))
 
     elif '.' in pattern:
         # Looks like a full task name
-        regex = pattern.replace('.', '\\.')
+        regex = re.compile(pattern.replace('.', '\\.'))
 
     else:
         # A bare function name perhaps?
         regex = re.compile(r'\.' + pattern)
 
-    return partial(re.search, regex)
+    return regex.search
+
+
+def prepare_name_matcher(name):
+    '''Build a strict matcher from a ``--name`` string
+
+    A task name is ``module.function``. ``name`` must match the whole task
+    name or a trailing part of it starting after a ``.``, so that
+    ``mod.func`` and ``func`` both match the task ``pkg.mod.func`` but
+    ``func`` does not match ``pkg.mod.func_other``.
+
+    ``name`` may contain shell-style wildcards (see :mod:`fnmatch`), the
+    most useful being ``*`` (any sequence of characters, including ``.``) and
+    ``?``: ``func*`` matches both ``mod.func`` and ``mod.func_other``.
+
+    Parameters
+    ----------
+    name : str
+
+    Returns
+    -------
+    matcher : callable
+        ``matcher(task_name)`` returns a bool
+    '''
+    regex = re.compile(fnmatch.translate(name))
+
+    def matcher(task_name):
+        pos = 0
+        while True:
+            if regex.match(task_name, pos):
+                return True
+            # try again from just after the next dot
+            pos = task_name.find('.', pos) + 1
+            if pos == 0:
+                return False
+    return matcher
+
+
+def prepare_matcher_from_options(name=None, pattern=None):
+    '''Combine ``--name`` and ``--pattern`` into a single matcher
+
+    A task must satisfy all the criteria that are given (i.e., not ``None``).
+
+    Returns
+    -------
+    matcher : callable or None
+        ``None`` if neither criterion was given
+    '''
+    matchers = []
+    if name is not None:
+        matchers.append(prepare_name_matcher(name))
+    if pattern is not None:
+        matchers.append(prepare_task_matcher(pattern))
+    if not matchers:
+        return None
+    return lambda task_name: all(m(task_name) for m in matchers)
+
+
+class _DeprecatedTargetAction(argparse.Action):
+    '''Store the value, but warn that this option name is deprecated'''
+    def __call__(self, parser, namespace, values, option_string=None):
+        sys.stderr.write(
+            f"jug: warning: {option_string} is deprecated and will be removed "
+            "in a future version. It now behaves like --name (strict match on "
+            "the task name, '*' is a wildcard). Use --pattern for the previous "
+            "behaviour (substring or /regex/ match).\n")
+        setattr(namespace, self.dest, values)
+
+
+def add_task_selection_options(parser, name_dest, pattern_dest, required, what):
+    '''Add ``--name`` and ``--pattern`` (and deprecated ``--target``) to parser
+
+    Used by the subcommands that select tasks by name (``execute`` and
+    ``invalidate``).
+
+    Parameters
+    ----------
+    parser : argparse parser
+    name_dest, pattern_dest : str
+        ``dest`` for ``--name`` (which ``--target`` and ``--invalid`` also
+        write to) and ``--pattern``
+    required : bool
+        Whether one of them must be given
+    what : str
+        What is being selected (used in the help strings)
+    '''
+    group = parser.add_mutually_exclusive_group(required=required)
+    group.add_argument('--name', action='store', dest=name_dest,
+                       metavar='NAME',
+                       help=(f"{what} whose name is NAME. NAME is either "
+                             "the full task name (module.function) or the "
+                             "end of it (function), and may contain "
+                             "wildcards (e.g., 'function*')"))
+    group.add_argument('--pattern', action='store', dest=pattern_dest,
+                       metavar='PATTERN',
+                       help=(f"{what} whose name contains PATTERN (or matches "
+                             "PATTERN if given as /regex/). Note that "
+                             "'function' also matches 'function_other'; "
+                             "use --name for exact matching"))
+    group.add_argument('--target', '--invalid', action=_DeprecatedTargetAction,
+                       dest=name_dest, metavar='NAME',
+                       help='Deprecated: use --name (or --pattern)')
 
 
 @TaskGenerator

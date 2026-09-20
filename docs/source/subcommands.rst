@@ -66,7 +66,10 @@ invalidate
 
 You can invalidate a group of tasks (by name). It deletes all results from
 those tasks and from any tasks that (directly or indirectly) depend on them.
-You need to give the subcommand the name with the ``--invalid`` option.
+You need to give the subcommand the name with the ``--name`` option (which
+must match exactly, but accepts wildcards such as ``'function*'``) or with the
+``--pattern`` option (which matches any task whose name contains the pattern,
+or a regular expression written as ``/regex/``).
 
 cleanup
 ~~~~~~~

@@ -1,6 +1,8 @@
 import inspect
 import os
 
+import pytest
+
 import jug.jug
 import jug.task
 import jug.subcommands.invalidate
@@ -33,6 +35,57 @@ def test_jug_invalidate():
     opts.invalid_name = setall[0].name
     jug.subcommands.invalidate.invalidate(store, opts)
     assert not list(store.store.keys()), list(store.store.keys())
+    jug.task.Task.store = dict_store()
+
+def _two_families():
+    def setA(i):
+        pass
+    def setA_other(i):
+        pass
+    tasks = [Task(setA, i) for i in range(4)] + [Task(setA_other, i) for i in range(4)]
+    store = dict_store()
+    jug.task.Task.store = store
+    for t in tasks: t.run()
+    return store, tasks
+
+
+@task_reset
+def test_invalidate_name_is_strict():
+    store, tasks = _two_families()
+    opts = Options(default_options)
+    opts.invalid_name = 'setA'
+    jug.subcommands.invalidate.invalidate(store, opts)
+    assert [store.can_load(t.hash()) for t in tasks] == [False]*4 + [True]*4
+    jug.task.Task.store = dict_store()
+
+
+@task_reset
+def test_invalidate_name_glob():
+    store, tasks = _two_families()
+    opts = Options(default_options)
+    opts.invalid_name = 'setA*'
+    jug.subcommands.invalidate.invalidate(store, opts)
+    assert not any(store.can_load(t.hash()) for t in tasks)
+    jug.task.Task.store = dict_store()
+
+
+@task_reset
+def test_invalidate_pattern():
+    store, tasks = _two_families()
+    opts = Options(default_options)
+    opts.invalid_pattern = 'setA'
+    jug.subcommands.invalidate.invalidate(store, opts)
+    assert not any(store.can_load(t.hash()) for t in tasks)
+    jug.task.Task.store = dict_store()
+
+
+@task_reset
+def test_invalidate_needs_name_or_pattern():
+    store, tasks = _two_families()
+    opts = Options(default_options)
+    with pytest.raises(ValueError):
+        jug.subcommands.invalidate.invalidate(store, opts)
+    assert all(store.can_load(t.hash()) for t in tasks)
     jug.task.Task.store = dict_store()
 
 @task_reset

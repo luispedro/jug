@@ -29,7 +29,7 @@ import sys
 
 from . import task
 from .barrier import BarrierError
-from .utils import prepare_task_matcher
+from .utils import prepare_matcher_from_options
 from .hooks import jug_hook
 
 
@@ -120,9 +120,9 @@ def execution_loop(tasks, options):
 
     logging.info(f'Execute start ({len(tasks)} tasks)')
 
-    # If we are running with a target, exclude non-matching tasks
-    if options.execute_target:
-        task_matcher = prepare_task_matcher(options.execute_target)
+    # If we are running with --name/--pattern, exclude non-matching tasks
+    task_matcher = prepare_matcher_from_options(options.execute_name, options.execute_pattern)
+    if task_matcher is not None:
         tasks = [t for t in tasks if task_matcher(t.name)]
         logging.info(f'Non-matching tasks discarded. Remaining ({len(tasks)} tasks)')
 

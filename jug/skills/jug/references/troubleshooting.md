@@ -62,22 +62,29 @@ Only do this when you know no healthy worker is still running those tasks.
 Jug hashes task names and arguments, not function bytecode. Changing task
 implementation does not invalidate cached results automatically.
 
-Invalidate by target name:
+Invalidate by function name (exact, so `process_other` is not affected):
 
 ```bash
-jug invalidate jugfile.py --target process
+jug invalidate jugfile.py --name process
 ```
 
 Invalidate by fully qualified name:
 
 ```bash
-jug invalidate jugfile.py --target mymodule.process
+jug invalidate jugfile.py --name mymodule.process
 ```
 
-Invalidate by regex:
+Invalidate several tasks with a wildcard:
 
 ```bash
-jug invalidate jugfile.py --target /compute_.*/
+jug invalidate jugfile.py --name 'compute_*'
+```
+
+Invalidate by substring or regex (loose matching):
+
+```bash
+jug invalidate jugfile.py --pattern process
+jug invalidate jugfile.py --pattern /compute_.*/
 ```
 
 `jug invalidate` removes matching results and all downstream dependents. Re-run
@@ -90,7 +97,7 @@ Common causes:
 - a dependency failed earlier
 - a stale lock is blocking a ready task
 - a `barrier()` or `bvalue()` split requires another execution pass
-- you restricted execution too much with `--target`
+- you restricted execution too much with `--name` or `--pattern`
 
 Useful checks:
 
@@ -99,7 +106,8 @@ jug status jugfile.py
 jug status jugfile.py --short
 ```
 
-If you suspect target filtering is the problem, re-run without `--target`.
+If you suspect task filtering is the problem, re-run without `--name` or
+`--pattern`.
 
 If the jugfile uses `barrier()` or `bvalue()`, waiting can be normal while Jug
 completes the tasks required to finish parsing the rest of the graph.

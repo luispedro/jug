@@ -1,3 +1,18 @@
+Unreleased
+	* jug execute, jug invalidate: Add --name, which selects tasks by exact
+	name (either module.function or just function) and accepts wildcards
+	(e.g., --name 'function*'), and --pattern, which keeps the previous
+	loose matching (substring, or /regex/). Before, `jug invalidate --target
+	function` would also invalidate `function_other` (GH #63).
+	* jug execute, jug invalidate: --target (and --invalid) are now
+	deprecated synonyms of --name and print a warning. NOTE: this makes
+	them strict; use --pattern for the previous behaviour.
+	* jug.options: The execute_target option is replaced by execute_name
+	and execute_pattern. invalid_name is now strict and there is a new
+	invalid_pattern option
+	* jug.utils: Add prepare_name_matcher(); prepare_task_matcher() now
+	compiles its regular expression
+
 Version 2.6.0 Sun 20 September 2026 by luispedro
 	* jug.hash: Pin the pickle protocol used for hashing to protocol=4.
 	This is a one-time compatibility break for users of Python 3.14 and
