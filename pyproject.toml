@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,8 @@ name = "Jug"
 dynamic = ['version']
 description = "A Task Based Parallelization Framework"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["COPYING.MIT"]
 authors = [
   {name = "Luis Pedro Coelho", email = "luis@luispedro.org"}
 ]
@@ -51,17 +52,11 @@ Homepage = "https://jug.readthedocs.io"
 jug = "jug.jug:main"
 jug-execute = "jug.jug:main_execute"
 
-[tool.setuptools]
-packages = [
-    'jug',
-    'jug.subcommands',
-    'jug.internal',
-    'jug.backends',
-    'jug.tests',
-    'jug.hooks',
-    'jug.tests.jugfiles',
-]
+[tool.setuptools.packages.find]
+include = ["jug*"]
+namespaces = true
 
+[tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.package-data]
