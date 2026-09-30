@@ -177,3 +177,21 @@ def test_local_config_shadows_farther(tmp_path, monkeypatch):
     monkeypatch.chdir(sub)
     opts = jug.options.read_configuration_file(default_options=jug.options.default_options)
     assert opts.jugfile == 'sub.py'
+
+
+def test_build_parser_has_subcommands():
+    parser = jug.options.build_parser()
+    args = parser.parse_args(['execute', 'jugfile.py'])
+    assert args.subcommand == 'execute'
+    assert args.jugfile == 'jugfile.py'
+
+
+def test_print_completion(capsys):
+    import pytest
+    pytest.importorskip('shtab')
+    with raises(SystemExit) as e:
+        jug.options.parse(['--print-completion', 'bash'])
+    assert e.value.code == 0
+    out = capsys.readouterr().out
+    assert 'jug' in out
+    assert 'execute' in out

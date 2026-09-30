@@ -328,6 +328,8 @@ Subcommands
         for name, cmd in sorted(self._commands.items()):
             parser = subparsers.add_parser(
                 name,
+                # Needed for shell completion (shtab ignores subcommands without help)
+                help=_get_helptext(cmd),
                 # This is necessary to have all the same output on all subparsers
                 usage=self.usage(_print=False, exit=False),
             )

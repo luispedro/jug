@@ -95,3 +95,44 @@ Extending Subcommands
     This feature is still experimental
 
 .. automodule:: jug.subcommands
+
+Shell completion
+----------------
+
+Jug supports tab-completion of subcommands and options in your shell. Two
+optional packages provide this; install them both with::
+
+    pip install jug[completion]
+
+Dynamic completion with argcomplete
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`argcomplete <https://kislyuk.github.io/argcomplete/>`__ works with bash, zsh,
+fish, and others. To enable it for the current shell session::
+
+    eval "$(register-python-argcomplete jug)"
+
+Add this line to your shell's startup file (e.g., ``~/.bashrc``) to make it
+permanent. Alternatively, run ``activate-global-python-argcomplete`` once to
+enable it for all argcomplete-enabled programs.
+
+Static completion script with shtab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`shtab <https://github.com/iterative/shtab>`__ generates a completion script
+ahead of time (bash, zsh, and tcsh are supported). Jug can print it directly::
+
+    jug --print-completion bash > ~/.local/share/bash_completion/completions/jug
+    jug --print-completion zsh > ~/.zfunc/_jug
+
+(For zsh, ``~/.zfunc`` must be in your ``fpath``.) This is equivalent to
+running shtab's own command-line tool on Jug's parser::
+
+    shtab --shell=bash jug.options.build_parser
+
+The generated script is static, so it needs to be regenerated if you upgrade
+Jug (or add user subcommands) and want completion to reflect the changes.
+
+.. note::
+
+    ``jug-execute`` does not support completion, only ``jug`` itself.

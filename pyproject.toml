@@ -36,7 +36,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+completion = [
+    "argcomplete",
+    "shtab",
+    ]
 dev = [
+    "argcomplete",
+    "shtab",
     "pytest",
     "numpy",
     "polars",

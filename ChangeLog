@@ -1,4 +1,8 @@
 Unreleased
+	* Add shell completion: argcomplete is supported (`eval "$(register-python-argcomplete jug)"`)
+	and `jug --print-completion {bash,zsh,tcsh}` generates a completion
+	script using shtab. Both are optional dependencies (`pip install jug[completion]`).
+	* jug.options: Add build_parser() (parser construction split from parse())
 	* jug execute, jug invalidate: Add --name, which selects tasks by exact
 	name (either module.function or just function) and accepts wildcards
 	(e.g., --name 'function*'), and --pattern, which keeps the previous

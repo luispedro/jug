@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# PYTHON_ARGCOMPLETE_OK
 # Copyright (C) 2008-2026, Luis Pedro Coelho <luis@luispedro.org>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
