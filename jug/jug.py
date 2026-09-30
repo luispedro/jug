@@ -98,7 +98,9 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     jugspace = jugmodule.__dict__
     sys.modules[jugmodname] = jugmodule
     try:
-        with open(jugfile) as jfile:
+        # Read bytes: compile() then decodes as Python source (UTF-8 by default,
+        # honouring PEP 263 cookies) independently of the locale.
+        with open(jugfile, 'rb') as jfile:
             exec(compile(jfile.read(), jugfile, 'exec'), jugspace, jugspace)
     except BarrierError:
         jugspace['__jug__hasbarrier__'] = True
