@@ -1,8 +1,8 @@
 from sys import exit
 def exit_if_file_exists(fname):
-    '''Before each task execute, check if file exists. If so, exit.
+    '''Before each task is executed, check if file exists. If so, exit.
 
-    Note that a check is only performed before a Task is execute. Thus, jug
+    Note that a check is only performed before a Task is executed. Thus, jug
     will not exit immediately if it is executing another long-running task.
 
     Parameters
@@ -20,7 +20,7 @@ def exit_if_file_exists(fname):
 def exit_when_true(f, function_takes_Task=False):
     '''Generic exit check.
     
-    After each task, call function ``f`` and exit if it return true.
+    After each task, call function ``f`` and exit if it returns true.
 
     Parameters
     ----------

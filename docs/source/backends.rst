@@ -10,7 +10,7 @@ synchronises the running processes when needed.
 What Backends Are Available?
 ----------------------------
 
-There are three backend available: one is based on the filesystem, the other is a
+There are three backends available: one is based on the filesystem, the other is a
 `redis <https://redis.io/>`__ backend and a simple in-memory backend which does
 not allow sharing across processes.
 
@@ -36,7 +36,7 @@ In Memory Store
 
 If you just want an in-memory store, use ``--jugdir=dict_store:filename`` and
 the results will be loaded and saved into ``filename`` (use just
-``--jugdir=dict_store`` to get a run where results are *not* saved to file.
+``--jugdir=dict_store`` to get a run where results are *not* saved to file).
 
 This is only appropriate for small projects, but has the lowest maintenance of
 any system.
@@ -47,7 +47,7 @@ Which Backend Should I Use?
 If all your nodes share a filesystem and you don't want to set anything up,
 just use the default filesystem backend. If your computations are non-trivial
 (in general, you should avoid breaking up your algorithm so much that each
-tasks takes less than a second), then this will be fast enough and very robust.
+task takes less than a second), then this will be fast enough and very robust.
 
 Do note that ``jug`` **works well over NFS**.
 

@@ -37,7 +37,7 @@ class NoHash:
 
         jug_execute(['make', '-j', NoHash(4)])
 
-    This way, the number of CPUs is not hashed and the task will be **not** be
+    This way, the number of CPUs is not hashed and the task will **not** be
     rerun if the number of CPUs changes.
 
     Parameters

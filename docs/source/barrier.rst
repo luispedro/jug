@@ -72,5 +72,5 @@ of ``value()`` as well. The above example could also be written as::
 
 
 Note, however, that if there are additional tasks which are not loaded by the
-``bvalue()`` call, the processing can continue processing them.
+``bvalue()`` call, processing can continue with them.
 

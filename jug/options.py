@@ -276,7 +276,7 @@ However, it detects certain types of errors and prints an error message. If
 true: you can use --debug mode without --pdb.''')
     group.add_argument('--will-cite',
                        # We **cannot** use store_true because that will set it
-                       # to False if the argument is not passsed.
+                       # to False if the argument is not passed.
                        # In this case, this is undesired behaviour as then the
                        # value in the configuration file will not be used.
                        action='store_const',

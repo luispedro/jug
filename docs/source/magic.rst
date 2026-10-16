@@ -40,10 +40,10 @@ Implementing a __jug_hash__ method
 When jug wants to hash an object, first it checks whether the object has a
 ``__jug_hash__`` method. If so, that method should return ``bytes`` (or a
 bytes-like object that can be used by a `hashlib
-<https://docs.python.org/3/library/hashlib.html>`__ object. If there is no
+<https://docs.python.org/3/library/hashlib.html>`__ object). If there is no
 ``__jug_hash__`` method, jug checks whether the object is one of its known
 types (dict, list, tuple, numpy array, ...). If so, it will use optimized code.
-Otherwise; it resorts to calling pickle on the object and then hashing the
+Otherwise, it resorts to calling pickle on the object and then hashing the
 pickled representation.
 
 This fallback can be very inefficient. For example, let's say you have an
@@ -76,17 +76,17 @@ Here is how we'd do it::
 
 
 The function ``hash_one`` takes one object and hashes it using the jug
-machinery. Because we are passing it a dictionary, it recursively build a hash
+machinery. Because we are passing it a dictionary, it recursively builds a hash
 for it. Thus, our ``NamedNumpy`` object now has a very fast hash function.
 
-In fact, the ``CustomHash`` object we saw above, just defined its
+In fact, the ``CustomHash`` object we saw above just defines its
 ``__jug_hash__`` function to call whatever you pass it in.
 
 Overriding the ``value`` function
 ---------------------------------
 
 Similarly to overriding the hashing, we can override the ``value`` call which
-jug used internally to load objects.
+jug uses internally to load objects.
 
 Again, ``value(x)`` works in the following way:
 

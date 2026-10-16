@@ -601,7 +601,7 @@ def CachedFunction(f,*args,**kwargs):
         task = Task(f, *args, **kwargs)
         value = bvalue(task)
 
-    This alternative method is more flexible, but will only be execute lazily.
+    This alternative method is more flexible, but will only be executed lazily.
     In particular, a ``jug status`` will not see past the ``bvalue`` call until
     ``jug execute`` is called to execute ``f``, while a ``CachedFunction``
     object will always execute.

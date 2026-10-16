@@ -159,7 +159,7 @@ be recomputed the first time you run them with this version:
   that are still running
 - Fix the `tput` fallback in `get_terminal_size`
 - Fix wrong exception type in `dict_store.cleanup()`
-- Fix saving to/loading from a file backend in `jug.backend.dict_store`
+- Fix saving to/loading from a file backend in `jug.backends.dict_store`
   on Python 3 (pickle files must be opened in binary mode)
 - Fix help text of `jug status --cache-file`
 
@@ -186,7 +186,7 @@ be recomputed the first time you run them with this version:
   `fcntl.ioctl` handles string arguments. Use `os.get_terminal_size()`
   instead (patch by justinrporter, [GH
   #90](https://github.com/luispedro/jug/issues/90)).
-- Fix `jug.backend.dict_store` for Python 3.
+- Fix `jug.backends.dict_store` for Python 3.
 - Fix `describe` in `jug.task` for Python 3.
 
 ## Version 2.4.0
@@ -197,7 +197,7 @@ be recomputed the first time you run them with this version:
 
 - Adds support for lambda functions in `Tasklets`
 - Adds `NoHash` class to disable hashing for some arguments. This is in
-  `jug.unsafe` as it can be used to \"fool\" Jug, but it can be useful
+  `jug.unsafe` as it can be used to "fool" Jug, but it can be useful
   when there are nuisance arguments that are not relevant for the task
   (e.g., number of threads)
 - jug.file_store: create files with better permissions

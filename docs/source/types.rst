@@ -2,7 +2,7 @@
 Types in Jug
 ============
 
-Any type that can be ``pickle()d`` can be used with jug tasks. However, it
+Any type that can be pickled can be used with jug tasks. However, it
 might sometimes be wiser to break up your tasks in ways that minimise the
 communication necessary. For example, consider the following image processing
 code::

@@ -99,7 +99,7 @@ pieces of functionality:
     from jug import TaskGenerator
 
     @TaskGenerator
-    def my_computation(input, ouput_filename):
+    def my_computation(input, output_filename):
         ...
 
     token = my_computation(input, 'output.txt')
@@ -118,7 +118,7 @@ cached_glob
     files = CachedFunction(glob, pattern)
     files.sort()
 
-Where ``pattern`` is a glob pattern can be simply written as::
+where ``pattern`` is a glob pattern, can be simply written as::
 
     from jug.utils import cached_glob
     files = cached_glob(pattern)
@@ -133,7 +133,7 @@ mechanism and can lead to incorrect results if used incorrectly.
 
 This marks certain arguments to Tasks as not being part of the hash that
 defines the results. It can be useful for arguments that do not change the
-results, but nonetheless need to be passsed to functions.
+results, but nonetheless need to be passed to functions.
 
 Example usage::
 

@@ -218,7 +218,7 @@ class base_store(metaclass=ABCMeta):
 
         Close the connection.
 
-        Mayb be a no-op.
+        May be a no-op.
         '''
 
     @staticmethod

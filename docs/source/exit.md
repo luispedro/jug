@@ -1,7 +1,7 @@
 # Early exit
 
 Note that, in all cases, _the process will only exit after finishing a task_.
-If you set a time limit and that time is reach while a task is running, then
+If you set a time limit and that time is reached while a task is running, then
 the task will keep going.
 
 ## Maximum running time

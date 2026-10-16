@@ -16,7 +16,7 @@ head node
   Computer that does not perform heavy computation locally. Instead it is in
   charge of managing and monitoring jug on other computers
 compute node/client
-  Interchangable terms for this doc. Computers that are connected to the head
+  Interchangeable terms for this doc. Computers that are connected to the head
   node (typically via an SSH connection) and will be performing computation.
 jug instance
   A single jug process, typically running on a compute node
@@ -118,7 +118,7 @@ run 10 jug processes per compute node.
 Name of script: Below, the name of my jug script is benchmark_jug.py.  Yours is
 likely different, so please update
 
-Output redirection: I'm outputing stdout and stderr to ``/mnt/localhd``. If your
+Output redirection: I'm outputting stdout and stderr to ``/mnt/localhd``. If your
 jug tasks do not use stdout or stderr, then perhaps just do ``jug execute
 <my_jug>.py &> /dev/null &`` to redirect everything to /dev/null. If you
 actually want output, make sure that the directory you're using for output (in
@@ -175,10 +175,10 @@ waits because if the script terminates before the child processes
 **jughalt**
 Creates a log message about halting, terminates the .waitonjug detached screen
 so that we don't have anyone waiting for the job to complete, and then uses
-pssh to issue a command to all compute node to kill all jug processes. The
-pkill command is used to automatically find and kill and processes names *jug*.
-Once the jug processes die then the run_worker.sh scripts will automatically
-terminate
+pssh to issue a command to all compute nodes to kill all jug processes. The
+pkill command is used to automatically find and kill any processes named *jug*.
+Once the jug processes die then the run_workers.sh scripts will automatically
+terminate.
 
 **juglog**
 Outputs the contents of the log file from the run/halt/complete.  Simple file,

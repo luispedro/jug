@@ -39,7 +39,7 @@ If the syntax of Python supported such a thing.
 An issue that might come up is that your *map* function can be **too fast**. A
 good task should take at least a few seconds (otherwise, the overhead of
 scheduling and loading the data overwhelms the performance advantages of
-parallelism. Analogously for the *reduce* function.
+parallelism). Analogously for the *reduce* function.
 
 Therefore, ``jug`` groups your inputs so that a mapping task actually consists
 of mapping and reducing more than one input. How many is controlled by the
@@ -71,7 +71,7 @@ In pure Python, we'd write something like::
                 best_val = cur
     print('Best parameter pair', best)
 
-This is, obviously, an **embarassingly parallel** problem and we want *jug* to
+This is, obviously, an **embarrassingly parallel** problem and we want *jug* to
 handle it.
 
 First note: we can, of course, perform this with a *map/reduce*::

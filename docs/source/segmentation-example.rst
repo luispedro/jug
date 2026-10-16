@@ -4,7 +4,7 @@ Image Segmentation Tutorial
 
 This was originally material for a presentation and `blog post
 <https://metarabbit.wordpress.com/2013/05/20/segmenting-images-in-parallel-with-python-jug/>`__.
-You can get the `slides online <https://luisepdro.org/talks/2013/jug-meetup>`__.
+You can get the `slides online <https://luispedro.org/talks/2013/jug-meetup>`__.
 
 Let us imagine you are trying to compare two image segmentation algorithms
 based on human-segmented images. This is a completely real-world example as it
@@ -22,7 +22,7 @@ First a few imports::
     from jug import TaskGenerator
     from glob import glob
 
-Here, we test two thresholding-based segmentation method, called ``method1`` and
+Here, we test two thresholding-based segmentation methods, called ``method1`` and
 ``method2``. They both (i) read the image, (ii) blur it with a Gaussian, and
 (iii) threshold it [#]_::
 

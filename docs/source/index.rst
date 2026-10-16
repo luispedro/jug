@@ -37,7 +37,7 @@ Here is a one minute example. Save the following to a file called ``primes.py``:
 
 .. literalinclude:: ../../examples/primes/primes.py
 
-Of course, this is only for didactical purposes, normally you would use a
+Of course, this is only for didactic purposes, normally you would use a
 better method. Similarly, the ``sleep`` function is so that it does not run too
 fast.
 

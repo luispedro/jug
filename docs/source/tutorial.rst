@@ -113,7 +113,7 @@ process::
 
 You can see that this code is almost identical to our original sequential code,
 except for the decorators at the top and the fact that *Nr_clusters* is now a
-function (actually a TaskGenerator, look at the use of a decorators).
+function (actually a TaskGenerator, look at the use of decorators).
 
 This file is called the jugfile (you should name it *jugfile.py* on the
 filesystem) and specifies your problem.
@@ -139,7 +139,7 @@ If you run jug on the script above, you will simply have reproduced the
 original code with the added benefit of having all the intermediate results
 saved.
 
-The interesting is what happens when you run several instances of jug at the
+The interesting part is what happens when you run several instances of jug at the
 same time. They will start running Tasks, but each instance will run its own
 tasks. This allows you to take advantage of multiple processors in a way that
 keeps the processors all occupied as long as there is work to be done, handles
@@ -180,7 +180,7 @@ Advantages
 jug is an attempt to get something that works in the setting that I have found
 myself in: code that is *embarrassingly parallel* with a couple of points where
 all the results of previous processing are merged, often in a simple way.  It
-is also a way for me to manage either the explosion of temporary files that
+is also a way for me to manage both the explosion of temporary files that
 plagued my code and the brittleness of making sure that all results from
 separate processors are merged correctly in my *ad hoc* scripts.
 

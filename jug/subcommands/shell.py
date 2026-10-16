@@ -91,7 +91,7 @@ class ShellCommand(SubCommand):
 
     Implement 'shell' command.
 
-    Currently depends on Ipython being installed.
+    Currently depends on IPython being installed.
     '''
     name = "shell"
 
@@ -166,7 +166,7 @@ class ShellCommand(SubCommand):
             'get_tasks': _get_tasks,
             'get_filtered_tasks': _get_filtered_tasks,
         }
-        # This is necessary for some versions of Ipython. See:
+        # This is necessary for some versions of IPython. See:
         # https://groups.google.com/group/pylons-discuss/browse_thread/thread/312e3ead5967468a
         jugspace.pop('__builtins__', None)
 

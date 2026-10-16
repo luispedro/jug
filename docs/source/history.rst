@@ -87,7 +87,7 @@ Bugfixes
   that are still running
 * Fix the ``tput`` fallback in ``get_terminal_size``
 * Fix wrong exception type in ``dict_store.cleanup()``
-* Fix saving to/loading from a file backend in ``jug.backend.dict_store`` on
+* Fix saving to/loading from a file backend in ``jug.backends.dict_store`` on
   Python 3 (pickle files must be opened in binary mode)
 * Fix help text of ``jug status --cache-file``
 
@@ -116,7 +116,7 @@ Bugfixes
   ``fcntl.ioctl`` handles string arguments. Use ``os.get_terminal_size()``
   instead (patch by justinrporter, `GH #90
   <https://github.com/luispedro/jug/issues/90>`__).
-* Fix ``jug.backend.dict_store`` for Python 3.
+* Fix ``jug.backends.dict_store`` for Python 3.
 * Fix ``describe`` in ``jug.task`` for Python 3.
 
 
@@ -274,8 +274,8 @@ Bugfixes
 Internal improvements
 ~~~~~~~~~~~~~~~~~~~~~
 
-- jug.backend.base_store has 1 new method ``listlocks``
-- jug.backend.base_lock has 2 new methods ``fail`` and ``is_failed``
+- jug.backends.base_store has 1 new method ``listlocks``
+- jug.backends.base_lock has 2 new methods ``fail`` and ``is_failed``
 
 Version 1.6.9
 -------------
@@ -415,7 +415,7 @@ version **0.9.4** (Apr 15 2013)
 - Print traceback on import error
 - Exit when no progress is made even with barrier
 - Use Tasklets for better jug.mapreduce.map
-- Use Ipython debugger if available (patch by Alex Ford)
+- Use IPython debugger if available (patch by Alex Ford)
 - Faster --aggressive-unload
 - Add currymap() function
 
@@ -440,7 +440,7 @@ version **0.9.2** (Nov 4 2012):
 - Make TaskGenerator pickle()able and hash()able
 - Add invalidate() method to Task
 - Add --keep-going option to execute
-- Better help messsage
+- Better help message
 
 version **0.9.1** (Jun 11 2012):
 
@@ -461,6 +461,6 @@ version **0.9**:
 - Added CompoundTaskGenerator
 - Support subclassing of Task
 - Avoid creating directories in file backend unless it is necessary
-- Add jug.mapreduce.reduce (which mimicks the builtin reduce)
+- Add jug.mapreduce.reduce (which mimics the builtin reduce)
 
 For older version see ``ChangeLog`` file.

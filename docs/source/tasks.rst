@@ -16,7 +16,7 @@ What should be a task?
 
 The trade-off is between tasks that are too small (you have too many of them
 and the overhead of ``jug`` will overwhelm your process) or too big (and then
-you have too few tasks per processor.
+you have too few tasks per processor).
 
 As a rule of thumb, each task should take at least a few seconds, but you
 should have enough tasks that your processors are not idle.
@@ -39,8 +39,8 @@ Identifying tasks
 -----------------
 
 In the module ``jug.hash``, jug attempts to construct a unique identifier, called
-a hash, for each of your tasks. For doing that, the name of the function involved
-invoked in the task together with  the parameters that it receives are used. This
+a hash, for each of your tasks. For doing that, the name of the function
+invoked in the task together with the parameters that it receives are used. This
 makes jug easy to use but has some drawbacks:
 
 - If your functions take long/big arguments, the hash process will potentially be

@@ -38,7 +38,7 @@ def CompoundTask(f, *args, **kwargs):
     `f` should be such that it returns a `Task`, which can depend on other
     Tasks (even recursively).
 
-    If this cannot been loaded (i.e., has not yet been run), then this becomes
+    If this cannot be loaded (i.e., has not yet been run), then this becomes
     equivalent to::
 
         f(*args, **kwargs)

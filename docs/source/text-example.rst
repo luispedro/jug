@@ -4,9 +4,9 @@ Processing text
 ...............
 
 Problem: Take a list of the British members of Parliament (MPs) in the last
-decade and characterise each by a couple of *meaningful* word from their
+decade and characterise each by a couple of *meaningful* words from their
 wikipedia pages. Meaningful words are those that appear in the article for the
-the particular MP but not everywhere else.
+particular MP but not everywhere else.
 
 (The complete code for this example and a list of MPs [valid in 2010] with the
 `jug source <https://github.com/luispedro/jug/tree/master/examples/text>`__)
@@ -32,7 +32,7 @@ The algorithm looks like this:
         meaningful.reverse()
         print(mp, meaningful[:8])
 
-Very simple. It's also *embarassingly parallel*, except for the line which
+Very simple. It's also *embarrassingly parallel*, except for the line which
 computes ``global_counts``, because it uses the results from everyone.
 
 To use ``jug``, we write the above, including the functions, to a file (in this
@@ -151,7 +151,7 @@ result in different task names and weirdness all around). ``jug.task.value``
 looks up the value computed and then we can process the results into a nicer
 output format.
 
-Besides serving to demonstrate, ``jug``'s abilities, this is actually a very
+Besides serving to demonstrate ``jug``'s abilities, this is actually a very
 convenient format for organising computations:
 
 1.  Have a master jugfile.py that does all the computations that take a long

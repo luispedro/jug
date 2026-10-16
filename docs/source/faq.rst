@@ -109,7 +109,7 @@ Now, if you check ``jug status``, you will see that you have one task, an ``f``
 task. If you run ``jug execute``, jug will execute your one task. But, now, if
 you check ``jug status`` again, there is still one task that needs to be run!
 
-While this may be surprising, it is actually correct. Everytime you run the
+While this may be surprising, it is actually correct. Every time you run the
 script, you build a task that consists of calling ``f`` with a different number
 (because it's a randomly generated number). Given that tasks are defined as the
 combination of a Python function and its arguments, every time you run jug, you

@@ -86,6 +86,6 @@ def register_hook(name, f=None):
 def reset_all_hooks():
     '''Reset all hooks
 
-    This is a destructive actions, which cannot be undone'''
+    This is a destructive action, which cannot be undone'''
     _registered.clear()
     _hooks.clear()

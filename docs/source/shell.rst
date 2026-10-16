@@ -15,7 +15,7 @@ get_tasks()``. As a convenience function, you can also use
     failed = get_filtered_tasks(failed=True)
 
 
-This returns only tasks that fulfil the filtering criteria used
+This returns only tasks that fulfil the filtering criteria used.
 
 
 .. versionadded:: 2.3
@@ -37,7 +37,7 @@ You can call methods on ``Task`` objects directly as well:
 - ``can_run()``: whether all dependencies are available
 - ``can_load()``: whether the task has already run
 - ``invalidate()``: remove the result of this task (**not recursive**, unlike
-  the ``invalidate`` subcommand, unlike the invalidate function).
+  both the ``invalidate`` subcommand and the ``invalidate()`` shell function).
 
 You can access the original function with the ``.f`` attribute as well.
 

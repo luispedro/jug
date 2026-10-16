@@ -143,7 +143,7 @@ class WebStatusCommand(SubCommand):
         parser.add_argument('--port',
                             action='store',
                             dest='webstatus_port',
-                            help=('Port for the webstatus serve to listen on'
+                            help=('Port for the webstatus server to listen on'
                                   ' (Default: 8080)')
         )
         parser.add_argument('--ip',

@@ -37,16 +37,16 @@ Version 2.6.0 Sun 20 September 2026 by luispedro
 	* jug.io: Fix the tput fallback of get_terminal_size
 	* jug.backend: Fall back to pickle for numpy arrays of object dtype
 	(which cannot be saved in numpy's native format)
-	* jug.backend.file_store: cleanup() no longer removes the temporary
+	* jug.backends.file_store: cleanup() no longer removes the temporary
 	files of concurrently running workers
-	* jug.backend.dict_store: Fix wrong exception type in cleanup()
+	* jug.backends.dict_store: Fix wrong exception type in cleanup()
 	* jug cleanup: Report the number of removed objects and locks
 	separately (store.cleanup() no longer counts locks)
 	* jug status: Fix help text of --cache-file
 	* jug.options: Read configuration files as UTF-8 regardless of locale
 	* jug.subcommands: Use @property/@abstractmethod instead of the
 	deprecated abstractproperty
-	* jug.backend.dict_store: Fix saving to/loading from a file backend on
+	* jug.backends.dict_store: Fix saving to/loading from a file backend on
 	Python 3 (pickle files must be opened in binary mode)
 	* jug: Better error message when loading results fails (patch by Justin R.
 	Porter, GH #92)
@@ -54,8 +54,8 @@ Version 2.6.0 Sun 20 September 2026 by luispedro
 Version 2.5.0 Thu 12 March 2026 by luispedro
 	* jug.io: Fix _get_terminal_size_linux for Python 3.14 (patch by
 	justinrporter, GH #90)
-	* jug.backend.file_store: Special case saving polars DataFrames for speed
-	* jug.backend.dict_store: Fix for Python 3
+	* jug.backends.file_store: Special case saving polars DataFrames for speed
+	* jug.backends.dict_store: Fix for Python 3
 	* jug.task: fix describe for Python 3
 	* jug.options: More flexible parsing of booleans
 	* jug.options: Support project-local configuration files (.jugrc/jugrc)
@@ -120,8 +120,8 @@ Version 2.0.1 Thu Jun 11 2020 by luispedro
 	#79)
 
 version 2.0.0 Fri Feb 21 2020 by luispedro
-	* jug.backend.base_store has 1 new method 'listlocks'
-	* jug.backend.base_lock has 2 new methods 'fail' and 'is_failed'
+	* jug.backends.base_store has 1 new method 'listlocks'
+	* jug.backends.base_lock has 2 new methods 'fail' and 'is_failed'
 	* Add 'jug execute --keep-failed' to preserve locks on failing tasks.
 	* Add 'jug cleanup --failed-only' to remove locks from failed tasks
 	* 'jug status' and 'jug graph' now display failed tasks
@@ -257,7 +257,7 @@ version 0.9.4 Mon Apr 15 2013 by luispedro
 	* Print traceback on import error
 	* Exit when no progress is made even with barrier
 	* Use Tasklets for better jug.mapreduce.map
-	* Use Ipython debugger if available (patch by Alex Ford)
+	* Use IPython debugger if available (patch by Alex Ford)
 	* Faster --aggressive-unload
 	* Add currymap() function
 
@@ -279,7 +279,7 @@ version 0.9.2 Sun Nov 4 2012 by luispedro
 	* Make TaskGenerator pickle()able and hash()able
 	* Add invalidate() method to Task
 	* Add --keep-going option to execute
-	* Better help messsage
+	* Better help message
 
 version 0.9.1 Mon Jun 11 2012 by luispedro
 	* Add --locks-only option to cleanup subcommand
@@ -297,7 +297,7 @@ version 0.9 Mon Dec 5 2011 by luispedro
 	* Added CompoundTaskGenerator
 	* Support subclassing of Task
 	* Avoid creating directories in file backend unless it is necessary
-	* Add jug.mapreduce.reduce (which mimicks the builtin reduce)
+	* Add jug.mapreduce.reduce (which mimics the builtin reduce)
 
 version 0.8.1 Tue Jul 5 2011 by luispedro
 	* Fix redis backend for new version of client module
