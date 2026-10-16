@@ -104,21 +104,20 @@ class block_access_slice(TaskletMixin):
         self.start,self.stop,self.stride = orig
         self._hvalue = None
 
+    def _range(self):
+        return range(self.start, self.stop, self.stride)
+
     def __getitem__(self, p):
         if isinstance(p, slice):
-            start,stop,stride = p.indices(len(self))
-            return block_access_slice(self.base, (self.start + start, self.stop - (len(self)-stop), self.stride * stride))
+            r = self._range()[p]
+            return block_access_slice(self.base, (r.start, r.stop, r.step))
         elif isinstance(p, int):
-            p *= self.stride
-            p += self.start
-            if p >= self.stop:
-                raise IndexError
-            return self.base[p]
+            return self.base[self._range()[p]]
         else:
             raise TypeError
 
     def __len__(self):
-        return self.stop - self.start
+        return len(self._range())
 
     def __jug_hash__(self):
         if self._hvalue is not None:
@@ -152,6 +151,8 @@ class block_access(TaskletMixin):
         if isinstance(p, slice):
             return block_access_slice(self, p.indices(self.len))
         elif isinstance(p, int):
+            if p < 0:
+                p += self.len
             if not (0 <= p < self.len):
                 raise IndexError
             b = p//self.block_size

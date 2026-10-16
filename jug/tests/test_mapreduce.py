@@ -102,3 +102,40 @@ def test_currymap():
     simple_execute()
     assert np.allclose(np.array(value(ts)) , A*2)
 
+
+@task_reset
+def test_map_slicing():
+    jug.task.Task.store = dict_store()
+    A = list(range(23))
+    ts = jug.mapreduce.map(mapper, A)
+    simple_execute()
+    expected = [mapper(a) for a in A]
+    assert value(ts[-1]) == expected[-1]
+    assert value(ts[-23]) == expected[-23]
+    for s in [slice(None, None, 2),
+              slice(1, 9, 3),
+              slice(None, None, -1),
+              slice(20, 2, -3),
+              slice(5, 3),
+              slice(3, 100)]:
+        assert value(ts[s]) == expected[s]
+        assert len(ts[s]) == len(expected[s])
+        for s2 in [slice(None, None, 2),
+                   slice(1, None),
+                   slice(None, None, -1),
+                   slice(1, 4, -1)]:
+            assert value(ts[s][s2]) == expected[s][s2]
+            assert len(ts[s][s2]) == len(expected[s][s2])
+        sub = ts[s]
+        for i in range(-len(sub), len(sub)):
+            assert value(sub[i]) == expected[s][i]
+
+
+@task_reset
+def test_map_slice_hash_unchanged():
+    # The hashes of stride-1 slices (which already worked) must not change
+    jug.task.Task.store = dict_store()
+    ts = jug.mapreduce.map(mapper, list(range(23)))
+    a = ts[2:8][1:3]
+    b = jug.mapreduce.block_access_slice(ts, (3, 5, 1))
+    assert a.__jug_hash__() == b.__jug_hash__()
