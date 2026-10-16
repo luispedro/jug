@@ -290,3 +290,19 @@ def test_describe_task_with_kwargs():
     assert desc['name'].endswith('add')
     assert 'kwargs' in desc
 
+
+@task_reset
+def test_describe_tuple():
+    """describe() must recurse into tuples, as it does for lists."""
+    from jug.task import Task, describe
+
+    def add(x, y=0):
+        return x + y
+
+    t = Task(add, 1, y=2)
+    desc = describe((t, 3))
+    assert isinstance(desc, tuple)
+    assert desc[0]['name'].endswith('add')
+    assert desc[1] == 3
+    assert describe(Task(add, (t, 3)))['args'][0][0]['name'].endswith('add')
+

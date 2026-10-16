@@ -1,4 +1,6 @@
 Unreleased
+	* jug.task: describe() now recurses into tuples (Tasks inside tuples
+	were returned as-is instead of being described)
 	* Python 3.15 is now supported (and tested on CI)
 	* Add shell completion: argcomplete is supported (`eval "$(register-python-argcomplete jug)"`)
 	and `jug --print-completion {bash,zsh,tcsh}` generates a completion

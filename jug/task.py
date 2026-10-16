@@ -806,5 +806,5 @@ def describe(t):
     elif isinstance(t, dict):
         return {k: describe(v) for k, v in t.items()}
     elif isinstance(t, tuple):
-        return tuple(list(t))
+        return tuple(describe(ti) for ti in t)
     return t
