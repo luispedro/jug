@@ -27,7 +27,7 @@ jobs:
         cache-dependency-glob: "uv.lock"
     - name: Install dependencies and Jug
       run: |
-        uv sync --all-extras --dev
+        uv sync --locked --all-extras --dev
     - name: Start Redis
       uses: supercharge/redis-github-action@1.8.1
       with:

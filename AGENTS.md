@@ -6,7 +6,7 @@ This file provides guidance to agents (including Claude Code, via the `CLAUDE.md
 
 **Set up the environment (as CI does, using `uv.lock`):**
 ```bash
-uv sync --all-extras --dev
+uv sync --locked --all-extras --dev
 ```
 (or `pip install -e ".[dev]"`)
 
