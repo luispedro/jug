@@ -137,7 +137,7 @@ inside ``jugdata``. To access it, we can write a little script:
     import jugfile
 
     results = jug.task.value(jugfile.results)
-    for mp, r in zip(file('MPs.txt'), results):
+    for mp, r in zip(open('MPs.txt', encoding='utf-8'), results):
         mp = mp.strip()
         print(mp, ":    ", " ".join(r[:8]))
 

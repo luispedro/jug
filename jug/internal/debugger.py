@@ -30,28 +30,19 @@ def _get_debugger():
     #
     # Unfortunately, their API kept changing prior to version 1.0.
     try:
-        import IPython
+        import IPython.core.debugger
         try:
-            import IPython.core.debugger
-            try:
-                from IPython.terminal.ipapp import load_default_config
-                config = load_default_config()
-                colors = config.TerminalInteractiveShell.colors
-            except:
-                import IPython.core.ipapi
-                ip = IPython.core.ipapi.get()
-                colors = ip.colors
-            try:
-                return IPython.core.debugger.Pdb(colors.get_value(initial='Linux'))
-            except AttributeError:
-                return IPython.core.debugger.Pdb(colors)
-        except ImportError:
-            #Fallback to older version of IPython API
-            import IPython.ipapi
-            import IPython.Debugger
-            shell = IPython.Shell.IPShell(argv=[''])
-            ip = IPython.ipapi.get()
-            return IPython.Debugger.Pdb(ip.options.colors)
+            from IPython.terminal.ipapp import load_default_config
+            config = load_default_config()
+            colors = config.TerminalInteractiveShell.colors
+        except:
+            import IPython.core.ipapi
+            ip = IPython.core.ipapi.get()
+            colors = ip.colors
+        try:
+            return IPython.core.debugger.Pdb(colors.get_value(initial='Linux'))
+        except AttributeError:
+            return IPython.core.debugger.Pdb(colors)
     except ImportError:
         #Fallback to standard debugger
         import pdb

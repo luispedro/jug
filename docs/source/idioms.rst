@@ -114,5 +114,5 @@ result dictionary to look at all the results.
     # Look for the maximum score
     print(max(result.values()))
     # Look at maximum score *and* the parameters that generated it:
-    print(max((v, k) for k, v in result.iteritems()))
+    print(max((v, k) for k, v in result.items()))
 

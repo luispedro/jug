@@ -23,7 +23,7 @@ this::
         return 2*x
 
     numbers = range(1024)
-    result = map(double, numbers)
+    result = [double(n) for n in numbers]
 
 This might work well for this problem. However, if instead of 1,024 numbers,
 you had 1 million and each computation was very fast, then this would actually
@@ -120,7 +120,7 @@ While the ``reducer`` adds two dictionaries together::
     def merge_dicts(rhs, lhs):
         # Note that we SHOULDN'T modify arguments, so we will create a copy
         rhs = rhs.copy()
-        for k,v in lhs.iteritems():
+        for k,v in lhs.items():
             rhs[k] += v
         return rhs
 
@@ -209,7 +209,7 @@ We left out the imports above, but other than that, it is a fully functional exa
     def merge_dicts(rhs, lhs):
         # Note that we SHOULDN'T modify arguments, so we will create a copy
         rhs = rhs.copy()
-        for k,v in lhs.iteritems():
+        for k,v in lhs.items():
             rhs[k] += v
         return rhs
 

@@ -17,8 +17,8 @@ def get_data(title):
     # In a real example, we would *not* have a cache, of course.
     cache = 'text-data/' + title
     if exists(cache):
-        with open(cache, 'rb') as f:
-            return f.read().decode('utf-8')
+        with open(cache, encoding='utf-8') as f:
+            return f.read()
 
     params = {'action': 'query',
               'prop': 'revisions',
@@ -37,8 +37,8 @@ def get_data(title):
         mkdir('text-data')
     except:
         pass
-    with open(cache, 'wb') as f:
-        f.write(text.encode('utf-8'))
+    with open(cache, 'w', encoding='utf-8') as f:
+        f.write(text)
     return text
 
 
@@ -93,9 +93,9 @@ def divergence(global_counts, nr_documents, counts):
 
 
 counts = []
-with open('MPs.txt', 'rb') as f:
+with open('MPs.txt', encoding='utf-8') as f:
     for mp in f:
-        mp = mp.decode('utf-8').strip()
+        mp = mp.strip()
         document = Task(get_data, mp)
         counts.append(Task(count_words, mp, document))
 avgs = Task(add_counts, counts)
