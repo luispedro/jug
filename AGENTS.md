@@ -82,4 +82,4 @@ Test jugfiles (used as fixtures for integration tests) are in `jug/tests/jugfile
 
 - Commit messages start with a tag: `ENH` (feature), `BUG` (fix), `MIN` (minor), `TST`, `DOC`, `BLD`, `RLS`.
 - User-visible changes get an entry under `Unreleased` at the top of `ChangeLog`.
-- Python >= 3.9 is supported (CI tests 3.9–3.14), so don't use syntax or stdlib features newer than 3.9.
+- Python >= 3.9 is supported (CI tests 3.9–3.15), so don't use syntax or stdlib features newer than 3.9.
