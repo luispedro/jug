@@ -1,4 +1,10 @@
 Unreleased
+	* jug.backends.encode: Fix quadratic slowdown when loading large results
+	that are not numpy arrays (e.g., a 64 MiB bytes object took over 90
+	seconds to load; it now takes a fraction of a second)
+	* jug.backends.encode: Fix decompress_stream.seek() with a negative
+	offset (seeking back too far was not detected and seeking back could
+	discard buffered data)
 	* jug.mapreduce: Fix slicing the result of map() with a step (e.g.,
 	m[::2] or m[::-1] raised IndexError) and support negative indices
 	(e.g., m[-1])

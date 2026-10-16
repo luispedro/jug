@@ -33,6 +33,38 @@ def test_decompress_stream_seek():
     second = st.read(8)
     assert first == second[:6]
 
+def test_decompress_stream_seek_keeps_queue():
+    import zlib
+    data = bytes(range(256)) * 4
+    st = decompress_stream(BytesIO(zlib.compress(data)), block=64)
+    assert st.read(100) == data[:100]
+    st.seek(-50, 1)
+    # served from the queue, which still holds 40 bytes afterwards
+    assert st.read(10) == data[50:60]
+    st.seek(-5, 1)
+    assert st.read(20) == data[55:75]
+
+
+def test_decompress_stream_seek_too_far():
+    import pytest
+    st = decompress_stream(BytesIO(encode(list(range(33)))))
+    st.read(6)
+    with pytest.raises(ValueError):
+        st.seek(-7, 1)
+
+
+def test_decode_large_is_fast():
+    # Decoding used to be quadratic in the size of the largest single read
+    # (pickle reads a large bytes object at once): 64 MiB took over 90 seconds
+    import os
+    from time import time
+    data = os.urandom(64 << 20)
+    s = encode(data)
+    start = time()
+    assert decode(s) == data
+    assert time() - start < 10.
+
+
 def test_decompress_stream_readline():
     text = b"1\n2\n3\n4"
     s = BytesIO()

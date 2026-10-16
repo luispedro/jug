@@ -120,17 +120,25 @@ class decompress_stream:
             self.queue = self.queue[nbytes:]
             self.lastread = res
             return res
-        res = self.queue
+        # Collect the pieces and join them once at the end: concatenating
+        # bytes in the loop would make large reads quadratic
+        chunks = [self.queue]
+        n = len(self.queue)
         self.queue = b''
 
         if self.D.unconsumed_tail:
-            res += self.D.decompress(self.D.unconsumed_tail, nbytes - len(res))
-        while len(res) < nbytes:
+            data = self.D.decompress(self.D.unconsumed_tail, nbytes - n)
+            chunks.append(data)
+            n += len(data)
+        while n < nbytes:
             buf = self.stream.read(self.block)
             if not buf:
-                res += self.D.flush()
+                chunks.append(self.D.flush())
                 break
-            res += self.D.decompress(buf, nbytes - len(res))
+            data = self.D.decompress(buf, nbytes - n)
+            chunks.append(data)
+            n += len(data)
+        res = b''.join(chunks)
         self.lastread = res
         return res
 
@@ -142,10 +150,10 @@ class decompress_stream:
             self.read(nbytes)
             offset -= nbytes
         if offset < 0:
-            if offset > len(self.lastread):
+            if -offset > len(self.lastread):
                 raise ValueError('seek too far')
             skip = len(self.lastread) + offset
-            self.queue = self.lastread[skip:]
+            self.queue = self.lastread[skip:] + self.queue
 
     def readline(self):
         qi = self.queue.find(b'\n')
