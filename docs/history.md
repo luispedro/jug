@@ -1,284 +1,242 @@
-=======
-History
-=======
+# History
 
-Unreleased
-----------
+## Unreleased
 
-Compatibility notes
-~~~~~~~~~~~~~~~~~~~
+### Compatibility notes
 
-``jug execute`` and ``jug invalidate`` select tasks by name using ``--name``
-(strict) or ``--pattern`` (loose). The old ``--target`` option (and
-``--invalid``, for ``jug invalidate``) is now a deprecated synonym of
-``--name`` and prints a warning. This makes it **stricter** than before:
+`jug execute` and `jug invalidate` select tasks by name using `--name`
+(strict) or `--pattern` (loose). The old `--target` option (and
+`--invalid`, for `jug invalidate`) is now a deprecated synonym of
+`--name` and prints a warning. This makes it **stricter** than before:
 
-* ``--target function`` used to match any task whose name contained
-  ``function``, so ``jug invalidate --target function`` would also invalidate
-  ``function_other`` (`GH #63 <https://github.com/luispedro/jug/issues/63>`__).
-  It now matches only tasks called ``function``. To get the previous behaviour,
-  use ``--pattern function``.
-* If you use jug's options programmatically, ``execute_target`` is replaced by
-  ``execute_name`` and ``execute_pattern``, and ``invalidate`` has a new
-  ``invalid_pattern`` option alongside ``invalid_name`` (which is now strict).
+- `--target function` used to match any task whose name contained
+  `function`, so `jug invalidate --target function` would also invalidate
+  `function_other` ([GH #63](https://github.com/luispedro/jug/issues/63)).
+  It now matches only tasks called `function`. To get the previous behaviour,
+  use `--pattern function`.
+- If you use jug's options programmatically, `execute_target` is replaced by
+  `execute_name` and `execute_pattern`, and `invalidate` has a new
+  `invalid_pattern` option alongside `invalid_name` (which is now strict).
 
-User-visible improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~
+### User-visible improvements
 
-* New ``--name`` option for ``jug execute`` and ``jug invalidate``: selects
-  tasks by their exact name, either fully qualified (``jugfile.function``) or
-  just the function name (``function``). Wildcards are supported, so
-  ``--name 'function*'`` matches both ``function`` and ``function_other``.
-* New ``--pattern`` option for ``jug execute`` and ``jug invalidate``: matches
+- New `--name` option for `jug execute` and `jug invalidate`: selects
+  tasks by their exact name, either fully qualified (`jugfile.function`) or
+  just the function name (`function`). Wildcards are supported, so
+  `--name 'function*'` matches both `function` and `function_other`.
+- New `--pattern` option for `jug execute` and `jug invalidate`: matches
   anywhere in the task name (or a regular expression, if written between
-  slashes: ``--pattern '/compute_.*/'``). This is what ``--target`` used to do.
-* ``--target`` and ``--invalid`` are deprecated (see above).
+  slashes: `--pattern '/compute_.*/'`). This is what `--target` used to do.
+- `--target` and `--invalid` are deprecated (see above).
 
-Internal improvements
-~~~~~~~~~~~~~~~~~~~~~
+### Internal improvements
 
-* New function ``jug.utils.prepare_name_matcher``. ``prepare_task_matcher`` now
+- New function `jug.utils.prepare_name_matcher`. `prepare_task_matcher` now
   compiles its regular expression.
 
-Version 2.6.0
--------------
+## Version 2.6.0
 
 *Released 20 September 2026*
 
-Compatibility notes
-~~~~~~~~~~~~~~~~~~~
+### Compatibility notes
 
 Two changes alter task hashes, so cached results for the affected tasks will
 be recomputed the first time you run them with this version:
 
-* The pickle protocol used for hashing is now pinned to protocol 4. This only
+- The pickle protocol used for hashing is now pinned to protocol 4. This only
   affects users of Python 3.14 and 3.15 (where pickle's default is protocol 5);
   Python 3.13 and earlier already used protocol 4. From now on, task hashes are
   stable across Python versions.
-* Tasklets built from ``lambda`` functions are now hashed using the lambda's
+- Tasklets built from `lambda` functions are now hashed using the lambda's
   constants, referenced names, closure and default arguments (previously only
   its bytecode was used, so lambdas that differed only in those hashed
   identically).
 
-User-visible improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~
+### User-visible improvements
 
-* Better error message when loading results fails (patch by Justin R. Porter,
-  `GH #92 <https://github.com/luispedro/jug/pull/92>`__)
-* Configuration files are now read as UTF-8 regardless of locale
-* ``jug cleanup`` now reports the number of removed objects and of removed
+- Better error message when loading results fails (patch by Justin R. Porter,
+  [GH #92](https://github.com/luispedro/jug/pull/92))
+- Configuration files are now read as UTF-8 regardless of locale
+- `jug cleanup` now reports the number of removed objects and of removed
   locks separately
 
-Internal improvements
-~~~~~~~~~~~~~~~~~~~~~
+### Internal improvements
 
-* Use ``@property`` and ``@abstractmethod`` instead of the deprecated
-  ``abstractproperty``
-* Modernize Python idioms and update documentation
+- Use `@property` and `@abstractmethod` instead of the deprecated
+  `abstractproperty`
+- Modernize Python idioms and update documentation
 
-Bugfixes
-~~~~~~~~
+### Bugfixes
 
-* Fix ``write_task_out`` for numpy arrays, which are now written in ``.npy``
+- Fix `write_task_out` for numpy arrays, which are now written in `.npy`
   format (they were silently pickled instead)
-* Fall back to pickle for numpy arrays of object dtype, which cannot be saved
+- Fall back to pickle for numpy arrays of object dtype, which cannot be saved
   in numpy's native format
-* ``file_store.cleanup()`` no longer deletes the temporary files of workers
+- `file_store.cleanup()` no longer deletes the temporary files of workers
   that are still running
-* Fix the ``tput`` fallback in ``get_terminal_size``
-* Fix wrong exception type in ``dict_store.cleanup()``
-* Fix saving to/loading from a file backend in ``jug.backends.dict_store`` on
+- Fix the `tput` fallback in `get_terminal_size`
+- Fix wrong exception type in `dict_store.cleanup()`
+- Fix saving to/loading from a file backend in `jug.backends.dict_store` on
   Python 3 (pickle files must be opened in binary mode)
-* Fix help text of ``jug status --cache-file``
+- Fix help text of `jug status --cache-file`
 
-Version 2.5.0
--------------
+## Version 2.5.0
 
 *Released 12 March 2026*
 
-User-visible improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~
+### User-visible improvements
 
-* Special case saving ``polars`` DataFrames in ``file_store`` for speed.
-* More flexible parsing of booleans in ``jug.options``.
-* Support project-local configuration files (``.jugrc`` or ``jugrc``). Jug now
+- Special case saving `polars` DataFrames in `file_store` for speed.
+- More flexible parsing of booleans in `jug.options`.
+- Support project-local configuration files (`.jugrc` or `jugrc`). Jug now
   walks up the directory tree from the current working directory (up to the git
   project root) looking for local configuration files. See
-  :doc:`configuration` for details.
-* Ship the Jug assistant skill in the Python package and add
-  ``jug install-skills --output DIR`` to install it into Codex or Claude Code
-  skills directories. See :doc:`ai-assistants` for usage details.
+  {doc}`configuration` for details.
+- Ship the Jug assistant skill in the Python package and add
+  `jug install-skills --output DIR` to install it into Codex or Claude Code
+  skills directories. See {doc}`ai-assistants` for usage details.
 
-Bugfixes
-~~~~~~~~
+### Bugfixes
 
-* Fix ``_get_terminal_size_linux`` for Python 3.14, which changed how
-  ``fcntl.ioctl`` handles string arguments. Use ``os.get_terminal_size()``
-  instead (patch by justinrporter, `GH #90
-  <https://github.com/luispedro/jug/issues/90>`__).
-* Fix ``jug.backends.dict_store`` for Python 3.
-* Fix ``describe`` in ``jug.task`` for Python 3.
+- Fix `_get_terminal_size_linux` for Python 3.14, which changed how
+  `fcntl.ioctl` handles string arguments. Use `os.get_terminal_size()`
+  instead (patch by justinrporter, [GH #90](https://github.com/luispedro/jug/issues/90)).
+- Fix `jug.backends.dict_store` for Python 3.
+- Fix `describe` in `jug.task` for Python 3.
 
-
-Version 2.4.0
--------------
+## Version 2.4.0
 
 *Released 8 May 2025*
 
-User-visible improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~
+### User-visible improvements
 
-* Adds support for lambda functions in ``Tasklets``
-* Adds ``NoHash`` class to disable hashing for some arguments. This is in
-  ``jug.unsafe`` as it can be used to "fool" Jug, but it can be useful when
+- Adds support for lambda functions in `Tasklets`
+- Adds `NoHash` class to disable hashing for some arguments. This is in
+  `jug.unsafe` as it can be used to "fool" Jug, but it can be useful when
   there are nuisance arguments that are not relevant for the task (e.g., number
   of threads)
-* jug.file_store: create files with better permissions
+- jug.file_store: create files with better permissions
 
-Internal improvements
-~~~~~~~~~~~~~~~~~~~~~
-* Convert to ``pyproject.toml`` for building
+### Internal improvements
 
-Bugfixes
-~~~~~~~~
+- Convert to `pyproject.toml` for building
 
-* Better error detection for permission problems
-* Bugfix when using local imports and ``jug pack``
+### Bugfixes
 
+- Better error detection for permission problems
+- Bugfix when using local imports and `jug pack`
 
 Drops support for versions of Python older than 3.7. Technically, it should
 still work, but they are too old to test in Github CI, so we will not support
 them.
 
-
-Version 2.3.1
--------------
+## Version 2.3.1
 
 *Released 5 November 2023*
 
 - Update for Python 3.12
 
-Version 2.3.0
--------------
+## Version 2.3.0
 
 *Released 25 June 2023*
 
-- jug shell: Add ``get_filtered_tasks()``
-- jug: Fix ``jug --version`` (which had been broken in the refactoring to use subcommands)
+- jug shell: Add `get_filtered_tasks()`
+- jug: Fix `jug --version` (which had been broken in the refactoring to use subcommands)
 - jug shell: Fix message in jug shell when there are no dependencies (it would repeatedly print the message stating *this will only be run once*)
 - jug pack: Make it much faster to invalidate elements
 - file_store: ensure that the temporary directory exists
 - Drops support for Python 3.4
 
-Version 2.2.3
--------------
+## Version 2.2.3
 
 *Released 26 May 2023*
 
-- Fix ``jug shell`` for newer versions of IPython
+- Fix `jug shell` for newer versions of IPython
 
-
-Version 2.2.2
--------------
+## Version 2.2.2
 
 *Released 19 July 2022*
 
-- Fix ``jug cleanup`` when packs are used (``jug pack``)
+- Fix `jug cleanup` when packs are used (`jug pack`)
 
-Version 2.2.0
--------------
+## Version 2.2.0
 
 *Released 4 May 2022*
 
-- Add ``jug pack`` subcommand
-- Make ``get_tasks()`` return a copy of the tasks instead of the internal list.
+- Add `jug pack` subcommand
+- Make `get_tasks()` return a copy of the tasks instead of the internal list.
   Technically, it is possible that this is a breaking change for some
   workflows, but returning the internal version was arguably a bug
-- Removed dependency on the ``six`` library as we no longer support Python 2.7.
+- Removed dependency on the `six` library as we no longer support Python 2.7.
 
-Version 2.1.1
--------------
+## Version 2.1.1
 
 *Released 18 March 2021*
 
 - Include requirements files in distribution
 
-Version 2.1.0
--------------
+## Version 2.1.0
 
 *Released 18 March 2021*
 
 - Improvements to webstatus (by Robert Denham)
 - Removed Python 2.7 support
 - Fix output encoding for Python 3.8
-- Fix bug mixing ``mapreduce()`` & ``status --cache``
-- Make block_access (used in ``mapreduce()``) much faster (20x)
+- Fix bug mixing `mapreduce()` & `status --cache`
+- Make block_access (used in `mapreduce()`) much faster (20x)
 - Fix important redis bug
-- More precise output in ``cleanup`` command
+- More precise output in `cleanup` command
 
-
-
-Version 2.0.2
--------------
+## Version 2.0.2
 
 *Released Thu Jun 11 2020*
 
-Bugfixes
-~~~~~~~~
+### Bugfixes
 
 - Fix command line argument parsing
 
-Version 2.0.1
--------------
+## Version 2.0.1
 
 *Released Thu Jun 11 2020*
 
-Bugfixes
-~~~~~~~~
+### Bugfixes
 
-- Fix handling of ``JUG_EXIT_IF_FILE_EXISTS`` environmental variable
-- Fix passing an argument to ``jug.main()`` function
-- Extend ``--pdb`` to exceptions raised while importing the jugfile (issue #79)
+- Fix handling of `JUG_EXIT_IF_FILE_EXISTS` environmental variable
+- Fix passing an argument to `jug.main()` function
+- Extend `--pdb` to exceptions raised while importing the jugfile (issue #79)
 
-
-Version 2.0.0
--------------
+## Version 2.0.0
 
 *Released Fri Feb 21 2020*
 
-User-visible improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~
+### User-visible improvements
 
 1. Jug can now keep track of failed tasks.
-   
-Use ``jug execute --keep-failed`` to preserve locks on failing tasks and ``jug
-cleanup --failed-only`` to remove locks from failed tasks. Similarly, ``jug
-status`` and ``jug graph`` now display failed tasks
+
+Use `jug execute --keep-failed` to preserve locks on failing tasks and `jug
+cleanup --failed-only` to remove locks from failed tasks. Similarly, `jug
+status` and `jug graph` now display failed tasks
 
 This avoids the situation where a failing task (for whatever reason) blocks the
-rest of the process. It improves on ``jug --keep-going`` (which does the same)
-as with ``--keep-going``, each new process will attempt to run the task. If the
+rest of the process. It improves on `jug --keep-going` (which does the same)
+as with `--keep-going`, each new process will attempt to run the task. If the
 task reproducibly fails after a long period, this results in wasted
 computation.
 
-2. The `exit environmental variable <exit.html>`__ are now checked by default.
-   Create a file called ``__jug_please_stop_running.txt`` in the current
-   working directory and ``Jug`` will stop after it finishes the current task.
+2. The [exit environmental variable](exit.md) are now checked by default.
+   Create a file called `__jug_please_stop_running.txt` in the current
+   working directory and `Jug` will stop after it finishes the current task.
 
+### Bugfixes
 
-Bugfixes
-~~~~~~~~
+- Fix `jug sleep-until` in the presence of barrier() (issue #71)
 
-- Fix ``jug sleep-until`` in the presence of barrier() (issue #71)
+### Internal improvements
 
-Internal improvements
-~~~~~~~~~~~~~~~~~~~~~
+- jug.backends.base_store has 1 new method `listlocks`
+- jug.backends.base_lock has 2 new methods `fail` and `is_failed`
 
-- jug.backends.base_store has 1 new method ``listlocks``
-- jug.backends.base_lock has 2 new methods ``fail`` and ``is_failed``
-
-Version 1.6.9
--------------
+## Version 1.6.9
 
 *Released on Tue Aug 6 2019*
 
@@ -286,16 +244,16 @@ Version 1.6.9
 
 version **1.6.8** (Wed July 10 2019)
 
-- Add ``cached_glob()`` function
+- Add `cached_glob()` function
 - Fix NoLoad (issue #73)
-- Fix ``jug shell``'s invalidate function with Tasklets (issue #77)
+- Fix `jug shell`'s invalidate function with Tasklets (issue #77)
 
 version **1.6.7** (Fri Apr 13 2018)
 
 - Fix issue with deeply recursive dependency structures and barrier()
 - Allow mapreduce.map() results to be used as dependencies
 
-version **1.6.6** (Sat Apr  7 2018)
+version **1.6.6** (Sat Apr 7 2018)
 
 - Fix bug in shell's invalidate() function
 - Fix wrong dependency handling with mapreduce.map()
@@ -314,29 +272,32 @@ version **1.6.3** (Wed Nov 1 2017)
 - Add citation request
 
 version **1.6.2** (Thu Oct 26 2017)
+
 - Add return_value argument to jug_execute
 - Add exit_env_vars
 
 version **1.6.1** (Thu Aug 29 2017)
-- Fix bug with ``invalidate()`` in the shell
+
+- Fix bug with `invalidate()` in the shell
 
 version **1.6.0** (Thu Aug 24 2017)
+
 - Add 'graph' subcommand - Generates a graph of tasks
 - 'jug execute --keep-going' now ends with non-zero exit code in case of failures
 - Fix bug with cleanup in dict_store not providing the number of removed records
 - Add 'jug cleanup --keep-locks' to remove obsolete results without affecting locks
 
 version **1.5.0** (Sun Jul 16 2017)
+
 - Add 'demo' subcommand
 - Add is_jug_running() function
 - Fix bug in finding config files
 - Improved --debug mode: check for unsupported recursive task creation
 - Add invalidate() to shell environment
 - Use ~/.config/jug/jugrc as configuration file
-- Add experimental support for extensible commands, use ``~/.config/jug/jug_user_commands.py``
+- Add experimental support for extensible commands, use `~/.config/jug/jug_user_commands.py`
 - jugrc: execute_wait_cycle_time_secs is now execute_wait_cycle_time
 - Expose sync_move in jug.utils
-
 
 version **1.4.0** (Tue Jan 3 2017)
 
@@ -347,6 +308,7 @@ version **1.4.0** (Tue Jan 3 2017)
 - Add return_tuple decorator
 
 version **1.3.0** (Tue Nov 1 2016)
+
 - Update `shell` subcommand to IPython 5
 - Use ~/.config/jugrc as configuration file
 - Cleanup usage string
@@ -366,33 +328,35 @@ version **1.2.1** (Mon Feb 15 2016)
 - Made Tasklets use slightly less memory
 
 version **1.2** (Thu Aug 20 2015)
+
 - Use HIGHEST_PROTOCOL when pickle()ing
 - Add compress_numpy option to file_store
 - Add register_hook_once function
 - Optimize case when most (or all) tasks are already run
 - Add --short option to 'jug status' and 'jug execute'
 - Fix bug with dictionary order in kwargs (fix by Andreas Sorge)
+
 - Fix ipython colors (fix by Andreas Sorge)
 - Sort tasks in 'jug status'
 
 version **1.1** (Tue Mar 3 2015)
+
 - Python 3 compatibility fixes
 - fsync(directory) in file backend
 - Jug hooks (still mostly undocumented, but already enabling internal code simplification)
 
-
 version **1.0** (Tue May 20 2014)
+
 - Adapt status output to terminal width (by Alex Ford)
 - Add a newline at the end of lockfiles for file backend
-- Add --cache-file option to specify file for ``status --cache``
-
+- Add --cache-file option to specify file for `status --cache`
 
 version **0.9.7** (Tue Feb 18 2014)
 
 - Fix use of numpy subclasses
 - Fix redis URL parsing
-- Fix ``shell`` for newer versions of IPython
-- Correctly fall back on non-sqlite ``status``
+- Fix `shell` for newer versions of IPython
+- Correctly fall back on non-sqlite `status`
 - Allow user to call set_jugdir() inside jugfile
 
 version **0.9.6** (Tue Aug 6 2013)
@@ -411,7 +375,7 @@ version **0.9.5** (May 27 2013)
 
 version **0.9.4** (Apr 15 2013)
 
-- Add CustomHash wrapper to set __jug_hash__
+- Add CustomHash wrapper to set `__jug_hash__`
 - Print traceback on import error
 - Exit when no progress is made even with barrier
 - Use Tasklets for better jug.mapreduce.map
@@ -425,14 +389,13 @@ version **0.9.3** (Dec 2 2012)
 - Make hashing robust to different orders when using randomized hashing
   (patch by Alcides Viamontes)
 - Allow regex in invalidate command (patch by Alcides Viamontes)
-- Add ``--cache --clear`` suboption to status
+- Add `--cache --clear` suboption to status
 - Allow builtin functions for tasks
-- Fix status --cache`` (a general bug which seems to be triggered mainly by
-  ``bvalue()`` usage).
-- Fix ``CompoundTask`` (broken by earlier ``__jug_hash__`` hook introduction)
-- Make ``Tasklets`` more flexible by allowing slicing with ``Tasks``
+- Fix `status --cache` (a general bug which seems to be triggered mainly by
+  `bvalue()` usage).
+- Fix `CompoundTask` (broken by earlier `__jug_hash__` hook introduction)
+- Make `Tasklets` more flexible by allowing slicing with `Tasks`
   (previously, slicing with tasks was **not** allowed)
-
 
 version **0.9.2** (Nov 4 2012):
 
@@ -445,10 +408,10 @@ version **0.9.2** (Nov 4 2012):
 version **0.9.1** (Jun 11 2012):
 
 - Add --locks-only option to cleanup subcommand
-- Make cache file (for ``status`` subcommand) configurable
-- Add ``webstatus`` subcommand
+- Make cache file (for `status` subcommand) configurable
+- Add `webstatus` subcommand
 - Add bvalue() function
-- Fix bug in ``shell`` subcommand (``value`` was not in global namespace)
+- Fix bug in `shell` subcommand (`value` was not in global namespace)
 - Improve identity()
 - Fix bug in using Tasklets and --aggressive-unload
 - Fix bug with Tasklets and sleep-until/check
@@ -463,4 +426,4 @@ version **0.9**:
 - Avoid creating directories in file backend unless it is necessary
 - Add jug.mapreduce.reduce (which mimics the builtin reduce)
 
-For older version see ``ChangeLog`` file.
+For older version see `ChangeLog` file.

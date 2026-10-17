@@ -32,6 +32,8 @@ extensions = [
 source_suffix = ['.rst', '.md']
 master_doc = 'index'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+myst_heading_anchors = 3
+myst_enable_extensions = ['deflist']
 
 project = 'Jug'
 copyright = '2008-2026, Luis Pedro Coelho'

@@ -1,1 +1,0 @@
-../../docs/decrypt-example.rst
