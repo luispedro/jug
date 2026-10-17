@@ -29,10 +29,9 @@ extensions = [
         'myst_parser',
         ]
 
-templates_path = ['.templates']
-
 source_suffix = ['.rst', '.md']
 master_doc = 'index'
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 project = 'Jug'
 copyright = '2008-2026, Luis Pedro Coelho'
@@ -97,11 +96,6 @@ pygments_style = 'sphinx'
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 #html_favicon = None
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
