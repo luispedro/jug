@@ -1,4 +1,10 @@
 Unreleased
+	* jug.hash: Fix task hashes of frozensets and of numpy arrays with
+	dtype=object (or structured dtypes with object fields), which could be
+	different in every process, so these tasks were never seen as finished
+	and parallel workers ran them repeatedly. NOTE: this changes the hash of
+	tasks with frozenset arguments even where it was stable before (e.g.,
+	frozensets of numbers), so their cached results will be recomputed
 	* jug status: Like jug check, exit with 0 if all tasks are finished and
 	1 otherwise (before, the exit code was the number of finished tasks, so
 	`jug status && ...` failed when work had been done)

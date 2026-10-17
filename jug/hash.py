@@ -55,8 +55,8 @@ def hash_update(M, elems):
         elif type(e) in (list, tuple):
             M.update(repr(type(e)).encode('utf-8'))
             hash_update(M, enumerate(e))
-        elif type(e) == set:
-            M.update(b'set')
+        elif type(e) in (set, frozenset):
+            M.update(b'set' if type(e) == set else b'frozenset')
             # With randomized hashing, different runs of Python might result in
             # different orders, so sort. We cannot trust that all the elements
             # in the set will be comparable, so we convert them to their hashes
@@ -74,11 +74,16 @@ def hash_update(M, elems):
             M.update(b'np.ndarray')
             M.update(pickle.dumps(e.dtype, protocol=_PICKLE_PROTOCOL))
             M.update(pickle.dumps(e.shape, protocol=_PICKLE_PROTOCOL))
-            try:
-                buffer = e.data
-                M.update(buffer)
-            except:
-                M.update(e.copy().data)
+            if e.dtype.hasobject:
+                # The buffer of an object array holds pointers, which differ
+                # between processes, so hash the elements themselves
+                hash_update(M, enumerate(e.ravel().tolist()))
+            else:
+                try:
+                    buffer = e.data
+                    M.update(buffer)
+                except:
+                    M.update(e.copy().data)
         else:
             M.update(pickle.dumps(e, protocol=_PICKLE_PROTOCOL))
     return M

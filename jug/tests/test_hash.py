@@ -52,3 +52,45 @@ def test_hash_ignores_pickle_default_protocol(monkeypatch):
     expected = hash_one([1, 'a', (2, 3)])
     monkeypatch.setattr(pickle, 'DEFAULT_PROTOCOL', 5 if pickle.DEFAULT_PROTOCOL != 5 else 3)
     assert hash_one([1, 'a', (2, 3)]) == expected
+
+
+def _hash_in_subprocess(code, seed):
+    import os
+    import subprocess
+    import sys
+    env = dict(os.environ, PYTHONHASHSEED=str(seed))
+    return subprocess.check_output(
+            [sys.executable, '-c', 'from jug.hash import hash_one\n' + code],
+            env=env).strip()
+
+
+def test_hash_stable_across_processes():
+    # Strings hash differently in each process (unless PYTHONHASHSEED is
+    # fixed), so iteration order of sets & dicts must not leak into the hash
+    cases = [
+        "print(hash_one(set(['a', 'b', 'c', 'd', 'e'])))",
+        "print(hash_one(frozenset(['a', 'b', 'c', 'd', 'e'])))",
+        "print(hash_one({'a': 1, 'b': 2, 'c': 3, 'd': 4}))",
+        "print(hash_one({frozenset(['a', 'b', 'c']): 1}))",
+        "import numpy as np\n"
+            "print(hash_one(np.array(['a', 'b', None, 3], dtype=object)))",
+    ]
+    for code in cases:
+        hashes = set(_hash_in_subprocess(code, seed) for seed in (1, 2, 3))
+        assert len(hashes) == 1, code
+
+
+def test_hash_frozenset():
+    assert hash_one(frozenset([1, 2, 3])) == hash_one(frozenset([3, 2, 1]))
+    assert hash_one(frozenset([1, 2, 3])) != hash_one(frozenset([1, 2]))
+    assert hash_one(frozenset([1, 2, 3])) != hash_one(set([1, 2, 3]))
+
+
+def test_hash_numpy_object():
+    A = np.array(['a', 'b', None, 3], dtype=object)
+    assert hash_one(A) == hash_one(A.copy())
+    assert hash_one(A) != hash_one(A[::-1])
+    assert hash_one(A) != hash_one(A.reshape((2, 2)))
+    B = A.copy()
+    B[0] = 'z'
+    assert hash_one(A) != hash_one(B)
