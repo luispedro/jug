@@ -111,3 +111,43 @@ def test_pack_decode_error_does_not_leak_sys_path(tmpdir):
     with pytest.raises(Exception):
         file_store(tmpdir)
     assert sys.path == before
+
+
+def test_pack_native_formats(tmpdir):
+    np = pytest.importorskip('numpy')
+    tmpdir = str(tmpdir)
+    fs = file_store(tmpdir)
+    data = {
+            hash_one('arr'): np.arange(4),
+            hash_one('farr'): np.array([1.5, 2.5]),
+            hash_one('none'): None,
+            hash_one('list'): [1, 2, 3],
+            }
+    for k, v in data.items():
+        fs.dump(v, k)
+    assert fs.update_pack() == len(data)
+    fs.close()
+
+    fs = file_store(tmpdir)
+    assert len(fs.list()) == len(data)
+    for k, v in data.items():
+        if isinstance(v, np.ndarray):
+            assert np.all(fs.load(k) == v)
+        else:
+            assert fs.load(k) == v
+    fs.close()
+
+
+def test_pack_polars(tmpdir):
+    pl = pytest.importorskip('polars')
+    tmpdir = str(tmpdir)
+    fs = file_store(tmpdir)
+    df = pl.DataFrame({'a': [1, 2]})
+    k = hash_one('df')
+    fs.dump(df, k)
+    fs.update_pack()
+    fs.close()
+
+    fs = file_store(tmpdir)
+    assert fs.load(k).equals(df)
+    fs.close()

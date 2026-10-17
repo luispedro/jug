@@ -223,9 +223,10 @@ class file_store(base_store):
             f = self._getfname(k)
             s = os.stat(f)
             if s.st_size <= MAX_FILESIZE_IN_PACK:
-                with open(f, 'rb') as ifile:
-                    self.packed[k] = decode_from(ifile)
-                    to_remove.append(k)
+                # Use load() rather than decode_from() as the file may be in
+                # a native format (npy or parquet)
+                self.packed[k] = self.load(k)
+                to_remove.append(k)
         self.resave_pack()
         for k in to_remove:
             os.unlink(self._getfname(k))
