@@ -30,7 +30,8 @@ The actual code is much more complex, of course.
 status
 ~~~~~~
 
-You can check the status of your computation at any time with status.
+You can check the status of your computation at any time with status. Like
+``check``, it exits with status 0 if all tasks have run, 1 otherwise.
 
 shell
 ~~~~~

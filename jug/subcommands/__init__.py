@@ -186,7 +186,8 @@ class SubCommand(metaclass=ABCMeta):
         * ``store``    - backend object responsible for handling jobs
         * ``jugspace`` - a namespace of jug internal variables (better not touch)
 
-        Anything returned by this method is ignored
+        When run from the command line, the return value is used as the exit
+        code (``None`` is the same as 0)
         """
         pass
 

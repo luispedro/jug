@@ -1,4 +1,7 @@
 Unreleased
+	* jug status: Like jug check, exit with 0 if all tasks are finished and
+	1 otherwise (before, the exit code was the number of finished tasks, so
+	`jug status && ...` failed when work had been done)
 	* jug.backends.encode: Fix quadratic slowdown when loading large results
 	that are not numpy arrays (e.g., a 64 MiB bytes object took over 90
 	seconds to load; it now takes a fraction of a second)

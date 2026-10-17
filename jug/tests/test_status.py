@@ -22,7 +22,7 @@ def test_nocache():
     options.jugdir = store
     options.jugfile = jugfile
     options.verbose = 'quiet'
-    assert status.status(options) == 8 * 4
+    assert sum(status._status(options).finished.values()) == 8 * 4
 
 @task_reset
 def test_cache():
@@ -36,9 +36,9 @@ def test_cache():
     options.status_cache = True
     options.status_cache_file = ':memory:'
 
-    assert status.status(options) == 0
+    assert sum(status._status(options).finished.values()) == 0
     simple_execute()
-    assert status.status(options) == 8 * 4
+    assert sum(status._status(options).finished.values()) == 8 * 4
 
 @task_reset
 def test_cache_block_status():
@@ -51,7 +51,7 @@ def test_cache_block_status():
     options.status_cache = True
     options.status_cache_file = ':memory:'
 
-    assert status.status(options) == 0
+    assert sum(status._status(options).finished.values()) == 0
 
 @task_reset
 def test_cache_bvalue():
@@ -65,7 +65,26 @@ def test_cache_bvalue():
     options.status_cache = True
     options.status_cache_file = ':memory:'
 
-    assert status.status(options) == 0
+    assert sum(status._status(options).finished.values()) == 0
     simple_execute()
-    assert status.status(options) == 1
+    assert sum(status._status(options).finished.values()) == 1
 
+
+@task_reset
+def test_status_exit_code(tmpdir):
+    # Like `jug check`, `jug status` exits with 0 iff all tasks are finished
+    jugfile = os.path.join(_jugdir, 'simple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    def exit_code(subcommand, *extra):
+        try:
+            jug.jug.main(['jug', subcommand, jugfile, '--jugdir', jugdir, '--verbose', 'quiet'] + list(extra))
+        except SystemExit as e:
+            return e.code
+        assert False
+
+    cache_file = str(tmpdir.join('status.sqlite3'))
+    assert exit_code('status') == 1
+    assert exit_code('status', '--cache', '--cache-file', cache_file) == 1
+    assert not exit_code('execute')
+    assert exit_code('status') == 0
+    assert exit_code('status', '--cache', '--cache-file', cache_file) == 0

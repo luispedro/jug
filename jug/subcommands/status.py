@@ -187,6 +187,13 @@ def update_status(store, ht, deps, rdeps):
     return ts, dirty
 
 
+def _all_complete(ts):
+    return not any(ts.ready.values()) \
+        and not any(ts.running.values()) \
+        and not any(ts.failed.values()) \
+        and not any(ts.waiting.values())
+
+
 def _print_status(options, ts):
     if options.short:
         n_ready = sum(ts.ready.values())
@@ -194,7 +201,7 @@ def _print_status(options, ts):
         n_failed = sum(ts.failed.values())
         n_waiting = sum(ts.waiting.values())
         n_finished = sum(ts.finished.values())
-        if not n_waiting and not n_running and not n_failed and not n_ready:
+        if _all_complete(ts):
             options.print_out(f'All tasks complete ({n_finished} tasks).')
         elif not n_running:
             options.print_out(f'{n_waiting + n_ready} tasks waiting to be run, {n_failed} failed, {n_finished} complete, (none active).')
@@ -239,7 +246,7 @@ def _status_cached(options):
             ht[k] = (k, name, hash, dirty[k])
         with _open_connection(options) as connection:
             create_sqlite3(connection, ht, deps, rdeps)
-    return sum(ts.finished.values())
+    return ts
 
 
 def _status_nocache(options):
@@ -262,7 +269,27 @@ def _status_nocache(options):
         else:
             ts.waiting[t.name] += 1
     _print_status(options, ts)
-    return sum(ts.finished.values())
+    return ts
+
+
+def _status(options):
+    '''Print status and return it (as a TaskStatus)
+
+    Returns None if the cache was cleared (``--cache --clear``)
+    '''
+    if options.status_cache:
+        try:
+            import sqlite3
+        except ImportError:
+            from sys import stderr
+            stderr.write('Cached status relies on sqlite3. Falling back to non-cached version')
+            options.status_cache = False
+            return _status(options)
+        if options.status_cache_clear:
+            return _clear_cache(options)
+        return _status_cached(options)
+    else:
+        return _status_nocache(options)
 
 
 class StatusCommand(SubCommand):
@@ -270,7 +297,8 @@ class StatusCommand(SubCommand):
 
     status.run(options)
 
-    Implements the status command.
+    Implements the status command. Like ``check``, returns 0 if all tasks are
+    finished, 1 otherwise.
 
     Parameters
     ----------
@@ -279,19 +307,10 @@ class StatusCommand(SubCommand):
     name = "status"
 
     def run(self, options, *args, **kwargs):
-        if options.status_cache:
-            try:
-                import sqlite3
-            except ImportError:
-                from sys import stderr
-                stderr.write('Cached status relies on sqlite3. Falling back to non-cached version')
-                options.status_cache = False
-                return self.run(options)
-            if options.status_cache_clear:
-                return _clear_cache(options)
-            return _status_cached(options)
-        else:
-            return _status_nocache(options)
+        ts = _status(options)
+        if ts is None or _all_complete(ts):
+            return 0
+        return 1
 
     def parse(self, parser):
         defaults = self.parse_defaults()
