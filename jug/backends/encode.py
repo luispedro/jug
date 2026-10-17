@@ -41,9 +41,9 @@ def encode(object):
     -------
       s : string (byte array).
 
-    See
-    ---
-      `decode`
+    See Also
+    --------
+    decode
     '''
     output = BytesIO()
     encode_to(object, output)

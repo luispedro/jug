@@ -238,9 +238,9 @@ class base_store(metaclass=ABCMeta):
 
 class base_lock(metaclass=ABCMeta):
     '''
+    Base class for locks
 
-    Functions:
-    ----------
+    Methods:
 
     - get(): acquire the lock
     - release(): release the lock

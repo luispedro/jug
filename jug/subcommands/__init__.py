@@ -51,7 +51,7 @@ your subcommand on the command-line.
 The body of the method ``run()`` defines what should happen when you
 call the subcommand ``jug my-fancy-report``.
 
-The ``run`` function will receive the following objects::
+The ``run`` function will receive the following objects:
 
 * ``options``  - object representing command-line and user options
 * ``store``    - backend object responsible for handling jobs

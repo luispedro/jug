@@ -154,5 +154,6 @@ jug_execute(['SemiBin2', 'single_easy_bin',
 
 ```{eval-rst}
 .. automodule:: jug.utils
+    :no-index:
     :members:
 ```

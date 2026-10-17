@@ -131,11 +131,11 @@ class cache_lock(base_lock):
     '''
     cache_lock
 
-    Functions:
-    ----------
-    get(): acquire the lock
-    release(): release the lock
-    is_locked(): check lock state
+    Methods:
+
+    - get(): acquire the lock
+    - release(): release the lock
+    - is_locked(): check lock state
     '''
 
     def __init__(self, base, name, locks):

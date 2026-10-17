@@ -489,8 +489,7 @@ class file_based_lock(base_lock):
     '''
     file_based_lock: File-system based locks
 
-    Functions:
-    ----------
+    Methods:
 
     - get(): acquire the lock
     - release(): release the lock
@@ -622,8 +621,7 @@ class file_keepalive_based_lock(file_based_lock):
     alive during execution, making it possible to recognize crashed/killed jobs
     as failed.
 
-    Functions:
-    ----------
+    Methods:
 
     - get(): acquire the lock
     - release(): release the lock

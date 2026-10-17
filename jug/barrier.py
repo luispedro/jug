@@ -86,21 +86,21 @@ def barrier():
 
 def bvalue(t):
     '''
-    value = bvalue(t)
+    Value of a task, stopping jugfile execution if it is not yet available
 
-    Named after ``barrier``+``value``, ``value = bvalue(t)`` is similar to::
+    Named after ``barrier`` + ``value``, ``v = bvalue(t)`` is similar to::
 
         barrier()
-        value = value(t)
+        v = value(t)
 
-    except that it only checks that `t` is complete (and not all tasks) and
+    except that it only checks that ``t`` is complete (and not all tasks) and
     thus can be much faster than a full ``barrier()`` call.
 
     Thus, ``bvalue`` stops interpreting the Jugfile if its argument has not run
     yet. When it has run, then it returns its value.
 
-    Example
-    -------
+    Examples
+    --------
 
     A typical use case is the following:
 
@@ -130,8 +130,7 @@ def bvalue(t):
 
         blocks = split_input_file('input.txt')
 
-    And now, use ``bvalue`` to continue processing:
-
+    And now, use ``bvalue`` to continue processing::
 
         for b in bvalue(blocks):
             process(b)

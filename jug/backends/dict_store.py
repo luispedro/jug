@@ -186,8 +186,7 @@ class dict_lock(base_lock):
     '''
     dict_lock
 
-    Functions:
-    ----------
+    Methods:
 
     - get(): acquire the lock
     - release(): release the lock

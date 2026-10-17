@@ -377,17 +377,18 @@ def glob_sort(pat):
 
 def cached_glob(pat):
     '''
-    A short-hand for
+    A short-hand for::
 
         from jug import CachedFunction
         from glob import glob
-        CachedFunction(glob, pattern)
+        CachedFunction(glob, pat)
 
     with the extra bonus that results are returned *sorted*
 
     Parameters
     ----------
-    pat: Same as glob.glob
+    pat : str
+        Same as for ``glob.glob``
 
     Returns
     -------

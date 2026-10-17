@@ -64,9 +64,10 @@ https://jug.readthedocs.io/en/latest/api.html?highlight=bvalue#jug.bvalue
 
 class Task(TaskletMixin):
     '''
-    T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
+    A (lazy) call to a function, whose result is cached in the store
 
-    Defines a task, which will call::
+    ``T = Task(f, dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)``
+    defines a task, which will call::
 
         f(dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
@@ -199,9 +200,9 @@ tricky to support since the general code relies on the function name)''')
 
     def unload_recursive(self):
         '''
-        t.unload_recursive()
+        Unload this task and all its (recursive) dependencies
 
-        Equivalent to::
+        ``t.unload_recursive()`` is equivalent to::
 
             for tt in recursive_dependencies(t): tt.unload()
         '''
@@ -584,9 +585,9 @@ def value(elem):
 
 def CachedFunction(f,*args,**kwargs):
     '''
-    value = CachedFunction(f, *args, **kwargs)
+    Call a function now, caching its result in the store
 
-    is equivalent to::
+    ``value = CachedFunction(f, *args, **kwargs)`` is equivalent to::
 
         task = Task(f, *args, **kwargs)
         if not task.can_load():
@@ -614,7 +615,7 @@ def CachedFunction(f,*args,**kwargs):
     Returns
     -------
     value : result
-        Result of calling ``f(*args,**kwargs)``
+        Result of calling ``f(*args, **kwargs)``
 
     See Also
     --------
@@ -633,19 +634,21 @@ def CachedFunction(f,*args,**kwargs):
 
 class TaskGenerator:
     '''
-    @TaskGenerator
-    def f(arg0, arg1, ...)
-        ...
+    Turns a function into a task generator
 
-    Turns f from a function into a task generator.
+    Use it as a decorator::
+
+        @TaskGenerator
+        def f(arg0, arg1, ...):
+            ...
 
     This means that calling ``f(arg0, arg1)`` results in:
     ``Task(f, arg0, arg1)``. This can make your jug-based code feel very
     similar to what you do with traditional Python.
 
 
-    Example
-    -------
+    Examples
+    --------
 
     Add the following to ``jugfile.py``::
 
@@ -668,7 +671,7 @@ class TaskGenerator:
 
     1. call ``get1``
     2. call ``add`` with the result of that and the value 2
-    2. call ``add`` again with the result of the previous call
+    3. call ``add`` again with the result of the previous call
 
     '''
     _jug_is_task_generator = True
@@ -696,11 +699,7 @@ class TaskGenerator:
 # This is lower case to be used like a function
 class iteratetask:
     '''
-    Examples::
-
-        a,b = iteratetask(task, 2)
-        for a in iteratetask(task, n):
-            ...
+    Sequence wrapper around the first ``n`` elements of a task's result
 
     This creates a sequence wrapper that iterates over the results of ``task[0],
     task[1], ..., task[n-1]``.
@@ -715,11 +714,19 @@ class iteratetask:
     sequence
         A wrapper implementing __getitem__ and __len__
 
-    Bugs
-    ----
+    Notes
+    -----
     You need to specify how many elements to use.
 
     There is no error checking that you have not missed elements at the end!
+
+    Examples
+    --------
+    ::
+
+        a,b = iteratetask(task, 2)
+        for a in iteratetask(task, n):
+            ...
     '''
     def __init__(self, base, n):
         self.base = base

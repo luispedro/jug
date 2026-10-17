@@ -33,10 +33,10 @@ def compound_task_execute(x, h):
 
 def CompoundTask(f, *args, **kwargs):
     '''
-    task = CompoundTask(f, *args, **kwargs)
+    A task whose function returns a Task (which may itself depend on others)
 
-    `f` should be such that it returns a `Task`, which can depend on other
-    Tasks (even recursively).
+    ``task = CompoundTask(f, *args, **kwargs)``: ``f`` should be such that it
+    returns a ``Task``, which can depend on other Tasks (even recursively).
 
     If this cannot be loaded (i.e., has not yet been run), then this becomes
     equivalent to::
@@ -44,10 +44,10 @@ def CompoundTask(f, *args, **kwargs):
         f(*args, **kwargs)
 
     However, if it can, then we get a pseudo-task which returns the same value
-    without `f` ever being executed.
+    without ``f`` ever being executed.
 
-    Example
-    -------
+    Examples
+    --------
     ::
 
         def complex_operation(input):
@@ -83,11 +83,13 @@ def CompoundTask(f, *args, **kwargs):
 
 def CompoundTaskGenerator(f):
     '''
-    @CompoundTaskGenerator
-    def f(arg0, arg1, ...)
-        ...
+    Turns a function into a compound task generator
 
-    Turns f from a function into a compound task generator.
+    Use it as a decorator::
+
+        @CompoundTaskGenerator
+        def f(arg0, arg1, ...):
+            ...
 
     This means that calling ``f(arg0, arg1)`` results in:
     ``CompoundTask(f, arg0, arg1)``
