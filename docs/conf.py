@@ -1,7 +1,4 @@
-# This file is execfile()d with the current directory set to its containing dir.
-#
-# The contents of this file are pickled, so don't put values in the namespace
-# that aren't pickleable (module imports are okay, they're removed automatically).
+# Sphinx configuration file for the jug documentation.
 #
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
@@ -20,10 +17,8 @@ from jug.jug_version import __version__ as jug_version
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
         'sphinx.ext.autodoc',
-        'sphinx.ext.imgmath',
         'sphinx.ext.autosummary',
         'numpydoc',
-        'sphinx.ext.intersphinx',
         'sphinx.ext.coverage',
         'sphinx.ext.doctest',
         'myst_parser',
@@ -34,12 +29,15 @@ master_doc = 'index'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 myst_heading_anchors = 3
 myst_enable_extensions = ['deflist']
+# Otherwise, numpydoc generates autosummary tables of class members, which
+# need stub files that are not generated
+numpydoc_show_class_members = False
 
 project = 'Jug'
 copyright = '2008-2026, Luis Pedro Coelho'
 
 # The short X.Y version.
-version = jug_version[:3]
+version = '.'.join(jug_version.split('.')[:2])
 # The full version, including alpha/beta/rc tags.
 release = jug_version
 
