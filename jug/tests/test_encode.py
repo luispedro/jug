@@ -86,3 +86,9 @@ class Derived(np.ndarray):
 def test_numpy_derived():
     a = Derived([1,2,3])
     assert type(decode(encode(a))) == type(a)
+
+def test_numpy_structured_object():
+    a = np.array([(1, 'one'), (2, [2])], dtype=[('x', int), ('y', object)])
+    b = decode(encode(a))
+    assert b.dtype == a.dtype
+    assert list(b['y']) == ['one', [2]]

@@ -67,7 +67,7 @@ def encode_to(object, stream):
     write = lambda obj,s: pickle.dump(obj, s, protocol=pickle.HIGHEST_PROTOCOL)
     try:
         import numpy as np
-        if type(object) is np.ndarray and object.dtype.kind != 'O':
+        if type(object) is np.ndarray and not object.dtype.hasobject:
             prefix = b'N'
             # We need to switch the arguments around because pickle.dump and
             # np.save have different argument orders:

@@ -151,3 +151,27 @@ def test_pack_polars(tmpdir):
     fs = file_store(tmpdir)
     assert fs.load(k).equals(df)
     fs.close()
+
+
+def test_dump_failure_removes_tempfile(tmpdir):
+    import threading
+    tmpdir = str(tmpdir)
+    fs = file_store(tmpdir)
+    with pytest.raises(TypeError):
+        fs.dump(threading.Lock(), hash_one('lock'))
+    assert os.listdir(fs.tempdir()) == []
+    assert not fs.can_load(hash_one('lock'))
+
+
+def test_structured_object_array(tmpdir):
+    np = pytest.importorskip('numpy')
+    tmpdir = str(tmpdir)
+    a = np.array([(1, 'one'), (2, [2])], dtype=[('x', int), ('y', object)])
+    for compress_numpy in (False, True):
+        fs = file_store(tmpdir, compress_numpy=compress_numpy)
+        k = hash_one(('structured', compress_numpy))
+        fs.dump(a, k)
+        b = fs.load(k)
+        assert b.dtype == a.dtype
+        assert list(b['x']) == [1, 2]
+        assert list(b['y']) == ['one', [2]]

@@ -67,7 +67,7 @@ def fsync_dir(fname):
 def _write_to(value, output, compress_numpy):
     try:
         import numpy as np
-        if not compress_numpy and type(value) is np.ndarray and value.dtype != object:
+        if not compress_numpy and type(value) is np.ndarray and not value.dtype.hasobject:
             np.lib.format.write_array(output, value)
             return
     except (ImportError, OSError, ValueError):
@@ -183,10 +183,14 @@ class file_store(base_store):
         name = self._getfname(name)
         os.makedirs(dirname(name), exist_ok=True)
         fname, output = _make_temp_file(self.tempdir())
-        _write_to(value, output, self.compress_numpy)
-
-        output.flush()
-        os.fsync(output.fileno())
+        try:
+            _write_to(value, output, self.compress_numpy)
+            output.flush()
+            os.fsync(output.fileno())
+        except:
+            output.close()
+            os.unlink(fname)
+            raise
         output.close()
 
         # Rename is atomic even over NFS.

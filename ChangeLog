@@ -1,4 +1,9 @@
 Unreleased
+	* file_store: Fix numpy structured arrays with object fields, which
+	could be saved but not loaded (zlib.error)
+	* file_store: Remove the temporary file when saving a result fails (e.g.,
+	because it cannot be pickled); before, partial files accumulated in
+	tempfiles/
 	* jug graph: Fix `--file-format`, which did not accept an argument (so
 	the output format could not be changed)
 	* Documentation: update all examples to match current behaviour (status
