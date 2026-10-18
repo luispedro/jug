@@ -53,6 +53,31 @@ def test_bvalue():
     assert 'four' in space
     assert space['four'] == 4
 
+@task_reset
+def test_bvalue_nested():
+    jugfile = find_test_jugfile('bvalue_nested.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    assert 'vals' not in space
+    simple_execute()
+    store, space = jug.jug.init(jugfile, store)
+    assert space['vals'] == {'first': [1], 'last': (3,)}
+    simple_execute()
+    assert [d.value() for d in space['doubled']] == [2, 6]
+
+@task_reset
+def test_bvalue_error_propagates():
+    # Errors computing the value (here, an IndexError in a Tasklet) must not
+    # be treated as an unsatisfied barrier
+    import pytest
+    options = default_options.copy()
+    options.jugdir = 'dict_store'
+    options.jugfile = find_test_jugfile('bvalue_error.py')
+    options.execute_nr_wait_cycles = 2
+    options.execute_wait_cycle_time = 0
+    with pytest.raises(SystemExit) as e:
+        jug.subcommands.execute.execute(options)
+    assert e.value.code == 1
+
 
 @task_reset
 def test_recursive():

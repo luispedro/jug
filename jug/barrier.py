@@ -144,9 +144,30 @@ def bvalue(t):
     --------
     barrier : Checks that **all** tasks have results available.
     '''
-    from .task import value
-    try:
-        return value(t)
-    except:
+    from .task import value, alltasks
+    if not _all_loadable(t, alltasks):
         raise BarrierError
+    return value(t)
+
+
+def _all_loadable(obj, alltasks):
+    '''Returns whether all the tasks needed to compute ``value(obj)`` have
+    their results available'''
+    from .task import Task
+    queue = [[obj]]
+    while queue:
+        for elem in queue.pop():
+            if isinstance(elem, Task):
+                if not elem.is_loaded() and not _can_load_limit_recursion(elem, alltasks):
+                    return False
+            elif hasattr(elem, '__jug_dependencies__'):
+                queue.append(elem.__jug_dependencies__())
+            elif hasattr(elem, 'can_load'):
+                if not elem.can_load():
+                    return False
+            elif isinstance(elem, (list, tuple)):
+                queue.append(elem)
+            elif isinstance(elem, dict):
+                queue.append(elem.values())
+    return True
 

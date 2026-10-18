@@ -1,4 +1,8 @@
 Unreleased
+	* bvalue: Only treat the value as unavailable when a task it needs has
+	not run yet; before, any error (e.g., an IndexError in a Tasklet) was
+	silently treated as an unsatisfied barrier and `jug execute` waited and
+	then exited with status 0
 	* hooks: Fix `exit_when_true()`, which always failed with a TypeError
 	(unless `function_takes_Task=True` was passed)
 	* file_store: Fix numpy structured arrays with object fields, which
