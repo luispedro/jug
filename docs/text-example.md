@@ -8,7 +8,7 @@ wikipedia pages. Meaningful words are those that appear in the article for the
 particular MP but not everywhere else.
 
 (The complete code for this example and a list of MPs [valid in 2010] with the
-[jug source](https://github.com/luispedro/jug/tree/master/examples/text))
+[jug source](https://github.com/luispedro/jug/tree/main/examples/text))
 
 The algorithm looks like this:
 

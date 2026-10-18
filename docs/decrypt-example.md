@@ -7,7 +7,7 @@ five-letter lower-case word and that you know that the plain text contains my
 name.
 
 (The complete code for this example and a secret message comes with the
-[jug source](https://github.com/luispedro/jug/tree/master/examples/decrypt))
+[jug source](https://github.com/luispedro/jug/tree/main/examples/decrypt))
 
 This is the ultimate parallel problem: try very many keys (26\*\*5 ~ 11M), but
 there is no interaction between the different tasks.
