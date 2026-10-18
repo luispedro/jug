@@ -249,11 +249,11 @@ memory errors.''')
                        dest='jugdir',
                        help=f'''\
 Directory in which to save intermediate files
-You can use Python format syntax, the following variables are available:
-    - date
-    - jugfile (without extension)
+You can use Python %%-format placeholders, the following variables are available:
+    - %%(date)s
+    - %%(jugfile)s (the jugfile name without the .py extension)
 
-    By default, the value of `jugdir` is "{default_options.jugfile}.jugdata"''')
+    By default, the value of `jugdir` is "%%(jugfile)s.jugdata" (e.g., "jugfile.jugdata")''')
     group.add_argument('--verbose',
                        action='store',
                        dest='verbose',

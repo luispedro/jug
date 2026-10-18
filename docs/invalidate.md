@@ -20,14 +20,18 @@ powerful.
 Consider the [British parliament example](text-example.md) we used
 elsewhere in this guide:
 
-```
+```python
 allcounts = []
 for mp in MPs:
     article = get_data(mp)
     words = count_words(mp, article)
     allcounts.append(words)
 
-global_counts = add_counts(allcounts) # Here all processes must sync
+avgs = add_counts(allcounts) # Here all processes must sync
+
+results = []
+for words in allcounts:
+    results.append(divergence(avgs, len(allcounts), words))
 ```
 
 Its dependency graph looks like this:
@@ -48,14 +52,14 @@ This is a typical fan-in-fan-out structure. After you have run the code, `jug
 status` will give you this output:
 
 ```
-       Waiting       Ready    Finished     Running  Task name
-----------------------------------------------------------------------------------
-           0           0           1           0  jugfile.add_counts
-           0           0         656           0  jugfile.count_words
-           0           0         656           0  jugfile.divergence
-           0           0         656           0  jugfile.get_data
-..................................................................................
-           0           0        1969           0  Total
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           0           0           1           0  jugfile.add_counts
+           0           0           0         656           0  jugfile.count_words
+           0           0           0         656           0  jugfile.divergence
+           0           0           0         656           0  jugfile.get_data
+.....................................................................................
+           0           0           0        1969           0  Total
 ```
 
 Now assume that `add_counts` has a bug. Now you must:
@@ -67,11 +71,11 @@ Jug invalidation helps you with the second task.
 
 ```
 $ jug invalidate --name add_counts
-Invalidated  Task name
------------------------------------------------------------
+ Invalidated  Task name
+------------------------------------
            1  jugfile.add_counts
          656  jugfile.divergence
-...........................................................
+....................................
          657  Total
 ```
 
@@ -96,14 +100,14 @@ Older versions of jug used `--target` for this (which behaved like
 Now, `jug status` gives us:
 
 ```
-      Waiting       Ready    Finished     Running  Task name
-------------------------------------------------------------------------------------
-           0           1           0           0  jugfile.add_counts
-           0           0         656           0  jugfile.count_words
-         656           0           0           0  jugfile.divergence
-           0           0         656           0  jugfile.get_data
-....................................................................................
-         656           1        1312           0  Total
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           0           1           0           0  jugfile.add_counts
+           0           0           0         656           0  jugfile.count_words
+           0         656           0           0           0  jugfile.divergence
+           0           0           0         656           0  jugfile.get_data
+.....................................................................................
+           0         656           1        1312           0  Total
 ```
 
 So, now when you run `jug execute`, `add_counts` will be re-run as will

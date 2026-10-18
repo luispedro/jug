@@ -49,17 +49,20 @@ You can also include a reduce step:
 def add(a, b):
     return a + b
 
-final = mapreduce.map(add, double, numbers, map_step=32)
+final = mapreduce.mapreduce(add, double, numbers, map_step=32)
 ```
 
 this is sort of equivalent to:
 
 ```
+from functools import reduce
 final = reduce(add, map(double, numbers))
 ```
 
-except that **the order in which the reduction is done is not from left to
-right**! In fact, this only works well if the reduction function is
+except that **the reduction is not done strictly from left to right**: the
+elements are reduced in blocks, and then the partial results are reduced
+together. Adjacent elements are always combined in order, but the grouping is
+different. Therefore, this only works well if the reduction function is
 associative.
 
 ### Curried mapping
@@ -145,19 +148,19 @@ final_counts = jug.mapreduce.mapreduce(
 Running `jug status` shows up the structure of our problem:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jug.mapreduce._jug_map_reduce                      0           6           0           0
-jug.mapreduce._jug_reduce                          1           0           0           0
-........................................................................................
-Total:                                             1           6           0           0
+      Failed     Waiting       Ready    Complete      Active  Task name
+-----------------------------------------------------------------------------------------------
+           0           0           7           0           0  jug.mapreduce._jug_map_reduce
+           0           1           0           0           0  jug.mapreduce._jug_reduce
+...............................................................................................
+           0           1           7           0           0  Total
 ```
 
-If we had more than just 6 "files", the values in the table would be much
+If we had more than just 7 "files", the values in the table would be much
 larger. Let's also assume that this is part of some much larger programme that
 computes counts and then does some further processing with them.
 
-Once that task is done, we might not care anymore about the break up into 6
+Once that task is done, we might not care anymore about the break up into 7
 units. So, we can wrap the whole thing into a **compound task**:
 
 ```
@@ -171,26 +174,26 @@ final_counts = CompoundTask(jug.mapreduce.mapreduce,
 At first, this does not do much. The status is the same:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jug.compound.compound_task_execute                 1           0           0           0
-jug.mapreduce._jug_map_reduce                      0           6           0           0
-jug.mapreduce._jug_reduce                          1           0           0           0
-........................................................................................
-Total:                                             2           6           0           0
+      Failed     Waiting       Ready    Complete      Active  Task name
+----------------------------------------------------------------------------------------------------
+           0           1           0           0           0  jug.compound.compound_task_execute
+           0           0           7           0           0  jug.mapreduce._jug_map_reduce
+           0           1           0           0           0  jug.mapreduce._jug_reduce
+....................................................................................................
+           0           2           7           0           0  Total
 ```
 
 But if we *execute* the tasks and re-check the status:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jug.mapreduce.mapreduce                            0           0           1           0
-........................................................................................
-Total:                                             0           0           1           0
+      Failed     Waiting       Ready    Complete      Active  Task name
+-----------------------------------------------------------------------------------------
+           0           0           0           1           0  jug.mapreduce.mapreduce
+.........................................................................................
+           0           0           0           1           0  Total
 ```
 
-Now, `jug status` reports a single task (the mapreduce task) and it is *Finished*.
+Now, `jug status` reports a single task (the mapreduce task) and it is *Complete*.
 
 Compound tasks not only lower the cognitive load, but they also make operations
 such as `jug status` much faster.

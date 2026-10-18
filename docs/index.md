@@ -38,13 +38,13 @@ fast.
 Now type `jug status primes.py` to get:
 
 ```
- Waiting       Ready    Finished     Running  Task name
----------------------------------------------------------------------------
-       1           0           0           0  primes.count_primes
-       0          99           0           0  primes.is_prime
-       1           0           0           0  primes.write_output
-...........................................................................
-       2          99           0           0  Total
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           1           0           0           0  primes.count_primes
+           0           0          99           0           0  primes.is_prime
+           0           1           0           0           0  primes.write_output
+.....................................................................................
+           0           2          99           0           0  Total
 ```
 
 This tells you that you have 99 tasks called `primes.is_prime` ready to run,
@@ -55,16 +55,16 @@ After starting 4 instances and waiting a few seconds, you can check the status
 again (with `jug status primes.py`):
 
 ```
- Waiting       Ready    Finished     Running  Task name
----------------------------------------------------------------------------
-       1           0           0           0  primes.count_primes
-       0          63          32           4  primes.is_prime
-       1           0           0           0  primes.write_output
-...........................................................................
-       2          99           0           0  Total
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           1           0           0           0  primes.count_primes
+           0           0          63          32           4  primes.is_prime
+           0           1           0           0           0  primes.write_output
+.....................................................................................
+           0           2          63          32           4  Total
 ```
 
-Now you have 32 tasks finished, 4 running, and 63 still ready. Eventually, they
+Now you have 32 tasks complete, 4 active (running), and 63 still ready. Eventually, they
 will all finish (including `count_primes` and `write_output`) and you can
 inspect the results with `jug shell primes.py`. This will give you an
 `ipython` shell. The `primes100` variable is available, but it is an ugly

@@ -144,7 +144,7 @@ script to read in the hostname ;-)
 JUG_PROCESSES_PER_WORKER=10
 
 rm /mnt/localhd/.jug*
-for i in {1..${JUG_PROCESSES_PER_WORKER}}
+for i in $(seq "$JUG_PROCESSES_PER_WORKER")
 do
     jug execute benchmark_jug.py > /mnt/localhd/.jug$i.out 2> /mnt/localhd/.jug$i.err &
 done

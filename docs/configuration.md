@@ -6,7 +6,8 @@
 In previous versions, the configuration file was called `~/.jug/configrc`. Since version 1.3, the path `~/.config/jugrc` is used (for compatibility, `~/.jug/configrc` is read if `~/.config/jugrc` is missing).
 ```
 
-On startup, `jug` reads the file `~/.config/jugrc` (if it exists). It
+On startup, `jug` reads the first of the files `~/.config/jug/jugrc`,
+`~/.config/jugrc`, and `~/.jug/configrc` that exists (if any). It
 expects an *.ini* format file. It can have the following fields:
 
 ```
@@ -18,14 +19,20 @@ jugfile=jugfile.py
 cache=off
 
 [execute]
-aggressive-unload=False
-pdb=False
+keep-going=off
 wait-cycle-time=12
 nr-wait-cycles=150
 ```
 
 These have the same meaning as the analogous command line options. If both are
-given, the command line takes priority.
+given, the command line takes priority. Settings in the `[main]` section
+correspond to the global options (e.g., `--jugdir`), while settings in other
+sections correspond to options of that subcommand (e.g., `wait-cycle-time` in
+the `[execute]` section corresponds to `jug execute --wait-cycle-time`).
+Boolean settings accept `on`/`off`, `true`/`false`, or `1`/`0`.
+
+Note that the global flags `--aggressive-unload`, `--debug`, `--pdb`, and
+`--short` cannot currently be set in the configuration file.
 
 ## Project-local configuration
 

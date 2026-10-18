@@ -7,12 +7,12 @@ example:
 
 ```
 $ jug status
-     Waiting       Ready    Finished     Running  Task name
--------------------------------------------------------------------------
-           0           2           0           0  jugfile.compfeats
-          10           0           0           0  jugfile.nfold
-.........................................................................
-          10           2           0           0  Total
+      Failed     Waiting       Ready    Complete      Active  Task name
+-----------------------------------------------------------------------------------
+           0           0           2           0           0  jugfile.compfeats
+           0          10           0           0           0  jugfile.nfold
+...................................................................................
+           0          10           2           0           0  Total
 ```
 
 ## Short Status
@@ -21,7 +21,14 @@ The same status as above, now in a `short` version:
 
 ```
 $ jug status --short
-12 tasks to be run, 0 finished, (none running).
+12 tasks waiting to be run, 0 failed, 0 complete, (none active).
+```
+
+Once every task has finished, this becomes:
+
+```
+$ jug status --short
+All tasks complete (12 tasks).
 ```
 
 ## Cached Status

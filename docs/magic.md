@@ -66,7 +66,7 @@ class NamedNumpy:
         from jug.hash import hash_one
 
         return hash_one({
-            'type': 'NumpyPair',
+            'type': 'NamedNumpy',
             'data': self.data,
             'name': self.name,
             })
@@ -86,11 +86,12 @@ jug uses internally to load objects.
 
 Again, `value(x)` works in the following way:
 
-1. Does the `x.__jug_value__` member exist? If so, call it.
-2. Is `x` one of the composite types it knows about (dict, list,...). If so, use
-   special code to recursively get all the sub objects. For a list
+1. Is it a `Task` or a `Tasklet`? If so, load it from the store.
+2. Is `x` one of the composite types it knows about (exactly a `list`, `tuple`,
+   or `dict`; subclasses are not included)? If so, use special code to
+   recursively get all the sub objects. For a list
    `value([x,y]) == [value(x), value(y)]`.
-3. Is it a `Task` or a `Tasklet`? If so, load it from the store.
+3. Does the `x.__jug_value__` member exist? If so, call it.
 4. Otherwise, `value(x) == x`.
 
 What if you have your own sequence object? Then you can set a `__jug_value__`

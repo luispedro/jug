@@ -23,7 +23,7 @@ Certain mechanisms in jug, for example, `jug.mapreduce.map` and
 `jug.mapreduce.mapreduce` allow the user to tweak the task breakup with a
 couple of parameters
 
-In `map` for example, `jug` does, by default, issue a task for each element
+In `map` for example, `jug` does not, by default, issue a task for each element
 in the sequence. It rather issues one for each 4 elements. This expects tasks
 to not take that long so that grouping them gives you a better trade-off
 between the throughput and latency. You might quibble with the default, but the
@@ -48,13 +48,16 @@ makes jug easy to use but has some drawbacks:
   are equivalent modulo 2\*pi.
 
 If you control the types of your arguments, you can add a `__jug_hash__`
-method to your type directly. This method should return a string:
+method to your type directly. This method should return a `bytes` object:
 
 ```
 class MySpecialThing:
     def __jug_hash__(self):
-        return some_string
+        return some_bytes
 ```
+
+You can use `jug.hash.hash_one` to compute such a value from other objects
+(e.g., `return hash_one((self.name, self.size))`).
 
 Alternatively, you can use `jug.utils.CustomHash` in the case where you
 cannot (or rather, would not) change the types:
@@ -62,11 +65,11 @@ cannot (or rather, would not) change the types:
 ```
 from jug.utils import CustomHash
 def my_hash_function(x):
-    return some_string_based_on_x
+    return some_bytes_based_on_x
 
-complex = ...
-value = CustomHash(complex, my_hash_function)
+obj = ...
+wrapped = CustomHash(obj, my_hash_function)
 ```
 
-Now, `value` behaves exactly like `complex`, but its hash is computed by
+Now, `wrapped` behaves exactly like `obj`, but its hash is computed by
 calling `my_hash_function`.

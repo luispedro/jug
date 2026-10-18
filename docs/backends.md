@@ -13,7 +13,8 @@ not allow sharing across processes.
 
 ### Filesystem
 
-By default, jug will save its results in a directory called `jugdata`. This
+By default, jug will save its results in a directory named after the jugfile
+(e.g., `jugfile.jugdata` for `jugfile.py`). This
 is done in a way that works across **NFS** if you are using a cluster.
 
 ### Redis

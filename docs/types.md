@@ -8,9 +8,11 @@ code:
 ```
 from glob import glob
 from mahotas import imread
+from jug import Task
 
 def process(img):
     # complex image processing
+    ...
 
 files = glob('inputs/*.png')
 imgs = [Task(imread, f) for f in files]
@@ -22,11 +24,13 @@ rewriting this to:
 
 ```
 from glob import glob
+from jug import Task
 
 def process(f):
     from mahotas import imread
     img = imread(f)
     # complex image processing
+    ...
 
 files = glob('inputs/*.png')
 props = [Task(process, f) for f in files]

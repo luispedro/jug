@@ -47,7 +47,8 @@ jug execute [jugfile] [options]
 
 **Stop signals:** Create a file named `__jug_please_stop_running.txt` in the
 working directory to ask all workers to exit cleanly after finishing their
-current task. Remove the file to let them resume.
+current task. Workers that saw the file exit; to resume, remove the file and
+start new workers.
 
 Workers re-import the jugfile each cycle, so jugfiles with `barrier()` are
 handled transparently across multiple cycles.
@@ -201,8 +202,9 @@ Example session:
 # In jug shell:
 ready = get_filtered_tasks(available=True)
 print(len(ready))               # how many runnable tasks?
-r = value(ready[0])             # load first result
-invalidate(ready[0])            # force re-run of ready[0]
+done = get_filtered_tasks(loadable=True)
+r = value(done[0])              # load first result
+invalidate(done[0])             # force re-run of done[0] (and its dependents)
 ```
 
 ---
@@ -291,7 +293,7 @@ nr-wait-cycles = 60
 keep-going = true
 
 [status]
-short = true
+cache = on
 ```
 
 Option keys match CLI long-option names. Dashes and underscores are

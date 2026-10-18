@@ -107,7 +107,7 @@ class CustomHash:
     ----------
     obj : any object
     hash_function : function
-        This should take your object and return a str
+        This should take your object and return a bytes object
     '''
     def __init__(self, obj, hash_function):
         self.obj = obj

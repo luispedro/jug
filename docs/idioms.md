@@ -24,7 +24,7 @@ then *jug* has some helper functions.
 The `jug.mapreduce.mapreduce` function implements mapreduce:
 
 ```
-jug.mapreduce(reducer, mapper, inputs)
+jug.mapreduce.mapreduce(reducer, mapper, inputs)
 ```
 
 is roughly equivalent to:
@@ -47,8 +47,8 @@ of mapping and reducing more than one input. How many is controlled by the
 single task (by default, 8; reflecting the fact that reduce operations tend to
 be lighter than map operations).
 
-The [compound task](compound.md) section has a worked out example of using
-map/reduce.
+The [map/reduce](mapreduce.md) section has a worked out example of using
+map/reduce (including how to combine it with a [compound task](compound.md)).
 
 ## Parameter Sweep
 
@@ -77,7 +77,10 @@ handle it.
 First note: we can, of course, perform this with a *map/reduce*:
 
 ```
-def mapper(data, p0, p1):
+# The mapper is called with a single element of the input list, here a
+# (p0, p1) tuple; `data` is a module-level variable
+def mapper(params):
+    p0, p1 = params
     return (p0, p1, score(data, p0, p1))
 
 def reducer(a, b):
@@ -90,8 +93,8 @@ best = jug.mapreduce.mapreduce(
                 reducer,
                 mapper,
                 [(p0, p1)
-                        for p0 in range(101)
-                        for p1 in range(-20, 21)])
+                        for p0 in range(100)
+                        for p1 in range(-20, 20)])
 ```
 
 However, if you want to look at the whole parameter space instead of just the
@@ -104,17 +107,17 @@ score = TaskGenerator(score)
 results = {}
 for p0 in range(100):
     for p1 in range(-20, 20):
-        result[p0,p1] = value(data, p0, p1)
+        results[p0,p1] = score(data, p0, p1)
 ```
 
 Now, *after you've run `jug execute`*, you can use `jug shell` and load the
-result dictionary to look at all the results.
+`results` dictionary to look at all the results.
 
 ```
-result = value(result)
-print(result[0, -2])
+results = value(results)
+print(results[0, -2])
 # Look for the maximum score
-print(max(result.values()))
+print(max(results.values()))
 # Look at maximum score *and* the parameters that generated it:
-print(max((v, k) for k, v in result.items()))
+print(max((v, k) for k, v in results.items()))
 ```

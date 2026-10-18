@@ -193,7 +193,7 @@ Set the jugdir on the command line with `--jugdir`, or in the config file.
 | Backend | When to use | How to select |
 |---------|-------------|---------------|
 | **file store** (default) | Local disk or NFS. NFS-safe — uses atomic rename. | `--jugdir path/to/dir` |
-| **Redis store** | No shared filesystem; fast. | `--jugdir redis://host:port/dbname` |
+| **Redis store** | No shared filesystem; fast. | `--jugdir redis://host:port/` |
 | **dict store** | Unit testing or small local runs. In-memory, optionally persisted to one file. | `--jugdir dict_store` or `--jugdir dict_store:path/to/file` |
 | **file keepalive store** | Shared filesystem with dead-worker detection. | `--jugdir file_keepalive:path/to/dir` |
 

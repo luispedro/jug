@@ -13,7 +13,7 @@ There are a few other operations, like deleting an entry, that are useful, but
 not strictly necessary.
 
 Backends are identified by a URI type string, generically called `jugdir`.
-For example, to connect to a redis backend, use `redis:host:port/database`.
+For example, to connect to a redis backend, use `redis://host:port/`.
 Your backend should support a similar scheme.
 
 ## How to write a backend

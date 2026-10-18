@@ -1,4 +1,9 @@
 Unreleased
+	* Documentation: update all examples to match current behaviour (status
+	output format, default jugdir, and several code examples that did not
+	run as written)
+	* jug --help: Fix description of `jug pack` and of the `--jugdir`
+	default
 	* jug pack: Fix crash (zlib.error) when the jugdir contains small numpy
 	arrays or polars DataFrames (which are saved in their native formats)
 	* jug.hash: Fix task hashes of frozensets and of numpy arrays with

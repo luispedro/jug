@@ -33,12 +33,13 @@ trying every possibility *starting* with that letter:
 
 ```python
 @TaskGenerator
-def decrypt(prefix, suffix_size):
+def decrypt(prefix):
     res = []
-    for p in product(letters, repeat=suffix_size):
-        text = decode(ciphertext, np.concatenate([prefix, p]))
+    for suffix in product(letters, repeat=5 - len(prefix)):
+        passwd = np.concatenate([prefix, suffix])
+        text = decode(ciphertext, passwd)
         if isgood(text):
-            passwd = "".join(map(chr, p))
+            passwd = "".join(map(chr, passwd))
             res.append((passwd, text))
     return res
 
@@ -46,7 +47,7 @@ def decrypt(prefix, suffix_size):
 def join(partials):
     return list(chain(*partials))
 
-fullresults = join([decrypt([let], 4) for let in letters])
+fullresults = join([decrypt([let]) for let in letters])
 ```
 
 Here, the `decrypt` function returns a list of all the good passwords it
@@ -72,35 +73,36 @@ $ jug status jugfile.py
 And you will get an output such as:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jugfile.join                                       1           0           0           0
-jugfile.decrypt                                    0          14           8           4
-........................................................................................
-Total:                                             1          14           8           4
+      Failed     Waiting       Ready    Complete      Active  Task name
+---------------------------------------------------------------------------------
+           0           0          14           8           4  jugfile.decrypt
+           0           1           0           0           0  jugfile.join
+.................................................................................
+           0           1          14           8           4  Total
 ```
 
-There are two task functions: `decrypt`, of which 8 are finished, 14 are ready
-to run, and 4 are currently running; and `join` which has a single instance,
+There are two task functions: `decrypt`, of which 8 are complete, 14 are ready
+to run, and 4 are currently active (running); and `join` which has a single instance,
 which is `waiting`: it cannot run until all the `decrypt` tasks have
 finished.
 
 Eventually, everything will be finished and your results will be saved in
-directory `jugdata` in files with names such as
-`jugdata/5/4/a1266debc307df7c741cb7b997004f` The name is simply a hash of the
-task description (function and its arguments).
+directory `jugfile.jugdata` (by default, the jugdir is named after the
+jugfile) in files with names such as
+`jugfile.jugdata/04/545bde0f665d9364005e10bb83b7ccf3e11b05`. The name is simply
+a hash of the task description (function and its arguments).
 
 In order to make sense of all of this, we write a final script, which loads the
 results and prints them on stdout:
 
 ```python
 import jug
-jug.init('jugfile.py', 'jugdata')
+jug.init('jugfile.py', 'jugfile.jugdata')
 import jugfile
 
 results = jug.task.value(jugfile.fullresults)
 for p, t in results:
-    print("%s\n\n    Password was '%s'" % (t, p))
+    print(f"{t}\n\n    Password was '{p}'")
 ```
 
 `jug.init` takes the jugfile name (which happens to be `jugfile.py`) and

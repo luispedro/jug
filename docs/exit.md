@@ -39,6 +39,7 @@ Use the variable `JUG_MAX_TASKS` or run the following code:
 
 
 ```python
+from os import environ
 from jug.hooks.exit_checks import exit_after_n_tasks
 exit_after_n_tasks(int(environ['JUG_MAX_TASKS']))
 ```

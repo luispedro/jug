@@ -32,7 +32,7 @@ __all__ = [
 
 
 class PackCommand(SubCommand):
-    '''Returns 0 if all tasks are finished. 1 otherwise.
+    '''Pack small result files into a single file (file-based stores only)
 
     pack(store, options)
 

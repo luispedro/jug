@@ -52,7 +52,7 @@ def isstopword(titlewords, w):
 
 def count_words(title, document):
     '''
-    Takes a file name and returns a wordcount.
+    Takes an MP's name and the text of their article and returns a wordcount.
     '''
     sleep(4)
     titlewords = [w.lower() for w in title.split()]
@@ -79,8 +79,8 @@ def add_counts(counts):
 def divergence(global_counts, nr_documents, counts):
     '''
     Takes the global word counts as well as a single count vector
-    and returns a set of words *in this document* that are document
-    specific.
+    and returns a list of the words *in this document* that are document
+    specific (sorted by decreasing count).
     '''
     sleep(8)
     specific = []

@@ -21,9 +21,9 @@ for mp in MPs:
 
 global_counts = add_counts(allcounts) # Here all processes must sync
 
-for mp, mp_count in zip(MPs, counts):
+for mp, mp_count in zip(MPs, allcounts):
     meaningful = []
-    for w, c in mp_count:
+    for w, c in mp_count.items():
         if c > global_counts[w] // 100:
             meaningful.append(w)
     meaningful.sort(key=mp_count.get)
@@ -39,17 +39,17 @@ case, the file is `jugfile.py`). Now, I can call `jug status jugfile.py` to
 see the state of the computation:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jugfile.get_data                                   0         657           0           0
-jugfile.count_words                              657           0           0           0
-jugfile.divergence                               657           0           0           0
-jugfile.add_counts                                 1           0           0           0
-........................................................................................
-Total:                                          1315         657           0           0
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           1           0           0           0  jugfile.add_counts
+           0         656           0           0           0  jugfile.count_words
+           0         656           0           0           0  jugfile.divergence
+           0           0         656           0           0  jugfile.get_data
+.....................................................................................
+           0        1313         656           0           0  Total
 ```
 
-Unsurprisingly, no task is finished and only the `get_data` task is ready to
+Unsurprisingly, no task is complete and only the `get_data` task is ready to
 run. No nodes are running. So, let's start a couple of processes [^footnote-1]:
 
 ```bash
@@ -65,27 +65,27 @@ $ jug status jugfile.py
 
 This prints out first:
 
-```bash
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jugfile.get_data                                   0         653           0           4
-jugfile.count_words                              657           0           0           0
-jugfile.divergence                               657           0           0           0
-jugfile.add_counts                                 1           0           0           0
-........................................................................................
-Total:                                          1315         653           0           4
+```
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           1           0           0           0  jugfile.add_counts
+           0         656           0           0           0  jugfile.count_words
+           0         656           0           0           0  jugfile.divergence
+           0           0         652           0           4  jugfile.get_data
+.....................................................................................
+           0        1313         652           0           4  Total
 
 $ sleep 48
 $ jug status jugfile.py
 
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jugfile.get_data                                   0         635          20           2
-jugfile.count_words                              637           2          16           2
-jugfile.divergence                               657           0           0           0
-jugfile.add_counts                                 1           0           0           0
-........................................................................................
-Total:                                          1295         637          36           4
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           1           0           0           0  jugfile.add_counts
+           0         636           2          16           2  jugfile.count_words
+           0         656           0           0           0  jugfile.divergence
+           0           0         634          20           2  jugfile.get_data
+.....................................................................................
+           0        1293         636          36           4  Total
 ```
 
 So, we can see that almost immediately after the four background processes were
@@ -101,14 +101,14 @@ clustering system and a whole lot more nodes have become available). The nodes
 will happily chug along until we get to the following situation:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jugfile.get_data                                   0           0         657           0
-jugfile.count_words                                0           0         657           0
-jugfile.divergence                               657           0           0           0
-jugfile.add_counts                                 0           0           0           1
-........................................................................................
-Total:                                           657           0        1314           1
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           0           0           0           1  jugfile.add_counts
+           0           0           0         656           0  jugfile.count_words
+           0         656           0           0           0  jugfile.divergence
+           0           0           0         656           0  jugfile.get_data
+.....................................................................................
+           0         656           0        1312           1  Total
 ```
 
 This is the bottleneck in the programme: Notice how there is only one node
@@ -117,24 +117,24 @@ running, it is computing `add_counts()`. Everyone else is waiting (there are no
 work computing `divergence`:
 
 ```
-Task name                                    Waiting       Ready    Finished     Running
-----------------------------------------------------------------------------------------
-jugfile.get_data                                   0           0         657           0
-jugfile.count_words                                0           0         657           0
-jugfile.divergence                                 0         653           0           4
-jugfile.add_counts                                 0           0           1           0
-........................................................................................
-Total:                                             0         653        1315           4
+      Failed     Waiting       Ready    Complete      Active  Task name
+-------------------------------------------------------------------------------------
+           0           0           0           1           0  jugfile.add_counts
+           0           0           0         656           0  jugfile.count_words
+           0           0         652           0           4  jugfile.divergence
+           0           0           0         656           0  jugfile.get_data
+.....................................................................................
+           0           0         652        1313           4  Total
 ```
 
 Eventually, all the nodes finish and we are done. All the results are now left
-inside `jugdata`. To access it, we can write a little script:
+inside `jugfile.jugdata` (by default, the jugdir is named after the jugfile). To access it, we can write a little script:
 
 ```python
 import jug
 import jug.task
 
-jug.init('jugfile.py', 'jugdata')
+jug.init('jugfile.py', 'jugfile.jugdata')
 import jugfile
 
 results = jug.task.value(jugfile.results)

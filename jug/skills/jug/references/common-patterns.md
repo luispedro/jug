@@ -154,9 +154,10 @@ def preprocess_and_align(sample):
 result = preprocess_and_align(my_sample)
 ```
 
-`jug status` sees `preprocess_and_align` as a single task group rather than
-separate `clean` and `align` entries. The underlying tasks are still computed
-individually.
+Until the compound task has run, `jug status` shows the inner `clean` and
+`align` tasks (plus a `jug.compound.compound_task_execute` task). Once it has
+completed, `jug status` shows only a single `preprocess_and_align` entry. The
+underlying tasks are still computed individually.
 
 ---
 

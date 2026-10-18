@@ -17,13 +17,13 @@ You need to start separate `jug execute` processes on each node.
 See also the answer to the next question if you are using a batch system or the
 [bash utilities page](bash.md) if you are not.
 
-## Will jug work on batch cluster systems (like SGE/LFS/PBS)?
+## Will jug work on batch cluster systems (like SGE/LSF/PBS)?
 
 Yes, it was built for it.
 
 The simplest way to do it is to use a job array.
 
-On LFS, it would be run like this:
+On LSF, it would be run like this:
 
 ```
 bsub -o output.txt -J "jug[1-100]" jug execute myscript.py
@@ -32,7 +32,7 @@ bsub -o output.txt -J "jug[1-100]" jug execute myscript.py
 For SGE, you often need to write a script. For example:
 
 ```
-cat >>jug1.sh <<EOF
+cat >jug1.sh <<EOF
 #!/bin/bash
 
 exec jug execute myscript.py

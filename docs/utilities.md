@@ -144,6 +144,9 @@ results, but nonetheless need to be passed to functions.
 Example usage:
 
 ```
+from jug.unsafe import NoHash
+from jug.utils import jug_execute
+
 jug_execute(['SemiBin2', 'single_easy_bin',
                 '--cpus', NoHash('8'),
                 '-i', 'input/contigs.fna.gz',

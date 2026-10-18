@@ -29,7 +29,7 @@ for k in range(2, 200):
     for repeat in range(10):
         clusters.append(kmeans(features,k=k,random_seed=repeat))
         bics.append(compute_bic(clusters[-1]))
-Nr_clusters = argmin(bics) // 10
+Nr_clusters = argmin(bics) // 10 + 2
 ```
 
 Very simple and solves the problem. However, if I want to take advantage of the
@@ -71,6 +71,9 @@ understands lists of tasks and dictionaries with tasks. For example, the
 following code declares the necessary tasks for our problem:
 
 ```
+def best_k(bics):
+    return argmin(bics) // 10 + 2
+
 imgs = glob('*.png')
 feature_tasks = [Task(computefeatures,img,parameter=2) for img in imgs]
 cluster_tasks = []
@@ -79,7 +82,7 @@ for k in range(2, 200):
     for repeat in range(10):
         cluster_tasks.append(Task(kmeans,feature_tasks,k=k,random_seed=repeat))
         bic_tasks.append(Task(compute_bic,cluster_tasks[-1]))
-Nr_clusters = Task(argmin,bic_tasks)
+Nr_clusters = Task(best_k,bic_tasks)
 ```
 
 ### Task Generators
@@ -96,8 +99,8 @@ kmeans = TaskGenerator(kmeans)
 compute_bic = TaskGenerator(compute_bic)
 
 @TaskGenerator
-def Nr_Clusters(bics):
-    return argmin(bics) // 10
+def Nr_clusters(bics):
+    return argmin(bics) // 10 + 2
 
 imgs = glob('*.png')
 features = [computefeatures(img,parameter=2) for img in imgs]
@@ -114,8 +117,8 @@ You can see that this code is almost identical to our original sequential code,
 except for the decorators at the top and the fact that *Nr_clusters* is now a
 function (actually a TaskGenerator, look at the use of decorators).
 
-This file is called the jugfile (you should name it *jugfile.py* on the
-filesystem) and specifies your problem.
+This file is called the jugfile (by default, jug looks for a file called
+*jugfile.py*, but you can use any name) and specifies your problem.
 
 ### Jug
 
@@ -158,11 +161,12 @@ saves them to disk and loading them from there. If the results of your
 computation are simple enough, this might be the simplest way.
 
 Another way, which is also the way to access the intermediate results if you
-want them, is to run the jug script and then access the *result* property of
-the Task object. For example,
+want them, is to load the jugfile (e.g., using `jug shell`, or calling
+`jug.init()` from a script) and then access the *result* property of the Task
+object. For example,
 
 ```
-img = glob('*.png')
+imgs = glob('*.png')
 features = [computefeatures(img,parameter=2) for img in imgs]
 ...
 
