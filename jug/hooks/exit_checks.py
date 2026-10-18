@@ -31,10 +31,8 @@ def exit_when_true(f, function_takes_Task=False):
     '''
 
     from jug import hooks
-    if not function_takes_Task:
-        f = lambda t : f()
     def exit_when(t):
-        if f(t):
+        if (f(t) if function_takes_Task else f()):
             exit(0)
     hooks.register_hook('execute.task-executed1', exit_when)
 

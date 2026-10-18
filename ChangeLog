@@ -1,4 +1,6 @@
 Unreleased
+	* hooks: Fix `exit_when_true()`, which always failed with a TypeError
+	(unless `function_takes_Task=True` was passed)
 	* file_store: Fix numpy structured arrays with object fields, which
 	could be saved but not loaded (zlib.error)
 	* file_store: Remove the temporary file when saving a result fails (e.g.,
