@@ -1,4 +1,6 @@
 Unreleased
+	* jug graph: Fix `--file-format`, which did not accept an argument (so
+	the output format could not be changed)
 	* Documentation: update all examples to match current behaviour (status
 	output format, default jugdir, and several code examples that did not
 	run as written)

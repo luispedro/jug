@@ -219,12 +219,11 @@ jug graph [jugfile] [options]
 
 | Option | Description |
 |--------|-------------|
-| `--file-format` | Currently just enables PNG rendering; the parser does not accept a format argument |
+| `--file-format FORMAT` | Format of the rendered graph (default: `png`); any format supported by `dot -T` (e.g. `svg`, `pdf`) |
 | `--no-status` | Don't annotate nodes with task counts |
 
 The DOT file is written to `<jugfile>.dot`. Jug also attempts to render
-`<jugfile>.png` via `dot` because the current implementation defaults the
-rendered format to PNG.
+`<jugfile>.<FORMAT>` (by default, `<jugfile>.png`) via `dot`.
 
 Node labels show counts per status: **F**ailed, **W**aiting, **R**eady,
 **A**ctive, **C**omplete.

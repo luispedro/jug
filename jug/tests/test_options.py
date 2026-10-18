@@ -186,6 +186,15 @@ def test_build_parser_has_subcommands():
     assert args.jugfile == 'jugfile.py'
 
 
+def test_graph_file_format():
+    parsed = jug.options.parse(['graph', 'jugfile.py', '--file-format', 'svg'])
+    assert parsed.graph_format == 'svg'
+    assert not parsed.argv
+
+    parsed = jug.options.parse(['graph', 'jugfile.py'])
+    assert parsed.graph_format == 'png'
+
+
 def test_print_completion(capsys):
     import pytest
     pytest.importorskip('shtab')
