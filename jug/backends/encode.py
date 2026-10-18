@@ -18,7 +18,14 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
+'''
+Serialization of results
 
+Objects are encoded as a zlib-compressed stream consisting of a one-byte
+prefix followed by the data: ``N`` for numpy arrays (of non-object dtype),
+which are saved with ``np.save``, or ``P`` for any other object, which is
+pickled. ``None`` is encoded as an empty stream.
+'''
 
 import pickle
 from io import BytesIO
@@ -31,15 +38,15 @@ def encode(object):
     '''
     s = encode(object)
 
-    Return a string (byte-array) representation of object.
+    Return a ``bytes`` representation of object.
 
     Parameters
     ----------
-      object : Any thing that is pickle()able
+    object : Any thing that is pickle()able
 
     Returns
     -------
-      s : string (byte array).
+    s : bytes
 
     See Also
     --------
@@ -81,6 +88,12 @@ def encode_to(object, stream):
 
 
 class compress_stream:
+    '''
+    Write-only file-like object which compresses (with zlib) what is written
+    to it before writing it to ``stream``
+
+    ``flush()`` must be called at the end to write out the remaining data.
+    '''
     def __init__(self, stream):
         self.stream = stream
         self.C = zlib.compressobj()
@@ -107,6 +120,10 @@ class compress_stream:
         self.stream.flush()
 
 class decompress_stream:
+    '''
+    Read-only file-like object which decompresses (with zlib) the data read
+    from ``stream``
+    '''
     def __init__(self, stream, block=8192):
         self.stream = stream
         self.D = zlib.decompressobj()

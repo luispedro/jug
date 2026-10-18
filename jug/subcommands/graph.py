@@ -45,8 +45,6 @@ def handle_tasklet(tlet):
 class GraphCommand(SubCommand):
     '''Graph: produce a diagram of task dependencies
 
-    graph(store, options)
-
     Implement 'graph' command
     '''
     name = "graph"

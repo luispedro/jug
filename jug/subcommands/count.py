@@ -34,8 +34,6 @@ __all__ = [
 class CountCommand(SubCommand):
     '''Simply count tasks
 
-    count(store, options)
-
     Print a count of task names.
 
     Parameters

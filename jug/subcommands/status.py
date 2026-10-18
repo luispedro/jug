@@ -295,8 +295,6 @@ def _status(options):
 class StatusCommand(SubCommand):
     '''Print status
 
-    status.run(options)
-
     Implements the status command. Like ``check``, returns 0 if all tasks are
     finished, 1 otherwise.
 

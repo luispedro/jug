@@ -18,7 +18,16 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
+'''
+Utilities for writing jugfiles
 
+- timed_path: a path whose hash includes the file's mtime and size
+- identity: identity function as a Task
+- jug_execute: run an external command as a Task
+- CustomHash: wrap an object with a custom hash function
+- sync_move: move a file after syncing its directory
+- cached_glob: glob (sorted), with the result cached in the store
+'''
 
 import argparse
 import fnmatch
@@ -157,8 +166,9 @@ def timed_path(path):
 
     Returns
     -------
-    opath : str
-        A task equivalent to ``(lambda: path)``.
+    opath : CustomHash
+        An object which is replaced by ``path`` when passed to a Task (but is
+        hashed using the mtime and size of the file).
     '''
     return CustomHash(path, hash_with_mtime_size)
 
@@ -330,6 +340,7 @@ def jug_execute(args, check_exit=True, run_after=None, return_value=None):
     args : list of str
     check_exit : boolean, optional
         If true (default), then a non-zero exit results in an exception
+        (``SystemError``)
     run_after : any, optional
         This is unused by the function, but can be used to order different
         calls to jug_execute
@@ -343,9 +354,10 @@ def jug_execute(args, check_exit=True, run_after=None, return_value=None):
     return return_value
 
 def sync_move(src, dst):
-    '''Sync the file and move it
+    '''Sync the directory containing the file and move it
 
-    This ensures that the move is truly atomic
+    This calls ``fsync`` on the directory containing ``src`` (not on the file
+    contents) and then renames ``src`` to ``dst``.
 
     Parameters
     ----------
@@ -384,6 +396,12 @@ def cached_glob(pat):
         CachedFunction(glob, pat)
 
     with the extra bonus that results are returned *sorted*
+
+    Note that, as with ``CachedFunction``, the glob is run while the jugfile
+    is being loaded and its result is cached in the store (as a
+    ``jug.utils.glob_sort`` task, which shows up in ``jug status``). Thus, new
+    files will **not** be picked up until this task is invalidated (e.g., with
+    ``jug invalidate --name jug.utils.glob_sort``).
 
     Parameters
     ----------

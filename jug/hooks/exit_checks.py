@@ -58,7 +58,7 @@ def exit_after_n_tasks(n):
 
 
 def exit_after_time(hours=0, minutes=0, seconds=0):
-    '''Exit after a specific number of tasks have been executed
+    '''Exit after a specific amount of time has elapsed
 
     Note that this only checks the time **after each task has finished
     executing**. Thus if you are using this to limit the amount of time each

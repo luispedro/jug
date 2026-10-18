@@ -45,19 +45,25 @@ def is_jug_running():
 
 def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     '''
-    store, jugspace = init(jugfile='jugfile.py', jugdir='jugdata', on_error='exit', store=None)
+    store, jugspace = init(jugfile={'jugfile.py'}, jugdir={'jugdata'}, on_error='exit', store=None)
 
     Initializes jug (create backend connection, ...).
     Imports jugfile
 
+    The jugfile is registered in ``sys.modules`` under its module name (the
+    filename without ``.py``), so that a subsequent ``import jugfile``
+    returns the same module (even if a barrier was hit while loading it).
+
     Parameters
     ----------
     jugfile : str, optional
-        jugfile to import (default: 'jugfile')
+        jugfile to import (default: 'jugfile.py')
     jugdir : str, optional
-        jugdir to use (could be a path)
+        jugdir to use (could be a path). If not given, 'jugdata' is used (see
+        ``set_jugdir``). Ignored if ``store`` is given.
     on_error : str, optional
-        What to do if import fails (default: exit)
+        What to do if import fails: 'exit' (default) prints the error and exits
+        the process, while 'propagate' re-raises the exception.
     store : storage object, optional
         If used, this is returned as ``store`` again.
 
@@ -71,7 +77,7 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     assert on_error in ('exit', 'propagate'), 'jug.init: on_error option is not valid.'
 
     if jugfile is None:
-        jugfile = 'jugfile'
+        jugfile = 'jugfile.py'
     if store is None:
         store = set_jugdir(jugdir)
 

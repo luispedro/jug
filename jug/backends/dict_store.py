@@ -163,7 +163,7 @@ class dict_store(base_store):
         for key in store.listlocks():
             ...
 
-        Iterates over all the keys in the store
+        Iterates over all the locks in the store
         '''
         for k in self.store.keys():
             if k.startswith(b'lock:'):
@@ -171,9 +171,23 @@ class dict_store(base_store):
 
 
     def getlock(self, name):
+        '''
+        lock = store.getlock(name)
+
+        Retrieve a lock object associated with ``name``.
+
+        Returns
+        -------
+        lock : dict_lock
+        '''
         return dict_lock(self.store, self.counts, name)
 
     def close(self):
+        '''
+        store.close()
+
+        If the store is backed by a file, save its contents to that file.
+        '''
         if self.backend is not None:
             with open(self.backend, 'wb') as ofile:
                 pickle.dump(self.store, ofile)

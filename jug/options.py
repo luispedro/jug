@@ -21,11 +21,16 @@
 '''
 Options
 
-Options
--------
+Options are kept in chained ``Options`` objects: looking up an attribute
+which is not set on an object falls through to the next object in the
+chain. ``parse()`` builds the chain: command line -> configuration files ->
+default options -> subcommand default options.
+
+Main options
+------------
 - jugdir: main jug directory.
 - jugfile: filesystem name for the Jugfile
-- cmd: command to run.
+- subcommand: command to run.
 - aggressive_unload: --aggressive-unload
 - invalid_name: --name (for invalidate)
 - invalid_pattern: --pattern (for invalidate)
@@ -40,6 +45,15 @@ import sys
 
 
 class Options:
+    '''
+    Chained options object
+
+    Attribute lookups that fail on this object are forwarded to ``next``
+    (another ``Options`` object, or ``None`` to end the chain).
+
+    If ``autoinit`` is given, it is called (once) with this object the first
+    time an attribute is looked up, so that default values can be set lazily.
+    '''
     def __init__(self, next, autoinit=False):
         self.next = next
         self._autoinit = autoinit
@@ -71,6 +85,12 @@ class Options:
 
 
 def load_default_options(opt):
+    '''
+    load_default_options(opt)
+
+    Set the default values of the common options on ``opt`` and chain it to
+    the subcommands' default options.
+    '''
     opt.jugdir = '%(jugfile)s.jugdata'
     opt.jugfile = 'jugfile.py'
     opt.subcommand = None
@@ -185,18 +205,26 @@ def _parse_config_file(fp, next_options, default_options=None):
 
 def read_configuration_file(fp=None, default_options=None):
     '''
-    options = read_configuration_file(fp='~/.config/jugrc',
-                                      default_options={'':'', ...})
+    options = read_configuration_file(fp=None, default_options=None)
 
-    Parse configuration file.
+    Parse configuration file(s).
 
     Parameters
     ----------
-    fp : inputfile, optional
-        File to read. If not given, use
-    default_options: dictionary, optional
-        Dictionary with the default values for all command-line arguments.
-        Used to convert settings in the config file to the correct object type.
+    fp : file-like object, optional
+        File to read. If not given, the first global configuration file found
+        among ``~/.config/jug/jugrc``, ``~/.config/jugrc`` and
+        ``~/.jug/configrc`` is read, followed by any local configuration files
+        (see ``find_local_configuration_files``), with closer files taking
+        precedence.
+    default_options : Options, optional
+        Options object with the default values for all command-line
+        arguments. Used to convert settings in the config file to the correct
+        type, and as the end of the returned options chain.
+
+    Returns
+    -------
+    options : Options
     '''
     if fp is not None:
         return _parse_config_file(fp, default_options, default_options=default_options)
@@ -348,9 +376,25 @@ def build_parser():
 
 def parse(args=None, optionsfile=None):
     '''
-    options.parse(args={sys.argv[1:]}, optionsfile=None)
+    options = parse(args={sys.argv[1:]}, optionsfile=None)
 
     Parse the command line options and set the option variables.
+
+    Note that ``sys.argv`` is rewritten to ``[jugfile] + user_args`` (the
+    arguments not consumed by jug), so that the jugfile sees its own
+    arguments.
+
+    Parameters
+    ----------
+    args : list of str, optional
+        Command line arguments (default: ``sys.argv[1:]``)
+    optionsfile : file-like object, optional
+        Configuration file to read (see ``read_configuration_file``)
+
+    Returns
+    -------
+    options : Options
+        Options chained as command line -> configuration files -> defaults
     '''
     import argparse
     from .subcommands import cmdapi
@@ -428,7 +472,10 @@ def set_jugdir(jugdir):
 
     Parameters
     ----------
-    jugdir : str
+    jugdir : str or store object
+        If ``None``, ``'jugdata'`` is used. A string is interpreted as for
+        ``--jugdir`` (see ``jug.backends.select``). Any other object is used
+        directly as the store.
 
     Returns
     -------

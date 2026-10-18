@@ -113,14 +113,10 @@ class WebStatusCommand(SubCommand):
         except ImportError:
             from sys import stderr
             stderr.write('''
-    webstatus subcommand requires that web.py be installed (it could not be found).
-    You can try one of the following commands to install it:
+    webstatus subcommand requires that bottle be installed (it could not be found).
+    You can install it with:
 
         pip install bottle
-
-    or
-
-        easy_install bottle
     ''')
             return
 

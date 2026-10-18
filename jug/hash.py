@@ -18,6 +18,13 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
+'''
+Hashing of task arguments
+
+Tasks are identified by a hash of their function and arguments, computed
+with the functions in this module. Objects can customize how they are hashed
+by implementing a ``__jug_hash__()`` method returning ``bytes``.
+'''
 
 # The pickle protocol is pinned (rather than using pickle's default, which
 # changes between Python versions: 4 up to Python 3.13, 5 from 3.14) so that
@@ -31,11 +38,18 @@ def hash_update(M, elems):
 
     Update the hash object ``M`` with the sequence ``elems``.
 
+    Objects which define a ``__jug_hash__()`` method (which must return
+    ``bytes``) are hashed by calling it. Lists, tuples, sets, frozensets,
+    dictionaries and numpy arrays are handled specially (recursively, and
+    independently of the iteration order for sets and dictionaries). Any
+    other object is hashed by pickling it.
+
     Parameters
     ----------
     M : hashlib object
         An object on which the update method will be called
     elems : sequence of 2-tuples
+        Pairs of ``(name, object)``
 
     Returns
     -------
@@ -110,11 +124,13 @@ def hash_one(obj):
     Parameters
     ----------
     obj : object
-        Hashable object
+        Any object that jug can hash (picklable, or implementing
+        ``__jug_hash__``)
 
     Returns
     -------
-    hvalue : str
+    hvalue : bytes
+        Hexadecimal digest
     '''
     h = new_hash_object()
     hash_update(h, [('hash1', obj)])

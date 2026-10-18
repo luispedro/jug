@@ -29,6 +29,13 @@ It can be used as a starting point (template) for writing new backends.
 from abc import ABCMeta, abstractmethod
 
 class base_store(metaclass=ABCMeta):
+    '''
+    Abstract base class for jug backends (stores)
+
+    Keys are normally task hashes, which are ``bytes`` objects (see
+    ``Task.hash``), and ``list()`` should yield ``bytes``. Backends should
+    also accept ``str`` keys.
+    '''
     def __init__(self, name):
         '''
         base_store(name)
@@ -51,7 +58,7 @@ class base_store(metaclass=ABCMeta):
         Parameters
         ----------
         object : anything
-        name : str
+        name : bytes or str
             Key to use
         '''
 
@@ -80,7 +87,7 @@ class base_store(metaclass=ABCMeta):
 
         Parameters
         ----------
-        name : str
+        name : bytes or str
             Key to use
 
         Returns
@@ -97,7 +104,7 @@ class base_store(metaclass=ABCMeta):
 
         Parameters
         ----------
-        name : str
+        name : bytes or str
             Key to use
 
         Returns
@@ -119,12 +126,12 @@ class base_store(metaclass=ABCMeta):
 
         Parameters
         ----------
-        names : iterable of str
+        names : iterable of bytes or str
             Keys
 
         Returns
         -------
-        removed : set of str
+        removed : set of bytes or str
             Keys that were actually removed
         '''
         removed = set()
@@ -144,7 +151,7 @@ class base_store(metaclass=ABCMeta):
 
         Parameters
         ----------
-        name : str
+        name : bytes or str
             Key
 
         Returns
@@ -198,7 +205,7 @@ class base_store(metaclass=ABCMeta):
 
         Parameters
         ----------
-        name : str
+        name : bytes or str
             Key
 
         Returns
@@ -233,6 +240,22 @@ class base_store(metaclass=ABCMeta):
         '''
 
     def metadata(self, t):
+        '''
+        meta = store.metadata(t)
+
+        Returns metadata on the stored result of task ``t`` (used by
+        ``jug.task.describe`` and ``jug.io.write_metadata``)
+
+        The default implementation returns ``None`` (no metadata).
+
+        Parameters
+        ----------
+        t : Task
+
+        Returns
+        -------
+        meta : dict or None
+        '''
         return None
 
 

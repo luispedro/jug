@@ -20,7 +20,7 @@
 #  THE SOFTWARE.
 
 '''
-file_store_monitor : part of file_store to keep locks alive during execution
+file_keepalive_monitor : part of file_keepalive_store to keep locks alive during execution
 '''
 
 from os import utime, getppid, kill

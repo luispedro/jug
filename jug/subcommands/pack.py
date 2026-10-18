@@ -34,8 +34,6 @@ __all__ = [
 class PackCommand(SubCommand):
     '''Pack small result files into a single file (file-based stores only)
 
-    pack(store, options)
-
     Executes pack subcommand
 
     Parameters

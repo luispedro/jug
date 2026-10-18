@@ -71,6 +71,27 @@ class Task(TaskletMixin):
 
         f(dep0, dep1,..., kw_arg0=kw_val0, kw_arg1=kw_val1, ...)
 
+    Any arguments that are themselves tasks (or lists/tuples/dicts containing
+    tasks) are replaced by their results before ``f`` is called.
+
+    A task is identified by a hash of the function (its module and name) and
+    of all its arguments (see ``Task.hash``). Its result is stored in the
+    store under this hash, so a task with the same function and arguments
+    will reuse a previously computed result.
+
+    ``f`` must be a named function (defined with ``def``); lambda functions
+    raise a ``ValueError`` (use ``Tasklet`` to apply a lambda to a task's
+    result).
+
+    Attributes
+    ----------
+    f : function
+        The function to be called
+    name : str
+        The fully qualified name of ``f`` (``module.function``)
+    result : object
+        The result of the task (loaded from the store if needed)
+
     See Also
     --------
 
@@ -82,8 +103,8 @@ class Task(TaskletMixin):
         if getattr(f, '__name__', '') == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
 
-Write an email to the authors if you feel you have a strong reason to use them (they are a bit
-tricky to support since the general code relies on the function name)''')
+Use a named function (defined with `def`) instead. To apply a lambda to the result of a
+task, use `Tasklet(task, lambda r: ...)`, which does accept lambda functions.''')
 
         self.name = f'{f.__module__}.{f.__name__}'
         self.f = f
@@ -135,6 +156,12 @@ tricky to support since the general code relies on the function name)''')
 
     result = property(_get_result, doc='Result value')
     def value(self):
+        '''
+        val = task.value()
+
+        Returns the result of the task, loading it from the store if needed
+        (same as ``task.result``)
+        '''
         return self.result
 
 
@@ -263,7 +290,7 @@ tricky to support since the general code relies on the function name)''')
         '''
         fname = t.hash()
 
-        Returns the hash for this task.
+        Returns the hash for this task (as a ``bytes`` object).
 
         The results are cached, so the first call can be much slower than
         subsequent calls.
@@ -361,6 +388,10 @@ tricky to support since the general code relies on the function name)''')
         Marks the task as failed
 
         If the lock was not held, an exception will be raised
+
+        Returns
+        -------
+        None
         '''
         return self._lock.fail()
 
@@ -375,8 +406,7 @@ tricky to support since the general code relies on the function name)''')
 
         See Also
         --------
-        lock : create lock
-        unlock : destroy lock
+        fail : mark task as failed
         '''
         if not hasattr(self, '_lock'):
             self._lock = self.store.getlock(self.hash())
@@ -508,8 +538,9 @@ def topological_sort(tasks):
     '''
     topological_sort(tasks)
 
-    Sorts a list of tasks topologically in-place. The list is sorted when
-    there is never a dependency between tasks[i] and tasks[j] if i < j.
+    Sorts a list of tasks topologically in-place. After sorting, a task never
+    depends on a task that comes after it in the list, i.e., ``tasks[i]`` never
+    depends on ``tasks[j]`` for ``j > i``.
     '''
     sorted = []
     whites = set(tasks)
@@ -557,13 +588,15 @@ def value(elem):
     '''
     value = value(obj)
 
-    Loads a task object recursively. This correctly handles lists,
-    dictionaries and any other type handled by the tasks themselves.
+    Loads a task object recursively. This correctly handles lists, tuples,
+    dictionaries and any other type handled by the tasks themselves. Objects
+    which define a ``__jug_value__()`` method are replaced by its return
+    value. Any other object is returned unchanged.
 
     Parameters
     ----------
     obj : object
-        Anything that can be pickled or a Task
+        A Task, a Tasklet, or any object (possibly containing tasks)
 
     Returns
     -------
@@ -594,8 +627,8 @@ def CachedFunction(f,*args,**kwargs):
             task.run()
         value = task.value()
 
-    That is, it calls the function if the value is available,
-    but caches the result for the future.
+    That is, it calls the function only if the value is **not** available
+    in the store, and caches the result for the future.
 
     You can often use ``bvalue`` to achieve similar results::
 
@@ -604,8 +637,8 @@ def CachedFunction(f,*args,**kwargs):
 
     This alternative method is more flexible, but will only be executed lazily.
     In particular, a ``jug status`` will not see past the ``bvalue`` call until
-    ``jug execute`` is called to execute ``f``, while a ``CachedFunction``
-    object will always execute.
+    ``jug execute`` is called to execute ``f``, while ``CachedFunction`` will
+    run ``f`` immediately (whenever no cached result is available).
 
     Parameters
     ----------
@@ -622,8 +655,6 @@ def CachedFunction(f,*args,**kwargs):
     bvalue : function
         An alternative way to achieve similar results to ``CachedFunction(f)``
         is using ``bvalue``.
-
-
     '''
     t = Task(f,*args, **kwargs)
     if not t.can_load():
@@ -646,6 +677,9 @@ class TaskGenerator:
     ``Task(f, arg0, arg1)``. This can make your jug-based code feel very
     similar to what you do with traditional Python.
 
+    The function must be defined at the top level of a module (not nested
+    inside another function or class), as tasks refer to it by its module
+    and name.
 
     Examples
     --------
@@ -761,10 +795,6 @@ def return_tuple(n):
 
         x,x1 = plus1(0)
 
-
-
-
-
     Parameters
     ----------
     n : int
@@ -791,6 +821,9 @@ def describe(t):
     Returns
     -------
     description : obj
+        Nested structure of dicts and lists. Each task is described by a
+        dict with its ``name`` and (if present) its ``args``, ``kwargs`` and
+        ``meta`` (metadata from the store), recursively.
     '''
     if isinstance(t, Task):
         description = { 'name': t.name, }

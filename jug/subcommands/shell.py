@@ -55,6 +55,9 @@ Jug Shell
 Available jug functions:
     - value() : loads a specific object
     - load_all() : loads all objects
+    - invalidate() : recursively invalidates a task
+    - get_tasks() : returns all tasks
+    - get_filtered_tasks() : returns tasks that are loadable/failed/available
 
 Enjoy...
 '''
@@ -86,8 +89,6 @@ def invalidate(tasklist, reverse, task):
 
 class ShellCommand(SubCommand):
     '''Run a shell after initialization
-
-    shell(store, options, jugspace)
 
     Implement 'shell' command.
 
@@ -151,6 +152,21 @@ class ShellCommand(SubCommand):
             return alltasks
 
         def _get_filtered_tasks(loadable=False, failed=False, available=False):
+            '''Returns a list of the tasks matching any of the given flags
+
+            The flags are OR-ed together: a task is returned if it matches at
+            least one of them (no flags returns an empty list).
+
+            Parameters
+            ----------
+            loadable : boolean, optional
+                Tasks whose results are available
+            failed : boolean, optional
+                Tasks which are in the failed state
+            available : boolean, optional
+                Tasks which are ready to run (dependencies done, but no
+                result yet)
+            '''
             return [t
                     for t in _get_tasks()
                     if (loadable and t.can_load()) or

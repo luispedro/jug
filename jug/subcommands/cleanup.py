@@ -31,8 +31,6 @@ __all__ = [
 class CleanupCommand(SubCommand):
     '''Cleanup: remove result files that are not used
 
-    cleanup(store, options)
-
     Implement 'cleanup' command
     '''
     name = "cleanup"

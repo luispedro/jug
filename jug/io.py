@@ -5,6 +5,9 @@
 Jug.IO module
 
 - write_task_out: write out results, possibly with metadata.
+- write_metadata: write out metadata on a computation.
+- NoLoad: pass a Task (rather than its result) to another Task.
+- print_task_summary_table: print a table of task counts (used by subcommands).
 '''
 
 from .task import TaskGenerator, Tasklet
@@ -79,9 +82,13 @@ def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     If ``metadata_fname`` is not None, it should be the name of a file to which
     to write metadata on the computation (see ``jug.task.describe``).
 
+    This function returns a Task (which does the writing), so it must be
+    called from the jugfile (like any other task) and the output is only
+    written when that task is executed.
+
     Parameters
     ----------
-    result: a Task object
+    result : a Task object
     oname : str
         The target output filename
     metadata_fname : str, optional
@@ -89,6 +96,11 @@ def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     metadata_format : str, optional
         What format to write data in. Currently, 'yaml' (which requires
         PyYAML) & 'json' are supported.
+
+    Returns
+    -------
+    task : Task
+        The task that writes the output
     '''
 
     return _do_write_task_out(result, NoLoad(result), oname, metadata_fname, metadata_format)
@@ -99,15 +111,23 @@ def write_metadata(result, metadata_fname, metadata_format='yaml'):
 
     Write out the metadata on a Task out.
 
+    This function returns a Task (which does the writing), so it must be
+    called from the jugfile (like any other task) and the output is only
+    written when that task is executed.
 
     Parameters
     ----------
-    result: a Task object
+    result : a Task object
     metadata_fname : str
         metadata will be written to this file.
     metadata_format : str, optional
         What format to write data in. Currently, 'yaml' (which requires
         PyYAML) & 'json' are supported.
+
+    Returns
+    -------
+    task : Task
+        The task that writes the metadata
     '''
 
     return _do_write_task_out(result, NoLoad(result), None, metadata_fname, metadata_format)
@@ -117,7 +137,7 @@ def write_metadata(result, metadata_fname, metadata_format='yaml'):
 def print_task_summary_table(options, groups):
     """Print task summary table given tasks groups.
 
-    groups - [(group_title, {(task_name, count)})] grouped summary of tasks.
+    groups - [(group_title, {task_name: count})] grouped summary of tasks.
     """
     if options.short:
         for name,gv in groups:
@@ -167,10 +187,10 @@ import subprocess
 
 def get_terminal_size():
     """ get_terminal_size()
-     - get width and height of console
-     - works on linux,os x,windows,cygwin(windows)
-     originally retrieved from:
-     https://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
+     - get width and height of console, as a tuple ``(columns, lines)``
+     - on Linux, macOS and cygwin, uses ``os.get_terminal_size()``
+     - on Windows, uses the console API (or ``tput`` as a fallback)
+     - returns ``(80, 25)`` if the size cannot be determined
     """
     current_os = platform.system()
     tuple_xy = None

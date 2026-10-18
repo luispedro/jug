@@ -119,9 +119,19 @@ def _make_temp_file(tempdir):
 class file_store(base_store):
     def __init__(self, dname, compress_numpy=False):
         '''
-        file_store(dname)
+        file_store(dname, compress_numpy=False)
 
-        Recursively create directories.
+        Initialise a file-based store. Directories are not created here, but
+        only when needed (see ``create()``).
+
+        Parameters
+        ----------
+        dname : str
+            Directory to use (the jugdir)
+        compress_numpy : boolean, optional
+            If true, numpy arrays and polars DataFrames are stored compressed
+            (like any other object) instead of in their native formats
+            (``.npy`` and parquet, respectively). Default: False
         '''
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
@@ -170,10 +180,12 @@ class file_store(base_store):
 
         Performs roughly the same as
 
-        pickle.dump(value, open(name,'w'))
+        pickle.dump(value, open(name,'wb'))
 
         but does it in a way that is guaranteed to be atomic even over NFS and
-        using compression on the disk for faster access.
+        using compression on the disk for faster access. Numpy arrays and
+        polars DataFrames are stored in their native formats (``.npy`` and
+        parquet), unless ``compress_numpy`` was set.
         '''
         if name in self.packed:
             del self.packed[name]
@@ -202,7 +214,7 @@ class file_store(base_store):
         for f in store._iter_filekeys():
             ...
 
-        Internal. Use `self.keys()`
+        Internal. Use `self.list()`
 
         '''
         if not exists(self.jugdir):
@@ -222,6 +234,20 @@ class file_store(base_store):
         return list(self.packed.keys()) + list(self._iter_filekeys())
 
     def update_pack(self):
+        '''
+        nr_packed = store.update_pack()
+
+        Moves all result files of at most ``MAX_FILESIZE_IN_PACK`` bytes into
+        the pack file (which backs ``jug pack``).
+
+        Note that the whole pack is loaded into memory by every process that
+        opens the store.
+
+        Returns
+        -------
+        nr_packed : int
+            Number of results that were moved into the pack
+        '''
         to_remove = []
         for k in self._iter_filekeys():
             f = self._getfname(k)
@@ -238,6 +264,11 @@ class file_store(base_store):
 
 
     def resave_pack(self):
+        '''
+        store.resave_pack()
+
+        Writes the in-memory pack to disk (atomically, holding a lock)
+        '''
         os.makedirs(path.join(self.jugdir, 'packs'), exist_ok=True)
         lock = self.getlock('pack-save')
         for i in range(10):
@@ -329,9 +360,14 @@ class file_store(base_store):
 
     def remove_many(self, names):
         '''
-        store.remove_many(names)
+        removed = store.remove_many(names)
 
         Removes the objects with the given names from the store.
+
+        Returns
+        -------
+        removed : set
+            Names that were actually removed
         '''
         removed = set()
         for name in names:
@@ -436,7 +472,7 @@ class file_store(base_store):
         Returns
         -------
         lock : Lock object
-            This is a file_lock object
+            This is a file_based_lock object
         '''
         return file_based_lock(self.jugdir, name)
 
@@ -612,7 +648,7 @@ class file_keepalive_store(file_store):
         Returns
         -------
         lock : Lock object
-            This is a file_lock object
+            This is a file_keepalive_based_lock object
         '''
         return file_keepalive_based_lock(self.jugdir, name)
 

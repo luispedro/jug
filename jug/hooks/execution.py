@@ -6,6 +6,11 @@ def _mean(vs):
     return sum(vs)/float(len(vs))
 
 class TimeTasks:
+    '''
+    Collects the execution time of each task (grouped by task name)
+
+    Used by ``register_time_tasks``.
+    '''
     def __init__(self):
         from collections import defaultdict
         self.times = defaultdict(list)

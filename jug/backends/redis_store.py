@@ -56,6 +56,19 @@ _redis_urlpat = re.compile(r'redis://(?P<host>[A-Za-z0-9\.\-]+)(\:(?P<port>[0-9]
 class redis_store(base_store):
     def __init__(self, url):
         '''
+        redis_store(url)
+
+        Initialise a Redis-based store (requires the ``redis`` Python package)
+
+        Parameters
+        ----------
+        url : str
+            URL of the form ``redis://host`` or ``redis://host:port`` (e.g.,
+            ``redis://127.0.0.1:6379/``). A database number cannot be
+            specified (anything after the port is ignored). If ``url`` does
+            not match this format (e.g., just ``redis:``), the default
+            connection parameters of ``redis.Redis()`` are used (i.e., the
+            default port on localhost).
         '''
         if not redis_functional:
             raise OSError('jug.redis_store: redis module is not found!')
@@ -117,8 +130,20 @@ class redis_store(base_store):
         nr_removed = store.cleanup(active, keeplocks=False)
 
         Implement 'cleanup' command
-        '''
 
+        Parameters
+        ----------
+        active : sequence of Tasks
+            tasks whose results are *not to be removed*
+        keeplocks : boolean, optional
+            whether to preserve or remove locks (default: remove them)
+
+        Returns
+        -------
+        nr_removed : integer
+            number of removed result objects (removed locks are *not*
+            included in this count; see ``remove_locks()``)
+        '''
 
         existing = set(self.list())
         existing -= set(act.hash() for act in active)
@@ -133,27 +158,63 @@ class redis_store(base_store):
         return cleaned
 
     def remove_locks(self):
+        '''
+        removed = store.remove_locks()
+
+        Remove all locks
+
+        Returns
+        -------
+        removed : int
+            Number of locks removed
+        '''
         locks = self.redis.keys('lock:*')
         for lk in locks:
             self.redis.delete(lk)
         return len(locks)
 
     def list(self):
+        '''
+        for key in store.list():
+            ...
+
+        Iterates over all the keys in the store
+        '''
         existing = self.redis.keys('result:*')
         for ex in existing:
             yield ex[len('result:'):]
 
     def listlocks(self):
+        '''
+        for key in store.listlocks():
+            ...
+
+        Iterates over all the locks in the store
+        '''
         locks = self.redis.keys('lock:*')
         for lk in locks:
             yield lk[len('lock:'):]
 
 
     def getlock(self, name):
+        '''
+        lock = store.getlock(name)
+
+        Retrieve a lock object associated with ``name``.
+
+        Returns
+        -------
+        lock : redis_lock
+        '''
         return redis_lock(self.redis, name)
 
 
     def close(self):
+        '''
+        store.close()
+
+        Close the connection to the Redis server.
+        '''
         # It seems some versions of the protocol are implemented differently
         # and do not have the ``disconnect`` method
         try:

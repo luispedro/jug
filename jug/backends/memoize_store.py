@@ -29,6 +29,20 @@ from .base import base_store, base_lock
 class memoize_store(base_store):
     def __init__(self, base, list_base=False):
         '''
+        store = memoize_store(base, list_base=False)
+
+        Wraps ``base``, caching the results of ``can_load`` and of the lock
+        state queries. Only these queries are supported; other operations
+        raise ``NotImplementedError``.
+
+        Parameters
+        ----------
+        base : store
+            The store to wrap
+        list_base : boolean, optional
+            If true, the keys and locks of ``base`` are listed once (when the
+            wrapper is created) and the queries are answered from these lists,
+            instead of querying ``base`` for each key (default: False)
         '''
         self.base = base
         self.cache = {}
@@ -41,14 +55,14 @@ class memoize_store(base_store):
 
     def dump(self, object, outname):
         '''
-        dump(outname, object)
+        store.dump(object, outname)
         '''
         raise NotImplementedError
 
 
     def can_load(self, name):
         '''
-        can = can_load(name)
+        can = store.can_load(name)
         '''
         if self.keys is not None:
             return name in self.keys
@@ -79,7 +93,7 @@ class memoize_store(base_store):
 
     def load(self, name):
         '''
-        obj = load(name)
+        obj = store.load(name)
 
         Loads the objects. Equivalent to pickle.load(), but a bit smarter at times.
         '''
@@ -88,7 +102,7 @@ class memoize_store(base_store):
 
     def remove(self, name):
         '''
-        was_removed = remove(name)
+        was_removed = store.remove(name)
 
         Remove the entry associated with name.
 
@@ -111,7 +125,7 @@ class memoize_store(base_store):
 
     def cleanup(self, active, keeplocks=False):
         '''
-        cleanup()
+        nr_removed = store.cleanup(active, keeplocks=False)
 
         Implement 'cleanup' command
         '''
@@ -133,9 +147,11 @@ class cache_lock(base_lock):
 
     Methods:
 
-    - get(): acquire the lock
-    - release(): release the lock
+    - get(): acquire the lock (not implemented)
+    - release(): release the lock (not implemented)
     - is_locked(): check lock state
+    - fail(): mark task as failed (not implemented)
+    - is_failed(): check if task is failed
     '''
 
     def __init__(self, base, name, locks):

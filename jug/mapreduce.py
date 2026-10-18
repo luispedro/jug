@@ -16,6 +16,7 @@ from itertools import chain
 __all__ = [
     'mapreduce',
     'map',
+    'currymap',
     'reduce',
     ]
 
@@ -64,13 +65,15 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
 
         reduce(reducer, map(mapper, inputs))
 
-    Roughly because the order of operations might be different. In particular,
-    `reducer` should be a true `reducer` functions (i.e., commutative and
-    associative).
+    Roughly because the grouping of operations might be different (the order
+    of the inputs is preserved). In particular, `reducer` should be
+    associative (it does not need to be commutative).
+
+    If ``inputs`` is empty, the result is ``identity([])``.
 
     Parameters
     ----------
-    reducer : associative, commutative function
+    reducer : associative function
             This should map
                   Y_0,Y_1 -> Y'
     mapper : function from X -> Y
@@ -98,6 +101,9 @@ def mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8):
         assert False, 'This is a bug'
 
 class block_access_slice(TaskletMixin):
+    '''
+    A slice of a ``block_access`` object (see ``map``)
+    '''
     __slots__ = ('base', 'start', 'stop', 'stride', '_hvalue')
     def __init__(self, access, orig):
         self.base = access
@@ -140,6 +146,13 @@ class block_access_slice(TaskletMixin):
 
 
 class block_access(TaskletMixin):
+    '''
+    List-like view over the results of the tasks created by ``map``
+
+    Each of the ``blocks`` (tasks) returns a list of up to ``block_size``
+    elements. Indexing returns the corresponding element (as a Tasklet) and
+    slicing returns a ``block_access_slice``.
+    '''
     __slots__ = ('blocks','block_size', 'len','_hvalue')
     def __init__(self, blocks, block_size, len):
         self.blocks = blocks
@@ -211,8 +224,10 @@ def map(mapper, sequence, map_step=4):
 
     Returns
     -------
-    sequence' : list of B
-        sequence'[i] = mapper(sequence[i])
+    sequence' : sequence of B
+        sequence'[i] = mapper(sequence[i]). If ``map_step == 1``, this is a
+        list of tasks. Otherwise, it is a list-like object (supporting
+        ``len()``, indexing and slicing), which can be passed to other tasks.
 
     See Also
     --------
@@ -277,12 +292,23 @@ def reduce(reducer, inputs, reduce_step=8):
     '''
     task = reduce(reducer, inputs, reduce_step=8)
 
+    Create a task that does roughly the following::
+
+        functools.reduce(reducer, inputs)
+
+    Roughly because the grouping of operations might be different (the order
+    of the inputs is preserved). In particular, `reducer` should be
+    associative (it does not need to be commutative).
+
+    If ``inputs`` is empty, the result is ``identity([])``.
+
     Parameters
     ----------
-    reducer : associative, commutative function
+    reducer : associative function
             This should map
                   Y_0,Y_1 -> Y'
-    inputs : list of X
+    inputs : list of Y
+        Tasks or values
     reduce_step : integer, optional
             Number of reduce operations to do in one go.
             (default: 8)

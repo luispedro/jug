@@ -35,8 +35,6 @@ __all__ = [
 class CheckCommand(SubCommand):
     '''Returns 0 if all tasks are finished. 1 otherwise.
 
-    check(store, options)
-
     Executes check subcommand
 
     Parameters
@@ -54,16 +52,17 @@ class CheckCommand(SubCommand):
 class SleepUntilCommand(SubCommand):
     '''Wait until all tasks are done, then exit.
 
-    sleep_until(store, options)
-
     Execute sleep-until subcommand
+
+    If the jugfile contains barriers, it is re-imported (using
+    ``options.jugfile`` and ``options.jugdir``) whenever all the tasks seen so
+    far are done, until no barrier is hit.
 
     Parameters
     ----------
     store : jug.backend
             backend to use
     options : jug options
-        ignored
     '''
     name = "sleep-until"
 

@@ -87,9 +87,11 @@ the ``run()`` method as part of the ``options`` object.
 
 The second defines default values in case of omission. The ``key`` should match
 the ``dest=`` attribute of ``add_argument()`` and the ``value`` should be any object
-to be used by your ``run()`` method. Note that the value received in the command-line
-will be automatically converted to the same type as this default (i.e. if your default
-is ``True`` any ``--tofile john`` would result in ``bool("john") -> True``).
+to be used by your ``run()`` method. Note that values given in a configuration file
+(``jugrc``) are automatically converted to the same type as this default (for booleans,
+the strings ``0``, ``false``, ``off`` and the empty string are ``False``; anything else
+is ``True``). Values given on the command-line are used as returned by ``argparse``
+(use ``type=`` in ``add_argument()`` if you need a conversion).
 
 For more information on parser configuration refer to ``argparse``'s documentation.
 
@@ -123,7 +125,7 @@ class SubCommandError(Exception):
 
 
 class NoSuchCommandError(Exception):
-    "Exception raised when a subcommand doesn't respect the API"
+    "Exception raised when an unknown subcommand is requested"
 
 
 def _get_helptext(command):

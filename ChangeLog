@@ -12,6 +12,8 @@ Unreleased
 	tempfiles/
 	* jug graph: Fix `--file-format`, which did not accept an argument (so
 	the output format could not be changed)
+	* jug.init(): Fix calling it without a jugfile argument, which failed
+	(it now defaults to 'jugfile.py', as documented)
 	* Documentation: update all examples to match current behaviour (status
 	output format, default jugdir, and several code examples that did not
 	run as written)

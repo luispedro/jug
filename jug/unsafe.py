@@ -18,6 +18,12 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
+'''
+Unsafe utilities: use with care, as they can make jug reuse results which
+are no longer valid.
+
+- NoHash: pass an object to a Task without it being included in the hash.
+'''
 
 __all__ = [
     'NoHash',

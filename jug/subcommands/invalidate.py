@@ -35,8 +35,6 @@ __all__ = [
 class InvalidateCommand(SubCommand):
     '''Invalidate the results of a task
 
-    invalidate(store, options)
-
     Implements 'invalidate' command
 
     Parameters
