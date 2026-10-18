@@ -28,9 +28,10 @@ class TimeTasks:
 def register_time_tasks():
     '''register_time_tasks()
 
+    Time each task and print a summary at the end of ``jug execute``
+
     Call this function in your jugfile to trigger printing a timing summary at
     the end of jug execute::
-
 
         from jug.hooks.execution import register_time_tasks
         register_time_tasks()

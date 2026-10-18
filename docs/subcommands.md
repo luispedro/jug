@@ -24,6 +24,39 @@ while not all_done():
 
 The actual code is much more complex, of course.
 
+`jug execute` accepts the following options:
+
+`--name NAME`, `--pattern PATTERN`
+: Only execute the tasks that match, using the same rules as
+  [invalidate](#invalidate). Dependencies are not added automatically: a
+  matching task whose inputs have not been computed (by another process) just
+  waits for them.
+
+`--keep-going`
+: By default, a process stops at the first task that raises an exception.
+  With `--keep-going`, it logs the error and continues with the remaining
+  tasks (it still exits with status 1 at the end).
+
+`--keep-failed`
+: Normally, the lock of a task that failed is released, so another process
+  will try it again. With `--keep-failed`, the lock is kept and marked as
+  failed: `jug status` lists the task as *Failed* and no process runs it
+  again until you run `jug cleanup --failed-only` (or `--locks-only`).
+
+`--wait-cycle-time SECONDS`, `--nr-wait-cycles N`
+: When no task is ready to run (because the remaining tasks are waiting for
+  results that other processes are still computing), jug sleeps for
+  `--wait-cycle-time` seconds (default: 12) and checks again, up to
+  `--nr-wait-cycles` times (default: 150, so that the total is 30 minutes),
+  before giving up.
+
+`--no-check-environment`
+: Do not check the `JUG_*` environment variables or the
+  `__jug_please_stop_running.txt` file (see [Early exit](exit.md)).
+
+`jug-execute jugfile.py [OPTIONS]` is a shortcut for `jug execute
+jugfile.py [OPTIONS]` (it is installed alongside `jug`).
+
 ### status
 
 You can check the status of your computation at any time with status. Like
@@ -64,7 +97,76 @@ or a regular expression written as `/regex/`).
 
 ### cleanup
 
-Removes all elements in the store that are not used by your jugfile.
+Removes all elements in the store that are not used by your jugfile, as well
+as all locks. The following (mutually exclusive) options change what is
+removed:
+
+`--locks-only`
+: Remove all locks, but keep all results. This is useful if processes were
+  killed and left behind locks for tasks that are no longer running. **Do not
+  run it while other processes are executing tasks**, as their locks would be
+  removed too.
+
+`--failed-only`
+: Remove only the locks of failed tasks (see `jug execute --keep-failed`),
+  so that those tasks can be run again.
+
+`--keep-locks`
+: Remove unused results, but keep all locks.
+
+### count
+
+Prints the number of tasks of each type (i.e., the number of tasks with the
+same name). Unlike `status`, it does not check which tasks have run.
+
+### graph
+
+Writes a diagram of the dependencies between task types to `jugfile.dot` (for
+`jugfile.py`), in [Graphviz](https://graphviz.org/) format, and runs the
+`dot` command to render it to `jugfile.png`. Each node is labelled with the
+number of failed (F), waiting (W), ready (R), active (A) and complete (C)
+tasks of that type.
+
+`--file-format FORMAT`
+: Render to another format supported by `dot` (e.g., `svg` or `pdf`)
+  instead of `png`.
+
+`--no-status`
+: Leave out the task counts (which require checking the store for every
+  task).
+
+If Graphviz is not installed, the `.dot` file is still written and can be
+rendered later.
+
+### webstatus
+
+Starts a web server showing the status of the computation in a table that is
+refreshed every 3 seconds (add `?refresh=N` to the URL to change this). It
+requires [bottle](https://bottlepy.org/) (`pip install bottle`).
+
+`--port PORT`
+: The port to listen on (default: 8080).
+
+`--ip IP`
+: The address to listen on (default: `localhost`). Use `0.0.0.0` to make the
+  page reachable from other machines.
+
+### pack
+
+Combines small result files (up to 512 bytes) of a filesystem jugdir into a
+single file (`packs/jugpack` inside the jugdir), which reduces the number of
+files. This only works with the default filesystem backend. Run it when no
+other jug processes are using the jugdir.
+
+### demo
+
+Creates a directory called `jug-demo/` with an example jugfile (`primes.py`)
+and prints instructions on how to run it.
+
+### test-jug
+
+Runs jug's internal test suite (requires `pytest`). This is useful to check
+whether jug works correctly on your system.
 
 ### install-skills
 

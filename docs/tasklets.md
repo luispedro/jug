@@ -62,3 +62,25 @@ next = Task(next_function, result[0])
 ```
 
 Now, we have a version that is both idiomatic Python and efficient.
+
+## Functions that return tuples
+
+If a function returns a tuple of known size, the `jug.task.return_tuple`
+decorator makes the `TaskGenerator` return a tuple of Tasklets, so the result
+can be unpacked directly:
+
+```
+from jug import TaskGenerator
+from jug.task import return_tuple
+
+@return_tuple(2)
+@TaskGenerator
+def min_max(xs):
+    return min(xs), max(xs)
+
+lo, hi = min_max(values)
+```
+
+Here, `lo` and `hi` are Tasklets (equivalent to `min_max(values)[0]` and
+`min_max(values)[1]`). There is still a single task, and its result is checked
+to have exactly 2 elements when it is used.

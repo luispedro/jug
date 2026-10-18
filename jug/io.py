@@ -73,8 +73,11 @@ def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
 
     Write out the results of a Task to file, possibly including metadata.
 
+    The result is written in ``.npy`` format if it is a numpy array (use
+    ``numpy.load`` to read it), and pickled otherwise.
+
     If ``metadata_fname`` is not None, it should be the name of a file to which
-    to write metadata on the computation.
+    to write metadata on the computation (see ``jug.task.describe``).
 
     Parameters
     ----------
@@ -84,7 +87,8 @@ def write_task_out(result, oname, metadata_fname=None, metadata_format='yaml'):
     metadata_fname : str, optional
         If not None, metadata will be written to this file.
     metadata_format : str, optional
-        What format to write data in. Currently, 'yaml' & 'json' are supported.
+        What format to write data in. Currently, 'yaml' (which requires
+        PyYAML) & 'json' are supported.
     '''
 
     return _do_write_task_out(result, NoLoad(result), oname, metadata_fname, metadata_format)
@@ -102,7 +106,8 @@ def write_metadata(result, metadata_fname, metadata_format='yaml'):
     metadata_fname : str
         metadata will be written to this file.
     metadata_format : str, optional
-        What format to write data in. Currently, 'yaml' & 'json' are supported.
+        What format to write data in. Currently, 'yaml' (which requires
+        PyYAML) & 'json' are supported.
     '''
 
     return _do_write_task_out(result, NoLoad(result), None, metadata_fname, metadata_format)

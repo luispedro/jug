@@ -7,15 +7,32 @@ synchronises the running processes when needed.
 
 ## What Backends Are Available?
 
-There are three backends available: one is based on the filesystem, the other is a
-[redis](https://redis.io/) backend and a simple in-memory backend which does
-not allow sharing across processes.
+There are four backends available: the default one is based on the
+filesystem, a variation of it (`file_keepalive`) can detect processes that
+died, the third is a [redis](https://redis.io/) backend, and the last is a
+simple in-memory backend which does not allow sharing across processes.
 
 ### Filesystem
 
 By default, jug will save its results in a directory named after the jugfile
 (e.g., `jugfile.jugdata` for `jugfile.py`). This
 is done in a way that works across **NFS** if you are using a cluster.
+
+Results are compressed pickles, except that numpy arrays are saved in numpy's
+`.npy` format and [polars](https://pola.rs/) DataFrames as parquet files.
+
+### Filesystem with keepalive
+
+If a jug process is killed (e.g., by the cluster's job scheduler) while it is
+running a task, the lock for that task is left behind and no other process
+will run it (until you run `jug cleanup --locks-only`). The `file_keepalive`
+backend avoids this problem. Use it with `--jugdir=file_keepalive:path`
+(e.g., `--jugdir=file_keepalive:jugfile.jugdata`). It stores results exactly
+as the default filesystem backend (so you can switch between them), but, while
+a task runs, a helper process refreshes the timestamp of its lock every 5
+minutes. A lock that has not been refreshed for 30 minutes is considered
+*failed*: `jug status` lists the task as Failed, and `jug cleanup
+--failed-only` removes those locks so that the tasks can be run again.
 
 ### Redis
 

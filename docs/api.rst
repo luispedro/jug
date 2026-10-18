@@ -18,10 +18,16 @@ API Documentation
     :members:
 
 .. automodule:: jug.hooks
-    :members:
+    :members: register_hook, register_hook_once
 
 .. automodule:: jug.hooks.exit_checks
     :members:
 
+.. automodule:: jug.hooks.execution
+    :members: register_time_tasks
+
 .. automodule:: jug.io
+    :members:
+
+.. automodule:: jug.unsafe
     :members:

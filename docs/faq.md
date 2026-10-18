@@ -170,9 +170,10 @@ Short answer: No.
 
 Long answer: Yes, with a little bit of special code. If you have another way to
 get them from one machine to another, you could write a special backend for
-that. Right now, only `numpy` arrays are treated as a special case (they are
-not pickled, but rather saved in their native format), but you could extend
-this. Ask on the [mailing list](https://groups.google.com/group/jug-users) if
+that. Right now, only `numpy` arrays and `polars` DataFrames are treated as
+special cases by the filesystem backend (they are not pickled, but rather saved
+in their native formats: `.npy` and parquet, respectively), but you could
+extend this. Ask on the [mailing list](https://groups.google.com/group/jug-users) if
 you want to learn more.
 
 ## Is jug based on a background server?

@@ -62,12 +62,26 @@ def register_hook_once(name, code, f):
 def register_hook(name, f=None):
     '''Register a hook
 
-    Known hooks
+    Known hooks (all called by ``jug execute``; return values are ignored):
+
+    execute.task-loadable(Task)
+        A task was skipped because its result is already available.
+
+    execute.task-pre-execute(Task)
+        A task is about to be executed (its lock has been acquired).
 
     execute.task-executed1(Task)
-        A single task has been executed. This hook can call ``sys.exit`` to
-        exit the jug process (technically, it needs to raise SystemExit).
-        Return values are ignored.
+        A single task has been executed successfully (it is not called if the
+        task raised an exception). This hook can call ``sys.exit`` to exit the
+        jug process (technically, it needs to raise SystemExit).
+
+    execute.finished_pre_status()
+        ``jug execute`` has finished running tasks (because all tasks are done,
+        or because it gave up waiting), and the summary table is about to be
+        printed.
+
+    execute.finished_post_status()
+        The summary table has been printed.
 
     Parameters
     ----------

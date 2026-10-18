@@ -1,5 +1,10 @@
 # Early exit
 
+`jug execute` can be told to exit early (i.e., before all tasks are done),
+either with environment variables or with code in the jugfile (which uses
+[hooks](hooks.md)). Afterwards, you can start new processes to continue the
+computation.
+
 Note that, in all cases, _the process will only exit after finishing a task_.
 If you set a time limit and that time is reached while a task is running, then
 the task will keep going.
@@ -44,3 +49,10 @@ from jug.hooks.exit_checks import exit_after_n_tasks
 exit_after_n_tasks(int(environ['JUG_MAX_TASKS']))
 ```
 
+
+## Disabling the checks
+
+`jug execute --no-check-environment` ignores the `JUG_*` environment variables
+listed above as well as the `__jug_please_stop_running.txt` file (and the file
+given by `JUG_EXIT_IF_FILE_EXISTS`). Checks set up in code in the jugfile are
+not affected.

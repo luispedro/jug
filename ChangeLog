@@ -15,6 +15,9 @@ Unreleased
 	* Documentation: update all examples to match current behaviour (status
 	output format, default jugdir, and several code examples that did not
 	run as written)
+	* Documentation: document the subcommands and options that were missing
+	(count, graph, webstatus, pack, demo, test-jug, and the options of
+	execute and cleanup), the file_keepalive backend, and hooks
 	* jug --help: Fix description of `jug pack` and of the `--jugdir`
 	default
 	* jug pack: Fix crash (zlib.error) when the jugdir contains small numpy

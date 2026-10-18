@@ -40,3 +40,11 @@ I have also moved the import of `mahotas.imread` to inside the `process`
 function. This is another micro-optimisation: it makes `jug status` and
 friends just that little bit faster (as they do not need to perform this import
 to do their jobs).
+
+## How results are stored
+
+By default, results are pickled and compressed. With the default filesystem
+backend, numpy arrays are instead saved in numpy's `.npy` format and
+[polars](https://pola.rs/) DataFrames as parquet files, which is faster and
+does not require pickling (numpy arrays with `dtype=object` are still
+pickled).

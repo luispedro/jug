@@ -14,10 +14,11 @@ If you use Jug to generate results for a scientific publication, please cite
 Jug allows you to write code that is broken up into tasks and run different
 tasks on different processors.
 
-It currently has two backends. The first uses the filesystem to communicate
-between processes and works correctly over NFS, so you can coordinate processes
-on different machines. The second is based on redis so the processes only need
-the capability to connect to a common redis server.
+Its main backend uses the filesystem to communicate between processes and
+works correctly over NFS, so you can coordinate processes on different
+machines. Another is based on redis so the processes only need the capability
+to connect to a common redis server. See [backends](backends.md) for all
+options.
 
 Jug also takes care of saving all the intermediate results to the backend in a
 way that allows them to be retrieved later.
@@ -121,6 +122,7 @@ segmentation-example
 subcommands
 status
 exit
+hooks
 shell
 types
 tasks

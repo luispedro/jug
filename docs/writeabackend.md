@@ -21,6 +21,12 @@ Your backend should support a similar scheme.
 You can start with the file `jug/backends/base.py` which provides a
 template with documentation. Implement the functions in there.
 
+`jug status` wraps the store in `jug.backends.memoize_store`, which caches
+the answers of `can_load` and of the lock status checks. If the backend
+implements `list()` and `listlocks()`, `memoize_store` calls them once at
+the start, instead of checking every task (and every lock) separately, which
+makes `jug status` much faster for backends where each check is slow.
+
 ```{eval-rst}
 .. automodule:: jug.backends.base
     :members: base_store, base_lock

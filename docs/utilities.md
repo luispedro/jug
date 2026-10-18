@@ -1,7 +1,8 @@
 # Utilities
 
 The module `jug.utils` has a few functions which are meant to be used in
-writing jugfiles.
+writing jugfiles (a few more are in `jug.task` and `jug.io`, see the end of
+this page).
 
 ## Identity
 
@@ -154,6 +155,26 @@ jug_execute(['SemiBin2', 'single_easy_bin',
                 '--output', 'output'
                 ])
 ```
+
+## Inspecting tasks
+
+`jug.task.describe(t)` returns a description of how the result of task `t`
+is computed, as nested dictionaries and lists with the name of each task and
+its arguments (recursively including the tasks it depends on).
+
+`jug.task.recursive_dependencies(t, max_level=-1)` iterates over all the
+tasks that `t` depends on, directly or indirectly (use `max_level` to limit
+the depth).
+
+## Writing results to files
+
+`jug.io.write_task_out(t, 'output.pkl')` creates a task that writes the
+result of task `t` to a file: numpy arrays are saved in `.npy` format (load
+them with `numpy.load`), and everything else is pickled. If you also pass
+`metadata_fname`, the output of `describe(t)` is written to that file, in
+YAML (the default, which requires [PyYAML](https://pyyaml.org/)) or JSON
+(`metadata_format='json'`). `jug.io.write_metadata` writes only the
+metadata.
 
 ```{eval-rst}
 .. automodule:: jug.utils
