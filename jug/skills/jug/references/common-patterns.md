@@ -42,7 +42,7 @@ results = currymap(process_with_params, pairs)
 
 ### `jug.mapreduce.reduce(reducer, inputs, reduce_step=8)`
 
-Reduce a list of task results using an associative, commutative function:
+Reduce a list of task results using an associative function:
 
 ```python
 from jug.mapreduce import reduce as jug_reduce
@@ -50,8 +50,11 @@ from jug.mapreduce import reduce as jug_reduce
 total = jug_reduce(add, partial_sums)
 ```
 
-The reducer must be associative and commutative because jug may apply it in
-any order for parallelism.
+The reducer must be associative: for parallelism, jug reduces the inputs in
+blocks and then reduces the partial results together. The order of the
+elements is preserved (adjacent elements are always combined in order), so the
+reducer does not need to be commutative, but the grouping differs from a
+strict left-to-right reduction.
 
 ### `jug.mapreduce.mapreduce(reducer, mapper, inputs, map_step=4, reduce_step=8)`
 
@@ -161,7 +164,7 @@ underlying tasks are still computed individually.
 
 ---
 
-## `NoHash` — Exclude Non-Deterministic Arguments
+## `NoHash` — Exclude Arguments That Don't Affect the Result
 
 Sometimes a task has an argument that should not affect the cache key — e.g.
 a `--threads` count or a log level. Wrap it in `NoHash` to exclude it from
@@ -317,6 +320,7 @@ result = summarize(analyses)
 
 ```python
 from jug import TaskGenerator
+from jug.utils import identity
 import itertools
 
 @TaskGenerator
@@ -327,23 +331,27 @@ def train(data, lr, depth):
 def pick_best(scores):
     return max(scores, key=lambda s: s['val_acc'])
 
-data = load_data()
+data = identity(load_data())   # hash the (large) dataset only once
 params = list(itertools.product([1e-3, 1e-4], [3, 5, 10]))
 scores = [train(data, lr, depth) for lr, depth in params]
 best = pick_best(scores)
 ```
 
+Wrapping `data` in `identity()` (see above) means that it is hashed once,
+instead of once for every `train` task. Better still, if `load_data` is
+expensive, make it a task itself (`data = load_data()` with `load_data`
+decorated by `@TaskGenerator`).
+
 ---
 
 ## Pattern: NFS-Safe File Store
 
-The default file store uses atomic rename, making it safe on NFS. No special
-configuration is required. For extra resilience on slow NFS:
+The default file store is safe on NFS: results are written to a temporary
+file and atomically renamed into place, and locks are created with
+`O_CREAT|O_EXCL`, so two workers can never hold the same lock. No special
+configuration is required: just point all workers to the same jugdir on the
+shared filesystem.
 
-```ini
-[execute]
-wait-cycle-time = 30
-```
-
-Increase the wait cycle time if workers frequently see apparent lock collisions
-due to NFS attribute caching delays.
+(`--wait-cycle-time` only controls how long an idle worker sleeps while
+waiting for other workers to finish dependencies; it has no effect on
+locking.)

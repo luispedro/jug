@@ -43,6 +43,12 @@ tasks, so `jug status && ...` failed when work had been done).
   [shtab](https://pypi.org/project/shtab/). Both are optional dependencies
   (`pip install 'jug[completion]'`). See {doc}`subcommands`.
 - Python 3.15 is now supported (and tested on CI).
+- `return_tuple` can be imported directly from `jug` (`from jug import
+  return_tuple`).
+- `jug.utils.jug_execute`: the error raised when the command fails now
+  includes the command and its exit code.
+- `jug webstatus` uses the same column names and order as `jug status`
+  (Failed, Waiting, Ready, Complete, Active).
 - Documentation: all examples were updated to match current behaviour, and
   the subcommands, options, backends, and hooks that were missing are now
   documented. The documentation is now written in Markdown.

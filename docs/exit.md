@@ -19,7 +19,9 @@ The following variables specify the maximum running time:
 
 The names should be self-explanatory, but note that they are **additive**, so
 that `JUG_MAX_HOURS=1 JUG_MAX_MINUTES=30` means that the process will run for 1
-hour **and** 30 minutes.
+hour **and** 30 minutes. The values must be integers (e.g., `JUG_MAX_HOURS=1.5`
+is an error; use `JUG_MAX_MINUTES=90` instead). The time is checked after each
+task finishes.
 
 ```python
 from jug.hooks.exit_checks import exit_after_time
@@ -30,6 +32,10 @@ exit_after_time(hours=..., minutes=..., seconds=...)
 
 This can be specified by the environmental variable `JUG_EXIT_IF_FILE_EXISTS`,
 but the filename `__jug_please_stop_running.txt` is always added as well.
+Relative paths (including `__jug_please_stop_running.txt`) are relative to the
+current working directory of the `jug execute` process (not to the jugfile or
+the jugdir). The check is performed *before* each task is executed, so creating
+the file will not interrupt a task that is already running.
 
 To achieve the same with code, run:
 
@@ -40,7 +46,8 @@ exit_if_file_exists('__jug_please_stop_running.txt')
 
 ## Exiting after a specified number of tasks
 
-Use the variable `JUG_MAX_TASKS` or run the following code:
+Use the variable `JUG_MAX_TASKS` (which must be an integer) or run the
+following code:
 
 
 ```python

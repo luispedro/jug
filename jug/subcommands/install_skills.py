@@ -17,6 +17,7 @@ SKILL_NAME = 'jug'
 
 
 def bundled_skill_path():
+    '''Return the path of the skill bundled with jug (as package data)'''
     return os.path.join(
         os.path.dirname(os.path.dirname(__file__)),
         'skills',
@@ -31,6 +32,25 @@ def _remove_existing(path):
 
 
 def install_skill(output, force=False):
+    '''Copy the bundled skill to ``output/jug``
+
+    Parameters
+    ----------
+    output : str
+        Skills directory (created if it does not exist)
+    force : bool, optional
+        Whether to replace an existing ``output/jug`` (default: False)
+
+    Returns
+    -------
+    target : str
+        Absolute path of the installed skill
+
+    Raises
+    ------
+    RuntimeError
+        If the destination exists (and ``force`` is False) or cannot be written
+    '''
     source = bundled_skill_path()
     if not os.path.isdir(source):
         raise RuntimeError(f'Bundled skill payload is missing: {source}')

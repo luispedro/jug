@@ -125,6 +125,27 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
 
 
 def execution_loop(tasks, options):
+    '''Run the tasks in ``tasks`` (the core of ``jug execute``)
+
+    Repeatedly picks tasks whose dependencies are available, locks them, runs
+    them, and stores their results. If no task can be run, waits
+    ``options.execute_wait_cycle_time`` seconds (up to
+    ``options.execute_nr_wait_cycles`` times) for other processes to finish
+    dependencies before giving up.
+
+    Parameters
+    ----------
+    tasks : list of Task
+        Tasks to run (this list is modified)
+    options : jug options
+
+    Returns
+    -------
+    failures : bool
+        Whether any task raised an exception (only possible to return if
+        ``options.execute_keep_going`` is set, otherwise the exception is
+        propagated)
+    '''
     from time import sleep
 
     logging.info(f'Execute start ({len(tasks)} tasks)')
@@ -240,6 +261,16 @@ def execution_loop(tasks, options):
 
 
 def main(argv=None):
+    '''Entry point for the ``jug`` command line script
+
+    Parses the arguments, loads the jugfile (for subcommands which need it),
+    runs the subcommand, and exits with its return value.
+
+    Parameters
+    ----------
+    argv : list of str, optional
+        Command line (including the program name). Defaults to ``sys.argv``
+    '''
     global _is_jug_running
     _is_jug_running = True
     from .options import parse
@@ -271,6 +302,7 @@ def main(argv=None):
 
 
 def main_execute():
+    '''Entry point for the ``jug-execute`` script (same as ``jug execute``)'''
     import sys
     args = sys.argv[:]
     args.insert(1, 'execute')

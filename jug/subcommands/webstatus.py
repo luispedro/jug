@@ -63,12 +63,13 @@ TH.task-name {
     <th>Failed</th>
     <th>Waiting</th>
     <th>Ready</th>
-    <th>Executing</th>
-    <th>Completed</th>
+    <th>Complete</th>
+    <th>Active</th>
 </tr>
 %(table)s
 </table>
 </body>
+</html>
 '''
 _row_template = '''
 <tr>
@@ -88,14 +89,14 @@ def _format_counts(ts):
         names.update(t)
     for n in names:
         table.append(
-                _row_template.format(escape(n), ts.failed.get(n, 0), ts.waiting.get(n, 0), ts.ready.get(n, 0), ts.running.get(n, 0), ts.finished.get(n, 0)))
+                _row_template.format(escape(n), ts.failed.get(n, 0), ts.waiting.get(n, 0), ts.ready.get(n, 0), ts.finished.get(n, 0), ts.running.get(n, 0)))
     table.append(_row_template.format('', '', '', '', '', ''))
     table.append(_row_template.format('Total',
                           sum(ts.failed.values()),
                           sum(ts.waiting.values()),
                           sum(ts.ready.values()),
-                          sum(ts.running.values()),
-                          sum(ts.finished.values())))
+                          sum(ts.finished.values()),
+                          sum(ts.running.values())))
     return ''.join(table)
 
 

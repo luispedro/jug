@@ -12,9 +12,20 @@ all_tasks = get_tasks()
 
 loadable = get_filtered_tasks(loadable=True)
 failed = get_filtered_tasks(failed=True)
+ready = get_filtered_tasks(available=True)
 ```
 
-This returns only tasks that fulfil the filtering criteria used.
+The available flags are:
+
+- `loadable`: tasks whose results are available,
+- `failed`: tasks which are in the failed state,
+- `available`: tasks which are ready to run (all their dependencies are done,
+  but their result is not available yet).
+
+If you pass more than one flag, they are OR-ed together: a task is returned if
+it matches *any* of them (e.g., `get_filtered_tasks(loadable=True,
+failed=True)` returns tasks that are either loadable or failed). Calling
+`get_filtered_tasks()` with no flags returns an empty list.
 
 ```{versionadded} 2.3
 `get_filtered_tasks` was added in version 2.3. In previous versions, you had to filter the output of `get_tasks()` yourself

@@ -81,5 +81,6 @@ Test jugfiles (used as fixtures for integration tests) are in `jug/tests/jugfile
 ## Conventions
 
 - Commit messages start with a tag: `ENH` (feature), `BUG` (fix), `MIN` (minor), `TST`, `DOC`, `BLD`, `RLS`.
-- User-visible changes get an entry under `Unreleased` at the top of `ChangeLog`.
+- User-visible changes get an entry under `Unreleased` at the top of `ChangeLog`. Release notes are also kept in `docs/history.md` (which has its own `Unreleased` section) and in the "What's New" section of `README.md` (for released versions), so keep all three in sync.
+- `examples/decrypt/README.md` and `examples/text/README.md` are symlinks to `docs/decrypt-example.md` and `docs/text-example.md`: edit the files in `docs/`.
 - Python >= 3.9 is supported (CI tests 3.9–3.15), so don't use syntax or stdlib features newer than 3.9.

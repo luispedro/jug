@@ -21,6 +21,7 @@ __all__ = [
     'recursive_dependencies',
     'TaskGenerator',
     'iteratetask',
+    'return_tuple',
     'value',
     ]
 

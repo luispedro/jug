@@ -18,7 +18,7 @@ These apply to all subcommands:
 | `--will-cite` | false | Suppress citation reminder |
 | `--version` | — | Print version and exit |
 
-The jugdir string supports Python format variables:
+The jugdir string supports `%`-style format placeholders:
 - `%(jugfile)s` — jugfile basename without extension
 - `%(date)s` — today's date (`YYYY-MM-DD`)
 
@@ -192,9 +192,9 @@ The shell provides these helper functions:
 | Function | Description |
 |----------|-------------|
 | `value(task)` | Load and return the result of a task |
-| `invalidate(task)` | Remove a task's result from jugdir |
+| `invalidate(task)` | Remove the results of a task and, recursively, of all tasks that depend on it |
 | `get_tasks()` | Return all tasks seen in the jugfile |
-| `get_filtered_tasks(loadable=True, failed=True, available=True)` | Filter tasks by state |
+| `get_filtered_tasks(loadable=True, failed=True, available=True)` | Filter tasks by state (flags are OR-ed) |
 
 Example session:
 

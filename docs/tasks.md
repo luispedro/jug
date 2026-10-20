@@ -1,8 +1,6 @@
 # Structuring Your Tasks
 
-## Tips & Tricks
-
-These are some general guidelines for programming with jug.
+These are some general guidelines (tips & tricks) for programming with jug.
 
 ## What can be a task?
 

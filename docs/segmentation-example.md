@@ -8,7 +8,8 @@ based on human-segmented images. This is a completely real-world example as it
 [was one of the projects where I first used jug](https://github.com/luispedro/Coelho2009_ISBI_NuclearSegmentation) [^footnote-1].
 
 It depends on [mahotas](https://mahotas.readthedocs.io/) for image
-processing.
+processing and on [scikit-learn](https://scikit-learn.org/) for comparing
+segmentations.
 
 We are going to build this up piece by piece.
 
@@ -49,9 +50,9 @@ We need a way to compare these. We will use the [Adjusted Rand Index](https://en
 ```
 @TaskGenerator
 def compare(labeled, ref):
-    from milk.measures.cluster_agreement import rand_arand_jaccard
+    from sklearn.metrics import adjusted_rand_score
     ref = mh.imread(ref)
-    return rand_arand_jaccard(labeled.ravel(), ref.ravel())[1]
+    return adjusted_rand_score(ref.ravel(), labeled.ravel())
 ```
 
 Running over all the images **looks exactly like Python**:
@@ -110,6 +111,8 @@ dependency*. Jug picks up that to call `print_results`, it needs all the
 Easy as Py.
 
 The full script above including data is available [from github](https://github.com/luispedro/jug-presentations/tree/master/jug-segmentation-tutorial)
+(that version uses the now unmaintained [milk](https://github.com/luispedro/milk)
+package instead of scikit-learn to compute the Adjusted Rand Index).
 
 [^footnote-1]: The code in that repository still uses a pretty old version of jug, this
     was 2009, after all. `TaskGenerator` had not been invented yet.
@@ -118,4 +121,4 @@ The full script above including data is available [from github](https://github.c
     course.
 
 [^footnote-3]: Again, you can do better than Adjusted Rand, as we show in the paper;
-    but **this is a demo**. This way, we can just call a function in [milk](https://github.com/luispedro/milk)
+    but **this is a demo**. This way, we can just call a function in [scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html).

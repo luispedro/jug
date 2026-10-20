@@ -36,9 +36,10 @@ minutes. A lock that has not been refreshed for 30 minutes is considered
 
 ### Redis
 
-Redis is a non-relational database system. I assume you have already installed
-it (it is easy to install from source, but it is now a part of Ubuntu, so that
-is even easier).
+Redis is a non-relational database system. This section assumes that you have
+already installed it (see the [Redis installation
+documentation](https://redis.io/docs/latest/operate/oss_and_stack/install/);
+it is also available from most Linux distributions' package managers).
 
 This backend also requires the [redis](https://pypi.org/project/redis/)
 Python package, which is not installed together with jug (install it with
@@ -54,7 +55,7 @@ port is ignored and the default database is used. If the jugdir starts with
 `redis:` but is not in this form (e.g., just `--jugdir=redis:`), jug
 connects to the default port on `localhost`.
 
-## In Memory Store
+### In Memory Store
 
 If you just want an in-memory store, use `--jugdir=dict_store:filename` and
 the results will be loaded and saved into `filename` (use just

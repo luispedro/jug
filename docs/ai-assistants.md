@@ -11,8 +11,10 @@ Install the bundled skill into a user-level skills directory with:
 jug install-skills --output ~/.codex/skills
 ```
 
-This copies the bundled files to `~/.codex/skills/jug`. Use `--force` to
-replace an existing copy.
+This copies the bundled files to `~/.codex/skills/jug` (the directory is
+created if needed). The `--output` option is required: without it, the command
+prints an error and exits with status 2. If the destination already exists, the
+command fails unless you pass `--force` to replace the existing copy.
 
 For a project-local Claude Code install, use:
 

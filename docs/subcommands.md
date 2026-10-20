@@ -79,6 +79,12 @@ IPython needs to be installed for `shell` to work.
 Check is simple: it exits with status 0 if all tasks have run, 1 otherwise.
 Useful for shell scripting.
 
+Like the other subcommands, it imports the jugfile, so it respects
+[barriers](barrier.md): if a `barrier()` is hit, the tasks defined after it are
+not even generated, and `check` exits with status 1 (as the tasks before the
+barrier are not all finished). Use `sleep-until` if you want to wait for all
+tasks, including those after barriers.
+
 ### sleep-until
 
 This subcommand will simply wait until all tasks are finished before exiting.
@@ -193,10 +199,11 @@ This feature is still experimental
 ## Shell completion
 
 Jug supports tab-completion of subcommands and options in your shell. Two
-optional packages provide this; install them both with:
+optional packages provide this; install them both with (the quotes are
+needed in some shells, such as zsh):
 
 ```
-pip install jug[completion]
+pip install 'jug[completion]'
 ```
 
 ### Dynamic completion with argcomplete

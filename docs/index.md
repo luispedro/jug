@@ -81,8 +81,17 @@ Out[2]: [True, True, False, True, False, True, False, False, False, True]
 
 ### More Examples
 
-There is a worked out example in the [tutorial](tutorial.md), and another, fully functioning in
-the `examples/` directory.
+There is a worked out example in the [tutorial](tutorial.md). The
+[`examples/`](https://github.com/luispedro/jug/tree/main/examples) directory
+contains three fully functioning examples:
+
+- [`primes`](https://github.com/luispedro/jug/tree/main/examples/primes): the
+  short example above,
+- [`decrypt`](https://github.com/luispedro/jug/tree/main/examples/decrypt):
+  cracking a password by brute force (see the [decryption
+  example](decrypt-example.md)),
+- [`text`](https://github.com/luispedro/jug/tree/main/examples/text): finding
+  meaningful words in Wikipedia articles (see the [text example](text-example.md)).
 
 ## Links
 
@@ -98,11 +107,31 @@ The simplest is using pip:
 pip install jug
 ```
 
-You can either get the git repository at
+You can also get the git repository at
 
 [https://github.com/luispedro/jug](https://github.com/luispedro/jug)
 
 Or download the package from [PyPI](https://pypi.org/project/Jug/)
+
+If you use [conda](https://anaconda.org/), you can install jug from
+[conda-forge](https://conda-forge.org/):
+
+```
+conda config --add channels conda-forge
+conda install jug
+```
+
+## What do I need to run Jug?
+
+It is a Python only package. Jug is [continuously tested](https://github.com/luispedro/jug/actions) with Python 3.9 and up.
+
+## How does it work?
+
+Read the [tutorial](tutorial.md).
+
+## What's the status of the project?
+
+Since version 1.0, jug should be considered stable.
 
 ## Testimonials
 
@@ -143,18 +172,6 @@ magic
 api
 history
 ```
-
-## What do I need to run Jug?
-
-It is a Python only package. Jug is [continuously tested](https://github.com/luispedro/jug/actions) with Python 3.9 and up.
-
-## How does it work?
-
-Read the [tutorial](tutorial.md).
-
-## What's the status of the project?
-
-Since version 1.0, jug should be considered stable.
 
 ## Indices and tables
 

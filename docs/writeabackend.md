@@ -2,15 +2,35 @@
 
 ## What is a backend
 
-A backend is simply a store for objects. It needs to support four operations:
+A backend is simply a store for objects (identified by a key, which is a
+string) together with a locking mechanism. A backend is a subclass of
+`jug.backends.base.base_store` and must implement all of its abstract methods
+(Python will refuse to instantiate it otherwise):
 
-1. Saving Python objects associated with a key (a key is a string)
-2. Loading Python objects by their key
-3. Create a lock (identified by a key)
-4. Release a lock (identified by a key)
+- `dump(object, name)`: save a Python object under a key
+- `load(name)`: load a Python object by its key
+- `can_load(name)`: whether an object with that key exists
+- `list()`: iterate over all the keys in the store
+- `remove(name)`: remove an entry
+- `cleanup(active, keeplocks=False)`: remove all entries not in `active`
+- `listlocks()`: iterate over the keys of all the locks
+- `remove_locks()`: remove all the locks
+- `getlock(name)`: return a lock object (see below)
+- `close()`: release any resources held by the store
 
-There are a few other operations, like deleting an entry, that are useful, but
-not strictly necessary.
+Locks returned by `getlock` are subclasses of `jug.backends.base.base_lock`
+and must implement:
+
+- `get()`: try to acquire the lock, returning whether it succeeded (this must
+  be atomic across all processes using the store)
+- `release()`: release the lock
+- `is_locked()`: whether the lock is held (by any process)
+- `fail()`: mark the lock as *failed* (the task raised an error)
+- `is_failed()`: whether the lock is marked as failed
+
+Other methods (`remove_many`, `metadata`, and the static method
+`remove_store`) have default implementations which you can override if your
+backend can do better.
 
 The built-in backends are identified by a URI type string, generically called
 `jugdir`. For example, to connect to a redis backend, use

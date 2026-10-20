@@ -8,11 +8,20 @@ Tasklets were added in version 0.8, starting with the betas (named 0.7.9..)
 Since version 2.4.0, Tasklets can use a lambda function
 ```
 
+```{versionchanged} 2.6.0
+Lambda functions are now hashed using their constants, referenced names,
+closure and default arguments (previously, only their bytecode was used). This
+changes the hashes of tasks that depend on such Tasklets.
+```
+
 A Tasklet is a light-weight task. It looks very similar to a Task *except that
 it does not save its results to disk*. Every time you need its output, it is
 recomputed. Other than that, you can pass it around, just like a Task.
 
-They also get sometimes automatically generated.
+They are also sometimes generated automatically: indexing a Task (`t[0]`)
+returns a Tasklet (see [below](#with-tasklets)), as do
+[`iteratetask`](#iterating-over-a-fixed-number-of-results) and
+[`return_tuple`](#functions-that-return-tuples).
 
 ## Before Tasklets
 
@@ -63,15 +72,45 @@ next = Task(next_function, result[0])
 
 Now, we have a version that is both idiomatic Python and efficient.
 
+## Using lambda functions
+
+The function in a Tasklet can also be a lambda function (unlike a Task, which
+requires a named function):
+
+```
+result = Task(...)
+next = Task(next_function, Tasklet(result, lambda r: r['key']))
+```
+
+The lambda is hashed using its code, its constants, the names it references,
+its closure and its default arguments. Note that the *values* of global
+variables are not part of the hash (only their names are), so
+`Tasklet(t, lambda r: r * scale)` (where `scale` is a module-level variable)
+will not be recomputed if you change `scale`. Pass such values explicitly, e.g.
+as default arguments (`lambda r, scale=scale: r * scale`).
+
+## Iterating over a fixed number of results
+
+You cannot iterate over the result of a Task (as its length is not known when
+the jugfile is loaded). If you know how many elements it has, use
+`jug.iteratetask`, which returns a sequence of Tasklets:
+
+```
+from jug import iteratetask
+
+a, b = iteratetask(task, 2)
+for elem in iteratetask(task, n):
+    ...
+```
+
 ## Functions that return tuples
 
-If a function returns a tuple of known size, the `jug.task.return_tuple`
+If a function returns a tuple of known size, the `jug.return_tuple`
 decorator makes the `TaskGenerator` return a tuple of Tasklets, so the result
 can be unpacked directly:
 
 ```
-from jug import TaskGenerator
-from jug.task import return_tuple
+from jug import TaskGenerator, return_tuple
 
 @return_tuple(2)
 @TaskGenerator

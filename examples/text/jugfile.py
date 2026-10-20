@@ -76,7 +76,7 @@ def add_counts(counts):
     return dict(allcounts)
 
 
-def divergence(global_counts, nr_documents, counts):
+def divergence(global_counts, counts):
     '''
     Takes the global word counts as well as a single count vector
     and returns a list of the words *in this document* that are document
@@ -101,4 +101,4 @@ with open('MPs.txt', encoding='utf-8') as f:
 avgs = Task(add_counts, counts)
 results = []
 for c in counts:
-    results.append(Task(divergence, avgs, len(counts), c))
+    results.append(Task(divergence, avgs, c))

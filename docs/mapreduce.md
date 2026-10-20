@@ -127,12 +127,12 @@ def count1(str):
 While the `reducer` adds two dictionaries together:
 
 ```
-def merge_dicts(rhs, lhs):
+def merge_dicts(lhs, rhs):
     # Note that we SHOULDN'T modify arguments, so we will create a copy
-    rhs = rhs.copy()
-    for k,v in lhs.items():
-        rhs[k] += v
-    return rhs
+    merged = lhs.copy()
+    for k,v in rhs.items():
+        merged[k] += v
+    return merged
 ```
 
 We can now use `jug.mapreduce.mapreduce` to put these together:
@@ -225,12 +225,12 @@ def count1(str):
     return counts
 
 
-def merge_dicts(rhs, lhs):
+def merge_dicts(lhs, rhs):
     # Note that we SHOULDN'T modify arguments, so we will create a copy
-    rhs = rhs.copy()
-    for k,v in lhs.items():
-        rhs[k] += v
-    return rhs
+    merged = lhs.copy()
+    for k,v in rhs.items():
+        merged[k] += v
+    return merged
 
 #final_counts = jug.mapreduce.mapreduce(
 #                        merge_dicts,

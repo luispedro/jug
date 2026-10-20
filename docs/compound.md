@@ -11,6 +11,8 @@ they have run.
 For example:
 
 ```
+from jug import TaskGenerator
+
 @TaskGenerator
 def poly(a,b,c):
     return a*b+c
@@ -38,6 +40,8 @@ jug run slower. On the other hand, you may not want to simply have a single
 Task do everything:
 
 ```
+from jug import TaskGenerator
+
 def poly(a,b,c):
     return a*b+c
 
@@ -61,6 +65,8 @@ A compound task behaves like the first example until all necessary tasks have
 been computed:
 
 ```
+from jug import TaskGenerator, CompoundTaskGenerator
+
 @TaskGenerator
 def poly(a,b,c):
     return a*b+c

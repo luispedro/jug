@@ -9,9 +9,12 @@ different tasks on different processors.
 [![Downloads](https://static.pepy.tech/badge/jug/month)](https://pepy.tech/project/jug)
 [![image](https://img.shields.io/badge/CITATION-doi.org%2F10.5334%2Fjors.161-green.svg)](https://doi.org/10.5334/jors.161)
 
-It uses the filesystem to communicate between processes and works
-correctly over NFS, so you can coordinate processes on different
-machines.
+Its main backend uses the filesystem to communicate between processes
+and works correctly over NFS, so you can coordinate processes on
+different machines. Another is based on [Redis](https://redis.io/), so
+the processes only need to be able to connect to a common Redis server.
+See the [backends documentation](https://jug.readthedocs.io/en/latest/backends.html)
+for all options.
 
 Jug is a pure Python implementation and should work on any platform.
 
@@ -60,21 +63,37 @@ cite
 ## Short Example
 
 Here is a one minute example. Save the following to a file called
-`primes.py` (if you have installed jug, you can obtain a slightly longer
-version of this example by running `jug demo` on the command line):
+`primes.py` (if you have installed jug, you can also obtain this example
+by running `jug demo` on the command line):
 
     from jug import TaskGenerator
-    from time import sleep
 
     @TaskGenerator
     def is_prime(n):
+        from time import sleep
+
+        # Sleep for 1 second, this runs too fast and is not a good demo
         sleep(1.)
-        for j in range(2,n-1):
+        for j in range(2, n - 1):
             if (n % j) == 0:
                 return False
         return True
 
-    primes100 = [is_prime(n) for n in range(2,101)]
+    @TaskGenerator
+    def count_primes(ps):
+        return sum(ps)
+
+    @TaskGenerator
+    def write_output(n):
+        with open('output.txt', 'wt') as output:
+            output.write(f"Found {n} primes <= 100.\n")
+
+    primes100 = []
+    for n in range(2, 101):
+        primes100.append(is_prime(n))
+
+    n_primes = count_primes(primes100)
+    write_output(n_primes)
 
 This is a brute-force way to find all the prime numbers up to 100. Of
 course, this is only for didactic purposes, normally you would use a
@@ -85,29 +104,35 @@ embarrassingly parallel problems.
 Type `jug status primes.py` to get:
 
           Failed     Waiting       Ready    Complete      Active  Task name
-    ---------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
+               0           1           0           0           0  primes.count_primes
                0           0          99           0           0  primes.is_prime
-    .................................................................................
-               0           0          99           0           0  Total
+               0           1           0           0           0  primes.write_output
+    .....................................................................................
+               0           2          99           0           0  Total
 
 This tells you that you have 99 tasks called `primes.is_prime` ready to
-run. So run `jug execute primes.py &`. You can even run multiple
-instances in the background (if you have multiple cores, for example).
-After starting 4 instances and waiting a few seconds, you can check the
-status again (with `jug status primes.py`):
+run, while both other tasks are *waiting* (i.e., they need the
+`primes.is_prime` tasks to finish). So run `jug execute primes.py &`.
+You can even run multiple instances in the background (if you have
+multiple cores, for example). After starting 4 instances and waiting a
+few seconds, you can check the status again (with `jug status primes.py`):
 
           Failed     Waiting       Ready    Complete      Active  Task name
-    ---------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
+               0           1           0           0           0  primes.count_primes
                0           0          63          32           4  primes.is_prime
-    .................................................................................
-               0           0          63          32           4  Total
+               0           1           0           0           0  primes.write_output
+    .....................................................................................
+               0           2          63          32           4  Total
 
 Now you have 32 tasks complete, 4 active (running), and 63 still ready.
-Eventually, they will all finish and you can inspect the results with
-`jug shell primes.py`. This requires `ipython` to be installed and will
-give you an `ipython` shell. The `primes100` variable is
-available, but it is an ugly list of `jug.Task` objects. To
-get the actual value, you call the `value` function:
+Eventually, they will all finish (including `count_primes` and
+`write_output`) and you can inspect the results with `jug shell
+primes.py`. This requires `ipython` to be installed and will give you an
+`ipython` shell. The `primes100` variable is available, but it is an
+ugly list of `jug.Task` objects. To get the actual value, you call the
+`value` function:
 
     In [1]: primes100 = value(primes100)
 
@@ -116,11 +141,11 @@ get the actual value, you call the `value` function:
 
 ## What's New
 
-## Version 2.6.0
+### Version 2.6.0
 
 *Released 20 September 2026*
 
-### Compatibility notes
+#### Compatibility notes
 
 Two changes alter task hashes, so cached results for the affected tasks will
 be recomputed the first time you run them with this version:
@@ -134,7 +159,7 @@ be recomputed the first time you run them with this version:
   its bytecode was used, so lambdas that differed only in those hashed
   identically).
 
-### User-visible improvements
+#### User-visible improvements
 
 - Better error message when loading results fails (patch by Justin R.
   Porter, [GH #92](https://github.com/luispedro/jug/pull/92))
@@ -142,13 +167,13 @@ be recomputed the first time you run them with this version:
 - `jug cleanup` now reports the number of removed objects and of removed
   locks separately
 
-### Internal improvements
+#### Internal improvements
 
 - Use `@property` and `@abstractmethod` instead of the deprecated
   `abstractproperty`
 - Modernize Python idioms and update documentation
 
-### Bugfixes
+#### Bugfixes
 
 - Fix `write_task_out` for numpy arrays, which are now written in `.npy`
   format (they were silently pickled instead)
@@ -162,11 +187,11 @@ be recomputed the first time you run them with this version:
   on Python 3 (pickle files must be opened in binary mode)
 - Fix help text of `jug status --cache-file`
 
-## Version 2.5.0
+### Version 2.5.0
 
 *Released 12 March 2026*
 
-### User-visible improvements
+#### User-visible improvements
 
 - Special case saving `polars` DataFrames in `file_store` for speed.
 - More flexible parsing of booleans in `jug.options`.
@@ -181,7 +206,7 @@ be recomputed the first time you run them with this version:
   [ai-assistants](https://jug.readthedocs.io/en/latest/ai-assistants.html) for usage
   details.
 
-### Bugfixes
+#### Bugfixes
 
 - Fix `_get_terminal_size_linux` for Python 3.14, which changed how
   `fcntl.ioctl` handles string arguments. Use `os.get_terminal_size()`
@@ -190,11 +215,11 @@ be recomputed the first time you run them with this version:
 - Fix `jug.backends.dict_store` for Python 3.
 - Fix `describe` in `jug.task` for Python 3.
 
-## Version 2.4.0
+### Version 2.4.0
 
 *Released 8 May 2025*
 
-### User-visible improvements
+#### User-visible improvements
 
 - Adds support for lambda functions in `Tasklets`
 - Adds `NoHash` class to disable hashing for some arguments. This is in
@@ -203,11 +228,11 @@ be recomputed the first time you run them with this version:
   (e.g., number of threads)
 - jug.file_store: create files with better permissions
 
-### Internal improvements
+#### Internal improvements
 
 - Convert to `pyproject.toml` for building
 
-### Bugfixes
+#### Bugfixes
 
 - Better error detection for permission problems
 - Bugfix when using local imports and `jug pack`
@@ -216,13 +241,13 @@ Drops support for versions of Python older than 3.7. Technically, it
 should still work, but they are too old to test in Github CI, so we will
 not support them.
 
-## Version 2.3.1
+### Version 2.3.1
 
 *Released 5 November 2023*
 
 - Update for Python 3.12
 
-## Version 2.3.0
+### Version 2.3.0
 
 *Released 25 June 2023*
 

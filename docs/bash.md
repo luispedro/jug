@@ -77,7 +77,7 @@ myserver ~$ nano .bash_profile
 #alias jugstatus='watch -n 10 -d jug status --cache benchmark_jug.py'
 #alias jugrun='echo "`date`: Start" >> .juglog; screen -d -m -S jugwatcher sh ~/.waitonjug; pssh screen -d -S jug -m sh run_workers.sh'
 #alias jugoutput='pssh cat /mnt/localhd/.jug*'
-#alias jughalt='echo "`date`: Halt ">> .juglog; screen -S jugwatcher -X quit;  pssh pkill jug;'
+#alias jughalt='echo "`date`: Halt ">> .juglog; screen -S jugwatcher -X quit;  pssh pkill -f jug.execute;'
 #alias juglog='cat ~/.juglog'
 #
 # Now we need to tell the server to 'reload' .bash_profile
@@ -187,7 +187,10 @@ waits because if the script terminates before the child processes
 Creates a log message about halting, terminates the .waitonjug detached screen
 so that we don't have anyone waiting for the job to complete, and then uses
 pssh to issue a command to all compute nodes to kill all jug processes. The
-pkill command is used to automatically find and kill any processes named *jug*.
+`pkill -f jug.execute` command finds and kills all processes whose command line
+matches `jug execute` (the `.` matches the space, which avoids quoting issues
+inside the alias). Note that a plain `pkill jug` would also kill any other
+process with *jug* in its name (such as `jug status`).
 Once the jug processes die then the run_workers.sh scripts will automatically
 terminate.
 

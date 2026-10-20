@@ -168,7 +168,8 @@ jug shell jugfile.py
 
 Inside the shell you get a Python prompt with:
 - `value(task)` — load a task result
-- `invalidate(task)` — remove a task's cached result
+- `invalidate(task)` — remove the cached results of a task and, recursively,
+  of all the tasks that depend on it
 - `get_tasks()` — list all tasks
 - `get_filtered_tasks(loadable=True|failed=True|available=True)` — filter tasks
 
@@ -203,8 +204,12 @@ Default jugdir name: `<jugfile_basename>.jugdata`
 
 Jug reads configuration from (in order of increasing priority):
 
-1. `~/.config/jug/jugrc` (global)
-2. `.jugrc` or `jugrc` in the project directory (local, searched up to git root)
+1. A global file: the first of `~/.config/jug/jugrc`, `~/.config/jugrc` or
+   `~/.jug/configrc` that exists (only one is read)
+2. Local `.jugrc` or `jugrc` files, searched from the current directory up to
+   the git root (only the current directory if not in a git repository); the
+   closest file wins
+3. Command-line flags
 
 Config format (INI):
 
@@ -224,9 +229,13 @@ hold subcommand options.
 
 ## 8. Key Pitfalls
 
-**Random numbers** — If your task uses `random`, it will produce the same
-sequence every run (same input → same hash → same cache key). Seed explicitly
-with a task argument, e.g. `compute(data, seed=42)`.
+**Random arguments** — Do not generate task *arguments* randomly in the
+jugfile without a fixed seed: e.g. `compute(random.random())` builds a task
+with a different hash every time the jugfile is loaded, so the task is never
+seen as finished (`jug status` keeps showing it as ready after it has run).
+Call `random.seed(...)` at the top of the jugfile, or pass a seed as a task
+argument (`compute(data, seed=42)`) and generate the random numbers inside
+the task.
 
 **Code changes invalidate nothing automatically** — Jug hashes on function
 name + arguments, not on function bytecode. If you change the implementation

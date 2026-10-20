@@ -47,7 +47,7 @@ class PackCommand(SubCommand):
     def run(self, store, options, *args, **kwargs):
         if not hasattr(store, 'update_pack'):
             from sys import stderr, exit
-            stderr.write("Cannot pack this store (only basic file-based jugdata directories can be packed)")
+            stderr.write("Cannot pack this store (only basic file-based jugdata directories can be packed)\n")
             exit(1)
         packed = store.update_pack()
         options.print_out(f'Packed {packed} objects')

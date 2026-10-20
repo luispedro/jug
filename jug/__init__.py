@@ -30,9 +30,21 @@ The main use of jug is from the command line::
     jug execute jugfile.py
 
 Where ``jugfile.py`` is a Python script using the ``jug`` library.
+
+The main entry points for writing jugfiles are:
+
+- ``TaskGenerator`` (decorator) and ``Task``: define tasks
+- ``value``: load the result of a task (or of a structure containing tasks)
+- ``barrier`` and ``bvalue``: stop loading the jugfile until (some) tasks
+  have run, for task graphs which depend on earlier results
+- ``CompoundTaskGenerator``: tasks that build sub-graphs of tasks
+- ``iteratetask`` and ``return_tuple``: work with tasks returning sequences
+
+To use jug's results from a script or notebook, call ``init`` (or
+``set_jugdir``) and then ``value``.
 '''
 
-from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask
+from .task import TaskGenerator, Task, Tasklet, value, CachedFunction, iteratetask, return_tuple
 from .compound import CompoundTaskGenerator, CompoundTask
 from .barrier import barrier, bvalue
 from .options import set_jugdir
@@ -47,6 +59,7 @@ __all__ = [
     'Tasklet',
     'TaskGenerator',
     'iteratetask',
+    'return_tuple',
     'value',
     'CachedFunction',
     'CompoundTask',

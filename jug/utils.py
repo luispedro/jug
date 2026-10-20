@@ -343,7 +343,8 @@ def jug_execute(args, check_exit=True, run_after=None, return_value=None):
     args : list of str
     check_exit : boolean, optional
         If true (default), then a non-zero exit results in an exception
-        (``SystemError``)
+        (``SystemError``, whose message includes the command and its exit
+        code)
     run_after : any, optional
         This is unused by the function, but can be used to order different
         calls to jug_execute
@@ -353,7 +354,7 @@ def jug_execute(args, check_exit=True, run_after=None, return_value=None):
     import subprocess
     ret = subprocess.call(args)
     if check_exit and ret != 0:
-        raise SystemError("Error in system")
+        raise SystemError(f"Command {args!r} failed with exit code {ret}")
     return return_value
 
 def sync_move(src, dst):
