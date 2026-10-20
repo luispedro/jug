@@ -20,6 +20,8 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+from html import escape
+
 from . import status as st
 from . import SubCommand
 
@@ -86,7 +88,7 @@ def _format_counts(ts):
         names.update(t)
     for n in names:
         table.append(
-                _row_template.format(n, ts.failed.get(n, 0), ts.waiting.get(n, 0), ts.ready.get(n, 0), ts.running.get(n, 0), ts.finished.get(n, 0)))
+                _row_template.format(escape(n), ts.failed.get(n, 0), ts.waiting.get(n, 0), ts.ready.get(n, 0), ts.running.get(n, 0), ts.finished.get(n, 0)))
     table.append(_row_template.format('', '', '', '', '', ''))
     table.append(_row_template.format('Total',
                           sum(ts.failed.values()),
@@ -95,6 +97,18 @@ def _format_counts(ts):
                           sum(ts.running.values()),
                           sum(ts.finished.values())))
     return ''.join(table)
+
+
+def _render_page(jugfile, refresh, ts):
+    try:
+        refresh = int(refresh)
+    except (TypeError, ValueError):
+        refresh = 3
+    return template % {
+        'jugfile': escape(jugfile),
+        'refresh': refresh,
+        'table': _format_counts(ts),
+    }
 
 
 class WebStatusCommand(SubCommand):
@@ -127,11 +141,7 @@ class WebStatusCommand(SubCommand):
             ht, deps, rdeps = st.retrieve_sqlite3(connection)
             ts, dirty = st.update_status(store, ht, deps, rdeps)
             st.save_dirty3(connection, dirty)
-            return template % {
-                'jugfile': options.jugfile,
-                'refresh': request.query.refresh or "3",
-                'table': _format_counts(ts),
-            }
+            return _render_page(options.jugfile, request.query.refresh, ts)
         bottle.run(app, port=options.webstatus_port,
                    host=options.webstatus_ip, quiet=True)
 
