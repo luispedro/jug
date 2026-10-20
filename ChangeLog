@@ -1,4 +1,6 @@
 Unreleased
+	* hooks: `register_time_tasks()` prints mean times with two decimal
+	places (e.g., `123.46s`) instead of two significant digits (`1.2e+02s`)
 	* file_store: Fix concurrent changes to packed results (from `jug
 	pack`) being lost or undone (e.g., invalidated results coming back),
 	as the pack was saved from a copy read when the store was opened. Also,

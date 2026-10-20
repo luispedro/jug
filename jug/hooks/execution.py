@@ -16,17 +16,17 @@ class TimeTasks:
         self.times = defaultdict(list)
 
     def start(self, t):
-        self.start = time()
+        self.start_time = time()
 
     def stop(self, t):
-        ellapsed = time() - self.start
+        ellapsed = time() - self.start_time
         self.times[t.name].append(ellapsed)
 
     def print_summary(self):
         print("TIMES")
         print("-----\n")
         for k,v in self.times.items():
-            print(f"{k:20} {_mean(v):.2}s ({len(v)} tasks)")
+            print(f"{k:20} {_mean(v):.2f}s ({len(v)} tasks)")
 
 
 
