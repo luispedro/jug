@@ -73,7 +73,9 @@ def CompoundTask(f, *args, **kwargs):
     task = Task(f, *args, **kwargs)
     if task.can_load():
         return task
-    del alltasks[alltasks.index(task)]
+    # task was the last one to be created
+    assert alltasks[-1] is task
+    alltasks.pop()
     h = task.hash()
     del task
     inner = f(*args, **kwargs)

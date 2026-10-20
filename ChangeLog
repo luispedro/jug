@@ -1,4 +1,7 @@
 Unreleased
+	* CompoundTask: Remove the temporary task in constant time (instead of
+	searching the list of all tasks, which was quadratic in the number of
+	compound tasks)
 	* dict_store: `release()` and `fail()` on a lock which is not held have
 	no effect (as for the other backends), instead of raising `KeyError`
 	* TaskGenerator: Raise the intended error message when pickling a
