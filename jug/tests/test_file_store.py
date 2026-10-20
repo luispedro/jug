@@ -175,3 +175,58 @@ def test_structured_object_array(tmpdir):
         assert b.dtype == a.dtype
         assert list(b['x']) == [1, 2]
         assert list(b['y']) == ['one', [2]]
+
+
+def test_remove_does_not_rewrite_pack(tmpdir):
+    tmpdir = str(tmpdir)
+    fs = file_store(tmpdir)
+    k = hash_one('k1')
+    fs.dump([1], k)
+    assert fs.remove(k)
+    assert not fs.remove(k)
+    assert not os.path.exists(os.path.join(tmpdir, 'packs'))
+
+
+def test_pack_concurrent_stores(tmpdir):
+    tmpdir = str(tmpdir)
+    k1, k2, k3 = [hash_one(k) for k in ['k1', 'k2', 'k3']]
+    fs = file_store(tmpdir)
+    for k in [k1, k2, k3]:
+        fs.dump([k], k)
+    assert fs.update_pack() == 3
+
+    # Two processes with the store open: changes made by one must not be
+    # undone by the other
+    fs1 = file_store(tmpdir)
+    fs2 = file_store(tmpdir)
+    assert fs1.remove(k1)
+    assert fs2.remove(k2)
+
+    fs = file_store(tmpdir)
+    assert fs.list() == [k3]
+    assert not fs.can_load(k1)
+    assert not fs.can_load(k2)
+
+
+def test_pack_write_failure_releases_lock(tmpdir, monkeypatch):
+    import jug.backends.file_store
+    tmpdir = str(tmpdir)
+    k1, k2 = hash_one('k1'), hash_one('k2')
+    fs = file_store(tmpdir)
+    fs.dump([1], k1)
+    assert fs.update_pack() == 1
+    fs.dump([2], k2)
+
+    def failing_encode_to(obj, output):
+        raise OSError('disk full')
+    monkeypatch.setattr(jug.backends.file_store, 'encode_to', failing_encode_to)
+    with pytest.raises(OSError):
+        fs.update_pack()
+    monkeypatch.undo()
+    assert not fs.getlock('pack-save').is_locked()
+    assert os.listdir(fs.tempdir()) == []
+
+    fs = file_store(tmpdir)
+    assert fs.load(k1) == [1]
+    assert fs.load(k2) == [2]
+    assert fs.remove(k1)

@@ -1,4 +1,10 @@
 Unreleased
+	* file_store: Fix concurrent changes to packed results (from `jug
+	pack`) being lost or undone (e.g., invalidated results coming back),
+	as the pack was saved from a copy read when the store was opened. Also,
+	removing results (e.g., `jug invalidate`) no longer rewrites the pack
+	when nothing in it changed, and a failure to save the pack no longer
+	leaves the 'pack-save' lock held
 	* bvalue: Only treat the value as unavailable when a task it needs has
 	not run yet; before, any error (e.g., an IndexError in a Tasklet) was
 	silently treated as an unsatisfied barrier and `jug execute` waited and

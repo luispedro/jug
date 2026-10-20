@@ -136,17 +136,20 @@ class file_store(base_store):
         if dname.endswith('/'): dname = dname[:-1]
         self.jugdir = dname
         self.compress_numpy = compress_numpy
-        self.packed = {}
-        if path.exists(self._packfile()):
-            with open(self._packfile(), 'rb') as pfile:
-                sys.path.insert(0, '.')
-                try:
-                    self.packed = decode_from(pfile)
-                finally:
-                    del sys.path[0]
+        self.packed = self._read_pack()
 
     def _packfile(self):
         return path.join(self.jugdir, 'packs', 'jugpack')
+
+    def _read_pack(self):
+        if not path.exists(self._packfile()):
+            return {}
+        with open(self._packfile(), 'rb') as pfile:
+            sys.path.insert(0, '.')
+            try:
+                return decode_from(pfile)
+            finally:
+                del sys.path[0]
 
     def __repr__(self):
         return f'file_store({self.jugdir})'
@@ -187,9 +190,7 @@ class file_store(base_store):
         polars DataFrames are stored in their native formats (``.npy`` and
         parquet), unless ``compress_numpy`` was set.
         '''
-        if name in self.packed:
-            del self.packed[name]
-            self.resave_pack()
+        self._remove_from_pack([name])
 
         self._maybe_create()
         name = self._getfname(name)
@@ -248,20 +249,86 @@ class file_store(base_store):
         nr_packed : int
             Number of results that were moved into the pack
         '''
-        to_remove = []
+        to_pack = {}
         for k in self._iter_filekeys():
             f = self._getfname(k)
             s = os.stat(f)
             if s.st_size <= MAX_FILESIZE_IN_PACK:
                 # Use load() rather than decode_from() as the file may be in
                 # a native format (npy or parquet)
-                self.packed[k] = self.load(k)
-                to_remove.append(k)
-        self.resave_pack()
-        for k in to_remove:
+                to_pack[k] = self.load(k)
+        if to_pack:
+            def add(packed):
+                packed.update(to_pack)
+                return True
+            self._modify_pack(add)
+        for k in to_pack:
             os.unlink(self._getfname(k))
-        return len(to_remove)
+        return len(to_pack)
 
+
+    def _get_pack_lock(self):
+        lock = self.getlock('pack-save')
+        for i in range(10):
+            if lock.get():
+                return lock
+            from time import sleep
+            logging.warning("Waiting for lock file 'pack-save'")
+            sleep(2**i)
+        raise Exception('Could not obtain lock to save packed data')
+
+    def _write_pack(self, packed):
+        os.makedirs(path.join(self.jugdir, 'packs'), exist_ok=True)
+        self._maybe_create()
+        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
+        try:
+            with os.fdopen(fd, 'wb') as output:
+                encode_to(packed, output)
+                output.flush()
+                os.fsync(output.fileno())
+            # Rename is atomic even over NFS.
+            fsync_dir(fname)
+            os.rename(fname, self._packfile())
+        except:
+            with suppress(OSError):
+                os.unlink(fname)
+            raise
+
+    def _modify_pack(self, modify):
+        '''
+        store._modify_pack(modify)
+
+        Re-reads the pack from disk while holding the 'pack-save' lock (so
+        that changes made by other processes are not lost), calls
+        ``modify(packed)`` on it, and saves it if ``modify`` returns true.
+        '''
+        lock = self._get_pack_lock()
+        try:
+            packed = self._read_pack()
+            if modify(packed):
+                self._write_pack(packed)
+            self.packed = packed
+        finally:
+            lock.release()
+
+    def _remove_from_pack(self, names):
+        '''
+        removed = store._remove_from_pack(names)
+
+        Removes ``names`` from the pack, only touching the pack file if any of
+        them is in it.
+        '''
+        removed = set()
+        if not any(name in self.packed for name in names):
+            return removed
+        def remove(packed):
+            for name in names:
+                if name in packed:
+                    del packed[name]
+                    removed.add(name)
+            return bool(removed)
+        self._modify_pack(remove)
+        return removed
 
     def resave_pack(self):
         '''
@@ -269,28 +336,11 @@ class file_store(base_store):
 
         Writes the in-memory pack to disk (atomically, holding a lock)
         '''
-        os.makedirs(path.join(self.jugdir, 'packs'), exist_ok=True)
-        lock = self.getlock('pack-save')
-        for i in range(10):
-            if lock.get():
-                break
-            from time import sleep
-            logging.warning("Waiting for lock file 'pack-save'")
-            sleep(2**i)
-        else:
-            raise Exception('Could not obtain lock to save packed data')
-        self._maybe_create()
-        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
-        output = os.fdopen(fd, 'wb')
-        encode_to(self.packed, output)
-        output.flush()
-        os.fsync(output.fileno())
-        output.close()
-
-        # Rename is atomic even over NFS.
-        fsync_dir(fname)
-        os.rename(fname, path.join(self.jugdir, 'packs', 'jugpack'))
-        lock.release()
+        lock = self._get_pack_lock()
+        try:
+            self._write_pack(self.packed)
+        finally:
+            lock.release()
 
 
     def listlocks(self):
@@ -369,15 +419,12 @@ class file_store(base_store):
         removed : set
             Names that were actually removed
         '''
-        removed = set()
+        names = list(names)
+        removed = self._remove_from_pack(names)
         for name in names:
-            if name in self.packed:
-                del self.packed[name]
-                removed.add(name)
             with suppress(OSError):
                 os.unlink(self._getfname(name))
                 removed.add(name)
-        self.resave_pack()
         return removed
 
     def remove(self, name):
@@ -427,13 +474,17 @@ class file_store(base_store):
                     os.unlink(f)
                     if not is_lockdir:
                         removed += 1
-        pack_dirty = False
-        for k in frozenset(self.packed.keys()) - active:
-            del self.packed[k]
-            pack_dirty = True
-            removed += 1
-        if pack_dirty:
-            self.resave_pack()
+        if exists(self._packfile()):
+            nr_unpacked = 0
+            def remove_inactive(packed):
+                nonlocal nr_unpacked
+                inactive = frozenset(packed.keys()) - active
+                for k in inactive:
+                    del packed[k]
+                nr_unpacked = len(inactive)
+                return bool(inactive)
+            self._modify_pack(remove_inactive)
+            removed += nr_unpacked
         return removed
 
 
