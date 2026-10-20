@@ -31,9 +31,6 @@ sections correspond to options of that subcommand (e.g., `wait-cycle-time` in
 the `[execute]` section corresponds to `jug execute --wait-cycle-time`).
 Boolean settings accept `on`/`off`, `true`/`false`, or `1`/`0`.
 
-Note that the global flags `--aggressive-unload`, `--debug`, `--pdb`, and
-`--short` cannot currently be set in the configuration file.
-
 ## Valid settings
 
 The name of a setting is the name of the option it corresponds to (the
@@ -47,6 +44,10 @@ settings are silently ignored. The settings that have an effect are:
 | `[main]` | `jugdir` | `--jugdir` | `%(jugfile)s.jugdata` |
 | `[main]` | `jugfile` | `jugfile` argument | `jugfile.py` |
 | `[main]` | `verbose` | `--verbose` | `quiet` |
+| `[main]` | `short` | `--short` | `off` |
+| `[main]` | `debug` | `--debug` | `off` |
+| `[main]` | `pdb` | `--pdb` | `off` |
+| `[main]` | `aggressive-unload` | `--aggressive-unload` | `off` |
 | `[main]` | `will-cite` | `--will-cite` | `off` |
 | `[execute]` | `wait-cycle-time` | `jug execute --wait-cycle-time` | `12` |
 | `[execute]` | `nr-wait-cycles` | `jug execute --nr-wait-cycles` | `150` |

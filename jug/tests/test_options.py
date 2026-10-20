@@ -43,6 +43,22 @@ def test_parse():
     assert parsed.execute_wait_cycle_time == 23
     assert not parsed.aggressive_unload
 
+def test_parse_flags_from_config():
+    flags = ['aggressive_unload', 'short', 'pdb', 'debug', 'will_cite']
+    config = '[main]\n' + ''.join(f"{f.replace('_', '-')}=true\n" for f in flags)
+    parsed = jug.options.parse(["execute"], StringIO(config))
+    for f in flags:
+        assert getattr(parsed, f) is True
+
+    parsed = jug.options.parse(["execute"], StringIO(''))
+    for f in flags:
+        assert getattr(parsed, f) is False
+
+    parsed = jug.options.parse(["execute", "--short", "--debug"], StringIO(''))
+    assert parsed.short is True
+    assert parsed.debug is True
+    assert parsed.pdb is False
+
 def test_copy():
     parsed = jug.options.parse(
         ["execute", "--pdb"],

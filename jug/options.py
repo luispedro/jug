@@ -263,10 +263,14 @@ def read_configuration_file(fp=None, default_options=None):
 
 def add_common_options(parser):
     group = parser.add_argument_group("common")
+    # Boolean flags use store_const (not store_true) so that, when they are
+    # not passed, the value in the configuration file is used (see the note
+    # in jug/subcommands/__init__.py)
     group.add_argument('jugfile', action='store', nargs='?',
                        help=f"Python script to use. (Default: {default_options.jugfile})")
     group.add_argument('--aggressive-unload',
-                       action='store_true',
+                       action='store_const',
+                       const=True,
                        dest='aggressive_unload',
                        help='''\
 Aggressively unload data from memory. This causes many more reloading of
@@ -287,15 +291,18 @@ You can use Python %%-format placeholders, the following variables are available
                        dest='verbose',
                        help='Verbosity level [use "info" to see details of processing]')
     group.add_argument('--short',
-                       action='store_true',
+                       action='store_const',
+                       const=True,
                        dest='short',
                        help='Short output')
     group.add_argument('--pdb',
-                       action='store_true',
+                       action='store_const',
+                       const=True,
                        dest='pdb',
                        help='Drop to a PDB (debug) console on error')
     group.add_argument('--debug',
-                       action='store_true',
+                       action='store_const',
+                       const=True,
                        dest='debug',
                        help='''\
 Debug mode. This adds a little more error checking, thus it can be slower.
@@ -303,10 +310,6 @@ However, it detects certain types of errors and prints an error message. If
 --pdb is passed, --debug is automatically implied, but the opposite is not
 true: you can use --debug mode without --pdb.''')
     group.add_argument('--will-cite',
-                       # We **cannot** use store_true because that will set it
-                       # to False if the argument is not passed.
-                       # In this case, this is undesired behaviour as then the
-                       # value in the configuration file will not be used.
                        action='store_const',
                        const=True,
                        dest='will_cite',
