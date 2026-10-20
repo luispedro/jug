@@ -1,4 +1,10 @@
 Unreleased
+	* jug execute: `--wait-cycle-time` (and `wait-cycle-time` in configuration
+	files) accepts fractional values, which were previously rejected (on the
+	command line) or truncated (in configuration files)
+	* jug execute: Faster selection of the next task to run when there are
+	many tasks (the task list was rotated one element at a time, which is
+	quadratic, and was scanned twice in the last wait cycle)
 	* jug execute --keep-failed: Do not mark a task as failed when acquiring
 	its lock raised an error (the lock is not held, and may belong to another
 	worker)

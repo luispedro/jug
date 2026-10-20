@@ -139,7 +139,6 @@ def execution_loop(tasks, options):
     # can be loaded directly, just skip them as fast as possible:
     first_unloadable = 0
     while (first_unloadable < len(tasks)) and tasks[first_unloadable].can_load():
-        t = tasks[first_unloadable]
         jug_hook('execute.task-loadable', (tasks[first_unloadable],))
         first_unloadable += 1
     del tasks[:first_unloadable]
@@ -153,33 +152,27 @@ def execution_loop(tasks, options):
     while tasks:
         upnext = [] # tasks that can be run
         nr_wait_cycles = int(options.execute_nr_wait_cycles)
-        for i in range(nr_wait_cycles):
-            max_cannot_run = min(len(tasks), 128)
-            if i == nr_wait_cycles - 1:
-                # in the last loop iteration, check all tasks to ensure we don't miss any
-                max_cannot_run = len(tasks)
-            for i in range(max_cannot_run):
+        for _ in range(nr_wait_cycles):
+            first_runnable = next((ti for ti,t in enumerate(tasks) if t.can_run()), None)
+            if first_runnable is not None:
+                # Move the tasks that cannot run to the end of the list.
+                #
                 # The argument for this is the following:
                 # if T' is dependent on the result of T, it is better if the
                 # processor that ran T, also runs T'. By having everyone else
                 # push T' to the end of tasks, this is more likely to happen.
                 #
                 # Furthermore, this avoids always querying the same tasks.
-                if tasks[0].can_run():
-                    break
-                tasks.append(tasks.pop(0))
-            while tasks and tasks[0].can_run():
-                upnext.append(tasks.pop(0))
-            if upnext:
-                break
-            for ti,t in enumerate(tasks):
-                if t.can_run():
-                    upnext.append(tasks.pop(ti))
-                    break
-            if upnext:
+                if first_runnable:
+                    tasks[:] = tasks[first_runnable:] + tasks[:first_runnable]
+                nr_runnable = 1
+                while nr_runnable < len(tasks) and tasks[nr_runnable].can_run():
+                    nr_runnable += 1
+                upnext = tasks[:nr_runnable]
+                del tasks[:nr_runnable]
                 break
             logging.info(f'waiting {options.execute_wait_cycle_time} secs for an open task...')
-            sleep(int(options.execute_wait_cycle_time))
+            sleep(float(options.execute_wait_cycle_time))
         if not upnext:
             logging.info('No tasks can be run!')
             break

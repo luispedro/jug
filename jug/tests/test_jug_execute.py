@@ -219,3 +219,20 @@ def test_keep_failed_lock_error(monkeypatch):
     execution_loop(alltasks[:], options)
     assert other.is_locked()
     assert not other.is_failed()
+
+@task_reset
+def test_fractional_wait_cycle_time(monkeypatch):
+    from jug.jug import execution_loop
+    options = parse(['execute', '--wait-cycle-time', '0.5', '--nr-wait-cycles', '2'])
+    options.execute_name = None
+    options.execute_pattern = None
+    assert options.execute_wait_cycle_time == 0.5
+
+    Task.store = dict_store()
+    t = Task(double, 2)
+    t2 = Task(double, t)
+    sleeps = []
+    monkeypatch.setattr('time.sleep', sleeps.append)
+    # t2 cannot run, as t is not executed
+    execution_loop([t2], options)
+    assert sleeps == [0.5, 0.5]

@@ -102,7 +102,7 @@ class ExecuteCommand(SubCommand):
             if after == previous:
                 from time import sleep
                 noprogress += 1
-                sleep(int(options.execute_wait_cycle_time))
+                sleep(float(options.execute_wait_cycle_time))
             else:
                 noprogress = 0
         else:
@@ -120,7 +120,7 @@ class ExecuteCommand(SubCommand):
         defaults = self.parse_defaults()
 
         parser.add_argument('--wait-cycle-time', action='store', dest='execute_wait_cycle_time',
-                            metavar='WAIT_CYCLE_TIME', type=int,
+                            metavar='WAIT_CYCLE_TIME', type=float,
                             help=("How long to wait in each cycle (in seconds) "
                                   f"(Default: {defaults['execute_wait_cycle_time']})"))
         parser.add_argument('--nr-wait-cycles', action='store',
