@@ -1,4 +1,7 @@
 Unreleased
+	* file_store, sync_move: Sync the destination directory after renaming
+	a file (instead of the source directory before), so that the rename
+	is durable
 	* redis_store: Fix `close()`, which silently did nothing (it called
 	`disconnect()`, which redis-py does not have)
 	* CompoundTask: Save the result once, instead of twice

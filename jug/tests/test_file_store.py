@@ -230,3 +230,29 @@ def test_pack_write_failure_releases_lock(tmpdir, monkeypatch):
     assert fs.load(k1) == [1]
     assert fs.load(k2) == [2]
     assert fs.remove(k1)
+
+
+def test_fsync_dir_after_rename(tmpdir, monkeypatch):
+    # The directory must be synced *after* the rename for the rename to be
+    # durable, so, when fsync_dir is called, the destination must exist
+    import jug.backends.file_store as file_store_mod
+    from jug.utils import sync_move
+    synced = []
+    def fsync_dir(fname):
+        assert os.path.exists(fname)
+        synced.append(fname)
+    monkeypatch.setattr(file_store_mod, 'fsync_dir', fsync_dir)
+
+    fs = file_store(str(tmpdir / 'jugdata'))
+    fs.dump(1, hash_one('k0'))
+    assert synced == [fs._getfname(hash_one('k0'))]
+
+    fs.update_pack()
+    assert synced[-1] == fs._packfile()
+
+    src = str(tmpdir / 'src')
+    dst = str(tmpdir / 'dst')
+    with open(src, 'w') as f:
+        f.write('data')
+    sync_move(src, dst)
+    assert synced[-1] == dst

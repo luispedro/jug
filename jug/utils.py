@@ -25,7 +25,7 @@ Utilities for writing jugfiles
 - identity: identity function as a Task
 - jug_execute: run an external command as a Task
 - CustomHash: wrap an object with a custom hash function
-- sync_move: move a file after syncing its directory
+- sync_move: move a file and sync the destination directory
 - cached_glob: glob (sorted), with the result cached in the store
 '''
 
@@ -354,10 +354,11 @@ def jug_execute(args, check_exit=True, run_after=None, return_value=None):
     return return_value
 
 def sync_move(src, dst):
-    '''Sync the directory containing the file and move it
+    '''Move a file and sync the directory it was moved to
 
-    This calls ``fsync`` on the directory containing ``src`` (not on the file
-    contents) and then renames ``src`` to ``dst``.
+    This renames ``src`` to ``dst`` and then calls ``fsync`` on the directory
+    containing ``dst``, so that the rename is durable. It does not sync the
+    file contents (call ``os.fsync`` on the file before closing it for that).
 
     Parameters
     ----------
@@ -368,8 +369,8 @@ def sync_move(src, dst):
     '''
     from jug.backends.file_store import fsync_dir
     from os import rename
-    fsync_dir(src)
     rename(src, dst)
+    fsync_dir(dst)
 
 def glob_sort(pat):
     '''Glob and sort

@@ -207,8 +207,8 @@ class file_store(base_store):
         output.close()
 
         # Rename is atomic even over NFS.
-        fsync_dir(fname)
         os.rename(fname, name)
+        fsync_dir(name)
 
     def _iter_filekeys(self):
         '''
@@ -287,8 +287,8 @@ class file_store(base_store):
                 output.flush()
                 os.fsync(output.fileno())
             # Rename is atomic even over NFS.
-            fsync_dir(fname)
             os.rename(fname, self._packfile())
+            fsync_dir(self._packfile())
         except:
             with suppress(OSError):
                 os.unlink(fname)
