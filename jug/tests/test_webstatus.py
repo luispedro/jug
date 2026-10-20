@@ -17,3 +17,14 @@ def test_format_counts():
     ts.finished = {'n': 4, 'n1': 2}
 
     assert len(_format_counts(ts))
+
+
+def test_format_counts_failed():
+    ts = TaskStatus()
+    ts.failed['f'] = 7
+    ts.finished['n'] = 4
+
+    out = _format_counts(ts)
+    assert '<td>7</td>' in out
+    # 2 tasks + blank row + total, each with 5 counts
+    assert out.count('<td>') == 4 * 5

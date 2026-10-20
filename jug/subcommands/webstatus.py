@@ -27,9 +27,7 @@ from . import SubCommand
 template = '''
 <html>
 <head>
-<head>
   <meta http-equiv="refresh" content="%(refresh)s">
-</head>
 <title>Jug Status :: %(jugfile)s</title>
 <style>
 body {
@@ -60,6 +58,7 @@ TH.task-name {
 <table>
 <tr>
     <th>Task Name</th>
+    <th>Failed</th>
     <th>Waiting</th>
     <th>Ready</th>
     <th>Executing</th>
@@ -76,19 +75,21 @@ _row_template = '''
     <td>{}</td>
     <td>{}</td>
     <td>{}</td>
+    <td>{}</td>
 </tr>'''
 
 
 def _format_counts(ts):
     table = []
     names = set()
-    for t in [ts.waiting, ts.ready, ts.running, ts.finished]:
+    for t in [ts.failed, ts.waiting, ts.ready, ts.running, ts.finished]:
         names.update(t)
     for n in names:
         table.append(
-                _row_template.format(n, ts.waiting[n], ts.ready[n], ts.running[n], ts.finished[n]))
-    table.append(_row_template.format('', '', '', '', ''))
+                _row_template.format(n, ts.failed.get(n, 0), ts.waiting.get(n, 0), ts.ready.get(n, 0), ts.running.get(n, 0), ts.finished.get(n, 0)))
+    table.append(_row_template.format('', '', '', '', '', ''))
     table.append(_row_template.format('Total',
+                          sum(ts.failed.values()),
                           sum(ts.waiting.values()),
                           sum(ts.ready.values()),
                           sum(ts.running.values()),

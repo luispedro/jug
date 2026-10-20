@@ -1,4 +1,6 @@
 Unreleased
+	* jug webstatus: Show failed tasks, and fix the duplicate <head> in
+	the page
 	* Use `shutil.get_terminal_size()` to get the terminal width for
 	summary tables. The `COLUMNS` environment variable is now respected,
 	and the width is detected on all platforms (e.g., FreeBSD)
