@@ -115,3 +115,21 @@ def test_open_connection_closes_on_error(tmpdir, monkeypatch):
             connection.execute('SELECT * FROM missing_table')
     assert len(connections) == 1
     assert connections[0].closed
+
+
+@task_reset
+def test_cache_corrupt_file(tmpdir):
+    import pytest
+    cache_file = tmpdir / 'cache.sqlite3'
+    cache_file.write('this is not an sqlite3 database\n' * 64)
+
+    options = default_options.copy()
+    options.jugdir = 'dict_store'
+    options.jugfile = os.path.join(_jugdir, 'simple.py')
+    options.verbose = 'quiet'
+    options.status_cache = True
+    options.status_cache_file = str(cache_file)
+    with pytest.raises(SystemExit) as e:
+        status._status(options)
+    assert str(cache_file) in str(e.value.code)
+    assert '--clear' in str(e.value.code)

@@ -234,9 +234,17 @@ def _status_cached(options):
             ht, deps, rdeps = retrieve_sqlite3(connection)
         store = backends.select(options.jugdir)
         mode = update
-    except sqlite3.Error:
+    except sqlite3.OperationalError:
+        # The cache has not been created yet (its tables do not exist)
         store, ht, deps, rdeps = load_jugfile(options)
         mode = create
+    except sqlite3.DatabaseError as e:
+        raise SystemExit(
+            f'jug status: The status cache file {options.status_cache_file!r} '
+            f'cannot be read ({e}).\n'
+            'Delete it (or run `jug status --cache --clear`, passing the same '
+            '`--cache-file` if you used one) and run `jug status --cache` again '
+            'to rebuild it.')
 
     ts, dirty = update_status(store, ht, deps, rdeps)
     _print_status(options, ts)

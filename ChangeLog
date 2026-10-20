@@ -1,4 +1,7 @@
 Unreleased
+	* jug status --cache: Exit with a clear error message if the cache file is
+	not a valid cache (previously, it crashed with a traceback). Interrupting
+	the cache lookup no longer falls back to loading the jugfile
 	* jug execute: `--wait-cycle-time` (and `wait-cycle-time` in configuration
 	files) accepts fractional values, which were previously rejected (on the
 	command line) or truncated (in configuration files)
