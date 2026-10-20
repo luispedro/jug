@@ -1,4 +1,7 @@
 Unreleased
+	* recursive_dependencies: List each dependency only once. Previously,
+	a task reachable by several paths was listed once per path, so that
+	`jug check` took exponential time on diamond-shaped task graphs
 	* file_store, sync_move: Sync the destination directory after renaming
 	a file (instead of the source directory before), so that the rename
 	is durable

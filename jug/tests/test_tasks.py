@@ -306,3 +306,58 @@ def test_describe_tuple():
     assert desc[1] == 3
     assert describe(Task(add, (t, 3)))['args'][0][0]['name'].endswith('add')
 
+
+
+def add(x, y):
+    return x + y
+
+@task_reset
+def test_recursive_dependencies():
+    from jug.task import recursive_dependencies
+    t0 = Task(add1, 0)
+    t1 = Task(add1, t0)
+    t2 = Task(add, t1, t0)
+    assert list(recursive_dependencies(t0)) == []
+    assert list(recursive_dependencies(t2)) == [t1, t0]
+    assert list(recursive_dependencies(t2, max_level=None)) == [t1, t0]
+    assert list(recursive_dependencies(t2, max_level=0)) == []
+    assert list(recursive_dependencies(t2, max_level=1)) == [t1, t0]
+
+
+@task_reset
+def test_recursive_dependencies_diamond():
+    from jug.task import recursive_dependencies
+    # Each task depends on the previous one twice: without de-duplication,
+    # there are 2**n paths to the first task
+    tasks = [Task(add1, 0)]
+    for _ in range(100):
+        tasks.append(Task(add, tasks[-1], tasks[-1]))
+    deps = list(recursive_dependencies(tasks[-1]))
+    assert len(deps) == 100
+    assert set(map(id, deps)) == set(map(id, tasks[:-1]))
+    assert len(list(recursive_dependencies(tasks[-1], max_level=3))) == 3
+
+
+@task_reset
+def test_recursive_dependencies_max_level_shorter_path():
+    from jug.task import recursive_dependencies
+    # With max_level=3, c is reached first through the long path
+    # (b -> a -> c), with no levels left, and then directly, which still
+    # leaves a level to reach e
+    e = Task(add1, 0)
+    c = Task(add1, e)
+    a = Task(add1, c)
+    b = Task(add1, a)
+    top = Task(add, b, c)
+    assert set(map(id, recursive_dependencies(top, max_level=3))) == {id(b), id(a), id(c), id(e)}
+    assert set(map(id, recursive_dependencies(top, max_level=1))) == {id(b), id(c)}
+
+
+@task_reset
+def test_recursive_dependencies_long_chain():
+    import sys
+    from jug.task import recursive_dependencies
+    t = Task(add1, 0)
+    for _ in range(sys.getrecursionlimit() + 100):
+        t = Task(add1, t)
+    assert len(list(recursive_dependencies(t))) == sys.getrecursionlimit() + 100

@@ -560,7 +560,8 @@ def recursive_dependencies(t, max_level=-1):
     for dep in recursive_dependencies(t, max_level=-1):
         ...
 
-    Returns a generator that lists all recursive dependencies of task
+    Returns a generator that lists all recursive dependencies of task. Each
+    dependency is listed once, even if it is reachable by several paths.
 
     Parameters
     ----------
@@ -574,15 +575,30 @@ def recursive_dependencies(t, max_level=-1):
     deps : generator
         A generator over all dependencies
     '''
-    if max_level is None:
-        max_level = -1
+    if max_level is None or max_level < 0:
+        max_level = float('inf')
     if max_level == 0:
         return
 
-    for dep in t.dependencies():
-        yield dep
-        for d2 in recursive_dependencies(dep, max_level - 1):
-            yield d2
+    # A task can be reached first by a long path and later by a shorter one,
+    # so record, for each task, the largest number of levels left when it was
+    # reached, and only expand it again if a later path leaves more levels.
+    levels_left = {}
+    stack = [(iter(t.dependencies()), max_level)]
+    while stack:
+        deps, level = stack[-1]
+        dep = next(deps, None)
+        if dep is None:
+            stack.pop()
+            continue
+        prev = levels_left.get(id(dep))
+        if prev is not None and prev >= level:
+            continue
+        if prev is None:
+            yield dep
+        levels_left[id(dep)] = level
+        if level > 1:
+            stack.append((iter(dep.dependencies()), level - 1))
 
 def value(elem):
     '''
