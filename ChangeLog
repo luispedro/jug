@@ -1,4 +1,7 @@
 Unreleased
+	* jug execute --keep-failed: Do not mark a task as failed when acquiring
+	its lock raised an error (the lock is not held, and may belong to another
+	worker)
 	* CompoundTask: Remove the temporary task in constant time (instead of
 	searching the list of all tasks, which was quadratic in the number of
 	compound tasks)

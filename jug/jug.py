@@ -228,7 +228,7 @@ def execution_loop(tasks, options):
                             if dep is t:
                                 logging.critical('Other tasks are dependent on this one! Parallel processors will be held waiting!')
 
-                if options.execute_keep_failed:
+                if options.execute_keep_failed and locked:
                     t.fail()
 
                 if not options.execute_keep_going:

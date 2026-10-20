@@ -187,3 +187,35 @@ def test_failed_task():
     # 10 tasks could be run and were taken. Only the 10 waiting remain
     assert len(alltasks) == 10
     assert len([x for x in alltasks_copy if x.is_failed()]) == 1
+
+
+def double(x):
+    return 2*x
+
+@task_reset
+def test_keep_failed_lock_error(monkeypatch):
+    # If acquiring the lock raises, the lock is not held, so it must not be
+    # marked as failed (it may belong to another worker)
+    from jug.jug import execution_loop
+    from jug.task import alltasks
+    options = parse(['execute'])
+    options.execute_keep_going = True
+    options.execute_keep_failed = True
+    options.execute_nr_wait_cycles = 1
+    options.execute_wait_cycle_time = 0
+    options.execute_name = None
+    options.execute_pattern = None
+
+    store = dict_store()
+    Task.store = store
+    t = Task(double, 2)
+    other = store.getlock(t.hash())
+    assert other.get()
+
+    def lock_raises(self):
+        self._lock = self.store.getlock(self.hash())
+        raise OSError('lock error')
+    monkeypatch.setattr(Task, 'lock', lock_raises)
+    execution_loop(alltasks[:], options)
+    assert other.is_locked()
+    assert not other.is_failed()
