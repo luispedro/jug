@@ -59,6 +59,14 @@ def test_parse_flags_from_config():
     assert parsed.debug is True
     assert parsed.pdb is False
 
+def test_pdb_implies_debug():
+    parsed = jug.options.parse(["execute", "--pdb"], StringIO(''))
+    assert parsed.pdb is True
+    assert parsed.debug is True
+
+    parsed = jug.options.parse(["execute"], StringIO('[main]\npdb=true\n'))
+    assert parsed.debug is True
+
 def test_copy():
     parsed = jug.options.parse(
         ["execute", "--pdb"],

@@ -438,6 +438,8 @@ def parse(args=None, optionsfile=None):
     for key, val in vars(argopts).items():
         if val is not None:
             setattr(cmdline, key, val)
+    if cmdline.pdb:
+        cmdline.debug = True
     try:
         nlevel = {
             'DEBUG': logging.DEBUG,
