@@ -30,6 +30,11 @@ pytest jug/tests/test_tasks.py::test_function_name
 python -m build
 ```
 
+**Build the docs** (Sphinx + myst-parser + numpydoc, see `docs/requirements.txt`; published on Read the Docs via `.readthedocs.yml`):
+```bash
+make -C docs html
+```
+
 ## Architecture
 
 Jug is a task-based parallelization framework where a **jugfile** (a Python script) defines tasks, and multiple `jug execute` processes run those tasks concurrently using a shared backend store for coordination and result caching. Jug has **no required runtime dependencies**: numpy, polars, redis, argcomplete and shtab are all imported lazily and are optional.
@@ -46,7 +51,7 @@ Jug is a task-based parallelization framework where a **jugfile** (a Python scri
 
 Backends also implement **locking** to prevent duplicate execution across workers. `file_store` uses lock files; `redis_store` uses Redis locks. Serialization lives in `backends/encode.py` (compressed pickle, with numpy special-casing); `file_store` additionally stores numpy arrays and polars DataFrames in their native formats.
 
-**Hashing** (`jug/hash.py`): Task identity is determined by hashing the function (by name/module) and all arguments recursively. Objects can implement `__jug_hash__()` for custom hashing. **Any change that alters the hash of existing tasks forces every user to recompute their cached results**, so it must be deliberate and called out in the ChangeLog as a compatibility break (e.g. the pickle protocol used for hashing is pinned to 4 so that hashes are stable across Python versions).
+**Hashing** (`jug/hash.py`): Task identity is determined by hashing the function (by name/module) and all arguments recursively. Objects can implement `__jug_hash__()` for custom hashing. **Any change that alters the hash of existing tasks forces every user to recompute their cached results**, so it must be deliberate and called out in the ChangeLog as a compatibility break (e.g. the pickle protocol used for hashing is pinned to 4 so that hashes are stable across Python versions). Two escape hatches change the default hashing/loading behaviour: `jug.unsafe.NoHash` passes an argument without hashing it, and `jug.io.NoLoad` passes a Task itself (not its result) to another Task.
 
 **Subcommands** (`jug/subcommands/`): Each `jug <cmd>` maps to a `SubCommand` subclass. Modules in this package are auto-discovered via `pkgutil`, and a subcommand registers itself by being **instantiated at module level** (e.g. `execute = ExecuteCommand()`). CLI options are added in `parse(parser)` and their defaults in `parse_defaults()`. Users can add their own commands in `~/.config/jug/jug_user_commands.py`. The `execute` subcommand runs the core execution loop.
 
@@ -58,7 +63,7 @@ Backends also implement **locking** to prevent duplicate execution across worker
 
 **Hooks** (`jug/hooks/`): Event system for extending jug behavior (e.g., logging task execution events). Register with `register_hook(event_name, callback)`.
 
-**Options** (`jug/options.py`): A chained options object where attributes fall through to the next layer. Configuration can come from CLI args, local config files, or defaults.
+**Options** (`jug/options.py`): A chained options object where attributes fall through to the next layer. The chain is: command line → configuration files → defaults. Configuration files are INI-style: a global one (`~/.config/jug/jugrc`, `~/.config/jugrc` or `~/.jug/configrc`), plus any `.jugrc`/`jugrc` found walking up from the current directory, with the closest one taking precedence. A key in section `[main]` maps to the option of the same name, and a key in any other section `[sec]` maps to `sec_key` (e.g. `[execute] wait-cycle-time` → `execute_wait_cycle_time`). Values in config files are strings that are cast using the type of the default, so a new option needs a correctly-typed default in `parse_defaults()`.
 
 **Agent skill** (`jug/skills/jug/`): A bundled skill describing how to *use* jug, installed by `jug install-skills`. It ships as package data, so new files there must match the globs in `[tool.setuptools.package-data]` in `pyproject.toml`.
 
