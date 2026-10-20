@@ -15,6 +15,24 @@ $ jug status
            0          10           2           0           0  Total
 ```
 
+Each task is in one of the following states:
+
+- **Failed**: the task is locked and its lock is marked as failed. This
+  happens when the task raised an exception while running with `jug execute
+  --keep-failed` (otherwise, the lock is released and the task goes back to
+  *Ready*), or, with the `file_keepalive` backend, when the process running
+  it has died (see [backends](backends.md)). Failed tasks are not run again
+  until you remove their locks with `jug cleanup --failed-only`.
+- **Waiting**: the task cannot run yet, as some of its dependencies have not
+  finished.
+- **Ready**: all the dependencies of the task are available, so it can be run.
+- **Complete**: the result of the task is available.
+- **Active**: the task is locked, i.e., it is being run by a `jug execute`
+  process (with the default filesystem backend, a task whose process was
+  killed also remains *Active*, until you run `jug cleanup --locks-only`).
+
+`jug status` exits with status 0 if all tasks are complete and 1 otherwise.
+
 ## Short Status
 
 The same status as above, now in a `short` version:
@@ -49,6 +67,23 @@ $ jug status --cache --short
 The first time you run it, it will be as slow as usual as it will parse the
 jugfile and interrogate the store for every possible task. However, then it
 will save a record which will enable it to speed up the next few times.
+
+The cache is saved in the file `.jugstatus.sqlite3` in the current
+directory. Use `--cache-file` to choose a different file (e.g., if you have
+several jugfiles in the same directory):
+
+```
+$ jug status --cache --cache-file=analysis.jugstatus.sqlite3
+```
+
+To remove the cache (so that the next `jug status --cache` rebuilds it), use
+`--clear`:
+
+```
+$ jug status --cache --clear
+```
+
+You should do this every time you change the jugfile.
 
 **Note**: This is a fragile system, which should be used with care as the cache
 can easily become out of sync with the jugfile used (`jugfile.py` in the

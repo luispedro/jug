@@ -10,6 +10,10 @@ particular MP but not everywhere else.
 (The complete code for this example and a list of MPs [valid in 2010] with the
 [jug source](https://github.com/luispedro/jug/tree/main/examples/text))
 
+To run it, you need the [requests](https://pypi.org/project/requests/)
+package (`pip install requests`) and network access, as the articles are
+downloaded from Wikipedia.
+
 The algorithm looks like this:
 
 ```python

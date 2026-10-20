@@ -40,9 +40,19 @@ Redis is a non-relational database system. I assume you have already installed
 it (it is easy to install from source, but it is now a part of Ubuntu, so that
 is even easier).
 
+This backend also requires the [redis](https://pypi.org/project/redis/)
+Python package, which is not installed together with jug (install it with
+`pip install redis`).
+
 1. Run a redis server (see its docs for how to control it, but simply calling
    `redis-server` should work).
 2. Now start your jug jobs with the `--jugdir=redis://127.0.0.1/`.
+
+The jugdir must have the form `redis://host/` or `redis://host:port/` (the
+default port is 6379). A database number cannot be given: anything after the
+port is ignored and the default database is used. If the jugdir starts with
+`redis:` but is not in this form (e.g., just `--jugdir=redis:`), jug
+connects to the default port on `localhost`.
 
 ## In Memory Store
 

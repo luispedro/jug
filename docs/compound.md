@@ -88,6 +88,13 @@ this already available?* If yes, then it is just the current result; otherwise,
 the function is called immediately (**not** at execution time, but every time
 the jugfile is loaded).
 
+This is visible in `jug status`: until the compound task has finished, *all*
+the inner tasks are listed (in the example, `jugfile.poly` and
+`jugfile.max3`), together with an extra `jug.compound.compound_task_execute`
+task, which saves the final result. Once that has run, the inner tasks are no
+longer generated, and `jug status` shows only a single `jugfile.buildup`
+task.
+
 ## See Also
 
 See also the section on [mapreduce](mapreduce.md).

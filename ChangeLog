@@ -30,6 +30,9 @@ Unreleased
 	default
 	* jug pack: Fix crash (zlib.error) when the jugdir contains small numpy
 	arrays or polars DataFrames (which are saved in their native formats)
+	* Read jugfiles as Python source (UTF-8 by default, or as declared by
+	a PEP 263 coding comment) independently of the locale; before, a UTF-8
+	jugfile failed with UnicodeDecodeError under, e.g., LC_ALL=C
 	* jug.hash: Fix task hashes of frozensets and of numpy arrays with
 	dtype=object (or structured dtypes with object fields), which could be
 	different in every process, so these tasks were never seen as finished

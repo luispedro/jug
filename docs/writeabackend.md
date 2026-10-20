@@ -12,9 +12,44 @@ A backend is simply a store for objects. It needs to support four operations:
 There are a few other operations, like deleting an entry, that are useful, but
 not strictly necessary.
 
-Backends are identified by a URI type string, generically called `jugdir`.
-For example, to connect to a redis backend, use `redis://host:port/`.
-Your backend should support a similar scheme.
+The built-in backends are identified by a URI type string, generically called
+`jugdir`. For example, to connect to a redis backend, use
+`redis://host:port/`. The mapping from these strings to backends is fixed
+(see `jug.backends.select`), so a new backend cannot be selected with
+`--jugdir` on the command line.
+
+## How to use your own backend
+
+Wherever jug accepts a jugdir, you can pass a store *object* instead of a
+string and it will be used directly. To load results in a script (or a
+notebook), pass it to `jug.init`:
+
+```
+import jug
+from mystore import my_store
+
+store, jugspace = jug.init('jugfile.py', store=my_store(...))
+results = jug.value(jugspace['results'])
+```
+
+(Alternatively, `jug.set_jugdir(my_store(...))` sets the store without
+loading a jugfile.)
+
+To *run* the tasks (i.e., the equivalent of `jug execute`), use a small
+script which sets the jugdir option to your store and calls the subcommand:
+
+```
+from jug import options
+from jug.subcommands import cmdapi
+from mystore import my_store
+
+opts = options.parse(['execute', 'jugfile.py'])
+opts.jugdir = my_store(...)
+cmdapi.run('execute', options=opts)
+```
+
+Run this script (instead of `jug execute`) as many times in parallel as you
+wish.
 
 ## How to write a backend
 

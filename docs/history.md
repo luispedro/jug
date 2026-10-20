@@ -18,6 +18,15 @@
   `execute_name` and `execute_pattern`, and `invalidate` has a new
   `invalid_pattern` option alongside `invalid_name` (which is now strict).
 
+The hashes of tasks with `frozenset` arguments have changed (see the bugfix
+below), so their cached results will be recomputed the first time you run them
+with this version. This also applies to frozensets whose hash was stable
+before (e.g., frozensets of numbers).
+
+`jug status` now exits with status 0 if all tasks are complete and 1
+otherwise, like `jug check` (before, the exit code was the number of finished
+tasks, so `jug status && ...` failed when work had been done).
+
 ### User-visible improvements
 
 - New `--name` option for `jug execute` and `jug invalidate`: selects
@@ -28,11 +37,61 @@
   anywhere in the task name (or a regular expression, if written between
   slashes: `--pattern '/compute_.*/'`). This is what `--target` used to do.
 - `--target` and `--invalid` are deprecated (see above).
+- Shell completion: [argcomplete](https://pypi.org/project/argcomplete/) is
+  supported (`eval "$(register-python-argcomplete jug)"`) and
+  `jug --print-completion {bash,zsh,tcsh}` generates a completion script using
+  [shtab](https://pypi.org/project/shtab/). Both are optional dependencies
+  (`pip install 'jug[completion]'`). See {doc}`subcommands`.
+- Python 3.15 is now supported (and tested on CI).
+- Documentation: all examples were updated to match current behaviour, and
+  the subcommands, options, backends, and hooks that were missing are now
+  documented. The documentation is now written in Markdown.
 
 ### Internal improvements
 
 - New function `jug.utils.prepare_name_matcher`. `prepare_task_matcher` now
   compiles its regular expression.
+- New function `jug.options.build_parser()`, which builds the full argument
+  parser (split from `parse()`, so that it can be used by shell completion
+  tools).
+
+### Bugfixes
+
+- Jugfiles are read as Python source (UTF-8 by default, or as declared by a
+  PEP 263 coding comment) independently of the locale. Before, a UTF-8
+  jugfile failed with `UnicodeDecodeError` under, e.g., `LC_ALL=C`.
+- Fix task hashes of frozensets and of numpy arrays with `dtype=object` (or
+  structured dtypes with object fields), which could be different in every
+  process, so these tasks were never seen as finished and parallel workers
+  ran them repeatedly.
+- `bvalue()` only treats the value as unavailable when a task it needs has not
+  run yet. Before, any error (e.g., an `IndexError` in a Tasklet) was silently
+  treated as an unsatisfied barrier and `jug execute` waited and then exited
+  with status 0.
+- Fix `exit_when_true()`, which always failed with a `TypeError` (unless
+  `function_takes_Task=True` was passed).
+- `jug graph`: fix `--file-format`, which did not accept an argument.
+- `jug pack`: fix crash (`zlib.error`) when the jugdir contains small numpy
+  arrays or polars DataFrames.
+- `file_store`: fix concurrent changes to packed results (from `jug pack`)
+  being lost or undone (e.g., invalidated results coming back). Removing
+  results no longer rewrites the pack when nothing in it changed, and a
+  failure to save the pack no longer leaves its lock held.
+- `file_store`: fix numpy structured arrays with object fields, which could
+  be saved but not loaded.
+- `file_store`: remove the temporary file when saving a result fails (e.g.,
+  because it cannot be pickled); before, partial files accumulated.
+- Fix quadratic slowdown when loading large results that are not numpy arrays
+  (e.g., a 64 MiB bytes object took over 90 seconds to load; it now takes a
+  fraction of a second).
+- Fix `decompress_stream.seek()` with a negative offset.
+- `jug.mapreduce`: fix slicing the result of `map()` with a step (e.g.,
+  `m[::2]` or `m[::-1]` raised `IndexError`) and support negative indices.
+- `jug.task.describe()` now recurses into tuples.
+- `jug.init()`: fix calling it without a jugfile argument (it now defaults to
+  `jugfile.py`, as documented).
+- `jug --help`: fix the description of `jug pack` and of the `--jugdir`
+  default.
 
 ## Version 2.6.0
 

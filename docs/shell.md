@@ -23,6 +23,13 @@ This returns only tasks that fulfil the filtering criteria used.
 Inside the environment, you can use the `value(task)` function to load
 results (if available; otherwise, an exception is thrown).
 
+To load everything at once, call `load_all()`. This replaces every variable
+defined in the jugfile by its value: for example, if the jugfile contains
+`results = [compute(i) for i in range(10)]`, then, after `load_all()`,
+`results` is a list with the 10 results instead of a list of tasks. Variables
+whose value cannot be loaded (e.g., because some of their tasks have not run
+yet) are left unchanged and an error message is printed for each of them.
+
 The `invalidate(task)` function invalidates the results of its argument and
 all dependents, **recursively**, much like the `jug invalidate` subcommand.
 

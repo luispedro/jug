@@ -44,6 +44,24 @@ call and after the barrier call. When a barrier call is reached, if there are
 any tasks that have not run, then the jugfile is not loaded any further. This
 ensures that **after the call** you can load the results of previous tasks.
 
+## What happens during `jug execute`
+
+When `jug execute` reaches a barrier, it runs all the tasks defined up to that
+point (as long as their dependencies are available) and then imports the
+jugfile again. If all the tasks before the barrier have finished, the import
+now continues past it, and the newly defined tasks are run. This repeats for
+every barrier in the jugfile. Note that this means that the code before the
+barrier is run several times (so it should not have side effects).
+
+If several processes are running, a process may reach a barrier while tasks
+before it are still being run by other processes. In this case, it waits
+(`--wait-cycle-time` seconds, 12 by default) and imports the jugfile again. If
+no progress is made for `--nr-wait-cycles` consecutive attempts (150 by
+default, so 30 minutes in total), it gives up and exits. Thus, if a task
+before the barrier cannot be completed (e.g., it failed, or it is locked by a
+process that died), the processes waiting at the barrier exit after this
+time.
+
 `barrier()` is also useful when there are dependencies that Jug cannot see
 (e.g., one task which writes a file which later tasks rely on). An alternative
 solution (not always applicable) is to [add these dependencies through unused

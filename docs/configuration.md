@@ -34,6 +34,46 @@ Boolean settings accept `on`/`off`, `true`/`false`, or `1`/`0`.
 Note that the global flags `--aggressive-unload`, `--debug`, `--pdb`, and
 `--short` cannot currently be set in the configuration file.
 
+## Valid settings
+
+The name of a setting is the name of the option it corresponds to (the
+`dest` of the command line option, with `-` and `_` being interchangeable),
+which is *not always* the same as the name of the command line flag (e.g.,
+`jug graph --file-format` is `format` in the `[graph]` section). Unknown
+settings are silently ignored. The settings that have an effect are:
+
+| Section | Setting | Command line equivalent | Default |
+|---------|---------|-------------------------|---------|
+| `[main]` | `jugdir` | `--jugdir` | `%(jugfile)s.jugdata` |
+| `[main]` | `jugfile` | `jugfile` argument | `jugfile.py` |
+| `[main]` | `verbose` | `--verbose` | `quiet` |
+| `[main]` | `will-cite` | `--will-cite` | `off` |
+| `[execute]` | `wait-cycle-time` | `jug execute --wait-cycle-time` | `12` |
+| `[execute]` | `nr-wait-cycles` | `jug execute --nr-wait-cycles` | `150` |
+| `[execute]` | `keep-going` | `jug execute --keep-going` | `off` |
+| `[execute]` | `keep-failed` | `jug execute --keep-failed` | `off` |
+| `[execute]` | `no-check-environment` | `jug execute --no-check-environment` | `off` |
+| `[execute]` | `name` | `jug execute --name` | (none) |
+| `[execute]` | `pattern` | `jug execute --pattern` | (none) |
+| `[status]` | `cache` | `jug status --cache` | `off` |
+| `[status]` | `cache-file` | `jug status --cache-file` | `.jugstatus.sqlite3` |
+| `[cleanup]` | `locks-only` | `jug cleanup --locks-only` | `off` |
+| `[cleanup]` | `failed-only` | `jug cleanup --failed-only` | `off` |
+| `[cleanup]` | `keep-locks` | `jug cleanup --keep-locks` | `off` |
+| `[graph]` | `no-status` | `jug graph --no-status` | `off` |
+| `[graph]` | `format` | `jug graph --file-format` | `png` |
+| `[webstatus]` | `port` | `jug webstatus --port` | `8080` |
+| `[webstatus]` | `ip` | `jug webstatus --ip` | `localhost` |
+
+For example, to stop jug from printing the request for citation every time
+`jug execute` finishes (once you have resolved to cite it, of course), add
+the following to your configuration file:
+
+```
+[main]
+will-cite=on
+```
+
 ## Project-local configuration
 
 In addition to the global configuration file, `jug` also searches for

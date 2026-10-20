@@ -115,6 +115,21 @@ pieces of functionality:
    jug_execute(['gzip', 'output.txt'], run_after=token)
    ```
 
+3. It takes an argument called `return_value`, which is returned (unchanged)
+   once the command has run. This is often a cleaner way to chain steps that
+   communicate through files, as the name of the output file becomes the
+   result of the task, which can then be passed on to the next step:
+
+   ```
+   from jug.utils import jug_execute
+
+   sorted_file = jug_execute(['sort', '-o', 'sorted.txt', 'input.txt'],
+                             return_value='sorted.txt')
+   # `sorted_file` is a Task whose value is 'sorted.txt', so this
+   # automatically depends on the previous step:
+   jug_execute(['gzip', sorted_file])
+   ```
+
 ## cached_glob
 
 `cached_glob` is a simple utility to perform the following common operation:
@@ -132,6 +147,21 @@ where `pattern` is a glob pattern, can be simply written as:
 from jug.utils import cached_glob
 files = cached_glob(pattern)
 ```
+
+Note that the glob is run while the jugfile is being loaded (the first time)
+and its result is saved in the store, as a `jug.utils.glob_sort` task (which
+shows up in `jug status`). Afterwards, the saved result is used, so files
+which are created later are **not** picked up. To have the glob run again,
+invalidate it:
+
+```
+$ jug invalidate --name glob_sort
+```
+
+As `cached_glob` returns a plain list (not a task), tasks which use it are not
+invalidated by this, but tasks which receive a different list of files have a
+different hash, so they will be run (while results for the files which were
+already there are reused).
 
 ## NoHash
 
