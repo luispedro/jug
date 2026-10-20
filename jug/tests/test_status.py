@@ -88,3 +88,30 @@ def test_status_exit_code(tmpdir):
     assert not exit_code('execute')
     assert exit_code('status') == 0
     assert exit_code('status', '--cache', '--cache-file', cache_file) == 0
+
+
+def test_open_connection_closes_on_error(tmpdir, monkeypatch):
+    import sqlite3
+    import pytest
+    connections = []
+    orig_connect = sqlite3.connect
+
+    class RecordingConnection:
+        def __init__(self, *args):
+            self.conn = orig_connect(*args)
+            self.closed = False
+            connections.append(self)
+        def __getattr__(self, name):
+            return getattr(self.conn, name)
+        def close(self):
+            self.closed = True
+            self.conn.close()
+
+    monkeypatch.setattr(sqlite3, 'connect', RecordingConnection)
+    options = default_options.copy()
+    options.status_cache_file = str(tmpdir / 'cache.sqlite3')
+    with pytest.raises(sqlite3.OperationalError):
+        with status._open_connection(options) as connection:
+            connection.execute('SELECT * FROM missing_table')
+    assert len(connections) == 1
+    assert connections[0].closed

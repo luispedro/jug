@@ -103,9 +103,11 @@ def _open_connection(options):
     '''
     import sqlite3
     connection = sqlite3.connect(options.status_cache_file)
-    yield connection
-    connection.commit()
-    connection.close()
+    try:
+        yield connection
+        connection.commit()
+    finally:
+        connection.close()
 
 
 def load_jugfile(options):
