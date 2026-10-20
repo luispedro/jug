@@ -54,8 +54,12 @@ class NoHash:
         self.obj = obj
 
     def __jug_value__(self):
-        return self.obj
+        from .task import value
+        return value(self.obj)
 
     def __jug_hash__(self):
         return b'nohash'
+
+    def __jug_dependencies__(self):
+        return [self.obj]
 

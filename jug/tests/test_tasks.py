@@ -361,3 +361,29 @@ def test_recursive_dependencies_long_chain():
     for _ in range(sys.getrecursionlimit() + 100):
         t = Task(add1, t)
     assert len(list(recursive_dependencies(t))) == sys.getrecursionlimit() + 100
+
+
+@task_reset
+def test_wrapped_dependencies():
+    from jug.utils import CustomHash
+    from jug.unsafe import NoHash
+    from jug.hash import hash_one
+    for i, wrap in enumerate([lambda t: CustomHash(t, hash_one), NoHash]):
+        t0 = Task(add1, i)
+        t1 = Task(add1, wrap(t0))
+        assert list(t1.dependencies()) == [t0]
+        assert not t1.can_run()
+        t0.run()
+        assert t1.can_run()
+        assert t1.run() == i + 2
+
+
+from collections import namedtuple
+_Pair = namedtuple('_Pair', ['a', 'b'])
+
+@task_reset
+def test_task_in_namedtuple():
+    Task(add1, _Pair(1, 2)).hash()
+    t = Task(add1, _Pair(Task(add1, 1), 2))
+    with raises(TypeError):
+        t.hash()

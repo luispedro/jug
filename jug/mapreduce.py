@@ -137,6 +137,10 @@ class block_access_slice(TaskletMixin):
         })
         return self._hvalue
 
+    def __jug_dependencies__(self):
+        blocks = sorted(set(i // self.base.block_size for i in self._range()))
+        return [self.base.blocks[b] for b in blocks]
+
     def __jug_value__(self):
         from .task import value
         return [value(self[i]) for i in range(len(self))]

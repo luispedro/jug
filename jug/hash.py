@@ -99,8 +99,29 @@ def hash_update(M, elems):
                 except:
                     M.update(e.copy().data)
         else:
+            if isinstance(e, (list, tuple)) and _contains_task(e):
+                raise TypeError(
+                    f'jug: Tasks inside a {type(e).__name__} (a subclass of '
+                    'list/tuple, such as a namedtuple) are not supported. '
+                    'Use a plain list, tuple, or dict instead.')
             M.update(pickle.dumps(e, protocol=_PICKLE_PROTOCOL))
     return M
+
+def _contains_task(obj):
+    '''Returns whether ``obj`` contains a Task or Tasklet (recursively)'''
+    from .task import Task, Tasklet
+    queue = [obj]
+    while queue:
+        e = queue.pop()
+        if isinstance(e, (Task, Tasklet)):
+            return True
+        elif hasattr(e, '__jug_dependencies__'):
+            queue.extend(e.__jug_dependencies__())
+        elif isinstance(e, (list, tuple, set, frozenset)):
+            queue.extend(e)
+        elif isinstance(e, dict):
+            queue.extend(e.values())
+    return False
 
 def new_hash_object():
     '''

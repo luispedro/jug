@@ -139,3 +139,18 @@ def test_map_slice_hash_unchanged():
     a = ts[2:8][1:3]
     b = jug.mapreduce.block_access_slice(ts, (3, 5, 1))
     assert a.__jug_hash__() == b.__jug_hash__()
+
+
+@task_reset
+def test_map_slice_dependencies():
+    jug.task.Task.store = dict_store()
+    ts = jug.mapreduce.map(mapper, list(range(23)), map_step=4)
+    sub = ts[5:10]
+    assert list(jug.task.Task(sum, sub).dependencies()) == ts.blocks[1:3]
+    t = jug.task.Task(sum, sub)
+    assert not t.can_run()
+    ts.blocks[1].run()
+    assert not t.can_run()
+    ts.blocks[2].run()
+    assert t.can_run()
+    assert t.run() == sum(mapper(i) for i in range(5, 10))

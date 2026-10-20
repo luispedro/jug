@@ -1,4 +1,13 @@
 Unreleased
+	* Track Tasks wrapped in `CustomHash`, `NoHash` or a slice of the
+	result of `mapreduce.map` as dependencies. Before, such a task could be
+	started before the tasks it depends on had run (and then fail)
+	* NoHash: Pass the value of a wrapped Task to the function (instead of
+	the Task object itself)
+	* Raise a clear error when a Task is passed inside a subclass of
+	list/tuple (e.g., a namedtuple), which was never supported: the function
+	received the Task object instead of its value, and hashing could fail
+	with an obscure error
 	* recursive_dependencies: List each dependency only once. Previously,
 	a task reachable by several paths was listed once per path, so that
 	`jug check` took exponential time on diamond-shaped task graphs

@@ -128,6 +128,9 @@ class CustomHash:
     def __jug_value__(self):
         return value(self.obj)
 
+    def __jug_dependencies__(self):
+        return [self.obj]
+
 
 def hash_with_mtime_size(path):
     '''hvalue = hash_with_mtime_size(path)
