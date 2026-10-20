@@ -250,3 +250,13 @@ def test_dict_store_persistence(tmp_path):
     assert reloaded.can_load(key)
     assert reloaded.load(key) == list(range(10))
     reloaded.close()
+
+
+def test_redis_store_close():
+    # Does not need a server: redis.Redis() only connects when used
+    pytest.importorskip('redis')
+    st = jug.backends.redis_store.redis_store('redis:')
+    closed = []
+    st.redis.close = lambda: closed.append(True)
+    st.close()
+    assert closed == [True]

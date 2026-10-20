@@ -1,4 +1,6 @@
 Unreleased
+	* redis_store: Fix `close()`, which silently did nothing (it called
+	`disconnect()`, which redis-py does not have)
 	* CompoundTask: Save the result once, instead of twice
 	* jug webstatus: Escape the jugfile and task names, and only accept an
 	integer for `?refresh=` (which allowed injecting HTML/JavaScript into the

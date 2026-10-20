@@ -215,12 +215,7 @@ class redis_store(base_store):
 
         Close the connection to the Redis server.
         '''
-        # It seems some versions of the protocol are implemented differently
-        # and do not have the ``disconnect`` method
-        try:
-            self.redis.disconnect()
-        except:
-            pass
+        self.redis.close()
 
 
 
