@@ -1,4 +1,6 @@
 Unreleased
+	* Python 3.9 is no longer supported (it reached end-of-life in October
+	2025). Jug now requires Python 3.10 or later
 	* jug execute: With a barrier, the waiting time is bounded by
 	`--nr-wait-cycles` overall (previously, each re-load of the jugfile
 	waited the full time again, for up to about 75 hours with the default

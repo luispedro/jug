@@ -4,6 +4,9 @@
 
 ### Compatibility notes
 
+Python 3.9 is no longer supported (it reached end-of-life in October 2025):
+jug now requires Python 3.10 or later.
+
 `jug execute` and `jug invalidate` select tasks by name using `--name`
 (strict) or `--pattern` (loose). The old `--target` option (and
 `--invalid`, for `jug invalidate`) is now a deprecated synonym of

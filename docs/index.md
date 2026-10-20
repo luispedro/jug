@@ -123,7 +123,7 @@ conda install jug
 
 ## What do I need to run Jug?
 
-It is a Python only package. Jug is [continuously tested](https://github.com/luispedro/jug/actions) with Python 3.9 and up.
+It is a Python only package. Jug is [continuously tested](https://github.com/luispedro/jug/actions) with Python 3.10 and up.
 
 ## How does it work?
 
