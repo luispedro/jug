@@ -240,6 +240,7 @@ def map(mapper, sequence, map_step=4):
         Curried version of this function
     '''
     if map_step == 1:
+        mapper = _get_function(mapper)
         return [Task(mapper, s) for s in sequence]
     blocks = []
     n = 0
@@ -281,6 +282,7 @@ def currymap(mapper, sequence, map_step=4):
         Uncurried version of this function
     '''
     if map_step == 1:
+        mapper = _get_function(mapper)
         return [Task(mapper, *s) for s in sequence]
     result = []
     for ss in _break_up(sequence, map_step):

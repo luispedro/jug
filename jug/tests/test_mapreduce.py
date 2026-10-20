@@ -104,6 +104,20 @@ def test_currymap():
 
 
 @task_reset
+def test_taskgenerator_map_step_1():
+    jug.task.Task.store = dict_store()
+    A = list(range(8))
+    ts = jug.mapreduce.map(TaskGenerator(mapper), A, map_step=1)
+    cs = jug.mapreduce.currymap(TaskGenerator(mapper2), list(zip(A, A)), map_step=1)
+    # Same tasks as when built from the plain functions
+    assert [t.hash() for t in ts] == [jug.task.Task(mapper, a).hash() for a in A]
+    assert [t.hash() for t in cs] == [jug.task.Task(mapper2, a, a).hash() for a in A]
+    simple_execute()
+    assert value(ts) == [mapper(a) for a in A]
+    assert value(cs) == [mapper2(a, a) for a in A]
+
+
+@task_reset
 def test_map_slicing():
     jug.task.Task.store = dict_store()
     A = list(range(23))

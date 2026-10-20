@@ -1,4 +1,6 @@
 Unreleased
+	* mapreduce: `map` and `currymap` with `map_step=1` accept a
+	`TaskGenerator` (previously, they failed with `AttributeError: __name__`)
 	* jug status --cache: Exit with a clear error message if the cache file is
 	not a valid cache (previously, it crashed with a traceback). Interrupting
 	the cache lookup no longer falls back to loading the jugfile
