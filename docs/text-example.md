@@ -182,4 +182,4 @@ in the main `jugfile.py`, with a final function writing to an output file.
     is set to roughly half an hour. You can set this with the
     `--nr-wait-cycles` (how many times jug will check for tasks) and
     `--wait-cycle-time` (the number of seconds to wait between each check).
-    See [execute](subcommands.md#execute) for all the options.
+    See [execute](https://jug.readthedocs.io/en/latest/subcommands.html#execute) for all the options.

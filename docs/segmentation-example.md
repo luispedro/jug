@@ -7,7 +7,7 @@ Let us imagine you are trying to compare two image segmentation algorithms
 based on human-segmented images. This is a completely real-world example as it
 [was one of the projects where I first used jug](https://github.com/luispedro/Coelho2009_ISBI_NuclearSegmentation) [^footnote-1].
 
-It depends on [mahotas](https://mahotas.readthedocs.org/) for image
+It depends on [mahotas](https://mahotas.readthedocs.io/) for image
 processing.
 
 We are going to build this up piece by piece.
@@ -118,4 +118,4 @@ The full script above including data is available [from github](https://github.c
     course.
 
 [^footnote-3]: Again, you can do better than Adjusted Rand, as we show in the paper;
-    but **this is a demo**. This way, we can just call a function in [milk](https://luispedro.org/software/milk)
+    but **this is a demo**. This way, we can just call a function in [milk](https://github.com/luispedro/milk)

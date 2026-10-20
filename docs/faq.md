@@ -153,7 +153,7 @@ It would also slow things down. Even if it checked only the Python code: it
 would need to check the function code & all dependencies + global variables at
 the time of task generation.
 
-I believe [sumatra](https://pythonhosted.org/Sumatra/) accomplishes this.
+I believe [sumatra](https://sumatra.readthedocs.io/) accomplishes this.
 Consider using it if you desire all this functionality.
 
 2\) I was also afraid that this would make people wary of refactoring their
@@ -173,7 +173,7 @@ get them from one machine to another, you could write a special backend for
 that. Right now, only `numpy` arrays and `polars` DataFrames are treated as
 special cases by the filesystem backend (they are not pickled, but rather saved
 in their native formats: `.npy` and parquet, respectively), but you could
-extend this. Ask on the [mailing list](https://groups.google.com/group/jug-users) if
+extend this. Ask on the [mailing list](https://groups.google.com/g/jug-users) if
 you want to learn more.
 
 ## Is jug based on a background server?

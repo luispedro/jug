@@ -194,7 +194,7 @@ class ShellCommand(SubCommand):
             # This is tricky, but the following WOULD NOT work:
             #  for mod in modules.values():
             #     ..
-            # Some modules use https://pypi.python.org/pypi/apipkg which triggers
+            # Some modules use https://pypi.org/project/apipkg/ which triggers
             # name loading when __dict__ is accessed. This may itself import other
             # modules, thus raising an error: "RuntimeError: dictionary changed
             # size during iteration" Whether this happens depends on exactly which

@@ -21,10 +21,9 @@ suite](<https://github.com/luispedro/jug/actions>)).
 
 *Documentation*: <https://jug.readthedocs.io/>
 
-*Video*: On [vimeo](http://vimeo.com/8972696) or
-[showmedo](http://showmedo.com/videotutorials/video?name=9750000;fromSeriesID=975)
+*Video*: On [vimeo](https://vimeo.com/8972696)
 
-*Mailing List*: <https://groups.google.com/group/jug-users>
+*Mailing List*: <https://groups.google.com/g/jug-users>
 
 ## Testimonials
 
@@ -42,7 +41,7 @@ If you want to use `jug shell`, install IPython as well:
     pip install Jug ipython
 
 Or, if you use [conda](https://anaconda.org/), you can install
-jug from [conda-forge](https://conda-forge.github.io/) using the
+jug from [conda-forge](https://conda-forge.org/) using the
 following commands:
 
     conda config --add channels conda-forge
@@ -174,10 +173,12 @@ be recomputed the first time you run them with this version:
 - Support project-local configuration files (`.jugrc` or `jugrc`). Jug
   now walks up the directory tree from the current working directory (up
   to the git project root) looking for local configuration files. See
-  `configuration` for details.
+  [configuration](https://jug.readthedocs.io/en/latest/configuration.html)
+  for details.
 - Ship the Jug assistant skill in the Python package and add
   `jug install-skills --output DIR` to install it into Codex or Claude
-  Code skills directories. See `ai-assistants` for usage
+  Code skills directories. See
+  [ai-assistants](https://jug.readthedocs.io/en/latest/ai-assistants.html) for usage
   details.
 
 ### Bugfixes

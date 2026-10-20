@@ -86,7 +86,7 @@ the `examples/` directory.
 
 ## Links
 
-- [Mailing list](https://groups.google.com/group/jug-users)
+- [Mailing list](https://groups.google.com/g/jug-users)
 - [Github](https://github.com/luispedro/jug)
 - [Documentation](https://jug.readthedocs.io/)
 
@@ -102,7 +102,7 @@ You can either get the git repository at
 
 [https://github.com/luispedro/jug](https://github.com/luispedro/jug)
 
-Or download the package from [PyPI](https://pypi.python.org/pypi/Jug)
+Or download the package from [PyPI](https://pypi.org/project/Jug/)
 
 ## Testimonials
 

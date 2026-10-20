@@ -214,7 +214,7 @@ enable it for all argcomplete-enabled programs.
 
 ### Static completion script with shtab
 
-[shtab](https://github.com/iterative/shtab) generates a completion script
+[shtab](https://github.com/tqdm/shtab) generates a completion script
 ahead of time (bash, zsh, and tcsh are supported). Jug can print it directly:
 
 ```
