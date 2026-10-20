@@ -78,3 +78,24 @@ def test_debug():
     assert 'sixteen' in space
     assert space['sixteen'].result == 16
 
+
+
+@task_reset
+def test_compound_result_saved_once():
+    store = dict_store()
+    jug.task.Task.store = store
+    dumps = []
+    orig_dump = store.dump
+    def counting_dump(obj, name):
+        dumps.append(name)
+        return orig_dump(obj, name)
+    store.dump = counting_dump
+
+    A = np.arange(100)
+    x = CompoundTask(jug.mapreduce.mapreduce, reducer, mapper, A)
+    dfs_run(x)
+    assert dumps.count(x.hash()) == 1
+
+    y = CompoundTask(jug.mapreduce.mapreduce, reducer, mapper, A)
+    assert y.can_load()
+    assert y.value() == x.value()

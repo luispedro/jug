@@ -27,8 +27,9 @@ def compound_task_execute(x, h):
     compound_task_execute
 
     This is an internal function. Do **not** use directly.
+
+    The result is saved by ``Task.run`` (the compound task's hash is ``h``).
     '''
-    Task.store.dump(x, h)
     return x
 
 def CompoundTask(f, *args, **kwargs):

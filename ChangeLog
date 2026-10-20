@@ -1,4 +1,5 @@
 Unreleased
+	* CompoundTask: Save the result once, instead of twice
 	* jug webstatus: Escape the jugfile and task names, and only accept an
 	integer for `?refresh=` (which allowed injecting HTML/JavaScript into the
 	page)
