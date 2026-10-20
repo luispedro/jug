@@ -236,7 +236,7 @@ class dict_lock(base_lock):
         Removes lock
         '''
         self.counts[_gen_key('unlock', self.name)] += 1
-        del self.store[self.name]
+        self.store.pop(self.name, None)
 
     def is_locked(self):
         '''
@@ -257,7 +257,7 @@ class dict_lock(base_lock):
         if self.store.get(self.name, _NOT_LOCKED) == _LOCKED:
             self.store[self.name] = _FAILED
 
-        return self.store[self.name] == _FAILED
+        return self.store.get(self.name, _NOT_LOCKED) == _FAILED
 
     def is_failed(self):
         '''

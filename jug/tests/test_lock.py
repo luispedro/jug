@@ -5,6 +5,7 @@ from .task_reset import task_reset_at_exit, task_reset
 from jug.backends import memoize_store
 from jug import Task
 from time import sleep
+import pytest
 
 
 def test_twice(tmpdir):
@@ -28,8 +29,17 @@ def test_twolocks(tmpdir):
     bar.release()
 
 
-def test_fail_and_lock(tmpdir):
-    lock = file_based_lock(str(tmpdir), 'foo')
+@pytest.mark.parametrize('backend', ['file', 'dict'])
+def test_fail_and_lock(tmpdir, backend):
+    if backend == 'file':
+        lock = file_based_lock(str(tmpdir), 'foo')
+    else:
+        lock = dict_store().getlock('foo')
+    assert not lock.is_failed()
+    assert not lock.is_locked()
+
+    # releasing a lock which is not held has no effect
+    lock.release()
     assert not lock.is_failed()
     assert not lock.is_locked()
 

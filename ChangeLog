@@ -1,4 +1,6 @@
 Unreleased
+	* dict_store: `release()` and `fail()` on a lock which is not held have
+	no effect (as for the other backends), instead of raising `KeyError`
 	* TaskGenerator: Raise the intended error message when pickling a
 	function whose module cannot be found (instead of a `KeyError`)
 	* Task: Support `functools.partial` objects as the function, which
