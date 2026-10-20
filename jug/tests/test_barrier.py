@@ -88,3 +88,27 @@ def test_recursive():
     store, space = jug.jug.init(jugfile, store)
     assert 's2' in space
 
+
+@task_reset
+def test_barrier_failed_task_not_retried(monkeypatch):
+    # With a barrier, waiting must be bounded overall (not nr_wait_cycles in
+    # each re-load of the jugfile) and a failed task must not be re-run
+    import pytest
+    from jug.hooks import register_hook
+    for keep_failed in (False, True):
+        options = default_options.copy()
+        options.jugdir = 'dict_store'
+        options.jugfile = find_test_jugfile('failing_barrier.py')
+        options.execute_keep_going = True
+        options.execute_keep_failed = keep_failed
+        options.execute_nr_wait_cycles = 3
+        options.execute_wait_cycle_time = 0
+        sleeps = []
+        monkeypatch.setattr('time.sleep', sleeps.append)
+        executed = []
+        register_hook('execute.task-pre-execute', executed.append)
+        with pytest.raises(SystemExit) as e:
+            jug.subcommands.execute.execute(options)
+        assert e.value.code == 1
+        assert len(executed) == 1
+        assert len(sleeps) == 3

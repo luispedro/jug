@@ -1,4 +1,9 @@
 Unreleased
+	* jug execute: With a barrier, the waiting time is bounded by
+	`--nr-wait-cycles` overall (previously, each re-load of the jugfile
+	waited the full time again, for up to about 75 hours with the default
+	settings) and, with `--keep-going`, failed tasks are not re-run every
+	time the jugfile is re-loaded
 	* `return_tuple` is exported from `jug` (`from jug import return_tuple`)
 	* jug_execute: Include the command and its exit code in the error message
 	when the command fails

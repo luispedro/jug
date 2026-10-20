@@ -69,7 +69,7 @@ class ExecuteCommand(SubCommand):
     def run(self, options, *args, **kwargs):
         from signal import signal, SIGTERM
         from ..hooks.exit_checks import exit_env_vars, exit_if_file_exists
-        from ..jug import execution_loop
+        from ..jug import execution_loop, ExecutionState
 
         signal(SIGTERM, _sigterm)
         if not options.execute_no_check_environment:
@@ -82,9 +82,12 @@ class ExecuteCommand(SubCommand):
         register_hook_once('execute.task-loadable', '_log_loadable', _log_loadable)
 
         nr_wait_cycles = int(options.execute_nr_wait_cycles)
-        noprogress = 0
+        # Shared across iterations so that waiting is bounded overall (instead
+        # of nr_wait_cycles in each call to execution_loop) and failed tasks
+        # are not retried
+        state = ExecutionState()
         failures = False
-        while noprogress < nr_wait_cycles:
+        while True:
             del tasks[:]
             on_error = ('propagate' if options.pdb else 'exit')
             store, jugspace = init(options.jugfile, options.jugdir, on_error=on_error, store=store)
@@ -94,19 +97,19 @@ class ExecuteCommand(SubCommand):
                     t.hash()
 
             previous = sum(tstats.executed.values())
-            failures = execution_loop(tasks, options) or failures
+            failures = execution_loop(tasks, options, state) or failures
             after = sum(tstats.executed.values())
             done = not jugspace.get('__jug__hasbarrier__', False)
             if done:
                 break
+            if state.nr_waits >= nr_wait_cycles:
+                logging.info('No tasks can be run!')
+                break
             if after == previous:
                 from time import sleep
-                noprogress += 1
+                logging.info(f'waiting {options.execute_wait_cycle_time} secs for the barrier...')
                 sleep(float(options.execute_wait_cycle_time))
-            else:
-                noprogress = 0
-        else:
-            logging.info('No tasks can be run!')
+                state.nr_waits += 1
 
         jug_hook('execute.finished_pre_status')
         maybe_print_citation_info(options)

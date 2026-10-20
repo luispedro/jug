@@ -63,6 +63,12 @@ tasks, so `jug status && ...` failed when work had been done).
 
 ### Bugfixes
 
+- `jug execute` on a jugfile with a barrier: the waiting time is bounded by
+  `--nr-wait-cycles` overall. Before, each re-load of the jugfile waited the
+  full time again, so a stuck task (e.g., failed with `--keep-failed`) could
+  keep `jug execute` waiting for up to about 75 hours with the default
+  settings. With `--keep-going`, a failed task is also no longer re-run every
+  time the jugfile is re-loaded.
 - Jugfiles are read as Python source (UTF-8 by default, or as declared by a
   PEP 263 coding comment) independently of the locale. Before, a UTF-8
   jugfile failed with `UnicodeDecodeError` under, e.g., `LC_ALL=C`.

@@ -124,20 +124,42 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
     return store, jugspace
 
 
-def execution_loop(tasks, options):
+class ExecutionState:
+    '''State kept across calls to ``execution_loop``
+
+    ``jug execute`` calls ``execution_loop`` repeatedly when the jugfile has a
+    barrier (re-loading the jugfile each time), and this state ensures that
+    the waiting time is bounded overall and failed tasks are not retried.
+
+    Attributes
+    ----------
+    nr_waits : int
+        Number of wait cycles since the last progress (i.e., since a task was
+        run or a dependency became available while waiting)
+    failed : set of str
+        Hashes of tasks that failed (they are not run again)
+    '''
+    def __init__(self):
+        self.nr_waits = 0
+        self.failed = set()
+
+
+def execution_loop(tasks, options, state=None):
     '''Run the tasks in ``tasks`` (the core of ``jug execute``)
 
     Repeatedly picks tasks whose dependencies are available, locks them, runs
     them, and stores their results. If no task can be run, waits
     ``options.execute_wait_cycle_time`` seconds (up to
-    ``options.execute_nr_wait_cycles`` times) for other processes to finish
-    dependencies before giving up.
+    ``options.execute_nr_wait_cycles`` times since the last progress) for
+    other processes to finish dependencies before giving up.
 
     Parameters
     ----------
     tasks : list of Task
         Tasks to run (this list is modified)
     options : jug options
+    state : ExecutionState, optional
+        State shared with previous calls (by default, a new state is used)
 
     Returns
     -------
@@ -168,14 +190,20 @@ def execution_loop(tasks, options):
         start_task_set = {id(t) for t in task.alltasks}
 
 
+    if state is None:
+        state = ExecutionState()
+    nr_wait_cycles = int(options.execute_nr_wait_cycles)
     failures = False
     prevtask = None
     while tasks:
         upnext = [] # tasks that can be run
-        nr_wait_cycles = int(options.execute_nr_wait_cycles)
-        for _ in range(nr_wait_cycles):
+        waited = False
+        while True:
             first_runnable = next((ti for ti,t in enumerate(tasks) if t.can_run()), None)
             if first_runnable is not None:
+                if waited:
+                    # A dependency became available while waiting
+                    state.nr_waits = 0
                 # Move the tasks that cannot run to the end of the list.
                 #
                 # The argument for this is the following:
@@ -192,12 +220,19 @@ def execution_loop(tasks, options):
                 upnext = tasks[:nr_runnable]
                 del tasks[:nr_runnable]
                 break
+            if state.nr_waits >= nr_wait_cycles:
+                break
             logging.info(f'waiting {options.execute_wait_cycle_time} secs for an open task...')
             sleep(float(options.execute_wait_cycle_time))
+            state.nr_waits += 1
+            waited = True
         if not upnext:
             logging.info('No tasks can be run!')
             break
         for t in upnext:
+            if t.hash() in state.failed:
+                # Failed in a previous call (before the jugfile was re-loaded)
+                continue
             if t.can_load():
                 jug_hook('execute.task-loadable', (t,))
                 continue
@@ -218,6 +253,7 @@ def execution_loop(tasks, options):
                                 if id(d) not in active:
                                     d.unload()
                         prevtask = t
+                    state.nr_waits = 0
                     t.run(debug_mode=options.debug)
                     jug_hook('execute.task-executed1', (t,))
                     if options.debug:
@@ -231,6 +267,7 @@ def execution_loop(tasks, options):
                 raise
             except Exception as e:
                 failures = task_failed = True
+                state.failed.add(t.hash())
 
                 if options.pdb:
                     from .internal.debugger import debug_exception
