@@ -96,7 +96,8 @@ def hash_update(M, elems):
                 try:
                     buffer = e.data
                     M.update(buffer)
-                except:
+                except BufferError:
+                    # Non-contiguous arrays do not expose a contiguous buffer
                     M.update(e.copy().data)
         else:
             if isinstance(e, (list, tuple)) and _contains_task(e):

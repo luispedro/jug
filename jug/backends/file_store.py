@@ -46,7 +46,7 @@ def fsync_dir(fname):
     parent = dirname(fname)
     try:
         fd = os.open(parent, os.O_RDONLY)
-    except:
+    except OSError:
         # It seems that, on Windows and related platforms (cygwin...), you
         # cannot open a directory to get a file descriptor, so the call above
         # raises an error.

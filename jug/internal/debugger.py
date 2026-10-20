@@ -35,7 +35,7 @@ def _get_debugger():
             from IPython.terminal.ipapp import load_default_config
             config = load_default_config()
             colors = config.TerminalInteractiveShell.colors
-        except:
+        except Exception:
             import IPython.core.ipapi
             ip = IPython.core.ipapi.get()
             colors = ip.colors

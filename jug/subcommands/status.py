@@ -222,18 +222,19 @@ def _clear_cache(options):
     from os import unlink
     try:
         unlink(options.status_cache_file)
-    except:
+    except OSError:
         pass
 
 
 def _status_cached(options):
+    import sqlite3
     create, update = list(range(2))
     try:
         with _open_connection(options) as connection:
             ht, deps, rdeps = retrieve_sqlite3(connection)
         store = backends.select(options.jugdir)
         mode = update
-    except:
+    except sqlite3.Error:
         store, ht, deps, rdeps = load_jugfile(options)
         mode = create
 
