@@ -1,4 +1,7 @@
 Unreleased
+	* Task: Support `functools.partial` objects as the function, which
+	previously failed with `AttributeError: __name__`. The partial is
+	unwrapped, so `Task(partial(f, a), b)` is the same task as `Task(f, a, b)`
 	* Track Tasks wrapped in `CustomHash`, `NoHash` or a slice of the
 	result of `mapreduce.map` as dependencies. Before, such a task could be
 	started before the tasks it depends on had run (and then fail)

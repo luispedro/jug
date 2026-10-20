@@ -81,7 +81,8 @@ class Task(TaskletMixin):
 
     ``f`` must be a named function (defined with ``def``); lambda functions
     raise a ``ValueError`` (use ``Tasklet`` to apply a lambda to a task's
-    result).
+    result). ``f`` may also be a ``functools.partial`` object, which is
+    unwrapped: ``Task(partial(f, a), b)`` is the same task as ``Task(f, a, b)``.
 
     Attributes
     ----------
@@ -100,6 +101,11 @@ class Task(TaskletMixin):
     store = None
     # __slots__ = ('name', 'f', 'args', 'kwargs', '_hash','_lock')
     def __init__(self, f, *args, **kwargs):
+        from functools import partial
+        while isinstance(f, partial):
+            args = f.args + args
+            kwargs = {**f.keywords, **kwargs}
+            f = f.func
         if getattr(f, '__name__', '') == '<lambda>':
             raise ValueError('''jug.Task does not work with lambda functions!
 

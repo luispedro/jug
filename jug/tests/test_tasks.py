@@ -145,6 +145,30 @@ def test_task_rejects_lambda():
         jug.task.Task(lambda x: x + 1, 0)
 
 
+def add3(a, b=0, c=0):
+    return a + b + c
+
+@task_reset
+def test_task_partial():
+    from functools import partial
+    T0 = Task(add1, 0)
+    T = Task(partial(add3, T0, c=10), b=3)
+    assert T.name == f'{__name__}.add3'
+    assert T.hash() == Task(add3, T0, b=3, c=10).hash()
+    assert list(T.dependencies()) == [T0]
+    simple_execute()
+    assert T.value() == 14
+
+    # nested partials; keyword arguments of the call override the partial's
+    T = Task(partial(partial(add3, 1), b=2, c=3), c=4)
+    assert T.hash() == Task(add3, 1, b=2, c=4).hash()
+    simple_execute()
+    assert T.value() == 7
+
+    with raises(ValueError):
+        Task(partial(lambda x, y: x + y, 1), 2)
+
+
 @task_reset
 def test_taskgenerator():
     @jug.task.TaskGenerator
