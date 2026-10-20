@@ -737,9 +737,11 @@ class TaskGenerator:
     def __getstate__(self):
         from sys import modules
         modname = getattr(self.f, '__module__', None)
-        fname = self.f.__name__
-        obj = getattr(modules[modname], fname, None)
-        if modname is None or (obj is not self and obj is not self.f):
+        fname = getattr(self.f, '__name__', None)
+        obj = None
+        if modname in modules and fname is not None:
+            obj = getattr(modules[modname], fname, None)
+        if obj is not self and obj is not self.f:
             raise RuntimeError('jug.TaskGenerator could not pickle function.\nA function must be defined at the top-module level')
         return modname,fname
 

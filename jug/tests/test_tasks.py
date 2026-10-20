@@ -178,6 +178,16 @@ def test_taskgenerator():
     assert type(T) == jug.task.Task
 
 
+def test_taskgenerator_pickle_error():
+    import pickle
+    def local(x):
+        return x
+    for modname in [None, 'jug_no_such_module', __name__]:
+        local.__module__ = modname
+        with raises(RuntimeError):
+            pickle.dumps(jug.task.TaskGenerator(local))
+
+
 @task_reset
 def test_unload():
     T0 = jug.task.Task(add1,0)

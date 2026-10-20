@@ -1,4 +1,6 @@
 Unreleased
+	* TaskGenerator: Raise the intended error message when pickling a
+	function whose module cannot be found (instead of a `KeyError`)
 	* Task: Support `functools.partial` objects as the function, which
 	previously failed with `AttributeError: __name__`. The partial is
 	unwrapped, so `Task(partial(f, a), b)` is the same task as `Task(f, a, b)`
