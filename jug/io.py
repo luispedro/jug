@@ -177,66 +177,13 @@ def print_task_summary_table(options, groups):
     options.print_out(format_line([sum(g.values()) for _, g in groups], "Total"))
     options.print_out()
 
-# Terminal size calculation
-
-import os
-import shlex
-import struct
-import platform
-import subprocess
-
 def get_terminal_size():
     """ get_terminal_size()
      - get width and height of console, as a tuple ``(columns, lines)``
-     - on Linux, macOS and cygwin, uses ``os.get_terminal_size()``
-     - on Windows, uses the console API (or ``tput`` as a fallback)
+     - uses ``shutil.get_terminal_size()``, so the ``COLUMNS`` and ``LINES``
+       environment variables take precedence
      - returns ``(80, 25)`` if the size cannot be determined
     """
-    current_os = platform.system()
-    tuple_xy = None
-    if current_os == 'Windows':
-        tuple_xy = _get_terminal_size_windows()
-        if tuple_xy is None:
-            tuple_xy = _get_terminal_size_tput()
-            # needed for window's python in cygwin's xterm!
-    if current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
-        tuple_xy = _get_terminal_size_linux()
-    if tuple_xy is None:
-        tuple_xy = (80, 25)      # default value
-    return tuple_xy
-
-def _get_terminal_size_windows():
-    try:
-        from ctypes import windll, create_string_buffer
-        # stdin handle is -10
-        # stdout handle is -11
-        # stderr handle is -12
-        h = windll.kernel32.GetStdHandle(-12)
-        csbi = create_string_buffer(22)
-        res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
-        if res:
-            (bufx, bufy, curx, cury, wattr,
-             left, top, right, bottom,
-             maxx, maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
-            sizex = right - left + 1
-            sizey = bottom - top + 1
-            return sizex, sizey
-    except:
-        pass
-
-def _get_terminal_size_tput():
-    # get terminal width
-    # src: https://stackoverflow.com/questions/263890/how-do-i-find-the-width-height-of-a-terminal-window
-    try:
-        cols = int(subprocess.check_output(shlex.split('tput cols')))
-        rows = int(subprocess.check_output(shlex.split('tput lines')))
-        return (cols, rows)
-    except:
-        pass
-
-def _get_terminal_size_linux():
-    try:
-        columns, lines = os.get_terminal_size()
-        return columns, lines
-    except OSError:
-        return None
+    import shutil
+    columns, lines = shutil.get_terminal_size((80, 25))
+    return columns, lines

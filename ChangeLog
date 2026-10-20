@@ -1,4 +1,7 @@
 Unreleased
+	* Use `shutil.get_terminal_size()` to get the terminal width for
+	summary tables. The `COLUMNS` environment variable is now respected,
+	and the width is detected on all platforms (e.g., FreeBSD)
 	* hooks: `register_time_tasks()` prints mean times with two decimal
 	places (e.g., `123.46s`) instead of two significant digits (`1.2e+02s`)
 	* file_store: Fix concurrent changes to packed results (from `jug
