@@ -43,6 +43,13 @@ def test_parse():
     assert parsed.execute_wait_cycle_time == 23
     assert not parsed.aggressive_unload
 
+def test_parse_fractional_wait_cycle_time():
+    parsed = jug.options.parse(
+        ["execute"],
+        StringIO('[execute]\nwait-cycle-time=0.5\n'))
+    assert parsed.execute_wait_cycle_time == 0.5
+    assert isinstance(parsed.execute_nr_wait_cycles, int)
+
 def test_parse_flags_from_config():
     flags = ['aggressive_unload', 'short', 'pdb', 'debug', 'will_cite']
     config = '[main]\n' + ''.join(f"{f.replace('_', '-')}=true\n" for f in flags)

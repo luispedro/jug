@@ -20,8 +20,9 @@ Unreleased
 	not a valid cache (previously, it crashed with a traceback). Interrupting
 	the cache lookup no longer falls back to loading the jugfile
 	* jug execute: `--wait-cycle-time` (and `wait-cycle-time` in configuration
-	files) accepts fractional values, which were previously rejected (on the
-	command line) or truncated (in configuration files)
+	files) accepts fractional values, which were previously rejected (with an
+	error on the command line, and a ValueError at startup from a
+	configuration file)
 	* jug execute: Faster selection of the next task to run when there are
 	many tasks (the task list was rotated one element at a time, which is
 	quadratic, and was scanned twice in the last wait cycle)

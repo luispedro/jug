@@ -147,7 +147,7 @@ class ExecuteCommand(SubCommand):
                             help='Do not check environment variables JUG_* and file __jug_please_stop_running.txt')
 
     def parse_defaults(self):
-        wait_cycle_time = 12
+        wait_cycle_time = 12.
 
         default_values = {
             "execute_keep_going": False,
@@ -155,7 +155,7 @@ class ExecuteCommand(SubCommand):
             "execute_name": None,
             "execute_pattern": None,
             "execute_wait_cycle_time": wait_cycle_time,
-            "execute_nr_wait_cycles": (30 * 60) // wait_cycle_time,
+            "execute_nr_wait_cycles": int((30 * 60) // wait_cycle_time),
             "execute_no_check_environment": False,
         }
 
