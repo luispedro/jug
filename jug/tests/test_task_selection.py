@@ -73,7 +73,8 @@ def test_pattern_is_loose():
 
     m = prepare_task_matcher('function')
     assert m('jugfile.function_other')
-    assert not m('jugfile_function')
+    assert m('jugfile.other_function')
+    assert not m('jugfile.other')
 
     m = prepare_task_matcher('/compute_.*/')
     assert m('jugfile.compute_x')
@@ -81,6 +82,19 @@ def test_pattern_is_loose():
 
     assert not prepare_task_matcher('/function$/')('jugfile.function_other')
     assert prepare_task_matcher('/function$/')('jugfile.function')
+
+
+def test_pattern_is_substring():
+    assert prepare_task_matcher('prime')('primes.is_prime')
+    assert prepare_task_matcher('identity')('identity')
+    assert prepare_task_matcher('s.is_p')('primes.is_prime')
+    # outside /.../, regular expression characters are literal
+    assert not prepare_task_matcher('compute_.*')('jugfile.compute_x')
+    assert prepare_task_matcher('f+')('jugfile.f+g')
+    assert not prepare_task_matcher('f+')('jugfile.ff')
+    # '/a/b' is not a regular expression
+    assert not prepare_task_matcher('/a/b')('jugfile.a')
+    assert prepare_task_matcher('/a/b')('x/a/b')
 
 
 def test_matcher_from_options():

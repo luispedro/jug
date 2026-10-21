@@ -92,7 +92,7 @@ anywhere in the task name (`--pattern add_counts` will match
 written between slashes (`--pattern '/add_counts.*/'`).
 
 ```{note}
-Older versions of jug used `--target` for this (which behaved like
+Older versions of jug used `--target` for this (which behaved similarly to
 `--pattern`). `--target` and `--invalid` still work as synonyms of
 `--name`, but they are deprecated and print a warning.
 ```

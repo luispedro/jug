@@ -182,10 +182,9 @@ def prepare_task_matcher(pattern):
     The pattern is interpreted as follows:
 
     - ``/regex/``: a regular expression (searched anywhere in the task name)
-    - contains a ``.``: a full task name, but matched *anywhere* in the name
-      (so ``mod.func`` also matches ``mod.func_other``)
-    - otherwise: a function name, matched as ``\\.pattern`` anywhere in the
-      task name (so ``func`` also matches ``mod.func_other``)
+    - otherwise: a plain string (not a regular expression), matched anywhere
+      in the task name (so ``func`` also matches ``mod.func_other`` and
+      ``mod.other_func``)
 
     For strict matching, use :func:`prepare_name_matcher`.
 
@@ -198,17 +197,11 @@ def prepare_task_matcher(pattern):
     matcher : callable
         ``matcher(task_name)`` returns a true value if the name matches
     '''
-    if re.match(r'/.*/', pattern):
+    if len(pattern) >= 2 and pattern.startswith('/') and pattern.endswith('/'):
         # Looks like a regular expression
-        regex = re.compile(pattern.strip('/'))
-
-    elif '.' in pattern:
-        # Looks like a full task name
-        regex = re.compile(pattern.replace('.', '\\.'))
-
+        regex = re.compile(pattern[1:-1])
     else:
-        # A bare function name perhaps?
-        regex = re.compile(r'\.' + pattern)
+        regex = re.compile(re.escape(pattern))
 
     return regex.search
 
@@ -274,8 +267,8 @@ class _DeprecatedTargetAction(argparse.Action):
         sys.stderr.write(
             f"jug: warning: {option_string} is deprecated and will be removed "
             "in a future version. It now behaves like --name (strict match on "
-            "the task name, '*' is a wildcard). Use --pattern for the previous "
-            "behaviour (substring or /regex/ match).\n")
+            "the task name, '*' is a wildcard). Use --pattern for loose matching "
+            "(substring or /regex/ match).\n")
         setattr(namespace, self.dest, values)
 
 
