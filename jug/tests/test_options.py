@@ -111,6 +111,8 @@ def test_bool():
     assert not _str_to_bool("false")
     assert not _str_to_bool("FALSE")
     assert not _str_to_bool("off")
+    assert not _str_to_bool("no")
+    assert not _str_to_bool("N")
     assert _str_to_bool("on")
     assert _str_to_bool("true")
     assert _str_to_bool("1")
@@ -153,6 +155,21 @@ def test_find_local_config_with_git(tmp_path, monkeypatch):
     assert len(files) == 2
     assert files[0] == str(sub / ".jugrc")
     assert files[1] == str(project / ".jugrc")
+
+
+def test_find_local_config_with_git_file(tmp_path, monkeypatch):
+    # In git worktrees and submodules, .git is a file
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / ".git").write_text("gitdir: /elsewhere\n")
+    (project / ".jugrc").write_text("[main]\njugfile=root.py\n")
+
+    sub = project / "sub"
+    sub.mkdir()
+
+    monkeypatch.chdir(sub)
+    files = jug.options.find_local_configuration_files()
+    assert files == [str(project / ".jugrc")]
 
 
 def test_find_local_config_without_git(tmp_path, monkeypatch):

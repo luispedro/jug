@@ -256,3 +256,17 @@ def test_fsync_dir_after_rename(tmpdir, monkeypatch):
         f.write('data')
     sync_move(src, dst)
     assert synced[-1] == dst
+
+
+def test_metadata_packed(tmpdir):
+    class FakeTask:
+        def hash(self):
+            return hash_one('k0')
+    tmpdir = str(tmpdir)
+    t = FakeTask()
+    fs = file_store(tmpdir)
+    assert not fs.metadata(t)['computed']
+    fs.dump(3, t.hash())
+    assert fs.metadata(t)['computed']
+    assert fs.update_pack() == 1
+    assert fs.metadata(t)['computed']

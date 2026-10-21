@@ -44,8 +44,8 @@ class InternalValidationCommand(SubCommand):
         try:
             import pytest
         except ImportError:
-            logging.critical('jug test requires pytest library')
-            return
+            logging.critical('jug test-jug requires pytest library')
+            return 1
         currentdir = path.dirname(__file__)
         updir = path.join(currentdir, '..')
         return pytest.main([updir])

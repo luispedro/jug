@@ -65,3 +65,12 @@ def test_exit_when_true_takes_task(reset_hooks_at_exit):
     jug_hook('execute.task-executed1', ('go',))
     with pytest.raises(SystemExit):
         jug_hook('execute.task-executed1', ('stop',))
+
+
+def test_register_time_tasks_twice(reset_hooks_at_exit, capsys):
+    from jug.hooks.execution import register_time_tasks
+    # A jugfile with barriers is imported several times
+    register_time_tasks()
+    register_time_tasks()
+    jug_hook('execute.finished_post_status')
+    assert capsys.readouterr().out.count('TIMES') == 1

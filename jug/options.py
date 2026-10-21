@@ -116,7 +116,7 @@ default_options = Options(None, autoinit=load_default_options)
 
 
 def _str_to_bool(s):
-    return s.lower() not in ('', '0', 'false', 'off')
+    return s.lower() not in ('', '0', 'false', 'off', 'no', 'n')
 
 
 def key_to_option(s):
@@ -128,7 +128,7 @@ def find_local_configuration_files():
     files = find_local_configuration_files()
 
     Walk up from the current working directory looking for `.jugrc` or `jugrc`
-    files. If a `.git` directory is found, search up to (and including) that
+    files. If a `.git` directory (or file) is found, search up to (and including) that
     directory. If no `.git` is found, only search the current directory.
 
     Returns
@@ -143,7 +143,8 @@ def find_local_configuration_files():
 
     # Walk upward to find git root
     for d in [cwd, *cwd.parents]:
-        if (d / '.git').is_dir():
+        # .git is a file in worktrees and submodules
+        if (d / '.git').exists():
             git_root = d
             break
 

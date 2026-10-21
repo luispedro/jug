@@ -122,7 +122,7 @@ class redis_store(base_store):
 
         Returns whether any entry was actually removed.
         '''
-        return self.redis.delete(_resultname(name))
+        return self.redis.delete(_resultname(name)) > 0
 
 
     def cleanup(self, active, keeplocks=False):

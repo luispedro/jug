@@ -142,6 +142,23 @@ Unreleased
 	invalid_pattern option
 	* jug.utils: Add prepare_name_matcher(); prepare_task_matcher() now
 	matches a plain substring (or a /regex/) anywhere in the task name
+	* Configuration files: `no` and `n` are read as false for boolean
+	options (previously, e.g., `keep-going = no` turned the option on)
+	* Configuration files: Find the project root (to search for `.jugrc`
+	in parent directories) in git worktrees and submodules, where `.git` is
+	a file
+	* jug test-jug: Exit with a non-zero status (and name the right command)
+	when pytest is not available
+	* register_time_tasks: Print the timing summary only once with a
+	jugfile that has barriers (previously, once per re-load of the jugfile)
+	* jug sleep-until: Do not accumulate duplicate tasks when re-loading a
+	jugfile with barriers
+	* file_store: Report packed results (after `jug pack`) as computed in
+	`metadata()` (used by `describe()` and `write_metadata()`)
+	* Task: `unlock()` and `fail()` work when called before `lock()` (they
+	previously raised `AttributeError`)
+	* redis_store: `remove()` returns a bool, as documented
+	* examples/decrypt: Fix `brute.py`, which read the message as text
 
 Version 2.6.0 Sun 20 September 2026 by luispedro
 	* jug.hash: Pin the pickle protocol used for hashing to protocol=4.

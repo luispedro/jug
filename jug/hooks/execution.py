@@ -42,9 +42,11 @@ def register_time_tasks():
         register_time_tasks()
 
     '''
-    from . import register_hook
+    from . import register_hook_once
+    # The jugfile may be imported several times (e.g., with barriers), so
+    # only register the hooks the first time
     tt = TimeTasks()
-    register_hook('execute.task-pre-execute', tt.start)
-    register_hook('execute.task-executed1', tt.stop)
-    register_hook('execute.finished_post_status', tt.print_summary)
+    register_hook_once('execute.task-pre-execute', 'register_time_tasks', tt.start)
+    register_hook_once('execute.task-executed1', 'register_time_tasks', tt.stop)
+    register_hook_once('execute.finished_post_status', 'register_time_tasks', tt.print_summary)
  

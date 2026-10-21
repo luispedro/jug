@@ -72,6 +72,7 @@ class SleepUntilCommand(SubCommand):
             hasbarrier = jugspace.get('__jug__hasbarrier__', False)
             if not hasbarrier:
                 sys.exit(0)
+            del task.alltasks[:]
             store, jugspace = init(options.jugfile, options.jugdir, store=store)
 
 

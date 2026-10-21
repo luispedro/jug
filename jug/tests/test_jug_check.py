@@ -59,3 +59,26 @@ def test_tasklet():
     store, space = jug.jug.init(jugfile, store)
     assert jug.subcommands.check._check_or_sleep_until(store, False) == 0
     assert jug.subcommands.check._check_or_sleep_until(store, True) == 0
+
+
+@task_reset
+def test_sleep_until_barrier_reload():
+    import pytest
+    jugfile = os.path.join(_jugdir, 'wbarrier.py')
+    store, space = jug.jug.init(jugfile, 'dict_store')
+    assert space['__jug__hasbarrier__']
+    simple_execute()
+    jug.jug.init(jugfile, store)
+    simple_execute()
+    # simple_execute() removes the executed tasks from alltasks
+    jug.jug.init(jugfile, store)
+    assert len(jug.task.alltasks) == 3
+
+    options = default_options.copy()
+    options.jugfile = jugfile
+    options.jugdir = store
+    with pytest.raises(SystemExit) as e:
+        jug.subcommands.check.sleep_until.run(options, store, space)
+    assert e.value.code == 0
+    # The re-loaded jugfile has 3 tasks; they must not be duplicated
+    assert len(jug.task.alltasks) == 3

@@ -421,3 +421,18 @@ def test_task_in_namedtuple():
     t = Task(add1, _Pair(Task(add1, 1), 2))
     with raises(TypeError):
         t.hash()
+
+
+@task_reset
+def test_unlock_fail_without_lock():
+    assert Task(add1, 1).lock()
+    # A new Task object for the same task: neither lock() nor is_locked() was
+    # called on it before
+    t = Task(add1, 1)
+    t.fail()
+    assert t.is_failed()
+
+    assert Task(add1, 2).lock()
+    t2 = Task(add1, 2)
+    t2.unlock()
+    assert not t2.is_locked()

@@ -553,12 +553,17 @@ class file_store(base_store):
         '''
         from os import stat, path
         from time import ctime
-        fname = self._getfname(t.hash())
+        name = t.hash()
+        fname = self._getfname(name)
         if path.exists(fname):
             st = stat(fname)
             return {
                 'computed': True,
                 'completed': ctime(st.st_mtime),
+            }
+        if name in self.packed:
+            return {
+                'computed': True,
             }
         return {
                 'computed': False

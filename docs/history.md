@@ -167,6 +167,22 @@ unescaped, which allowed injecting HTML/JavaScript into it.
   `jugfile.py`, as documented).
 - `jug --help`: fix the description of `jug pack` and of the `--jugdir`
   default.
+- Configuration files: `no` and `n` are read as false for boolean options
+  (before, e.g., `keep-going = no` turned the option on).
+- Configuration files: find the project root (to search for `.jugrc` in
+  parent directories) in git worktrees and submodules, where `.git` is a file.
+- `jug test-jug`: exit with a non-zero status when pytest is not available.
+- `register_time_tasks()`: print the timing summary only once with a jugfile
+  that has barriers (before, once per re-load of the jugfile).
+- `jug sleep-until`: do not accumulate duplicate tasks when re-loading a
+  jugfile with barriers.
+- `file_store`: report packed results (after `jug pack`) as computed in
+  `metadata()` (used by `describe()` and `write_metadata()`).
+- `Task.unlock()` and `Task.fail()` work when called before `Task.lock()`
+  (before, they raised `AttributeError`).
+- `redis_store.remove()` returns a `bool`, as documented.
+- `examples/decrypt/brute.py`: fix reading the message (it was opened in text
+  mode).
 
 ## Version 2.6.0
 

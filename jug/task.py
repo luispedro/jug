@@ -364,6 +364,8 @@ task, use `Tasklet(task, lambda r: ...)`, which does accept lambda functions.'''
 
         If the lock was not held, this may remove another thread's lock!
         '''
+        if not hasattr(self, '_lock'):
+            self._lock = self.store.getlock(self.hash())
         self._lock.release()
 
     def is_locked(self):
@@ -400,6 +402,8 @@ task, use `Tasklet(task, lambda r: ...)`, which does accept lambda functions.'''
         -------
         None
         '''
+        if not hasattr(self, '_lock'):
+            self._lock = self.store.getlock(self.hash())
         return self._lock.fail()
 
     def is_failed(self):
