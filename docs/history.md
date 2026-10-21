@@ -15,8 +15,13 @@ jug now requires Python 3.10 or later.
 - `--target function` used to match any task whose name contained
   `function`, so `jug invalidate --target function` would also invalidate
   `function_other` ([GH #63](https://github.com/luispedro/jug/issues/63)).
-  It now matches only tasks called `function`. To get the previous behaviour,
-  use `--pattern function`.
+  It now matches only tasks called `function`. For loose matching, use
+  `--pattern function`.
+- `--pattern` matches a plain substring anywhere in the task name, so it
+  matches more tasks than the old `--target` did: a pattern without a dot used
+  to match only names (or dotted parts of names) that *started* with it (so
+  `--target prime` did not match `primes.is_prime`), and regular expression
+  characters were interpreted even outside `/.../`.
 - If you use jug's options programmatically, `execute_target` is replaced by
   `execute_name` and `execute_pattern`, and `invalidate` has a new
   `invalid_pattern` option alongside `invalid_name` (which is now strict).
@@ -30,15 +35,30 @@ before (e.g., frozensets of numbers).
 otherwise, like `jug check` (before, the exit code was the number of finished
 tasks, so `jug status && ...` failed when work had been done).
 
+`NoHash` (from `jug.unsafe`) now passes the *value* of a wrapped Task to the
+function. Before, the function received the Task object itself.
+
+Passing a Task inside a subclass of `list` or `tuple` (e.g., a `namedtuple`)
+now raises a `TypeError`. This was never supported: the function received the
+Task object instead of its value, and hashing could fail with an obscure
+error. Use a plain `list`, `tuple` or `dict` instead.
+
+### Security fix
+
+`jug webstatus` now escapes the jugfile and task names and only accepts an
+integer for `?refresh=`. Before, these values were inserted into the page
+unescaped, which allowed injecting HTML/JavaScript into it.
+
 ### User-visible improvements
 
 - New `--name` option for `jug execute` and `jug invalidate`: selects
   tasks by their exact name, either fully qualified (`jugfile.function`) or
   just the function name (`function`). Wildcards are supported, so
   `--name 'function*'` matches both `function` and `function_other`.
-- New `--pattern` option for `jug execute` and `jug invalidate`: matches
-  anywhere in the task name (or a regular expression, if written between
-  slashes: `--pattern '/compute_.*/'`). This is what `--target` used to do.
+- New `--pattern` option for `jug execute` and `jug invalidate`: matches a
+  plain substring anywhere in the task name (or a regular expression, if
+  written between slashes: `--pattern '/compute_.*/'`). This is a looser
+  version of what `--target` used to do (see above).
 - `--target` and `--invalid` are deprecated (see above).
 - Shell completion: [argcomplete](https://pypi.org/project/argcomplete/) is
   supported (`eval "$(register-python-argcomplete jug)"`) and
@@ -51,7 +71,18 @@ tasks, so `jug status && ...` failed when work had been done).
 - `jug.utils.jug_execute`: the error raised when the command fails now
   includes the command and its exit code.
 - `jug webstatus` uses the same column names and order as `jug status`
-  (Failed, Waiting, Ready, Complete, Active).
+  (Failed, Waiting, Ready, Complete, Active), and shows failed tasks.
+- A Task's function can be a `functools.partial` object. The partial is
+  unwrapped, so `Task(partial(f, a), b)` is the same task as `Task(f, a, b)`.
+- `jug execute --wait-cycle-time` (and `wait-cycle-time` in configuration
+  files) accepts fractional values.
+- `jug execute` is faster at selecting the next task to run when there are
+  many tasks.
+- Summary tables use `shutil.get_terminal_size()` to get the terminal width,
+  so the `COLUMNS` environment variable is respected and the width is detected
+  on all platforms (e.g., FreeBSD).
+- `register_time_tasks()` prints mean times with two decimal places (e.g.,
+  `123.46s`) instead of two significant digits (`1.2e+02s`).
 - Documentation: all examples were updated to match current behaviour, and
   the subcommands, options, backends, and hooks that were missing are now
   documented. The documentation is now written in Markdown.
@@ -59,7 +90,10 @@ tasks, so `jug status && ...` failed when work had been done).
 ### Internal improvements
 
 - New function `jug.utils.prepare_name_matcher`. `prepare_task_matcher` now
-  compiles its regular expression.
+  matches a plain substring (or a `/regex/`) anywhere in the task name.
+- `CompoundTask` removes its temporary task in constant time (instead of
+  searching the list of all tasks, which was quadratic in the number of
+  compound tasks).
 - New function `jug.options.build_parser()`, which builds the full argument
   parser (split from `parse()`, so that it can be used by shell completion
   tools).
@@ -72,6 +106,32 @@ tasks, so `jug status && ...` failed when work had been done).
   keep `jug execute` waiting for up to about 75 hours with the default
   settings. With `--keep-going`, a failed task is also no longer re-run every
   time the jugfile is re-loaded.
+- Tasks wrapped in `CustomHash`, `NoHash` or a slice of the result of
+  `mapreduce.map` are tracked as dependencies. Before, a task using them could
+  be started before the tasks it depends on had run (and then fail).
+- `recursive_dependencies` lists each dependency only once. Before, a task
+  reachable by several paths was listed once per path, so that `jug check`
+  took exponential time on diamond-shaped task graphs.
+- `jug execute --keep-failed`: do not mark a task as failed when acquiring its
+  lock raised an error (the lock is not held, and may belong to another
+  worker).
+- `--pdb` implies `--debug`, as documented (before, it did not).
+- The global flags `--aggressive-unload`, `--short`, `--pdb` and `--debug` can
+  be set in configuration files (before, the setting was ignored).
+- `mapreduce.map` and `mapreduce.currymap` with `map_step=1` accept a
+  `TaskGenerator` (before, they failed with `AttributeError: __name__`).
+- `jug status --cache`: exit with a clear error message if the cache file is
+  not a valid cache (before, it crashed with a traceback). Interrupting the
+  cache lookup no longer falls back to loading the jugfile.
+- `CompoundTask`: save the result once, instead of twice.
+- `TaskGenerator`: raise the intended error message when pickling a function
+  whose module cannot be found (instead of a `KeyError`).
+- `dict_store`: `release()` and `fail()` on a lock which is not held have no
+  effect (as for the other backends), instead of raising `KeyError`.
+- `file_store`: sync the destination directory after renaming a file (instead
+  of the source directory before), so that the rename is durable.
+- `redis_store`: fix `close()`, which silently did nothing.
+- `jug webstatus`: fix the duplicate `<head>` in the page.
 - Jugfiles are read as Python source (UTF-8 by default, or as declared by a
   PEP 263 coding comment) independently of the locale. Before, a UTF-8
   jugfile failed with `UnicodeDecodeError` under, e.g., `LC_ALL=C`.
@@ -292,12 +352,12 @@ cleanup --failed-only` to remove locks from failed tasks. Similarly, `jug
 status` and `jug graph` now display failed tasks
 
 This avoids the situation where a failing task (for whatever reason) blocks the
-rest of the process. It improves on `jug --keep-going` (which does the same)
+rest of the process. It improves on `jug execute --keep-going` (which does the same)
 as with `--keep-going`, each new process will attempt to run the task. If the
 task reproducibly fails after a long period, this results in wasted
 computation.
 
-2. The [exit environmental variable](exit.md) are now checked by default.
+2. The [exit environmental variables](exit.md) are now checked by default.
    Create a file called `__jug_please_stop_running.txt` in the current
    working directory and `Jug` will stop after it finishes the current task.
 
@@ -312,56 +372,76 @@ computation.
 
 ## Version 1.6.9
 
-*Released on Tue Aug 6 2019*
+*Released Tue Aug 6 2019*
 
 - Fix saving on newer version of numpy
 
-version **1.6.8** (Wed July 10 2019)
+## Version 1.6.8
+
+*Released Wed July 10 2019*
 
 - Add `cached_glob()` function
 - Fix NoLoad (issue #73)
 - Fix `jug shell`'s invalidate function with Tasklets (issue #77)
 
-version **1.6.7** (Fri Apr 13 2018)
+## Version 1.6.7
+
+*Released Fri Apr 13 2018*
 
 - Fix issue with deeply recursive dependency structures and barrier()
 - Allow mapreduce.map() results to be used as dependencies
 
-version **1.6.6** (Sat Apr 7 2018)
+## Version 1.6.6
+
+*Released Sat Apr 7 2018*
 
 - Fix bug in shell's invalidate() function
 - Fix wrong dependency handling with mapreduce.map()
 
-version **1.6.5** (Mon Mar 12 2018)
+## Version 1.6.5
+
+*Released Mon Mar 12 2018*
 
 - Add get_tasks() to 'jug shell' and document 'from jug.task import
   alltasks' (patch by Renato Alves)
 
-version **1.6.4** (Thu Nov 2 2017)
+## Version 1.6.4
+
+*Released Thu Nov 2 2017*
 
 - Fix exit_after_n_tasks. It would previously execute one task too many
 
-version **1.6.3** (Wed Nov 1 2017)
+## Version 1.6.3
+
+*Released Wed Nov 1 2017*
 
 - Add citation request
 
-version **1.6.2** (Thu Oct 26 2017)
+## Version 1.6.2
+
+*Released Thu Oct 26 2017*
 
 - Add return_value argument to jug_execute
 - Add exit_env_vars
 
-version **1.6.1** (Thu Aug 29 2017)
+## Version 1.6.1
+
+*Released Thu Aug 29 2017*
 
 - Fix bug with `invalidate()` in the shell
 
-version **1.6.0** (Thu Aug 24 2017)
+## Version 1.6.0
+
+*Released Thu Aug 24 2017*
 
 - Add 'graph' subcommand - Generates a graph of tasks
 - 'jug execute --keep-going' now ends with non-zero exit code in case of failures
 - Fix bug with cleanup in dict_store not providing the number of removed records
 - Add 'jug cleanup --keep-locks' to remove obsolete results without affecting locks
 
-version **1.5.0** (Sun Jul 16 2017)
+## Version 1.5.0
+
+*Released Sun Jul 16 2017*
 
 - Add 'demo' subcommand
 - Add is_jug_running() function
@@ -373,7 +453,9 @@ version **1.5.0** (Sun Jul 16 2017)
 - jugrc: execute_wait_cycle_time_secs is now execute_wait_cycle_time
 - Expose sync_move in jug.utils
 
-version **1.4.0** (Tue Jan 3 2017)
+## Version 1.4.0
+
+*Released Tue Jan 3 2017*
 
 - Fix bug with writing very large objects to disk
 - Smarter handling of --aggressive-unload (do not unload what will be immediately necessary)
@@ -381,7 +463,9 @@ version **1.4.0** (Tue Jan 3 2017)
 - Add test-jug subcommand
 - Add return_tuple decorator
 
-version **1.3.0** (Tue Nov 1 2016)
+## Version 1.3.0
+
+*Released Tue Nov 1 2016*
 
 - Update `shell` subcommand to IPython 5
 - Use ~/.config/jugrc as configuration file
@@ -390,18 +474,24 @@ version **1.3.0** (Tue Nov 1 2016)
 - Add `jug_execute` function
 - Add timing functionality
 
-version **1.2.2** (Sat Jun 25 2016)
+## Version 1.2.2
+
+*Released Sat Jun 25 2016*
 
 - Fix bugs in shell subcommand and a few corner cases in encoding/decoding results
 
-version **1.2.1** (Mon Feb 15 2016)
+## Version 1.2.1
+
+*Released Mon Feb 15 2016*
 
 - Changed execution loop to ensure that all tasks are checked (issue #33 on github)
 - Fixed bug that made 'check' or 'sleep-until' slower than necessary
 - Fixed jug on Windows (which does not support fsync on directories)
 - Made Tasklets use slightly less memory
 
-version **1.2** (Thu Aug 20 2015)
+## Version 1.2
+
+*Released Thu Aug 20 2015*
 
 - Use HIGHEST_PROTOCOL when pickle()ing
 - Add compress_numpy option to file_store
@@ -413,19 +503,25 @@ version **1.2** (Thu Aug 20 2015)
 - Fix ipython colors (fix by Andreas Sorge)
 - Sort tasks in 'jug status'
 
-version **1.1** (Tue Mar 3 2015)
+## Version 1.1
+
+*Released Tue Mar 3 2015*
 
 - Python 3 compatibility fixes
 - fsync(directory) in file backend
 - Jug hooks (still mostly undocumented, but already enabling internal code simplification)
 
-version **1.0** (Tue May 20 2014)
+## Version 1.0
+
+*Released Tue May 20 2014*
 
 - Adapt status output to terminal width (by Alex Ford)
 - Add a newline at the end of lockfiles for file backend
 - Add --cache-file option to specify file for `status --cache`
 
-version **0.9.7** (Tue Feb 18 2014)
+## Version 0.9.7
+
+*Released Tue Feb 18 2014*
 
 - Fix use of numpy subclasses
 - Fix redis URL parsing
@@ -433,21 +529,27 @@ version **0.9.7** (Tue Feb 18 2014)
 - Correctly fall back on non-sqlite `status`
 - Allow user to call set_jugdir() inside jugfile
 
-version **0.9.6** (Tue Aug 6 2013)
+## Version 0.9.6
+
+*Released Tue Aug 6 2013*
 
 - Faster decoding
 - Add jug-execute script
 - Add describe() function
 - Add write_task_out() function
 
-version **0.9.5** (May 27 2013)
+## Version 0.9.5
+
+*Released May 27 2013*
 
 - Added debug mode
 - Even better map.reduce.map using blocked access
 - Python 3 support
 - Documentation improvements
 
-version **0.9.4** (Apr 15 2013)
+## Version 0.9.4
+
+*Released Apr 15 2013*
 
 - Add CustomHash wrapper to set `__jug_hash__`
 - Print traceback on import error
@@ -457,7 +559,9 @@ version **0.9.4** (Apr 15 2013)
 - Faster --aggressive-unload
 - Add currymap() function
 
-version **0.9.3** (Dec 2 2012)
+## Version 0.9.3
+
+*Released Dec 2 2012*
 
 - Fix parsing of ports on redis URL (patch by Alcides Viamontes)
 - Make hashing robust to different orders when using randomized hashing
@@ -471,7 +575,9 @@ version **0.9.3** (Dec 2 2012)
 - Make `Tasklets` more flexible by allowing slicing with `Tasks`
   (previously, slicing with tasks was **not** allowed)
 
-version **0.9.2** (Nov 4 2012):
+## Version 0.9.2
+
+*Released Nov 4 2012*
 
 - More flexible mapreduce()/map() functions
 - Make TaskGenerator pickle()able and hash()able
@@ -479,7 +585,9 @@ version **0.9.2** (Nov 4 2012):
 - Add --keep-going option to execute
 - Better help message
 
-version **0.9.1** (Jun 11 2012):
+## Version 0.9.1
+
+*Released Jun 11 2012*
 
 - Add --locks-only option to cleanup subcommand
 - Make cache file (for `status` subcommand) configurable
@@ -490,7 +598,7 @@ version **0.9.1** (Jun 11 2012):
 - Fix bug in using Tasklets and --aggressive-unload
 - Fix bug with Tasklets and sleep-until/check
 
-version **0.9**:
+## Version 0.9
 
 - In the presence of a barrier(), rerun the jugfile. This makes barrier much
   easier to use.
@@ -500,4 +608,5 @@ version **0.9**:
 - Avoid creating directories in file backend unless it is necessary
 - Add jug.mapreduce.reduce (which mimics the builtin reduce)
 
-For older version see `ChangeLog` file.
+For older versions, see the
+[`ChangeLog` file](https://github.com/luispedro/jug/blob/main/ChangeLog).

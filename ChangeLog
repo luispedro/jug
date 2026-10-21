@@ -10,7 +10,6 @@ Unreleased
 	* jug_execute: Include the command and its exit code in the error message
 	when the command fails
 	* jug webstatus: Use the same column names and order as `jug status`
-	* Documentation fixes and improvements
 	* `--pdb` implies `--debug`, as documented (previously, it did not)
 	* The global flags `--aggressive-unload`, `--short`, `--pdb` and `--debug`
 	can be set in configuration files (previously, the setting was ignored)
@@ -90,10 +89,10 @@ Unreleased
 	(it now defaults to 'jugfile.py', as documented)
 	* Documentation: update all examples to match current behaviour (status
 	output format, default jugdir, and several code examples that did not
-	run as written)
-	* Documentation: document the subcommands and options that were missing
+	run as written), document the subcommands and options that were missing
 	(count, graph, webstatus, pack, demo, test-jug, and the options of
-	execute and cleanup), the file_keepalive backend, and hooks
+	execute and cleanup), the file_keepalive backend, and hooks, and fix
+	many smaller errors and inconsistencies
 	* jug --help: Fix description of `jug pack` and of the `--jugdir`
 	default
 	* jug pack: Fix crash (zlib.error) when the jugdir contains small numpy
