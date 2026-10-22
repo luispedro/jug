@@ -80,6 +80,27 @@ def test_bvalue_error_propagates():
 
 
 @task_reset
+def test_bvalue_no_load():
+    # value(NoLoad(t)) does not need the result of t, so bvalue() must not
+    # raise BarrierError if t has not run yet
+    import pytest
+    from jug import Task
+    from jug.barrier import bvalue, BarrierError
+    from jug.io import NoLoad
+    t = Task(sum, [1, 2])
+    nl = NoLoad(t)
+    assert bvalue(nl) is nl
+    assert bvalue([nl]) == [nl]
+    assert bvalue({'a': (nl,)}) == {'a': (nl,)}
+    with pytest.raises(BarrierError):
+        bvalue([nl, t])
+
+    # t must still be a dependency of a Task that takes NoLoad(t)
+    t2 = Task(len, [nl])
+    assert list(t2.dependencies()) == [t]
+
+
+@task_reset
 def test_recursive():
     jugfile = find_test_jugfile('barrier_recurse.py')
     store, space = jug.jug.init(jugfile, 'dict_store')

@@ -154,10 +154,15 @@ def _all_loadable(obj, alltasks):
     '''Returns whether all the tasks needed to compute ``value(obj)`` have
     their results available'''
     from .task import Task
+    from .io import NoLoad
     queue = [[obj]]
     while queue:
         for elem in queue.pop():
-            if isinstance(elem, Task):
+            if isinstance(elem, NoLoad):
+                # value(NoLoad(t)) is the NoLoad itself: it needs no results
+                # (even though `t` is a dependency for scheduling purposes)
+                continue
+            elif isinstance(elem, Task):
                 if not elem.is_loaded() and not _can_load_limit_recursion(elem, alltasks):
                     return False
             elif hasattr(elem, '__jug_dependencies__'):
