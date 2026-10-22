@@ -141,6 +141,107 @@ ugly list of `jug.Task` objects. To get the actual value, you call the
 
 ## What's New
 
+### Version 2.7.0
+
+*Released 23 October 2026*
+
+#### Compatibility notes
+
+- Python 3.9 is no longer supported (it reached end-of-life in October 2025):
+  jug now requires Python 3.10 or later.
+- `jug execute` and `jug invalidate` select tasks by name using `--name`
+  (strict) or `--pattern` (loose). The old `--target` option (and `--invalid`,
+  for `jug invalidate`) is now a deprecated synonym of `--name` and prints a
+  warning. This makes it **stricter** than before: `--target function` used to
+  match any task whose name contained `function`
+  ([GH #63](https://github.com/luispedro/jug/issues/63)), but now matches only
+  tasks called `function`. For loose matching, use `--pattern function`, which
+  matches a plain substring anywhere in the task name. Programmatic users:
+  `execute_target` is replaced by `execute_name` and `execute_pattern`, and
+  `invalidate` has a new `invalid_pattern` option alongside `invalid_name`.
+- The hashes of tasks with `frozenset` arguments have changed, so their cached
+  results will be recomputed the first time you run them with this version.
+- `jug status` now exits with status 0 if all tasks are complete and 1
+  otherwise, like `jug check` (before, the exit code was the number of
+  finished tasks). With `--cache`, the exit code is only as accurate as the
+  cache, so do not rely on it in scripts.
+- `NoHash` (from `jug.unsafe`) now passes the *value* of a wrapped Task to the
+  function (before, the function received the Task object itself).
+- The `redis` backend requires redis-py 3.5 or later.
+- `TimeTasks` (from `jug.hooks.execution`) stores the start time of the
+  current task in `start_time` (before, it overwrote its own `start` method).
+- Passing a Task inside a subclass of `list` or `tuple` (e.g., a
+  `namedtuple`) now raises a `TypeError`. This was never supported. Use a
+  plain `list`, `tuple` or `dict` instead.
+
+#### Security fix
+
+- `jug webstatus` now escapes the jugfile and task names and only accepts an
+  integer for `?refresh=`. Before, these values were inserted into the page
+  unescaped, which allowed injecting HTML/JavaScript into it.
+
+#### User-visible improvements
+
+- New `--name` and `--pattern` options for `jug execute` and `jug invalidate`
+  (see above). An empty pattern is an error, as it would match every task.
+- Shell completion: [argcomplete](https://pypi.org/project/argcomplete/) is
+  supported and `jug --print-completion {bash,zsh,tcsh}` generates a
+  completion script using [shtab](https://pypi.org/project/shtab/). Both are
+  optional dependencies (`pip install 'jug[completion]'`).
+- Python 3.15 is now supported.
+- `return_tuple` can be imported directly from `jug`.
+- A Task's function can be a `functools.partial` object.
+- `jug webstatus` uses the same columns as `jug status`, shows failed tasks,
+  and sorts the tasks by name.
+- `jug execute --wait-cycle-time` accepts fractional values, and
+  `jug execute` is faster at selecting the next task to run when there are
+  many tasks.
+- `jug execute` and `jug invalidate` warn if both a name and a pattern are set
+  (which can only happen through configuration files).
+- `jug.utils.jug_execute` includes the command and its exit code in the error
+  message when the command fails.
+- Summary tables respect the `COLUMNS` environment variable.
+- The documentation is now written in Markdown, all examples were updated to
+  match current behaviour, and previously undocumented subcommands, options,
+  backends and hooks are now documented.
+
+#### Internal improvements
+
+- New functions `jug.utils.prepare_name_matcher` and
+  `jug.options.build_parser()`.
+- `CompoundTask` removes its temporary task in constant time.
+
+#### Bugfixes
+
+This release fixes many bugs. The most important are listed below (see the
+[full history](https://jug.readthedocs.io/en/latest/history.html) for the
+rest):
+
+- `jug execute` on a jugfile with a barrier: waiting is bounded by
+  `--nr-wait-cycles` overall (it could previously wait for up to about 75
+  hours), and with `--keep-going`, failed tasks are not re-run on every
+  re-load of the jugfile.
+- Tasks wrapped in `CustomHash`, `NoHash` or a slice of `mapreduce.map`
+  results are tracked as dependencies.
+- `jug check` no longer takes exponential time on diamond-shaped task graphs.
+- Hashes of frozensets and of numpy object arrays are now stable across
+  processes (before, such tasks were never seen as finished).
+- Several fixes to `jug pack` and the `file_store` pack: no lost or undone
+  results, correct handling of numpy arrays and polars DataFrames, correct
+  permissions of the pack file, no crash on concurrently removed files.
+- `bvalue()` only treats a value as unavailable when a task it needs has not
+  run yet, instead of swallowing any error.
+- `jug.init(..., store=obj)` installs `obj` as the store.
+- `--pdb` implies `--debug` and no longer opens a second debugger on exit;
+  boolean flags can be set in configuration files, and `no`/`n` are read as
+  false.
+- `jug status --cache` fails with a clear message if the cache is invalid or
+  cannot be opened or written.
+- Fix a quadratic slowdown when loading large results.
+- Fix `exit_when_true()`, `jug graph --file-format`, slicing of `map()`
+  results with a step, `map`/`currymap` with `map_step=1` and a
+  `TaskGenerator`, and reading UTF-8 jugfiles under a non-UTF-8 locale.
+
 ### Version 2.6.0
 
 *Released 20 September 2026*

@@ -1,6 +1,8 @@
 # History
 
-## Unreleased
+## Version 2.7.0
+
+*Released 23 October 2026*
 
 ### Compatibility notes
 

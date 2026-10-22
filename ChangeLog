@@ -1,4 +1,4 @@
-Unreleased
+Version 2.7.0 Fri 23 October 2026 by luispedro
 	* hooks: `exit_if_file_exists()`, `exit_after_n_tasks()`,
 	`exit_after_time()` and `exit_when_true()` register their hook only once
 	for the same arguments, so that calling them in a jugfile with barriers
