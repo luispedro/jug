@@ -89,7 +89,9 @@ will remove results for all the `add_counts` tasks, *and all the
 use wildcards (`--name 'add_counts*'`) or `--pattern`, which matches
 anywhere in the task name (`--pattern add_counts` will match
 `add_counts_v2` as well) and can also take a regular expression if it is
-written between slashes (`--pattern '/add_counts.*/'`).
+written between slashes (`--pattern '/add_counts.*/'`). An empty pattern
+(`--pattern ''` or `--pattern '//'`) is rejected, as it would match every
+task.
 
 ```{note}
 Older versions of jug used `--target` for this (which behaved similarly to

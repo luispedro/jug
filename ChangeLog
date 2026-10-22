@@ -151,7 +151,9 @@ Unreleased
 	invalidate `function_other` (GH #63). Note that --pattern is looser than
 	the old --target: a pattern without a dot matched only names (or dotted
 	parts of names) starting with it, and regular expression characters were
-	interpreted even outside /.../
+	interpreted even outside /.../. An empty pattern ('' or '//') is an
+	error, as it would match every task (e.g., `jug invalidate --pattern
+	"$TASK"` with an unset variable would have invalidated everything)
 	* jug execute, jug invalidate: --target (and --invalid) are now
 	deprecated synonyms of --name and print a warning. NOTE: this makes
 	them strict; use --pattern for loose matching.

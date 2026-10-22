@@ -58,7 +58,10 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 - New `--pattern` option for `jug execute` and `jug invalidate`: matches a
   plain substring anywhere in the task name (or a regular expression, if
   written between slashes: `--pattern '/compute_.*/'`). This is a looser
-  version of what `--target` used to do (see above).
+  version of what `--target` used to do (see above). An empty pattern (`''`
+  or `'//'`) is an error, as it would match every task (so that, e.g.,
+  `jug invalidate --pattern "$TASK"` with an unset variable does not
+  invalidate everything).
 - `--target` and `--invalid` are deprecated (see above).
 - Shell completion: [argcomplete](https://pypi.org/project/argcomplete/) is
   supported (`eval "$(register-python-argcomplete jug)"`) and

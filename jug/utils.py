@@ -176,6 +176,23 @@ def timed_path(path):
     return CustomHash(path, hash_with_mtime_size)
 
 
+def _check_pattern(pattern):
+    '''Raise ValueError if ``pattern`` is empty (and would match every task)'''
+    if pattern in ('', '//'):
+        raise ValueError(
+            f"empty pattern ({pattern!r}) is not allowed, as it would "
+            "match every task (to select all tasks, use '/.*/')")
+    return pattern
+
+
+def _parse_pattern(pattern):
+    '''argparse ``type`` for ``--pattern`` (see :func:`_check_pattern`)'''
+    try:
+        return _check_pattern(pattern)
+    except ValueError as e:
+        raise argparse.ArgumentTypeError(str(e))
+
+
 def prepare_task_matcher(pattern):
     '''Build a loose matcher from a ``--pattern`` string
 
@@ -188,6 +205,10 @@ def prepare_task_matcher(pattern):
 
     For strict matching, use :func:`prepare_name_matcher`.
 
+    An empty pattern (``''`` or ``'//'``) is rejected, as it would match
+    every task (this is most likely an unset shell variable, as in ``jug
+    invalidate --pattern "$TASK"``).
+
     Parameters
     ----------
     pattern : str
@@ -196,7 +217,13 @@ def prepare_task_matcher(pattern):
     -------
     matcher : callable
         ``matcher(task_name)`` returns a true value if the name matches
+
+    Raises
+    ------
+    ValueError
+        If ``pattern`` is empty
     '''
+    _check_pattern(pattern)
     if len(pattern) >= 2 and pattern.startswith('/') and pattern.endswith('/'):
         # Looks like a regular expression
         regex = re.compile(pattern[1:-1])
@@ -306,7 +333,7 @@ def add_task_selection_options(parser, name_dest, pattern_dest, required, what):
                              "end of it (function), and may contain "
                              "wildcards (e.g., 'function*')"))
     group.add_argument('--pattern', action='store', dest=pattern_dest,
-                       metavar='PATTERN',
+                       metavar='PATTERN', type=_parse_pattern,
                        help=(f"{what} whose name contains PATTERN (or matches "
                              "PATTERN if given as /regex/). Note that "
                              "'function' also matches 'function_other'; "

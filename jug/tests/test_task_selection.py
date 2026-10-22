@@ -162,3 +162,28 @@ def test_parse_execute_selection_optional():
     options = parse(['execute'])
     assert options.execute_name is None
     assert options.execute_pattern is None
+
+
+@pytest.mark.parametrize('pattern', ['', '//'])
+def test_pattern_empty_is_rejected(pattern):
+    # an empty pattern would match every task (e.g., `--pattern "$TASK"` with
+    # an unset variable would invalidate everything)
+    with pytest.raises(ValueError):
+        prepare_task_matcher(pattern)
+    with pytest.raises(ValueError):
+        prepare_matcher_from_options(pattern=pattern)
+
+
+def test_pattern_slash_is_literal():
+    m = prepare_task_matcher('/')
+    assert m('x/y')
+    assert not m('jugfile.function')
+
+
+@pytest.mark.parametrize('cmd', ['execute', 'invalidate'])
+@pytest.mark.parametrize('pattern', ['', '//'])
+def test_parse_pattern_empty_is_rejected(cmd, pattern, capsys):
+    with pytest.raises(SystemExit) as e:
+        parse([cmd, '--pattern', pattern])
+    assert e.value.code == 2
+    assert 'empty pattern' in capsys.readouterr().err

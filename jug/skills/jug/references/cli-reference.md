@@ -109,6 +109,7 @@ jug invalidate jugfile --pattern PATTERN
 **`--pattern` formats** (matches anywhere in the task name):
 - `/regex/` — regex (e.g., `/compute_.*/`)
 - `module.function` or `function` — substring match, so `function` also matches `function_other`
+- an empty pattern (`''` or `'//'`) is an error, as it would match every task (use `'/.*/'` to select all)
 
 After invalidating, re-run `jug execute` to recompute.
 
