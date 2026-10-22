@@ -315,3 +315,53 @@ def test_metadata_packed(tmpdir):
     assert fs.metadata(t)['computed']
     assert fs.update_pack() == 1
     assert fs.metadata(t)['computed']
+
+
+def test_pack_concurrent_remove(tmpdir, monkeypatch):
+    # Another process (e.g., jug invalidate) may remove result files while
+    # jug pack is running
+    tmpdir = str(tmpdir)
+    k1, k2, k3 = [hash_one(k) for k in ['k1', 'k2', 'k3']]
+    fs = file_store(tmpdir)
+    for k in [k1, k2, k3]:
+        fs.dump([k], k)
+
+    load_file = fs._load_file
+    def removed_before_load(k):
+        if k == k1:
+            os.unlink(fs._getfname(k1))
+        return load_file(k)
+    monkeypatch.setattr(fs, '_load_file', removed_before_load)
+
+    modify_pack = fs._modify_pack
+    def removed_before_unlink(modify):
+        os.unlink(fs._getfname(k2))
+        return modify_pack(modify)
+    monkeypatch.setattr(fs, '_modify_pack', removed_before_unlink)
+
+    assert fs.update_pack() == 2
+    monkeypatch.undo()
+    fs = file_store(tmpdir)
+    assert not fs.can_load(k1)
+    assert fs.load(k3) == [k3]
+
+
+def test_native_write_failure_discards_partial_output(tmpdir, monkeypatch):
+    np = pytest.importorskip('numpy')
+    tmpdir = str(tmpdir)
+    k = hash_one('k')
+
+    write_array = np.lib.format.write_array
+    calls = []
+    def failing_write_array(output, value, *args, **kwargs):
+        # Only the first call fails (the fallback, encode_to, also uses it)
+        calls.append(None)
+        if len(calls) == 1:
+            output.write(b'partial output')
+            raise ValueError('cannot write')
+        return write_array(output, value, *args, **kwargs)
+    monkeypatch.setattr(np.lib.format, 'write_array', failing_write_array)
+    fs = file_store(tmpdir)
+    fs.dump(np.arange(4), k)
+    monkeypatch.undo()
+    assert list(file_store(tmpdir).load(k)) == [0, 1, 2, 3]

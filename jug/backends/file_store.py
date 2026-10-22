@@ -64,20 +64,31 @@ def fsync_dir(fname):
 
 
 def _write_to(value, output, compress_numpy):
+    start = output.tell()
+    def rewind():
+        # Writing in a native format may have failed after part of the output
+        # was written, which must be discarded before falling back to
+        # encode_to (or the file could not be loaded)
+        output.seek(start)
+        output.truncate()
     try:
         import numpy as np
         if not compress_numpy and type(value) is np.ndarray and not value.dtype.hasobject:
             np.lib.format.write_array(output, value)
             return
-    except (ImportError, OSError, ValueError):
+    except ImportError:
         pass
+    except (OSError, ValueError):
+        rewind()
     try:
         import polars as pl
         if not compress_numpy and type(value) is pl.DataFrame:
             value.write_parquet(output)
             return
-    except (ImportError, OSError, ValueError):
+    except ImportError:
         pass
+    except (OSError, ValueError):
+        rewind()
 
     encode_to(value, output)
 
@@ -201,7 +212,8 @@ class file_store(base_store):
             os.fsync(output.fileno())
         except:
             output.close()
-            os.unlink(fname)
+            with suppress(OSError):
+                os.unlink(fname)
             raise
         output.close()
 
@@ -251,20 +263,26 @@ class file_store(base_store):
         to_pack = {}
         for k in self._iter_filekeys():
             f = self._getfname(k)
-            s = os.stat(f)
-            if s.st_size <= MAX_FILESIZE_IN_PACK:
-                # Use _load_file() rather than decode_from() as the file may
-                # be in a native format (npy or parquet), and rather than
-                # load() so that a stale packed value does not overwrite the
-                # file we are about to remove
-                to_pack[k] = self._load_file(k)
+            # Another process (e.g., ``jug invalidate``) may remove the file
+            # concurrently, in which case there is nothing to pack
+            try:
+                s = os.stat(f)
+                if s.st_size <= MAX_FILESIZE_IN_PACK:
+                    # Use _load_file() rather than decode_from() as the file
+                    # may be in a native format (npy or parquet), and rather
+                    # than load() so that a stale packed value does not
+                    # overwrite the file we are about to remove
+                    to_pack[k] = self._load_file(k)
+            except FileNotFoundError:
+                pass
         if to_pack:
             def add(packed):
                 packed.update(to_pack)
                 return True
             self._modify_pack(add)
         for k in to_pack:
-            os.unlink(self._getfname(k))
+            with suppress(FileNotFoundError):
+                os.unlink(self._getfname(k))
         return len(to_pack)
 
 
@@ -338,6 +356,11 @@ class file_store(base_store):
         store.resave_pack()
 
         Writes the in-memory pack to disk (atomically, holding a lock)
+
+        WARNING: This is not used by jug itself and is only kept for
+        backwards compatibility. The in-memory pack may be stale (it is read
+        when the store is opened), so this can undo changes made to the pack
+        by other processes since then (e.g., bring back invalidated results).
         '''
         lock = self._get_pack_lock()
         try:

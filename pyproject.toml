@@ -47,7 +47,7 @@ dev = [
     "numpy",
     "polars",
     "pyyaml",
-    "redis",
+    "redis>=3.5",
     ]
 
 [project.urls]

@@ -32,8 +32,6 @@ Main options
 - jugfile: filesystem name for the Jugfile
 - subcommand: command to run.
 - aggressive_unload: --aggressive-unload
-- invalid_name: --name (for invalidate)
-- invalid_pattern: --pattern (for invalidate)
 - argv: Arguments not captured by jug (for script use)
 - print_out: Print function to be used for output (behaves like Python3's print)
 '''
@@ -95,8 +93,6 @@ def load_default_options(opt):
     opt.jugfile = 'jugfile.py'
     opt.subcommand = None
     opt.aggressive_unload = False
-    opt.invalid_name = None
-    opt.invalid_pattern = None
     opt.argv = None
     opt.print_out = print
     opt.short = False
@@ -239,7 +235,7 @@ def read_configuration_file(fp=None, default_options=None):
             try:
                 f = open(gfp, encoding='utf-8')
             except OSError:
-                break
+                continue
             global_options = _parse_config_file(f, default_options, default_options=default_options)
             break
 
@@ -280,13 +276,11 @@ memory errors.''')
     group.add_argument('--jugdir',
                        action='store',
                        dest='jugdir',
-                       help=f'''\
-Directory in which to save intermediate files
-You can use Python %%-format placeholders, the following variables are available:
-    - %%(date)s
-    - %%(jugfile)s (the jugfile name without the .py extension)
-
-    By default, the value of `jugdir` is "%%(jugfile)s.jugdata" (e.g., "jugfile.jugdata")''')
+                       help=('Directory in which to save intermediate files. '
+                             'It may contain the Python %%-format placeholders '
+                             '%%(date)s and %%(jugfile)s (the jugfile name '
+                             'without the .py extension). '
+                             f"(Default: {default_options.jugdir.replace('%', '%%')})"))
     group.add_argument('--verbose',
                        action='store',
                        dest='verbose',

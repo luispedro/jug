@@ -50,6 +50,8 @@ class InvalidateCommand(SubCommand):
 
     def run(self, store, options, *args, **kwargs):
         task_matcher = prepare_matcher_from_options(options.invalid_name, options.invalid_pattern)
+        # Only reachable when called programmatically, as the command line
+        # requires --name or --pattern
         if task_matcher is None:
             raise ValueError('jug invalidate: one of invalid_name or invalid_pattern must be given')
         tasks = task.alltasks
@@ -86,8 +88,19 @@ class InvalidateCommand(SubCommand):
             print_task_summary_table(options, [("Invalidated", task_counts)])
 
     def parse(self, parser):
+        # The dests are invalid_* (not invalidate_*) for historical reasons,
+        # so the configuration file section would be [invalid]. As one of
+        # --name/--pattern is required on the command line, the tasks to
+        # invalidate cannot be selected by a configuration file alone (which
+        # is a good thing for a destructive command)
         add_task_selection_options(parser, 'invalid_name', 'invalid_pattern',
                                    required=True, what='Invalidate tasks')
+
+    def parse_defaults(self):
+        return {
+            'invalid_name': None,
+            'invalid_pattern': None,
+        }
 
 
 invalidate = InvalidateCommand()

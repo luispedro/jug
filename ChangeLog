@@ -1,4 +1,22 @@
 Unreleased
+	* hooks: `exit_if_file_exists()`, `exit_after_n_tasks()`,
+	`exit_after_time()` and `exit_when_true()` register their hook only once
+	for the same arguments, so that calling them in a jugfile with barriers
+	does not accumulate a new hook every time the jugfile is re-loaded. The
+	time limit of `exit_after_time()` is counted from the first call
+	(previously, re-loading the jugfile also added a later deadline)
+	* jug pack: Do not crash if a result file is removed concurrently (e.g.,
+	by `jug invalidate`)
+	* file_store: If saving an array or DataFrame in its native format
+	fails, discard the partial output before falling back to the generic
+	format (which could otherwise produce a file that cannot be loaded).
+	A failure to remove the temporary file no longer hides the original
+	error
+	* Configuration files: If a global configuration file exists but cannot
+	be read, try the next location (previously, the others were skipped)
+	* redis_store: Requires redis-py 3.5 or later
+	* hooks: `TimeTasks` stores the start time of the current task in
+	`start_time` (it used to overwrite its own `start` method)
 	* jug pack: The pack file is created with the same permissions as result
 	files (it used to be created with mode 0600, making packed results
 	unreadable to other users of a shared jugdir)
@@ -177,7 +195,9 @@ Unreleased
 	* jug test-jug: Exit with a non-zero status (and name the right command)
 	when pytest is not available
 	* register_time_tasks: Print the timing summary only once with a
-	jugfile that has barriers (previously, once per re-load of the jugfile)
+	jugfile that has barriers (previously, once per re-load of the jugfile).
+	The hooks are registered only once per process, so calling it again has
+	no effect
 	* jug sleep-until: Do not accumulate duplicate tasks when re-loading a
 	jugfile with barriers
 	* file_store: Report packed results (after `jug pack`) as computed in

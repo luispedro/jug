@@ -40,6 +40,11 @@ was cached as finished are not detected), so do not rely on it in scripts.
 `NoHash` (from `jug.unsafe`) now passes the *value* of a wrapped Task to the
 function. Before, the function received the Task object itself.
 
+The `redis` backend requires redis-py 3.5 or later.
+
+`TimeTasks` (from `jug.hooks.execution`) stores the start time of the current
+task in `start_time`. Before, it overwrote its own `start` method with it.
+
 Passing a Task inside a subclass of `list` or `tuple` (e.g., a `namedtuple`)
 now raises a `TypeError`. This was never supported: the function received the
 Task object instead of its value, and hashing could fail with an obscure
@@ -202,7 +207,21 @@ unescaped, which allowed injecting HTML/JavaScript into it.
   parent directories) in git worktrees and submodules, where `.git` is a file.
 - `jug test-jug`: exit with a non-zero status when pytest is not available.
 - `register_time_tasks()`: print the timing summary only once with a jugfile
-  that has barriers (before, once per re-load of the jugfile).
+  that has barriers (before, once per re-load of the jugfile). The hooks are
+  registered only once per process, so calling it again has no effect.
+- `exit_if_file_exists()`, `exit_after_n_tasks()`, `exit_after_time()` and
+  `exit_when_true()` register their hook only once for the same arguments, so
+  that calling them in a jugfile with barriers does not accumulate a new hook
+  every time the jugfile is re-loaded. The time limit of `exit_after_time()`
+  is counted from the first call.
+- `jug pack`: do not crash if a result file is removed concurrently (e.g., by
+  `jug invalidate`).
+- `file_store`: if saving an array or DataFrame in its native format fails,
+  discard the partial output before falling back to the generic format (which
+  could otherwise produce a file that cannot be loaded). A failure to remove
+  the temporary file no longer hides the original error.
+- Configuration files: if a global configuration file exists but cannot be
+  read, try the next location (before, the others were skipped).
 - `jug sleep-until`: do not accumulate duplicate tasks when re-loading a
   jugfile with barriers.
 - `file_store`: report packed results (after `jug pack`) as computed in

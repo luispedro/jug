@@ -42,8 +42,8 @@ documentation](https://redis.io/docs/latest/operate/oss_and_stack/install/);
 it is also available from most Linux distributions' package managers).
 
 This backend also requires the [redis](https://pypi.org/project/redis/)
-Python package, which is not installed together with jug (install it with
-`pip install redis`).
+Python package (version 3.5 or later), which is not installed together with
+jug (install it with `pip install redis`).
 
 1. Run a redis server (see its docs for how to control it, but simply calling
    `redis-server` should work).

@@ -84,7 +84,7 @@ requires-dist = [
     { name = "polars", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pyyaml", marker = "extra == 'dev'" },
-    { name = "redis", marker = "extra == 'dev'" },
+    { name = "redis", marker = "extra == 'dev'", specifier = ">=3.5" },
     { name = "shtab", marker = "extra == 'completion'" },
     { name = "shtab", marker = "extra == 'dev'" },
 ]

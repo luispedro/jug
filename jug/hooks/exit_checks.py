@@ -1,4 +1,10 @@
 from sys import exit
+
+# The jugfile may be imported several times (e.g., with barriers), so these
+# functions register their hooks only once for the same arguments. This also
+# means that the limits are counted from the first call (e.g., the time limit
+# of exit_after_time is not reset when the jugfile is re-loaded)
+
 def exit_if_file_exists(fname):
     '''Before each task is executed, check if file exists. If so, exit.
 
@@ -15,7 +21,7 @@ def exit_if_file_exists(fname):
         from os import path
         if path.exists(fname):
             exit(0)
-    hooks.register_hook('execute.task-pre-execute', check_file)
+    hooks.register_hook_once('execute.task-pre-execute', ('exit_if_file_exists', fname), check_file)
 
 def exit_when_true(f, function_takes_Task=False):
     '''Generic exit check.
@@ -34,7 +40,14 @@ def exit_when_true(f, function_takes_Task=False):
     def exit_when(t):
         if (f(t) if function_takes_Task else f()):
             exit(0)
-    hooks.register_hook('execute.task-executed1', exit_when)
+    if getattr(f, '__closure__', True) is None:
+        # A plain function (without a closure) re-created by re-loading the
+        # jugfile has the same code, so it can be identified by it
+        hooks.register_hook_once('execute.task-executed1',
+                                 ('exit_when_true', f.__code__, function_takes_Task),
+                                 exit_when)
+    else:
+        hooks.register_hook('execute.task-executed1', exit_when)
 
 
 def exit_after_n_tasks(n):
@@ -54,7 +67,7 @@ def exit_after_n_tasks(n):
         executed[0] += 1
         if executed[0] >= n:
             exit(0)
-    hooks.register_hook('execute.task-executed1', exit_after)
+    hooks.register_hook_once('execute.task-executed1', ('exit_after_n_tasks', n), exit_after)
 
 
 def exit_after_time(hours=0, minutes=0, seconds=0):
@@ -80,7 +93,9 @@ def exit_after_time(hours=0, minutes=0, seconds=0):
     def check_time(_t):
         if time() >= deadline:
             exit(0)
-    hooks.register_hook('execute.task-executed1', check_time)
+    hooks.register_hook_once('execute.task-executed1',
+                             ('exit_after_time', hours, minutes, seconds),
+                             check_time)
 
 
 def exit_env_vars(environ=None):

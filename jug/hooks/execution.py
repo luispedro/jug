@@ -49,4 +49,3 @@ def register_time_tasks():
     register_hook_once('execute.task-pre-execute', 'register_time_tasks', tt.start)
     register_hook_once('execute.task-executed1', 'register_time_tasks', tt.stop)
     register_hook_once('execute.finished_post_status', 'register_time_tasks', tt.print_summary)
- 

@@ -252,3 +252,15 @@ def test_print_completion(capsys):
     out = capsys.readouterr().out
     assert 'jug' in out
     assert 'execute' in out
+
+
+def test_global_config_unreadable_tries_next(tmp_path, monkeypatch):
+    monkeypatch.setenv('HOME', str(tmp_path))
+    # ~/.config/jug/jugrc exists, but cannot be read (it is a directory)
+    (tmp_path / '.config' / 'jug' / 'jugrc').mkdir(parents=True)
+    (tmp_path / '.config' / 'jugrc').write_text('[main]\njugfile=global.py\n')
+    project = tmp_path / 'project'
+    project.mkdir()
+    monkeypatch.chdir(project)
+    opts = jug.options.read_configuration_file(default_options=jug.options.default_options)
+    assert opts.jugfile == 'global.py'

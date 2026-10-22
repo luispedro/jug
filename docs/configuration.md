@@ -29,7 +29,9 @@ given, the command line takes priority. Settings in the `[main]` section
 correspond to the global options (e.g., `--jugdir`), while settings in other
 sections correspond to options of that subcommand (e.g., `wait-cycle-time` in
 the `[execute]` section corresponds to `jug execute --wait-cycle-time`).
-Boolean settings accept `on`/`off`, `true`/`false`, or `1`/`0`.
+Boolean settings accept `on`/`off`, `true`/`false`, `yes`/`no`, `y`/`n`, or
+`1`/`0` (any value other than `off`, `false`, `no`, `n`, `0` or an empty
+value is read as true).
 
 ## Valid settings
 
@@ -81,8 +83,8 @@ In addition to the global configuration file, `jug` also searches for
 project-local configuration files named `.jugrc` or `jugrc`. Starting from
 the current working directory, `jug` walks up the directory tree looking for
 these files. If the current directory is inside a git repository (i.e., a
-`.git` directory is found), the search continues up to and including the
-repository root. If no git repository is detected, only the current directory is
+`.git` directory, or a `.git` file as in git worktrees and submodules, is
+found), the search continues up to and including the repository root. If no git repository is detected, only the current directory is
 searched.
 
 All found configuration files are applied with the following priority (highest
