@@ -100,6 +100,11 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 
 ### Bugfixes
 
+- `jug execute` and `jug invalidate` print a warning if both a name and a
+  pattern are set. This can only happen when one of them comes from a
+  configuration file (on the command line, `--name` and `--pattern` are
+  mutually exclusive); only tasks matching both are selected. Before, this
+  happened silently.
 - `jug execute` on a jugfile with a barrier: the waiting time is bounded by
   `--nr-wait-cycles` overall. Before, each re-load of the jugfile waited the
   full time again, so a stuck task (e.g., failed with `--keep-failed`) could

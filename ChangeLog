@@ -1,4 +1,8 @@
 Unreleased
+	* jug execute, jug invalidate: Print a warning if both a name and a
+	pattern are set (this can only happen when one of them comes from a
+	configuration file, as the command line options are mutually
+	exclusive). Only tasks matching both are selected
 	* Python 3.9 is no longer supported (it reached end-of-life in October
 	2025). Jug now requires Python 3.10 or later
 	* jug execute: With a barrier, the waiting time is bounded by

@@ -245,6 +245,10 @@ def prepare_matcher_from_options(name=None, pattern=None):
     '''Combine ``--name`` and ``--pattern`` into a single matcher
 
     A task must satisfy all the criteria that are given (i.e., not ``None``).
+    On the command line, ``--name`` and ``--pattern`` are mutually exclusive,
+    so both can only be set if one of them comes from a configuration file;
+    in that case, a warning is printed as the result is probably not what was
+    intended.
 
     Returns
     -------
@@ -252,6 +256,11 @@ def prepare_matcher_from_options(name=None, pattern=None):
         ``None`` if neither criterion was given
     '''
     matchers = []
+    if name is not None and pattern is not None:
+        sys.stderr.write(
+            "jug: warning: both a name and a pattern are set (one of them may "
+            "come from a configuration file). Only tasks which match both "
+            "will be selected.\n")
     if name is not None:
         matchers.append(prepare_name_matcher(name))
     if pattern is not None:

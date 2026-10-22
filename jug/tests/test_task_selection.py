@@ -97,15 +97,19 @@ def test_pattern_is_substring():
     assert prepare_task_matcher('/a/b')('x/a/b')
 
 
-def test_matcher_from_options():
+def test_matcher_from_options(capsys):
     assert prepare_matcher_from_options() is None
     assert prepare_matcher_from_options(name='function')('mod.function')
     assert not prepare_matcher_from_options(name='function')('mod.function_other')
     assert prepare_matcher_from_options(pattern='function')('mod.function_other')
+    assert capsys.readouterr().err == ''
 
     m = prepare_matcher_from_options(name='function*', pattern='/other/')
     assert m('mod.function_other')
     assert not m('mod.function')
+    err = capsys.readouterr().err
+    assert 'warning' in err
+    assert 'both a name and a pattern' in err
 
 
 @pytest.mark.parametrize('cmd,name_attr,pattern_attr', [
