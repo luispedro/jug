@@ -29,7 +29,6 @@ import sys
 from os import path
 from os.path import dirname, exists
 import logging
-import tempfile
 import shutil
 from contextlib import suppress
 from subprocess import Popen
@@ -282,9 +281,11 @@ class file_store(base_store):
     def _write_pack(self, packed):
         os.makedirs(path.join(self.jugdir, 'packs'), exist_ok=True)
         self._maybe_create()
-        fd, fname = tempfile.mkstemp('.jugtmp', 'jugtemp', self.tempdir())
+        # Not tempfile.mkstemp (see _make_temp_file): the pack must have the
+        # same permissions as the result files it replaces
+        fname, output = _make_temp_file(self.tempdir())
         try:
-            with os.fdopen(fd, 'wb') as output:
+            with output:
                 encode_to(packed, output)
                 output.flush()
                 os.fsync(output.fileno())

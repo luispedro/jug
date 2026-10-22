@@ -1,4 +1,7 @@
 Unreleased
+	* jug pack: The pack file is created with the same permissions as result
+	files (it used to be created with mode 0600, making packed results
+	unreadable to other users of a shared jugdir)
 	* jug execute, jug invalidate: Print a warning if both a name and a
 	pattern are set (this can only happen when one of them comes from a
 	configuration file, as the command line options are mutually

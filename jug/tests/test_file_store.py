@@ -261,6 +261,22 @@ def test_pack_write_failure_releases_lock(tmpdir, monkeypatch):
     assert fs.remove(k1)
 
 
+def test_pack_permissions(tmpdir):
+    # The pack must be readable by whoever could read the result files it
+    # replaces (it used to be created with mode 0600 by tempfile.mkstemp)
+    old_umask = os.umask(0o002)
+    try:
+        fs = file_store(str(tmpdir))
+        fs.dump([1], hash_one('k0'))
+        result_mode = os.stat(fs._getfname(hash_one('k0'))).st_mode & 0o777
+        assert fs.update_pack() == 1
+        pack_mode = os.stat(fs._packfile()).st_mode & 0o777
+    finally:
+        os.umask(old_umask)
+    assert result_mode == 0o664
+    assert pack_mode == result_mode
+
+
 def test_fsync_dir_after_rename(tmpdir, monkeypatch):
     # The directory must be synced *after* the rename for the rename to be
     # durable, so, when fsync_dir is called, the destination must exist

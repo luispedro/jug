@@ -103,6 +103,10 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 
 ### Bugfixes
 
+- `jug pack` creates the pack file with the same permissions as the result
+  files (following the umask). Before, it was created with mode 0600, so, on
+  a jugdir shared with a group, packed results became unreadable to the other
+  users.
 - `jug execute` and `jug invalidate` print a warning if both a name and a
   pattern are set. This can only happen when one of them comes from a
   configuration file (on the command line, `--name` and `--pattern` are
