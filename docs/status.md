@@ -89,3 +89,13 @@ You should do this every time you change the jugfile.
 can easily become out of sync with the jugfile used (`jugfile.py` in the
 examples above). It is kept in jug as the speed gains can be quite spectacular
 (from many seconds to instantaneous).
+
+The cache can also become out of sync with the store: once a task is recorded
+as finished, its result is never checked again. If results are removed (e.g.,
+with `jug invalidate`, `jug cleanup`, or by deleting the jugdir), `jug status
+--cache` will still report those tasks as finished. This also applies to the
+exit code (0 if all tasks are finished, 1 otherwise), so do not rely on it in
+scripts (e.g., `jug status --cache && ...`): use `jug status` without
+`--cache` (or `jug check`) instead. Enabling the cache in a configuration file
+(`cache = on` in the `[status]` section) affects every `jug status` call, so
+use `jug status --cache --clear` whenever you need an accurate answer.

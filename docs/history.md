@@ -33,7 +33,9 @@ before (e.g., frozensets of numbers).
 
 `jug status` now exits with status 0 if all tasks are complete and 1
 otherwise, like `jug check` (before, the exit code was the number of finished
-tasks, so `jug status && ...` failed when work had been done).
+tasks, so `jug status && ...` failed when work had been done). With `--cache`,
+the exit code is only as accurate as the cache (results removed after a task
+was cached as finished are not detected), so do not rely on it in scripts.
 
 `NoHash` (from `jug.unsafe`) now passes the *value* of a wrapped Task to the
 function. Before, the function received the Task object itself.

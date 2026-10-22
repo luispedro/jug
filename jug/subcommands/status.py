@@ -309,6 +309,10 @@ class StatusCommand(SubCommand):
     Implements the status command. Like ``check``, returns 0 if all tasks are
     finished, 1 otherwise.
 
+    With ``--cache``, tasks recorded as finished in the cache are not checked
+    against the store again, so the status (and the return value) can be
+    out of date if results were since removed.
+
     Parameters
     ----------
     options : jug options
@@ -327,7 +331,9 @@ class StatusCommand(SubCommand):
         parser.add_argument('--cache',
                             action='store_const', const=True,
                             dest='status_cache',
-                            help='Use a cache for faster status [does not update after jugfile changes, though]')
+                            help=('Use a cache for faster status [does not update after jugfile '
+                                  'changes or after results are removed, so the output and the '
+                                  'exit code may be out of date]'))
 
         parser.add_argument('--cache-file',
                             action='store', metavar="CACHE_FILE",

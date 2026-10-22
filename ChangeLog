@@ -131,7 +131,9 @@ Unreleased
 	frozensets of numbers), so their cached results will be recomputed
 	* jug status: Like jug check, exit with 0 if all tasks are finished and
 	1 otherwise (before, the exit code was the number of finished tasks, so
-	`jug status && ...` failed when work had been done)
+	`jug status && ...` failed when work had been done). With `--cache`, the
+	exit code is only as accurate as the cache (results removed after a task
+	was cached as finished are not detected), so do not rely on it in scripts
 	* jug.backends.encode: Fix quadratic slowdown when loading large results
 	that are not numpy arrays (e.g., a 64 MiB bytes object took over 90
 	seconds to load; it now takes a fraction of a second)
