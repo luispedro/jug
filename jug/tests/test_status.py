@@ -133,3 +133,37 @@ def test_cache_corrupt_file(tmpdir):
         status._status(options)
     assert str(cache_file) in str(e.value.code)
     assert '--clear' in str(e.value.code)
+
+
+@task_reset
+def test_cache_cannot_open(tmpdir):
+    import pytest
+    options = default_options.copy()
+    options.jugdir = 'dict_store'
+    options.jugfile = os.path.join(_jugdir, 'simple.py')
+    options.verbose = 'quiet'
+    options.status_cache = True
+    options.status_cache_file = str(tmpdir / 'nonexistent-dir' / 'cache.sqlite3')
+    with pytest.raises(SystemExit) as e:
+        status._status(options)
+    assert options.status_cache_file in str(e.value.code)
+
+
+@task_reset
+def test_cache_cannot_write(tmpdir, monkeypatch):
+    import sqlite3
+    import pytest
+    options = default_options.copy()
+    options.jugdir = 'dict_store'
+    options.jugfile = os.path.join(_jugdir, 'simple.py')
+    options.verbose = 'quiet'
+    options.status_cache = True
+    options.status_cache_file = str(tmpdir / 'cache.sqlite3')
+
+    def fail(*args):
+        raise sqlite3.OperationalError('database is locked')
+    monkeypatch.setattr(status, 'create_sqlite3', fail)
+    with pytest.raises(SystemExit) as e:
+        status._status(options)
+    assert options.status_cache_file in str(e.value.code)
+    assert 'database is locked' in str(e.value.code)

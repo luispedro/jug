@@ -234,7 +234,13 @@ def _status_cached(options):
             ht, deps, rdeps = retrieve_sqlite3(connection)
         store = backends.select(options.jugdir)
         mode = update
-    except sqlite3.OperationalError:
+    except sqlite3.OperationalError as e:
+        # Other operational errors include the file not being openable or
+        # the database being locked: rebuilding the cache would not help
+        if 'no such table' not in str(e):
+            raise SystemExit(
+                f'jug status: The status cache file {options.status_cache_file!r} '
+                f'cannot be opened ({e}).')
         # The cache has not been created yet (its tables do not exist)
         store, ht, deps, rdeps = load_jugfile(options)
         mode = create
@@ -248,15 +254,20 @@ def _status_cached(options):
 
     ts, dirty = update_status(store, ht, deps, rdeps)
     _print_status(options, ts)
-    if mode == update:
-        with _open_connection(options) as connection:
-            save_dirty3(connection, dirty)
-    else:
+    if mode == create:
         for k in dirty:
             _, name, hash, _ = ht[k]
             ht[k] = (k, name, hash, dirty[k])
+    try:
         with _open_connection(options) as connection:
-            create_sqlite3(connection, ht, deps, rdeps)
+            if mode == update:
+                save_dirty3(connection, dirty)
+            else:
+                create_sqlite3(connection, ht, deps, rdeps)
+    except sqlite3.Error as e:
+        raise SystemExit(
+            f'jug status: The status cache file {options.status_cache_file!r} '
+            f'could not be written ({e}).')
     return ts
 
 

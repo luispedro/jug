@@ -152,8 +152,9 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 - `mapreduce.map` and `mapreduce.currymap` with `map_step=1` accept a
   `TaskGenerator` (before, they failed with `AttributeError: __name__`).
 - `jug status --cache`: exit with a clear error message if the cache file is
-  not a valid cache (before, it crashed with a traceback). Interrupting the
-  cache lookup no longer falls back to loading the jugfile.
+  not a valid cache, or cannot be opened or written (before, it crashed with a
+  traceback, after printing the status if the file could not be opened).
+  Interrupting the cache lookup no longer falls back to loading the jugfile.
 - `CompoundTask`: save the result once, instead of twice.
 - `TaskGenerator`: raise the intended error message when pickling a function
   whose module cannot be found (instead of a `KeyError`).
