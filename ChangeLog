@@ -6,6 +6,9 @@ Unreleased
 	waited the full time again, for up to about 75 hours with the default
 	settings) and, with `--keep-going`, failed tasks are not re-run every
 	time the jugfile is re-loaded
+	* jug.init: `store=` is now installed as the store of the tasks (it used
+	to be ignored, and the previous store, `None` in a new process, was
+	returned instead)
 	* `return_tuple` is exported from `jug` (`from jug import return_tuple`)
 	* jug_execute: Include the command and its exit code in the error message
 	when the command fails

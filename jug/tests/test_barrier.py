@@ -112,3 +112,19 @@ def test_barrier_failed_task_not_retried(monkeypatch):
         assert e.value.code == 1
         assert len(executed) == 1
         assert len(sleeps) == 3
+
+
+def test_init_store_object():
+    import jug.task
+    from jug.backends.dict_store import dict_store
+    jugfile = find_test_jugfile('wbarrier.py')
+    jug.task.Task.store = None
+    try:
+        s = dict_store()
+        store, space = jug.jug.init(jugfile, store=s)
+        assert store is s
+        assert jug.task.Task.store is s
+    finally:
+        jug.task.Task.store = None
+        while jug.task.alltasks:
+            jug.task.alltasks.pop()

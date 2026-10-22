@@ -65,7 +65,8 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
         What to do if import fails: 'exit' (default) prints the error and exits
         the process, while 'propagate' re-raises the exception.
     store : storage object, optional
-        If used, this is returned as ``store`` again.
+        If used, it is installed as the store for the tasks (``Task.store``)
+        and returned as ``store`` again.
 
     Returns
     -------
@@ -78,8 +79,8 @@ def init(jugfile=None, jugdir=None, on_error='exit', store=None):
 
     if jugfile is None:
         jugfile = 'jugfile.py'
-    if store is None:
-        store = set_jugdir(jugdir)
+    # set_jugdir installs the store as Task.store (a store object is used as is)
+    store = set_jugdir(jugdir if store is None else store)
 
     curdir = os.path.abspath('.')
     if curdir not in sys.path or curdir != sys.path[0]:

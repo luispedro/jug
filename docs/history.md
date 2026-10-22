@@ -115,6 +115,9 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 - `jug execute --keep-failed`: do not mark a task as failed when acquiring its
   lock raised an error (the lock is not held, and may belong to another
   worker).
+- `jug.init(..., store=obj)` installs `obj` as the store of the tasks (before,
+  it was ignored, and the previous store, `None` in a new process, was
+  returned instead).
 - `--pdb` implies `--debug`, as documented (before, it did not).
 - The global flags `--aggressive-unload`, `--short`, `--pdb` and `--debug` can
   be set in configuration files (before, the setting was ignored).
