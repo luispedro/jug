@@ -155,6 +155,9 @@ unescaped, which allowed injecting HTML/JavaScript into it.
   being lost or undone (e.g., invalidated results coming back). Removing
   results no longer rewrites the pack when nothing in it changed, and a
   failure to save the pack no longer leaves its lock held.
+- `jug pack`: do not lose a result which is both in the pack and on disk
+  (which can happen if another process packed it while this one had the store
+  open). The packed value was re-packed and the newer file deleted.
 - `file_store`: fix numpy structured arrays with object fields, which could
   be saved but not loaded.
 - `file_store`: remove the temporary file when saving a result fails (e.g.,

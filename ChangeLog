@@ -75,6 +75,9 @@ Unreleased
 	removing results (e.g., `jug invalidate`) no longer rewrites the pack
 	when nothing in it changed, and a failure to save the pack no longer
 	leaves the 'pack-save' lock held
+	* jug pack: Do not lose a result which is both in the pack and on disk
+	(which can happen if another process packed it while this one had the
+	store open). The packed value was re-packed and the newer file deleted
 	* bvalue: Only treat the value as unavailable when a task it needs has
 	not run yet; before, any error (e.g., an IndexError in a Tasklet) was
 	silently treated as an unsatisfied barrier and `jug execute` waited and

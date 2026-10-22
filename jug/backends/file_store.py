@@ -254,9 +254,11 @@ class file_store(base_store):
             f = self._getfname(k)
             s = os.stat(f)
             if s.st_size <= MAX_FILESIZE_IN_PACK:
-                # Use load() rather than decode_from() as the file may be in
-                # a native format (npy or parquet)
-                to_pack[k] = self.load(k)
+                # Use _load_file() rather than decode_from() as the file may
+                # be in a native format (npy or parquet), and rather than
+                # load() so that a stale packed value does not overwrite the
+                # file we are about to remove
+                to_pack[k] = self._load_file(k)
         if to_pack:
             def add(packed):
                 packed.update(to_pack)
@@ -388,6 +390,20 @@ class file_store(base_store):
         '''
         if name in self.packed:
             return self.packed[name]
+        return self._load_file(name)
+
+    def _load_file(self, name):
+        '''
+        obj = store._load_file(name)
+
+        Internal. Loads the result *file* for ``name``, ignoring the pack.
+
+        Use ``self.load()`` instead, unless the file is specifically what is
+        wanted: a key can be both in the pack and on disk (the pack is only
+        read when the store is opened, so another process may have written a
+        file for a key which this process still sees in its pack), and in
+        that case the file is the newer value.
+        '''
         fname = self._getfname(name)
         with open(fname, 'rb') as ifile:
             try:

@@ -208,6 +208,35 @@ def test_pack_concurrent_stores(tmpdir):
     assert not fs.can_load(k2)
 
 
+def test_pack_keeps_newer_file(tmpdir):
+    # A key can be both in the pack and on disk, with the file holding the
+    # newer value: update_pack() must pack the file, not the stale packed
+    # value (and must not then delete the file)
+    tmpdir = str(tmpdir)
+    k1 = hash_one('k1')
+
+    fs = file_store(tmpdir)
+    fs.dump('OLD', k1)
+
+    # A second process opens the store before the pack is created, so its
+    # in-memory pack does not have k1
+    other = file_store(tmpdir)
+
+    assert fs.update_pack() == 1
+    # The second process now writes a new value. Because k1 is not in its
+    # (stale) in-memory pack, the pack is left alone and only a file is
+    # written, so k1 is now both packed and on disk.
+    other.dump('NEW', k1)
+    assert os.path.exists(fs._getfname(k1))
+
+    # Packing again must preserve the newer value from the file (it used to
+    # re-pack the stale packed value and then delete the file)
+    fs = file_store(tmpdir)
+    assert fs.update_pack() == 1
+    assert fs.load(k1) == 'NEW'
+    assert file_store(tmpdir).load(k1) == 'NEW'
+
+
 def test_pack_write_failure_releases_lock(tmpdir, monkeypatch):
     import jug.backends.file_store
     tmpdir = str(tmpdir)
