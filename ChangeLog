@@ -14,6 +14,9 @@ Unreleased
 	when the command fails
 	* jug webstatus: Use the same column names and order as `jug status`
 	* `--pdb` implies `--debug`, as documented (previously, it did not)
+	* `--pdb`: Do not open a second debugger on jug's own exit. `jug execute`
+	exits with status 1 when a task failed, and that `SystemExit` was caught
+	and debugged as if it were an error
 	* The global flags `--aggressive-unload`, `--short`, `--pdb` and `--debug`
 	can be set in configuration files (previously, the setting was ignored)
 	* mapreduce: `map` and `currymap` with `map_step=1` accept a

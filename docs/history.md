@@ -123,6 +123,9 @@ unescaped, which allowed injecting HTML/JavaScript into it.
   it was ignored, and the previous store, `None` in a new process, was
   returned instead).
 - `--pdb` implies `--debug`, as documented (before, it did not).
+- `--pdb`: do not open a second debugger on jug's own exit. `jug execute`
+  exits with status 1 when a task failed, and that `SystemExit` was caught and
+  debugged as if it were an error.
 - The global flags `--aggressive-unload`, `--short`, `--pdb` and `--debug` can
   be set in configuration files (before, the setting was ignored).
 - `mapreduce.map` and `mapreduce.currymap` with `map_step=1` accept a

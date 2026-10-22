@@ -252,6 +252,23 @@ def test_lock_error_task_still_runnable(monkeypatch):
     assert t.value() == 4
 
 @task_reset
+def test_pdb_does_not_trap_exit(monkeypatch, tmpdir):
+    # main() must let SystemExit through: with --pdb, the debugger is for the
+    # failing task, not for `jug execute`'s own sys.exit(1)
+    calls = []
+    monkeypatch.setattr('jug.internal.debugger.debug_exception',
+                        lambda: calls.append(1))
+    jugfile = find_test_jugfile('failing.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    with pytest.raises(SystemExit) as e:
+        jug.jug.main(['jug', 'execute', '--pdb', '--keep-going',
+                      '--wait-cycle-time', '0', '--nr-wait-cycles', '1',
+                      '--verbose', 'quiet', jugfile, '--jugdir', jugdir])
+    assert e.value.code == 1
+    # One call per failing task, and none for the exit
+    assert len(calls) == 3
+
+@task_reset
 def test_fractional_wait_cycle_time(monkeypatch):
     from jug.jug import execution_loop
     options = parse(['execute', '--wait-cycle-time', '0.5', '--nr-wait-cycles', '2'])

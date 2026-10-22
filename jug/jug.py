@@ -332,7 +332,7 @@ def main(argv=None):
             store, jugspace = init(options.jugfile, options.jugdir, on_error=on_error)
         from .subcommands import cmdapi
         retval = cmdapi.run(options.subcommand, options=options, store=store, jugspace=jugspace)
-    except:
+    except Exception:
         if options.pdb:
             from .internal.debugger import debug_exception
             debug_exception()
