@@ -268,7 +268,13 @@ def execution_loop(tasks, options, state=None):
                 raise
             except Exception as e:
                 failures = task_failed = True
-                state.failed.add(t.hash())
+                if locked:
+                    # Only blacklist the task if we held its lock, i.e., if it
+                    # was ours to run and it really failed. If acquiring the
+                    # lock itself raised, the task never ran (and the lock may
+                    # belong to another worker), so it must stay runnable for
+                    # the next re-load of the jugfile.
+                    state.failed.add(t.hash())
 
                 if options.pdb:
                     from .internal.debugger import debug_exception

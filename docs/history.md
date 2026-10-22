@@ -115,6 +115,10 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 - `jug execute --keep-failed`: do not mark a task as failed when acquiring its
   lock raised an error (the lock is not held, and may belong to another
   worker).
+- `jug execute --keep-going`: a task whose lock could not be acquired because
+  of an error is no longer treated as failed for the rest of the run. It never
+  ran, so it is retried when the jugfile is re-loaded (before, a transient
+  error, e.g. from NFS or redis, skipped the task permanently).
 - `jug.init(..., store=obj)` installs `obj` as the store of the tasks (before,
   it was ignored, and the previous store, `None` in a new process, was
   returned instead).

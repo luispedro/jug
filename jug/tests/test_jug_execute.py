@@ -221,6 +221,37 @@ def test_keep_failed_lock_error(monkeypatch):
     assert not other.is_failed()
 
 @task_reset
+def test_lock_error_task_still_runnable(monkeypatch):
+    # A task whose lock() raised never ran, so it must not be blacklisted:
+    # the next re-load of the jugfile (i.e., the next execution_loop call
+    # with the same state) must still try to run it
+    from jug.jug import execution_loop, ExecutionState
+    options = parse(['execute'])
+    options.execute_keep_going = True
+    options.execute_nr_wait_cycles = 1
+    options.execute_wait_cycle_time = 0
+    options.execute_name = None
+    options.execute_pattern = None
+
+    Task.store = dict_store()
+    t = Task(double, 2)
+
+    real_lock = Task.lock
+    def lock_raises_once(self):
+        monkeypatch.setattr(Task, 'lock', real_lock)
+        raise OSError('transient lock error')
+    monkeypatch.setattr(Task, 'lock', lock_raises_once)
+
+    state = ExecutionState()
+    assert execution_loop([t], options, state)
+    assert not t.can_load()
+
+    # Second pass: the task is not in state.failed, so it runs
+    assert not execution_loop([t], options, state)
+    assert t.can_load()
+    assert t.value() == 4
+
+@task_reset
 def test_fractional_wait_cycle_time(monkeypatch):
     from jug.jug import execution_loop
     options = parse(['execute', '--wait-cycle-time', '0.5', '--nr-wait-cycles', '2'])
