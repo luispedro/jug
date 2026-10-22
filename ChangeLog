@@ -19,7 +19,9 @@ Unreleased
 	* `return_tuple` is exported from `jug` (`from jug import return_tuple`)
 	* jug_execute: Include the command and its exit code in the error message
 	when the command fails
-	* jug webstatus: Use the same column names and order as `jug status`
+	* jug webstatus: Use the same column names and order as `jug status`,
+	and sort the tasks by name, as `jug status` does (previously, the row
+	order was arbitrary)
 	* `--pdb` implies `--debug`, as documented (previously, it did not)
 	* `--pdb`: Do not open a second debugger on jug's own exit. `jug execute`
 	exits with status 1 when a task failed, and that `SystemExit` was caught

@@ -87,7 +87,7 @@ def _format_counts(ts):
     names = set()
     for t in [ts.failed, ts.waiting, ts.ready, ts.running, ts.finished]:
         names.update(t)
-    for n in names:
+    for n in sorted(names):
         table.append(
                 _row_template.format(escape(n), ts.failed.get(n, 0), ts.waiting.get(n, 0), ts.ready.get(n, 0), ts.finished.get(n, 0), ts.running.get(n, 0)))
     table.append(_row_template.format('', '', '', '', '', ''))

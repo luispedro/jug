@@ -30,6 +30,17 @@ def test_format_counts_failed():
     assert out.count('<td>') == 4 * 5
 
 
+def test_format_counts_sorted():
+    # Rows are sorted by name, as in `jug status`
+    names = ['jugfile.c', 'jugfile.a', 'jugfile.d', 'jugfile.b', 'jugfile.e']
+    ts = TaskStatus()
+    for n in names:
+        ts.waiting[n] = 1
+    out = _format_counts(ts)
+    positions = [out.index(n) for n in sorted(names)]
+    assert positions == sorted(positions)
+
+
 def test_render_page_escapes():
     ts = TaskStatus()
     ts.finished['<b>name</b>'] = 1

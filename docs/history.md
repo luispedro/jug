@@ -74,7 +74,9 @@ unescaped, which allowed injecting HTML/JavaScript into it.
 - `jug.utils.jug_execute`: the error raised when the command fails now
   includes the command and its exit code.
 - `jug webstatus` uses the same column names and order as `jug status`
-  (Failed, Waiting, Ready, Complete, Active), and shows failed tasks.
+  (Failed, Waiting, Ready, Complete, Active), shows failed tasks, and sorts
+  the tasks by name, as `jug status` does (before, the row order was
+  arbitrary).
 - A Task's function can be a `functools.partial` object. The partial is
   unwrapped, so `Task(partial(f, a), b)` is the same task as `Task(f, a, b)`.
 - `jug execute --wait-cycle-time` (and `wait-cycle-time` in configuration
