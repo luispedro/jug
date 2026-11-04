@@ -76,6 +76,7 @@ settings are silently ignored. The settings that have an effect are:
 | `[execute]` | `exclude-pattern` | `jug execute --exclude-pattern` | (none) |
 | `[status]` | `cache` | `jug status --cache` | `off` |
 | `[status]` | `cache-file` | `jug status --cache-file` | `.jugstatus.sqlite3` |
+| `[status]` | `json` | `jug status --json` | `off` |
 | `[cleanup]` | `locks-only` | `jug cleanup --locks-only` | `off` |
 | `[cleanup]` | `failed-only` | `jug cleanup --failed-only` | `off` |
 | `[cleanup]` | `keep-locks` | `jug cleanup --keep-locks` | `off` |

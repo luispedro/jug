@@ -12,6 +12,16 @@
   matches none of the exclusions. For example, `jug execute --name 'align_*'
   --exclude-name align_fast`. As with `--pattern`, an empty
   `--exclude-pattern` is an error.
+- New `--json` option for `jug status`: prints the number of tasks in each
+  state (waiting, ready, running, failed, finished), by task name, as JSON,
+  together with whether loading the jugfile stopped at a barrier. Nothing
+  else is printed on standard output. See [the documentation of
+  status](subcommands.md#status) for the format.
+- `jug status` exits with status 1 if loading the jugfile stopped at a
+  barrier, as the list of tasks is incomplete. With `--cache`, this is
+  recorded when the cache is built, so a cache built before a barrier was
+  passed no longer reports that all tasks are complete (rebuild it with
+  `jug status --cache --clear`).
 - Configuration files: settings whose value is a list (currently,
   `exclude-name` and `exclude-pattern` in `[execute]`) take one entry per
   line.

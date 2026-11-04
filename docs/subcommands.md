@@ -84,7 +84,54 @@ jugfile.py [OPTIONS]` (it is installed alongside `jug`).
 ### status
 
 You can check the status of your computation at any time with status. Like
-`check`, it exits with status 0 if all tasks have run, 1 otherwise.
+`check`, it exits with status 0 if all tasks have run, 1 otherwise. If
+loading the jugfile stopped at a [barrier](barrier.md), the list of tasks is
+incomplete, so `status` exits with 1 even if all the tasks before the barrier
+have run.
+
+`jug status` accepts the following options:
+
+`--short`
+: Print a one-line summary instead of a table.
+
+`--cache`, `--cache-file CACHE_FILE`, `--clear`
+: Keep the status in an SQLite file (by default, `.jugstatus.sqlite3`), so
+  that tasks recorded as finished are not checked again. This is faster for
+  large jugfiles, but the jugfile is only loaded when the cache is built, so
+  the cache does not see changes to the jugfile (including tasks that only
+  appear after a barrier is passed) and does not notice if results are
+  removed. `--clear` removes the cache file, so that it is rebuilt the next
+  time.
+
+`--json`
+: Print the number of tasks in each state, by task name, as JSON. Nothing
+  else is printed on standard output (anything that the jugfile prints while
+  it is loaded goes to standard error). The exit code is the same as without
+  `--json`. For example:
+
+  ```json
+  {
+    "jug_version": "2.8.0",
+    "has_barrier": false,
+    "tasks": {
+      "jugfile.align": {"waiting": 3, "ready": 10, "running": 2, "failed": 0, "finished": 85}
+    },
+    "total": {"waiting": 3, "ready": 10, "running": 2, "failed": 0, "finished": 85}
+  }
+  ```
+
+  All five states are always present, even if their count is 0. A task is
+  *waiting* if some of its dependencies have not been computed, *ready* if
+  it could run, *running* if a process holds its lock, *failed* if it failed
+  and its lock was kept, and *finished* if its result is available. Tasks are
+  only reported as *failed* if the process that ran them used `jug execute
+  --keep-failed`; otherwise, the lock of a failed task is released, so it is
+  counted as *ready* again.
+
+  `has_barrier` is `true` if loading the jugfile stopped at a `barrier()`,
+  so that the tasks after it are not included. With `--cache`, it refers to
+  the time when the cache was built, and is `null` if the cache was built by
+  an older version of jug (which did not record it).
 
 ### shell
 

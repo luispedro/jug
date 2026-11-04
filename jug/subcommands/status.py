@@ -21,7 +21,8 @@
 #  THE SOFTWARE.
 
 from collections import defaultdict
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext, redirect_stdout
+import sys
 
 import jug
 from .. import task
@@ -42,6 +43,9 @@ ready = 'ready'
 running = 'running'
 failed = 'failed'
 finished = 'finished'
+
+# Order of the states in the JSON output
+_STATES = (waiting, ready, running, failed, finished)
 
 
 def create_sqlite3(connection, ht, deps, rdeps):
@@ -93,6 +97,36 @@ def retrieve_sqlite3(connection):
     return ht, dict(deps), dict(rdeps)
 
 
+def save_meta3(connection, has_barrier):
+    '''Record information about the jugfile load that built the cache'''
+    connection.executescript('''
+    CREATE TABLE IF NOT EXISTS meta (
+            key CHAR(64) PRIMARY KEY,
+            value CHAR(64));
+    ''')
+    connection.execute('INSERT OR REPLACE INTO meta VALUES(?,?)',
+                       ('has_barrier', '1' if has_barrier else '0'))
+
+
+def retrieve_meta3(connection):
+    '''Returns whether a barrier was hit when the cache was built
+
+    Returns ``None`` if this is not known (the cache was built by a version
+    of jug which did not record it)
+    '''
+    import sqlite3
+    try:
+        row = connection.execute(
+            "SELECT value FROM meta WHERE key = 'has_barrier'").fetchone()
+    except sqlite3.OperationalError as e:
+        if 'no such table' not in str(e):
+            raise
+        return None
+    if row is None:
+        return None
+    return row[0] == '1'
+
+
 def save_dirty3(connection, dirty):
     connection.executemany('UPDATE ht SET STATUS = ? WHERE id = ?', [(nstatus, id) for id, nstatus in dirty.items()])
 
@@ -110,8 +144,26 @@ def _open_connection(options):
         connection.close()
 
 
-def load_jugfile(options):
-    store, _ = jug.init(options.jugfile, options.jugdir)
+def _init_jugfile(options):
+    '''Load the jugfile (with ``jug.init``)
+
+    With ``--json``, anything printed while loading the jugfile (by the
+    jugfile itself or the traceback of an import error) goes to stderr, so
+    that stdout only has the JSON output.
+
+    Any previously loaded tasks are discarded first (as ``execute`` does when
+    re-loading the jugfile), so that they are not counted twice.
+    '''
+    del task.alltasks[:]
+    quiet = (redirect_stdout(sys.stderr) if getattr(options, 'status_json', False)
+             else nullcontext())
+    with quiet:
+        return jug.init(options.jugfile, options.jugdir)
+
+
+def _load_jugfile(options):
+    '''Like :func:`load_jugfile`, but also returns whether a barrier was hit'''
+    store, jugspace = _init_jugfile(options)
     h2idx = {}
     ht = []
     deps = {}
@@ -123,7 +175,6 @@ def load_jugfile(options):
             ht.append((i, t.name, hash, unknown))
             h2idx[hash] = i
     except KeyError:
-        import sys
         sys.stderr.write("Could not build dependency graph!\n")
         sys.stderr.write("This normally indicates a bug in your code!\n")
         sys.stderr.write("\n")
@@ -138,16 +189,45 @@ def load_jugfile(options):
     for k, v in deps.items():
         for rv in v:
             rdeps[rv].append(k)
-    return store, ht, deps, dict(rdeps)
+    return store, ht, deps, dict(rdeps), jugspace.get('__jug__hasbarrier__', False)
+
+
+def load_jugfile(options):
+    store, ht, deps, rdeps, _ = _load_jugfile(options)
+    return store, ht, deps, rdeps
 
 
 class TaskStatus:
+    '''Number of tasks in each state, by task name
+
+    Attributes
+    ----------
+    waiting, ready, running, failed, finished : dict
+        Task name -> number of tasks in that state
+    has_barrier : bool or None
+        Whether loading the jugfile stopped at a ``barrier()`` (so that the
+        list of tasks is incomplete). ``None`` if unknown (with a status
+        cache built by an older version of jug)
+    '''
     def __init__(self):
         self.failed=defaultdict(int)
         self.waiting=defaultdict(int)
         self.ready=defaultdict(int)
         self.running=defaultdict(int)
         self.finished=defaultdict(int)
+        self.has_barrier = False
+
+    def counts(self):
+        '''Returns ``{task_name: {state: count}}`` (all states are present)'''
+        names = set()
+        for st in _STATES:
+            names.update(getattr(self, st).keys())
+        return {name: {st: getattr(self, st).get(name, 0) for st in _STATES}
+                for name in sorted(names)}
+
+    def totals(self):
+        '''Returns ``{state: count}`` summed over all tasks'''
+        return {st: sum(getattr(self, st).values()) for st in _STATES}
 
 
 def update_status(store, ht, deps, rdeps):
@@ -196,8 +276,20 @@ def _all_complete(ts):
         and not any(ts.waiting.values())
 
 
+def _print_json(options, ts):
+    import json
+    options.print_out(json.dumps({
+        'jug_version': jug.__version__,
+        'has_barrier': ts.has_barrier,
+        'tasks': ts.counts(),
+        'total': ts.totals(),
+        }, indent=2))
+
+
 def _print_status(options, ts):
-    if options.short:
+    if getattr(options, 'status_json', False):
+        _print_json(options, ts)
+    elif options.short:
         n_ready = sum(ts.ready.values())
         n_running = sum(ts.running.values())
         n_failed = sum(ts.failed.values())
@@ -232,6 +324,7 @@ def _status_cached(options):
     try:
         with _open_connection(options) as connection:
             ht, deps, rdeps = retrieve_sqlite3(connection)
+            has_barrier = retrieve_meta3(connection)
         store = backends.select(options.jugdir)
         mode = update
     except sqlite3.OperationalError as e:
@@ -242,7 +335,7 @@ def _status_cached(options):
                 f'jug status: The status cache file {options.status_cache_file!r} '
                 f'cannot be opened ({e}).')
         # The cache has not been created yet (its tables do not exist)
-        store, ht, deps, rdeps = load_jugfile(options)
+        store, ht, deps, rdeps, has_barrier = _load_jugfile(options)
         mode = create
     except sqlite3.DatabaseError as e:
         raise SystemExit(
@@ -253,6 +346,7 @@ def _status_cached(options):
             'to rebuild it.')
 
     ts, dirty = update_status(store, ht, deps, rdeps)
+    ts.has_barrier = has_barrier
     _print_status(options, ts)
     if mode == create:
         for k in dirty:
@@ -264,6 +358,7 @@ def _status_cached(options):
                 save_dirty3(connection, dirty)
             else:
                 create_sqlite3(connection, ht, deps, rdeps)
+                save_meta3(connection, has_barrier)
     except sqlite3.Error as e:
         raise SystemExit(
             f'jug status: The status cache file {options.status_cache_file!r} '
@@ -272,10 +367,11 @@ def _status_cached(options):
 
 
 def _status_nocache(options):
-    store, _ = jug.init(options.jugfile, options.jugdir)
+    store, jugspace = _init_jugfile(options)
     Task.store = memoize_store(store, list_base=True)
 
     ts = TaskStatus()
+    ts.has_barrier = jugspace.get('__jug__hasbarrier__', False)
 
     for t in task.alltasks:
         if t.can_load():
@@ -303,8 +399,7 @@ def _status(options):
         try:
             import sqlite3
         except ImportError:
-            from sys import stderr
-            stderr.write('Cached status relies on sqlite3. Falling back to non-cached version\n')
+            sys.stderr.write('Cached status relies on sqlite3. Falling back to non-cached version\n')
             options.status_cache = False
             return _status(options)
         if options.status_cache_clear:
@@ -318,11 +413,15 @@ class StatusCommand(SubCommand):
     '''Print status
 
     Implements the status command. Like ``check``, returns 0 if all tasks are
-    finished, 1 otherwise.
+    finished, 1 otherwise. If loading the jugfile stopped at a ``barrier()``,
+    the list of tasks is incomplete, so 1 is returned.
 
     With ``--cache``, tasks recorded as finished in the cache are not checked
     against the store again, so the status (and the return value) can be
     out of date if results were since removed.
+
+    With ``--json``, the status is printed as JSON (and nothing else is
+    printed on stdout).
 
     Parameters
     ----------
@@ -332,9 +431,11 @@ class StatusCommand(SubCommand):
 
     def run(self, options, *args, **kwargs):
         ts = _status(options)
-        if ts is None or _all_complete(ts):
+        if ts is None:
             return 0
-        return 1
+        if ts.has_barrier or not _all_complete(ts):
+            return 1
+        return 0
 
     def parse(self, parser):
         defaults = self.parse_defaults()
@@ -355,12 +456,18 @@ class StatusCommand(SubCommand):
                             action='store_const', const=True,
                             dest='status_cache_clear',
                             help='Use with status --cache. Removes the cache file')
+        parser.add_argument('--json',
+                            action='store_const', const=True,
+                            dest='status_json',
+                            help=('Print the number of tasks in each state, by task name, '
+                                  'as JSON (and nothing else on standard output)'))
 
     def parse_defaults(self):
         return {
             "status_cache": False,
             "status_cache_clear": False,
             "status_cache_file": ".jugstatus.sqlite3",
+            "status_json": False,
         }
 
 

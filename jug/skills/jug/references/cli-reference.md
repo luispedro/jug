@@ -73,6 +73,7 @@ jug status [jugfile] [options]
 | `--cache` | false | Use an SQLite cache for faster repeated calls |
 | `--cache-file FILE` | `.jugstatus.sqlite3` | Path to the SQLite cache file |
 | `--clear` | false | Delete the cache file (use with `--cache`) |
+| `--json` | false | Print counts per task name and state as JSON (only JSON on stdout) |
 
 **Status values shown:**
 - **Failed** — task has a failed lock state (for example after `--keep-failed`
@@ -81,6 +82,11 @@ jug status [jugfile] [options]
 - **Ready** — all dependencies done, no worker has claimed it
 - **Active** — currently being executed by a worker
 - **Complete** — result is stored in jugdir
+
+**JSON output** (`--json`): `{"jug_version", "has_barrier", "tasks": {name:
+{"waiting", "ready", "running", "failed", "finished"}}, "total": {...}}`. Every
+state key is always present. `has_barrier` is true if loading stopped at a
+`barrier()` (the task list is incomplete); in that case the exit code is 1.
 
 **Tip:** `jug status --short` is safe to run frequently from scripts or
 monitoring dashboards. Use `--cache` to speed up status checks on jugfiles

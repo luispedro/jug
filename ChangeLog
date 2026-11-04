@@ -5,6 +5,16 @@ Unreleased
 	(a task runs if it is selected and matches no exclusion). In
 	configuration files, give one entry per line
 	* Configuration files: list-valued settings take one entry per line
+	* jug status: New `--json` option, which prints the number of tasks in
+	each state, by task name, as JSON (and nothing else on stdout), plus
+	whether loading the jugfile stopped at a barrier
+	* jug status: Exit with 1 if loading the jugfile stopped at a barrier
+	(the list of tasks is incomplete). With `--cache`, this is recorded
+	when the cache is built, so a cache built before a barrier was passed
+	no longer reports that all tasks are complete
+	* jug status: Discard previously loaded tasks before loading the
+	jugfile, so that calling it repeatedly in the same process does not
+	count tasks more than once
 
 Version 2.7.0 Fri 23 October 2026 by luispedro
 	* hooks: `exit_if_file_exists()`, `exit_after_n_tasks()`,

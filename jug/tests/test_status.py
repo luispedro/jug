@@ -167,3 +167,191 @@ def test_cache_cannot_write(tmpdir, monkeypatch):
         status._status(options)
     assert options.status_cache_file in str(e.value.code)
     assert 'database is locked' in str(e.value.code)
+
+
+def _run_jug(*args):
+    '''Runs ``jug *args`` and returns its exit code'''
+    try:
+        jug.jug.main(['jug', *args, '--verbose', 'quiet'])
+    except SystemExit as e:
+        return 0 if e.code is None else e.code
+    assert False, 'jug.jug.main did not exit'
+
+
+def _status_json(capsys, jugfile, jugdir, *extra):
+    import json
+    capsys.readouterr()
+    code = _run_jug('status', jugfile, '--jugdir', jugdir, '--json', *extra)
+    out = capsys.readouterr().out
+    return code, json.loads(out)
+
+
+_STATES = ['waiting', 'ready', 'running', 'failed', 'finished']
+
+
+def _check_json_format(data):
+    assert set(data.keys()) == {'jug_version', 'has_barrier', 'tasks', 'total'}
+    assert data['jug_version'] == jug.__version__
+    for counts in list(data['tasks'].values()) + [data['total']]:
+        assert list(counts.keys()) == _STATES
+    for st in _STATES:
+        assert data['total'][st] == sum(c[st] for c in data['tasks'].values())
+
+
+@task_reset
+def test_json_all_states(tmpdir, capsys):
+    from jug.task import alltasks
+    jugfile = os.path.join(_jugdir, 'simple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    cache_file = str(tmpdir.join('status.sqlite3'))
+
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir, '--name', 'double') == 0
+    # Hold the lock of one plus1 task (running) and mark another as failed
+    store, _ = jug.jug.init(jugfile, jugdir)
+    plus1 = [t for t in alltasks if t.name == 'simple.plus1']
+    assert store.getlock(plus1[0].hash()).get()
+    lock = store.getlock(plus1[1].hash())
+    assert lock.get()
+    lock.fail()
+
+    expected = {
+        'simple.double': {'waiting': 0, 'ready': 0, 'running': 0, 'failed': 0, 'finished': 8},
+        'simple.plus1': {'waiting': 0, 'ready': 6, 'running': 1, 'failed': 1, 'finished': 0},
+        'simple.sum2': {'waiting': 16, 'ready': 0, 'running': 0, 'failed': 0, 'finished': 0},
+    }
+    for extra in [(), ('--cache', '--cache-file', cache_file)]:
+        code, data = _status_json(capsys, jugfile, jugdir, *extra)
+        _check_json_format(data)
+        assert code == 1
+        assert data['has_barrier'] is False
+        assert data['tasks'] == expected
+        assert data['total'] == {'waiting': 16, 'ready': 6, 'running': 1, 'failed': 1, 'finished': 8}
+
+    store.remove_locks()
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir) == 0
+    for extra in [(), ('--cache', '--cache-file', cache_file)]:
+        code, data = _status_json(capsys, jugfile, jugdir, *extra)
+        assert code == 0
+        assert data['total'] == {'waiting': 0, 'ready': 0, 'running': 0, 'failed': 0, 'finished': 32}
+
+
+@task_reset
+def test_json_keep_failed(tmpdir, capsys):
+    # failed tasks are only reported if the worker used --keep-failed
+    jugfile = os.path.join(_jugdir, 'failing.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir,
+                    '--keep-going', '--keep-failed', '--nr-wait-cycles', '0') == 1
+    code, data = _status_json(capsys, jugfile, jugdir)
+    _check_json_format(data)
+    assert code == 1
+    assert data['tasks']['failing.some_fail']['failed'] == 3
+    assert data['tasks']['failing.some_fail']['finished'] == 7
+    assert data['tasks']['failing.plus1']['waiting'] == 3
+    assert data['tasks']['failing.plus1']['finished'] == 7
+
+
+@task_reset
+def test_json_agrees_with_status(tmpdir, capsys):
+    jugfile = os.path.join(_jugdir, 'simple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir, '--name', 'double') == 0
+    _, data = _status_json(capsys, jugfile, jugdir)
+
+    options = default_options.copy()
+    options.jugdir = jugdir
+    options.jugfile = jugfile
+    options.print_out = lambda *args, **kwargs: None
+    ts = status._status(options)
+    assert ts.counts() == data['tasks']
+    assert ts.totals() == data['total']
+
+
+@task_reset
+def test_json_jugfile_output_goes_to_stderr(tmpdir, capsys):
+    import json
+    jugfile = tmpdir.join('printing.py')
+    jugfile.write('''
+from jug import TaskGenerator
+print('printed by the jugfile')
+
+@TaskGenerator
+def f(x):
+    return x
+f(1)
+''')
+    jugdir = str(tmpdir.join('jugdata'))
+    capsys.readouterr()
+    assert _run_jug('status', str(jugfile), '--jugdir', jugdir, '--json') == 1
+    captured = capsys.readouterr()
+    assert 'printed by the jugfile' in captured.err
+    assert json.loads(captured.out)['total']['ready'] == 1
+
+
+@task_reset
+def test_json_import_error_not_on_stdout(tmpdir, capsys):
+    jugfile = tmpdir.join('broken.py')
+    jugfile.write('raise RuntimeError("broken jugfile")\n')
+    capsys.readouterr()
+    assert _run_jug('status', str(jugfile), '--jugdir', str(tmpdir.join('jugdata')), '--json') == 1
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert 'broken jugfile' in captured.err
+
+
+@task_reset
+def test_barrier_status(tmpdir, capsys):
+    jugfile = os.path.join(_jugdir, 'wbarrier.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    cache_file = str(tmpdir.join('status.sqlite3'))
+    for extra in [(), ('--cache', '--cache-file', cache_file)]:
+        code, data = _status_json(capsys, jugfile, jugdir, *extra)
+        assert code == 1
+        assert data['has_barrier'] is True
+        assert data['total']['ready'] == 1
+
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir) == 0
+    code, data = _status_json(capsys, jugfile, jugdir)
+    assert code == 0
+    assert data['has_barrier'] is False
+    assert data['total']['finished'] == 3
+
+    # The cache was built when loading stopped at the barrier, so it does not
+    # know about the later tasks: the exit code must not claim completion
+    code, data = _status_json(capsys, jugfile, jugdir, '--cache', '--cache-file', cache_file)
+    assert data['has_barrier'] is True
+    assert data['total']['finished'] == 1
+    assert code == 1
+    # The same applies to the plain output
+    assert _run_jug('status', jugfile, '--jugdir', jugdir, '--cache', '--cache-file', cache_file) == 1
+
+    assert _run_jug('status', jugfile, '--jugdir', jugdir,
+                    '--cache', '--cache-file', cache_file, '--clear') == 0
+    code, data = _status_json(capsys, jugfile, jugdir, '--cache', '--cache-file', cache_file)
+    assert code == 0
+    assert data['has_barrier'] is False
+    assert data['total']['finished'] == 3
+
+
+@task_reset
+def test_cache_without_meta(tmpdir, capsys):
+    # A cache built by an older version of jug does not record whether a
+    # barrier was hit
+    import sqlite3
+    jugfile = os.path.join(_jugdir, 'simple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    cache_file = str(tmpdir.join('status.sqlite3'))
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir) == 0
+    _status_json(capsys, jugfile, jugdir, '--cache', '--cache-file', cache_file)
+    with sqlite3.connect(cache_file) as connection:
+        connection.execute('DROP TABLE meta')
+    connection.close()
+    code, data = _status_json(capsys, jugfile, jugdir, '--cache', '--cache-file', cache_file)
+    assert data['has_barrier'] is None
+    assert code == 0
+
+
+def test_parse_json():
+    from jug.options import parse
+    assert parse(['status']).status_json is False
+    assert parse(['status', '--json']).status_json is True
