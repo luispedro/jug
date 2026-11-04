@@ -172,6 +172,11 @@ Useful in shell scripts:
 jug check jugfile.py && echo "Done, running post-processing" && ./post.sh
 ```
 
+`--name`, `--pattern`, `--exclude-name`, `--exclude-pattern` restrict the
+check to matching tasks (same rules as `jug execute`). If a barrier is hit,
+the exit code is 1 (tasks after it are unknown). If no task matches, it prints
+an error and exits 1.
+
 ---
 
 ## `jug sleep-until`
@@ -182,7 +187,11 @@ Like `jug check`, but keeps sleeping until all tasks are complete.
 jug sleep-until [jugfile]
 ```
 
-Polls every 12 seconds. Exits 0 when all tasks are finished.
+Polls every 12 seconds. Exits 0 when all tasks are finished. Accepts the same
+`--name`/`--pattern`/`--exclude-*` options as `jug check` to wait only for
+matching tasks (while a barrier is hit, it first waits for all tasks before
+the barrier). Never exits if a task failed and was kept locked
+(`--keep-failed`).
 
 ---
 

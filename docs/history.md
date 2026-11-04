@@ -12,6 +12,14 @@
   matches none of the exclusions. For example, `jug execute --name 'align_*'
   --exclude-name align_fast`. As with `--pattern`, an empty
   `--exclude-pattern` is an error.
+- `jug check` and `jug sleep-until` accept `--name`, `--pattern`,
+  `--exclude-name` and `--exclude-pattern` (with the same rules as for
+  `jug execute`), to only check or wait for the matching tasks:
+  `jug sleep-until --name preprocess && ./plot.sh`. If no task matches, they
+  print an error and exit with 1 (so that a typo is not mistaken for "all
+  done"). As tasks after a barrier are not known, `jug check` exits with 1
+  if a barrier is hit, and `jug sleep-until` waits for the barrier to be
+  passed.
 - New `--json` option for `jug status`: prints the number of tasks in each
   state (waiting, ready, running, failed, finished), by task name, as JSON,
   together with whether loading the jugfile stopped at a barrier. Nothing

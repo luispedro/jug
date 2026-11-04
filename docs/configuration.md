@@ -34,7 +34,8 @@ Boolean settings accept `on`/`off`, `true`/`false`, `yes`/`no`, `y`/`n`, or
 value is read as true).
 
 Settings that can be given several times on the command line
-(`exclude-name` and `exclude-pattern` in the `[execute]` section) take one
+(`exclude-name` and `exclude-pattern` in the `[execute]`, `[check]` and
+`[sleep-until]` sections) take one
 entry per line, with the continuation lines indented:
 
 ```
@@ -74,6 +75,10 @@ settings are silently ignored. The settings that have an effect are:
 | `[execute]` | `pattern` | `jug execute --pattern` | (none) |
 | `[execute]` | `exclude-name` | `jug execute --exclude-name` | (none) |
 | `[execute]` | `exclude-pattern` | `jug execute --exclude-pattern` | (none) |
+| `[check]` | `name`, `pattern` | `jug check --name`, `--pattern` | (none) |
+| `[check]` | `exclude-name`, `exclude-pattern` | `jug check --exclude-name`, `--exclude-pattern` | (none) |
+| `[sleep-until]` | `name`, `pattern` | `jug sleep-until --name`, `--pattern` | (none) |
+| `[sleep-until]` | `exclude-name`, `exclude-pattern` | `jug sleep-until --exclude-name`, `--exclude-pattern` | (none) |
 | `[status]` | `cache` | `jug status --cache` | `off` |
 | `[status]` | `cache-file` | `jug status --cache-file` | `.jugstatus.sqlite3` |
 | `[status]` | `json` | `jug status --json` | `off` |

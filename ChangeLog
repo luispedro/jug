@@ -5,6 +5,10 @@ Unreleased
 	(a task runs if it is selected and matches no exclusion). In
 	configuration files, give one entry per line
 	* Configuration files: list-valued settings take one entry per line
+	* jug check, jug sleep-until: New `--name`, `--pattern`,
+	`--exclude-name` and `--exclude-pattern` options to only check (or
+	wait for) the matching tasks. If no task matches, an error is printed
+	and the exit code is 1. `jug check` exits with 1 if a barrier is hit
 	* jug status: New `--json` option, which prints the number of tasks in
 	each state, by task name, as JSON (and nothing else on stdout), plus
 	whether loading the jugfile stopped at a barrier

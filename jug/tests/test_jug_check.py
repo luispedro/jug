@@ -1,4 +1,5 @@
 import inspect
+import pytest
 import os
 
 import jug.jug
@@ -82,3 +83,127 @@ def test_sleep_until_barrier_reload():
     assert e.value.code == 0
     # The re-loaded jugfile has 3 tasks; they must not be duplicated
     assert len(jug.task.alltasks) == 3
+
+
+def _run_jug(*args):
+    '''Runs ``jug *args`` (in a clean task list) and returns its exit code'''
+    import pytest
+    del jug.task.alltasks[:]
+    with pytest.raises(SystemExit) as e:
+        jug.jug.main(['jug', *args, '--verbose', 'quiet', '--will-cite'])
+    del jug.task.alltasks[:]
+    return 0 if e.value.code is None else e.value.code
+
+
+@task_reset
+def test_check_selection(tmpdir, capsys):
+    jugfile = os.path.join(_jugdir, 'simple_multiple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir, '--name', 'sum_2') == 0
+
+    def check(*extra):
+        return _run_jug('check', jugfile, '--jugdir', jugdir, *extra)
+    assert check() == 1
+    assert check('--name', 'sum_2') == 0
+    assert check('--name', 'sum_3') == 1
+    # loose match: sum_2 and sum_3
+    assert check('--pattern', 'sum_') == 1
+    assert check('--pattern', '/sum_2$/') == 0
+    assert check('--exclude-name', 'sum_3', '--exclude-pattern', 'tract') == 0
+    assert check('--name', 'sum_*', '--exclude-name', 'sum_3') == 0
+    assert check('--exclude-name', 'sum_3') == 1
+    assert capsys.readouterr().err == ''
+
+
+@task_reset
+def test_check_no_match(tmpdir, capsys):
+    jugfile = os.path.join(_jugdir, 'simple_multiple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir) == 0
+    assert _run_jug('check', jugfile, '--jugdir', jugdir) == 0
+    capsys.readouterr()
+    # A typo must not look like "all done"
+    for cmd in ['check', 'sleep-until']:
+        assert _run_jug(cmd, jugfile, '--jugdir', jugdir, '--name', 'sum_4') == 1
+        assert 'no task matches' in capsys.readouterr().err
+    assert _run_jug('check', jugfile, '--jugdir', jugdir,
+                    '--exclude-pattern', '/^simple_multiple\\./') == 1
+    assert 'no task matches' in capsys.readouterr().err
+
+
+@task_reset
+def test_check_barrier(tmpdir):
+    # Matching tasks may be defined after the barrier, so check cannot say
+    # that they are all done
+    jugfile = os.path.join(_jugdir, 'barrier_exclude.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    assert _run_jug('check', jugfile, '--jugdir', jugdir, '--name', 'after') == 1
+    assert _run_jug('check', jugfile, '--jugdir', jugdir, '--name', 'nonexistent') == 1
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir,
+                    '--exclude-name', 'after_skipped') == 0
+    assert _run_jug('check', jugfile, '--jugdir', jugdir) == 1
+    assert _run_jug('check', jugfile, '--jugdir', jugdir, '--name', 'after') == 0
+    assert _run_jug('check', jugfile, '--jugdir', jugdir, '--exclude-name', 'after_skipped') == 0
+
+
+@task_reset
+def test_sleep_until_selection_barrier(tmpdir, monkeypatch):
+    import time
+    jugfile = os.path.join(_jugdir, 'barrier_exclude.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    ran = []
+
+    def fake_sleep(_):
+        # Emulate a worker which runs everything except after_skipped
+        ran.append([t.name for t in jug.task.alltasks])
+        for t in list(jug.task.alltasks):
+            if t.name != 'barrier_exclude.after_skipped' \
+                    and not t.can_load() and t.can_run():
+                t.run()
+    monkeypatch.setattr(time, 'sleep', fake_sleep)
+
+    assert _run_jug('sleep-until', jugfile, '--jugdir', jugdir, '--name', 'after') == 0
+    # First, it waited for the tasks before the barrier (even though they do
+    # not match), then (after re-loading) for the matching tasks
+    assert len(ran) == 2
+    assert set(ran[0]) == {'barrier_exclude.before'}
+    assert 'barrier_exclude.after' in ran[1]
+
+    assert _run_jug('check', jugfile, '--jugdir', jugdir, '--name', 'after') == 0
+    assert _run_jug('check', jugfile, '--jugdir', jugdir, '--name', 'after_skipped') == 1
+
+
+@task_reset
+def test_sleep_until_selection_done(tmpdir, monkeypatch):
+    import time
+    jugfile = os.path.join(_jugdir, 'simple_multiple.py')
+    jugdir = str(tmpdir.join('jugdata'))
+    assert _run_jug('execute', jugfile, '--jugdir', jugdir, '--name', 'sum_2') == 0
+
+    def fail_sleep(_):
+        raise AssertionError('should not sleep')
+    monkeypatch.setattr(time, 'sleep', fail_sleep)
+    assert _run_jug('sleep-until', jugfile, '--jugdir', jugdir, '--name', 'sum_2') == 0
+    assert _run_jug('sleep-until', jugfile, '--jugdir', jugdir,
+                    '--exclude-pattern', '/sum_3|subtract/') == 0
+
+
+@pytest.mark.parametrize('cmd,prefix', [('check', 'check'), ('sleep-until', 'sleep_until')])
+def test_parse_selection(cmd, prefix):
+    from jug.options import parse
+    options = parse([cmd])
+    assert getattr(options, f'{prefix}_name') is None
+    assert getattr(options, f'{prefix}_pattern') is None
+    assert getattr(options, f'{prefix}_exclude_name') == []
+    assert getattr(options, f'{prefix}_exclude_pattern') == []
+
+    options = parse([cmd, '--name', 'a', '--exclude-name', 'b', '--exclude-pattern', 'c',
+                     '--exclude-name', 'd'])
+    assert getattr(options, f'{prefix}_name') == 'a'
+    assert getattr(options, f'{prefix}_exclude_name') == ['b', 'd']
+    assert getattr(options, f'{prefix}_exclude_pattern') == ['c']
+
+    with pytest.raises(SystemExit):
+        parse([cmd, '--name', 'a', '--pattern', 'b'])
+    with pytest.raises(SystemExit):
+        parse([cmd, '--exclude-pattern', ''])

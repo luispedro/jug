@@ -156,12 +156,35 @@ not even generated, and `check` exits with status 1 (as the tasks before the
 barrier are not all finished). Use `sleep-until` if you want to wait for all
 tasks, including those after barriers.
 
+`--name NAME`, `--pattern PATTERN`, `--exclude-name NAME`, `--exclude-pattern PATTERN`
+: Only check the tasks that match, with the same rules as for
+  [execute](#execute) (e.g., `jug check --name preprocess` exits with 0 once
+  all the `preprocess` tasks have run, even if others have not). As the tasks
+  after a barrier are not known, `check` still exits with 1 if a barrier is
+  hit. If no task matches, `check` prints an error and exits with 1, so that a
+  misspelled name is not mistaken for "all done".
+
 ### sleep-until
 
 This subcommand will simply wait until all tasks are finished before exiting.
 It is useful for monitoring a computation (especially if your terminal has an
 option to display a pop-up or bell when it detects activity). It **does not**
-monitor whether errors occur!
+monitor whether errors occur! In particular, it waits forever for a task that
+failed and was kept locked by `jug execute --keep-failed`.
+
+`--name NAME`, `--pattern PATTERN`, `--exclude-name NAME`, `--exclude-pattern PATTERN`
+: Only wait for the tasks that match, with the same rules as for
+  [execute](#execute). For example, to run a script once all the
+  `preprocess` tasks are done:
+
+  ```
+  jug sleep-until --name preprocess && ./plot_preprocessed.sh
+  ```
+
+  While loading the jugfile stops at a barrier, matching tasks may be
+  defined after it, so `sleep-until` waits for *all* the tasks before the
+  barrier (so that it is passed), and only then for the matching tasks. If no
+  task matches (once no barrier is hit), it prints an error and exits with 1.
 
 ### invalidate
 
