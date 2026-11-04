@@ -34,6 +34,14 @@
   `exclude-name` and `exclude-pattern` in `[execute]`) take one entry per
   line.
 
+### Internal improvements
+
+- Faster task hashing when numpy is not installed. Hashing tried to import
+  numpy for every argument, and a failed import is not cached, so each try
+  searched all of `sys.path`: loading a jugfile with 100,000 tasks (in
+  `jug execute`, `jug status`, ...) took about 11 seconds instead of about
+  1. Task hashes do not change.
+
 ## Version 2.7.0
 
 *Released 23 October 2026*

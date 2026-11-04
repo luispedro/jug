@@ -26,6 +26,8 @@ with the functions in this module. Objects can customize how they are hashed
 by implementing a ``__jug_hash__()`` method returning ``bytes``.
 '''
 
+import sys
+
 # The pickle protocol is pinned (rather than using pickle's default, which
 # changes between Python versions: 4 up to Python 3.13, 5 from 3.14) so that
 # task hashes, and thus cached results, are stable across interpreter versions.
@@ -58,10 +60,11 @@ def hash_update(M, elems):
     '''
     import pickle
 
-    try:
-        import numpy as np
-    except ImportError:
-        np = None
+    # A numpy array can only exist if numpy has been imported, so there is no
+    # need to import it here. Trying to (for every call, as this function is
+    # recursive) is slow when numpy is not installed: failed imports are not
+    # cached, so each one searches all of sys.path again.
+    np = sys.modules.get('numpy')
     for n,e in elems:
         M.update(pickle.dumps(n, protocol=_PICKLE_PROTOCOL))
         if hasattr(e, '__jug_hash__'):

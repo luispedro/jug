@@ -94,3 +94,22 @@ def test_hash_numpy_object():
     B = A.copy()
     B[0] = 'z'
     assert hash_one(A) != hash_one(B)
+
+
+def test_hash_does_not_import_numpy(monkeypatch):
+    # Hashing must not try to import numpy (which is slow if it is not
+    # installed, as failed imports are not cached)
+    import sys
+    attempts = []
+
+    class Finder:
+        def find_spec(self, name, path=None, target=None):
+            if name == 'numpy':
+                attempts.append(name)
+            return None
+
+    expected = hash_one([1, 'a', (2, 3), {'k': [1.5]}])
+    monkeypatch.delitem(sys.modules, 'numpy')
+    monkeypatch.setattr(sys, 'meta_path', [Finder(), *sys.meta_path])
+    assert hash_one([1, 'a', (2, 3), {'k': [1.5]}]) == expected
+    assert attempts == []

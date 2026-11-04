@@ -19,6 +19,9 @@ Unreleased
 	* jug status: Discard previously loaded tasks before loading the
 	jugfile, so that calling it repeatedly in the same process does not
 	count tasks more than once
+	* Faster task hashing when numpy is not installed: hashing no longer
+	tries to import numpy for every argument (a failed import is not cached
+	and searches all of sys.path). Task hashes do not change
 
 Version 2.7.0 Fri 23 October 2026 by luispedro
 	* hooks: `exit_if_file_exists()`, `exit_after_n_tasks()`,
