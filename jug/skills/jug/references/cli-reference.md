@@ -39,6 +39,8 @@ jug execute [jugfile] [options]
 | `--name NAME` | (all tasks) | Only execute tasks whose name is NAME: `module.function` or just `function`, `*` is a wildcard (same as `invalidate --name`) |
 | `--pattern PATTERN` | (all tasks) | Only execute tasks whose name contains PATTERN (or matches `/regex/`); looser than `--name` |
 | `--target` | | Deprecated synonym of `--name` (prints a warning) |
+| `--exclude-name NAME` | (none) | Skip tasks whose name is NAME (same rules as `--name`). Repeatable; can be combined with `--name`/`--pattern` |
+| `--exclude-pattern PATTERN` | (none) | Skip tasks whose name contains PATTERN or matches `/regex/` (same rules as `--pattern`). Repeatable; can be combined with `--name`/`--pattern` |
 | `--keep-going` | false | Continue executing other tasks after a task fails, instead of stopping |
 | `--keep-failed` | false | Leave failed tasks locked (do not release lock on failure) |
 | `--wait-cycle-time N` | 12 | Seconds to sleep between cycles when no task is ready |

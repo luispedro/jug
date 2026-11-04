@@ -90,7 +90,7 @@ the ``dest=`` attribute of ``add_argument()`` and the ``value`` should be any ob
 to be used by your ``run()`` method. Note that values given in a configuration file
 (``jugrc``) are automatically converted to the same type as this default (for booleans,
 the strings ``0``, ``false``, ``off`` and the empty string are ``False``; anything else
-is ``True``). Values given on the command-line are used as returned by ``argparse``
+is ``True``; for lists, each non-empty line of the value is one entry). Values given on the command-line are used as returned by ``argparse``
 (use ``type=`` in ``add_argument()`` if you need a conversion).
 
 For more information on parser configuration refer to ``argparse``'s documentation.

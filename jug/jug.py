@@ -173,8 +173,12 @@ def execution_loop(tasks, options, state=None):
 
     logging.info(f'Execute start ({len(tasks)} tasks)')
 
-    # If we are running with --name/--pattern, exclude non-matching tasks
-    task_matcher = prepare_matcher_from_options(options.execute_name, options.execute_pattern)
+    # If we are running with --name/--pattern/--exclude-*, discard non-matching tasks
+    task_matcher = prepare_matcher_from_options(
+                        options.execute_name,
+                        options.execute_pattern,
+                        exclude_names=getattr(options, 'execute_exclude_name', None),
+                        exclude_patterns=getattr(options, 'execute_exclude_pattern', None))
     if task_matcher is not None:
         tasks = [t for t in tasks if task_matcher(t.name)]
         logging.info(f'Non-matching tasks discarded. Remaining ({len(tasks)} tasks)')

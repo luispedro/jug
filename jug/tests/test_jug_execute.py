@@ -129,6 +129,69 @@ def test_name_and_pattern_combined():
     store = _execute_with('simple_multiple.py', execute_name='sum_*', execute_pattern='/sum_2/')
     assert len(store.store) == 8
 
+
+@task_reset
+def test_exclude_name():
+    # 8 tasks of each of sum_2, sum_3, subtract
+    store = _execute_with('simple_multiple.py', execute_exclude_name=['subtract'])
+    assert len(store.store) == 16
+
+
+@task_reset
+def test_exclude_name_is_strict():
+    # 'sum_' is not a function name, so nothing is excluded
+    store = _execute_with('simple_multiple.py', execute_exclude_name=['sum_'])
+    assert len(store.store) == 24
+
+
+@task_reset
+def test_exclude_pattern():
+    # loose match: 'tract' is part of 'subtract'
+    store = _execute_with('simple_multiple.py', execute_exclude_pattern=['tract'])
+    assert len(store.store) == 16
+    store = _execute_with('simple_multiple.py', execute_exclude_pattern=['/sum_3|subtract/'])
+    assert len(store.store) == 8
+
+
+@task_reset
+def test_include_and_exclude():
+    store = _execute_with('simple_multiple.py',
+                          execute_name='sum_*',
+                          execute_exclude_name=['sum_3'])
+    assert len(store.store) == 8
+
+
+@task_reset
+def test_several_exclusions():
+    store = _execute_with('simple_multiple.py',
+                          execute_exclude_name=['subtract'],
+                          execute_exclude_pattern=['/_3$/'])
+    assert len(store.store) == 8
+
+
+@task_reset
+def test_exclude_with_barrier():
+    # The excluded tasks are only defined after the barrier, so the filter
+    # must be applied every time the jugfile is re-loaded
+    import jug.subcommands.execute
+    options = parse(['execute'])
+    options.jugdir = 'dict_store'
+    options.jugfile = find_test_jugfile('barrier_exclude.py')
+    options.execute_exclude_name = ['after_skipped']
+    options.execute_nr_wait_cycles = 1
+    options.execute_wait_cycle_time = 0
+    options.print_out = lambda *args, **kwargs: None
+    jug.subcommands.execute.execute(options)
+
+    done = {}
+    for t in jug.task.alltasks:
+        done.setdefault(t.name, set()).add(t.can_load())
+    assert done == {
+        'barrier_exclude.before': {True},
+        'barrier_exclude.after': {True},
+        'barrier_exclude.after_skipped': {False},
+    }
+
 @task_reset
 def test_failed_task_keep_going():
     from jug.jug import execution_loop

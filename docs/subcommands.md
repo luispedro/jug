@@ -32,6 +32,30 @@ The actual code is much more complex, of course.
   matching task whose inputs have not been computed (by another process) just
   waits for them.
 
+`--exclude-name NAME`, `--exclude-pattern PATTERN`
+: Do not execute the tasks that match, using the same rules as `--name`
+  and `--pattern`, respectively (so `--exclude-name func` excludes
+  `mod.func`, but not `mod.func_other`). Both can be given several times,
+  mixed, and combined with `--name` or `--pattern`: a task is executed if it
+  is selected (by `--name`/`--pattern`, or all tasks if neither is given)
+  and matches none of the exclusions. For example, to run all `align_*`
+  tasks except `align_fast`:
+
+  ```
+  jug execute --name 'align_*' --exclude-name align_fast
+  ```
+
+  or to run everything except the `align_*` and `sort` tasks:
+
+  ```
+  jug execute --exclude-name 'align_*' --exclude-name sort
+  ```
+
+  As with the inclusion options, dependencies are not handled
+  automatically: if a task depends on an excluded task, it waits until
+  another process computes it. Unlike `--name`/`--pattern`, these options
+  are not available for `jug invalidate`.
+
 `--keep-going`
 : By default, a process stops at the first task that raises an exception.
   With `--keep-going`, it logs the error and continues with the remaining

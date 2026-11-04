@@ -28,7 +28,7 @@ from .. import task
 from ..hooks import jug_hook, register_hook, register_hook_once
 from ..io import print_task_summary_table
 from ..jug import init
-from ..utils import add_task_selection_options
+from ..utils import add_task_selection_options, add_task_exclusion_options
 from . import SubCommand, maybe_print_citation_info
 
 
@@ -133,6 +133,8 @@ class ExecuteCommand(SubCommand):
                                   f"(Default: {defaults['execute_nr_wait_cycles']})"))
         add_task_selection_options(parser, 'execute_name', 'execute_pattern',
                                    required=False, what='Only execute tasks')
+        add_task_exclusion_options(parser, 'execute_exclude_name', 'execute_exclude_pattern',
+                                   what='execute')
         parser.add_argument('--keep-going',
                             action='store_const', const=True,
                             dest='execute_keep_going',
@@ -154,6 +156,8 @@ class ExecuteCommand(SubCommand):
             "execute_keep_failed": False,
             "execute_name": None,
             "execute_pattern": None,
+            "execute_exclude_name": [],
+            "execute_exclude_pattern": [],
             "execute_wait_cycle_time": wait_cycle_time,
             "execute_nr_wait_cycles": int((30 * 60) // wait_cycle_time),
             "execute_no_check_environment": False,

@@ -268,19 +268,50 @@ def prepare_name_matcher(name):
     return matcher
 
 
-def prepare_matcher_from_options(name=None, pattern=None):
-    '''Combine ``--name`` and ``--pattern`` into a single matcher
+def _as_list(values):
+    '''Normalize ``None``, a single string or an iterable of strings to a list'''
+    if values is None:
+        return []
+    if isinstance(values, str):
+        return [values]
+    return list(values)
 
-    A task must satisfy all the criteria that are given (i.e., not ``None``).
+
+def prepare_matcher_from_options(name=None, pattern=None,
+                                 exclude_names=None, exclude_patterns=None):
+    '''Combine ``--name``, ``--pattern`` and the exclusions into one matcher
+
+    A task is selected if it satisfies all the inclusion criteria that are
+    given (i.e., not ``None``), or if none is given, *and* it matches none
+    of the exclusions.
+
     On the command line, ``--name`` and ``--pattern`` are mutually exclusive,
     so both can only be set if one of them comes from a configuration file;
     in that case, a warning is printed as the result is probably not what was
     intended.
 
+    Parameters
+    ----------
+    name : str, optional
+        Strict match (see :func:`prepare_name_matcher`)
+    pattern : str, optional
+        Loose match (see :func:`prepare_task_matcher`)
+    exclude_names : list of str, optional
+        Tasks matching any of these (with the same rules as ``name``) are
+        not selected
+    exclude_patterns : list of str, optional
+        Tasks matching any of these (with the same rules as ``pattern``) are
+        not selected
+
     Returns
     -------
     matcher : callable or None
-        ``None`` if neither criterion was given
+        ``None`` if no criterion (inclusion or exclusion) was given
+
+    Raises
+    ------
+    ValueError
+        If ``pattern`` or any of ``exclude_patterns`` is empty
     '''
     matchers = []
     if name is not None and pattern is not None:
@@ -292,9 +323,15 @@ def prepare_matcher_from_options(name=None, pattern=None):
         matchers.append(prepare_name_matcher(name))
     if pattern is not None:
         matchers.append(prepare_task_matcher(pattern))
-    if not matchers:
+    excluders = [prepare_name_matcher(n) for n in _as_list(exclude_names)]
+    excluders.extend(prepare_task_matcher(p) for p in _as_list(exclude_patterns))
+    if not matchers and not excluders:
         return None
-    return lambda task_name: all(m(task_name) for m in matchers)
+
+    def matcher(task_name):
+        return (all(m(task_name) for m in matchers)
+                and not any(e(task_name) for e in excluders))
+    return matcher
 
 
 class _DeprecatedTargetAction(argparse.Action):
@@ -341,6 +378,35 @@ def add_task_selection_options(parser, name_dest, pattern_dest, required, what):
     group.add_argument('--target', '--invalid', action=_DeprecatedTargetAction,
                        dest=name_dest, metavar='NAME',
                        help='Deprecated: use --name (or --pattern)')
+
+
+def add_task_exclusion_options(parser, exclude_name_dest, exclude_pattern_dest, what):
+    '''Add ``--exclude-name`` and ``--exclude-pattern`` to parser
+
+    Both can be repeated and combined with each other and with ``--name`` or
+    ``--pattern`` (see :func:`prepare_matcher_from_options`).
+
+    Parameters
+    ----------
+    parser : argparse parser
+    exclude_name_dest, exclude_pattern_dest : str
+        ``dest`` for ``--exclude-name`` and ``--exclude-pattern`` (the values
+        are lists)
+    what : str
+        What is done to the tasks that are not excluded (used in the help
+        strings)
+    '''
+    parser.add_argument('--exclude-name', action='append', dest=exclude_name_dest,
+                        metavar='NAME',
+                        help=(f"Do not {what} tasks whose name is NAME (same "
+                              "rules as --name). Can be given multiple times "
+                              "and combined with --name or --pattern"))
+    parser.add_argument('--exclude-pattern', action='append', dest=exclude_pattern_dest,
+                        metavar='PATTERN', type=_parse_pattern,
+                        help=(f"Do not {what} tasks whose name contains PATTERN "
+                              "(or matches PATTERN if given as /regex/; same "
+                              "rules as --pattern). Can be given multiple times "
+                              "and combined with --name or --pattern"))
 
 
 @TaskGenerator

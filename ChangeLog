@@ -1,3 +1,11 @@
+Unreleased
+	* jug execute: New `--exclude-name` and `--exclude-pattern` options to
+	skip tasks, with the same matching rules as `--name` and `--pattern`.
+	They can be repeated, mixed, and combined with `--name`/`--pattern`
+	(a task runs if it is selected and matches no exclusion). In
+	configuration files, give one entry per line
+	* Configuration files: list-valued settings take one entry per line
+
 Version 2.7.0 Fri 23 October 2026 by luispedro
 	* hooks: `exit_if_file_exists()`, `exit_after_n_tasks()`,
 	`exit_after_time()` and `exit_when_true()` register their hook only once

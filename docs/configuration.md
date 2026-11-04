@@ -33,6 +33,20 @@ Boolean settings accept `on`/`off`, `true`/`false`, `yes`/`no`, `y`/`n`, or
 `1`/`0` (any value other than `off`, `false`, `no`, `n`, `0` or an empty
 value is read as true).
 
+Settings that can be given several times on the command line
+(`exclude-name` and `exclude-pattern` in the `[execute]` section) take one
+entry per line, with the continuation lines indented:
+
+```
+[execute]
+exclude-name =
+    align_*
+    sort
+```
+
+If such an option is given on the command line, the command line values
+replace the ones in the configuration file (they are not added to them).
+
 ## Valid settings
 
 The name of a setting is the name of the option it corresponds to (the
@@ -58,6 +72,8 @@ settings are silently ignored. The settings that have an effect are:
 | `[execute]` | `no-check-environment` | `jug execute --no-check-environment` | `off` |
 | `[execute]` | `name` | `jug execute --name` | (none) |
 | `[execute]` | `pattern` | `jug execute --pattern` | (none) |
+| `[execute]` | `exclude-name` | `jug execute --exclude-name` | (none) |
+| `[execute]` | `exclude-pattern` | `jug execute --exclude-pattern` | (none) |
 | `[status]` | `cache` | `jug status --cache` | `off` |
 | `[status]` | `cache-file` | `jug status --cache-file` | `.jugstatus.sqlite3` |
 | `[cleanup]` | `locks-only` | `jug cleanup --locks-only` | `off` |

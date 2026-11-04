@@ -1,5 +1,21 @@
 # History
 
+## Unreleased
+
+### User-visible improvements
+
+- New `--exclude-name` and `--exclude-pattern` options for `jug execute`:
+  skip the tasks that match, using the same rules as `--name` (strict) and
+  `--pattern` (loose) respectively. Both can be given several times, mixed,
+  and combined with `--name` or `--pattern`: a task is executed if it is
+  selected (by `--name`/`--pattern`, or all tasks if neither is given) and
+  matches none of the exclusions. For example, `jug execute --name 'align_*'
+  --exclude-name align_fast`. As with `--pattern`, an empty
+  `--exclude-pattern` is an error.
+- Configuration files: settings whose value is a list (currently,
+  `exclude-name` and `exclude-pattern` in `[execute]`) take one entry per
+  line.
+
 ## Version 2.7.0
 
 *Released 23 October 2026*

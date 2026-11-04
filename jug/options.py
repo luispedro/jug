@@ -191,6 +191,10 @@ def _parse_config_file(fp, next_options, default_options=None):
                 if old_value is not None:
                     if isinstance(old_value, bool):
                         value = _str_to_bool(value)
+                    elif isinstance(old_value, list):
+                        # One entry per (non-empty) line, so that entries
+                        # may contain spaces or commas
+                        value = [v for v in value.splitlines() if v.strip()]
                     else:
                         value = type(old_value)(value)
 
