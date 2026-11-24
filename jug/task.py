@@ -613,7 +613,7 @@ def recursive_dependencies(t, max_level=-1):
 
 def value(elem):
     '''
-    value = value(obj)
+    value = value(elem)
 
     Loads a task object recursively. This correctly handles lists, tuples,
     dictionaries and any other type handled by the tasks themselves. Objects
@@ -622,13 +622,13 @@ def value(elem):
 
     Parameters
     ----------
-    obj : object
+    elem : object
         A Task, a Tasklet, or any object (possibly containing tasks)
 
     Returns
     -------
     value : object
-        The result of the task ``obj``
+        The result of the task ``elem``
     '''
     if isinstance(elem, (Task, Tasklet)):
         return elem.value()
@@ -769,7 +769,7 @@ class iteratetask:
 
     Parameters
     ----------
-    task : Task(let)
+    base : Task(let)
     n : integer
 
     Returns
